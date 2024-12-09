@@ -1,0 +1,84 @@
+
+※すべて１コマあたりのサイズ
+
+
+ ◆単色系
+フルスク(x1280,y720)
+
+
+★Title関連★
+ ◆Title
+	x492,y216
+ ◆TitleButton
+	x338,y270
+ ◆TitleButtonFont
+	・Start
+	 x154,y45
+	・End
+	 x123,y44
+ ◆BestTime
+	x315,y418
+
+
+★Result関連★
+ ◆GameClear
+	x706,y109
+ ◆Miss
+	x282,y108
+ ◆NewRecord
+	x375,y54
+ ◆Time
+	x156,y45
+ ◆Pause
+	x381,y108
+
+
+★Setting関連★
+ ◆SettingText
+ 	x256,y64
+ ◆Bar
+ 	x32,y64
+ ◆Meter
+ 	x600,y32
+ ◆Sensitivity
+ 	x170,y32
+ ◆FOV
+	x66,y32
+ ◆SoundText
+ 	x256,y64
+ ◆MasterVol
+ 	x160,y32
+ ◆BGMVol
+ 	x128,y32
+ ◆SEVol
+ 	x90,y32
+
+★その他★
+ ◆Number
+数字	x42,y48の四方
+「:」	x17,y48
+「.」	x16,y48
+
+ ◆Button
+x259,y41
+
+
+★ボタンの中身★
+(xは半分サイズ)
+
+ ◆Continue
+x160,y25
+
+ ◆Title
+x78,y25
+
+ ◆Option
+x128,y25
+
+ ◆Close
+x128,y25
+
+
+★Reticle★
+
+x18,y18
