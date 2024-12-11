@@ -65,12 +65,6 @@ bool CSoundManager::Load( HWND hWnd )
 		m_pSound.push_back(pSound);
 	}
 
-	//Jsonから情報を読み込む
-	Json SetData = CJson::GetInstance()->LoadjsonFile("Data\\JsonData\\Setting\\SettingData");
-	m_MasterVolume = SetData.at("MastarVol").get<float>();	//Jsonからマスターボリュームを取得.
-	m_BGMVolume = SetData.at("BGMVol").get<float>();		//JsonからBGMボリュームを取得.
-	m_SEVolume = SetData.at("SEVol").get<float>();			//JsonからSEボリュームを取得.
-
 	ApplyVolumeSetting();
 	return true;
 }
