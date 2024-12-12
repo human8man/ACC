@@ -1,4 +1,5 @@
 #include "CEffect.h"
+#include "Camera/CCamera.h"
 
 //描画スプライト最大数.
 constexpr int RENDER_SPRITE_MAX = 8000;
@@ -113,7 +114,7 @@ HRESULT CEffect::LoadData()
 //描画.
 void CEffect::Draw(
 	const D3DXMATRIX& mView, const D3DXMATRIX& mProj,
-	const LIGHT& Light, const CAMERA& Camera)
+	const LIGHT& Light)
 {
 	//ビュー行列を設定.
 	SetViewMatrix( mView );
@@ -123,7 +124,7 @@ void CEffect::Draw(
 
 	//レイヤーパラメータ設定.
 	Effekseer::Manager::LayerParameter layerParameter;
-	layerParameter.ViewerPosition = ToEfkVector3( &Camera.Position );
+	layerParameter.ViewerPosition = ToEfkVector3( &CCamera::GetInstance()->GetPos() );
 	m_pManager->SetLayerParameter( 0, layerParameter );
 
 	//エフェクトの更新処理.

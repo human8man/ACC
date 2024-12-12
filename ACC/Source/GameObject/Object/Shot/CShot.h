@@ -12,8 +12,7 @@ public:
 	virtual ~CShot() override;
 
 	virtual void Update() override;
-	virtual void Draw( D3DXMATRIX& View, D3DXMATRIX& Proj,
-		LIGHT& Light, CAMERA& Camera ) override;
+	virtual void Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light ) override;
 
 	//íeÇÃçƒê›íË.
 	void Reload( const D3DXVECTOR3& Pos, float RotY );

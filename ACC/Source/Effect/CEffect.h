@@ -64,7 +64,7 @@ public:
 	HRESULT LoadData();
 	//•`‰æ.
 	void Draw(const D3DXMATRIX& mView, const D3DXMATRIX& mProj,
-		const LIGHT& Light, const CAMERA& Camera);
+		const LIGHT& Light);
 
 	//--------------------------------------.
 	//	•ÏŠ·Œn.

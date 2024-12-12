@@ -1,4 +1,5 @@
 #include "GameObject/Mesh/Skin/CSkinMeshObject.h"
+#include "Camera/CCamera.h"
 
 CSkinMeshObject::CSkinMeshObject()
 	: m_pMesh		( nullptr )
@@ -21,9 +22,7 @@ void CSkinMeshObject::Update()
 	}
 }
 
-void CSkinMeshObject::Draw(
-	D3DXMATRIX& View, D3DXMATRIX& Proj,
-	LIGHT& Light, CAMERA& Camera)
+void CSkinMeshObject::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light)
 {
 	if (m_pMesh == nullptr) {
 		return;
@@ -35,7 +34,8 @@ void CSkinMeshObject::Draw(
 	m_pMesh->SetScale(m_vScale);
 
 	//レンダリング.
-	m_pMesh->Render( View, Proj, Light, Camera.Position,
+	m_pMesh->Render( View, Proj, Light,
+		CCamera::GetInstance()->GetPos(),
 		m_pAnimCtrl );	//クローンを設定.
 }
 

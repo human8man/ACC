@@ -30,7 +30,7 @@ public:
 
 protected:
 	void Draw( D3DXMATRIX& View, D3DXMATRIX& Proj,
-		LIGHT& Light, CAMERA& Camera ) override final;
+		LIGHT& Light ) override final;
 
 protected:
 	CSprite3D*	m_pSprite;

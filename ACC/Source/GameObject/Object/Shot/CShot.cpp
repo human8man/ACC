@@ -27,10 +27,10 @@ void CShot::Update()
 	}
 }
 
-void CShot::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light, CAMERA& Camera )
+void CShot::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 {
 	if( m_Display == true ){
-		CStaticMeshObject::Draw( View, Proj, Light, Camera );
+		CStaticMeshObject::Draw( View, Proj, Light );
 	}
 }
 

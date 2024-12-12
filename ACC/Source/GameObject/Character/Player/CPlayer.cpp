@@ -77,9 +77,9 @@ void CPlayer::Update()
 
 void CPlayer::Draw(
 	D3DXMATRIX& View, D3DXMATRIX& Proj,
-	LIGHT& Light, CAMERA& Camera )
+	LIGHT& Light )
 {
-	CCharacter::Draw( View, Proj, Light, Camera );
+	CCharacter::Draw( View, Proj, Light );
 }
 
 //ÉâÉWÉRÉìëÄçÏ.

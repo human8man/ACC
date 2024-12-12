@@ -3,6 +3,7 @@
 #include "DirectSound/CSoundManager.h"
 
 #include "Effect/CEffect.h"	//Effekseerを使うためのクラス.
+#include <Camera/CCamera.h>
 
 //コンストラクタ.
 CGame::CGame(HWND hWnd)
@@ -14,7 +15,6 @@ CGame::CGame(HWND hWnd)
 	, m_hWnd		( hWnd )
 	, m_mView		()
 	, m_mProj		()
-	, m_Camera		()
 	, m_Light		()
 
 
@@ -50,10 +50,6 @@ CGame::CGame(HWND hWnd)
 	, m_pZako				( nullptr )
 	, m_Zako				()
 {
-	//カメラ座標.
-	m_Camera.Position	= D3DXVECTOR3( 0.0f, 2.0f, 0.0f );
-	m_Camera.Look		= D3DXVECTOR3( 0.0f, 2.0f, 10.0f );
-
 	//ライト情報.
 	m_Light.vDirection	= D3DXVECTOR3( 1.5f, 1.0f, -1.0f );	//ライト方向.
 }
@@ -319,7 +315,10 @@ HRESULT CGame::LoadData()
 		pE->SetPosition( -3.0f + ( No * 3.0f ), 1.0f, 10.0f );
 	}
 #endif
-	
+
+	CCamera::GetInstance()->Init();
+	CCamera::GetInstance()->GetPlayerInfo(m_pPlayer->GetPosition());
+
 	return S_OK;
 }
 
@@ -330,32 +329,14 @@ void CGame::Release()
 
 void CGame::Init()
 {
+	CCamera::GetInstance()->Init();	// カメラの初期化.
 }
 
 
 //更新処理.
 void CGame::Update()
 {
-	//カメラ座標のデバックコマンド.
-	float add_value = 0.1f;
-	if( GetAsyncKeyState( 'W' ) & 0x8000 ){
-		m_Camera.Position.y += add_value;
-	}
-	if( GetAsyncKeyState( 'S') & 0x8000 ){
-		m_Camera.Position.y -= add_value;
-	}
-	if( GetAsyncKeyState( 'A' ) & 0x8000 ){
-		m_Camera.Position.x -= add_value;
-	}
-	if( GetAsyncKeyState( 'D' ) & 0x8000 ){
-		m_Camera.Position.x += add_value;
-	}
-	if( GetAsyncKeyState( 'Q' ) & 0x8000 ){
-		m_Camera.Position.z += add_value;
-	}
-	if( GetAsyncKeyState( 'E' ) & 0x8000 ){
-		m_Camera.Position.z -= add_value;
-	}
+	CCamera::GetInstance()->Update();
 
 //	m_pStcMeshObj->Update();
 
@@ -422,52 +403,45 @@ void CGame::Update()
 			CEffect::Stop( hEffect );
 		}
 	}
-
-	//三人称カメラ.
-	ThirdPersonCamera(
-		&m_Camera,
-		m_pPlayer->GetPosition(),
-		m_pPlayer->GetRotation().y );
 }
 
 //描画処理.
 void CGame::Draw()
 {
-	Camera();
-	Projection();
+	CCamera::GetInstance()->Camera(m_mView);
 
 //	m_pStcMeshObj->Draw( m_mView, m_mProj, m_Light, m_Camera );
 
 #if 1
-	m_pGround->Draw( m_mView, m_mProj, m_Light, m_Camera );
+	m_pGround->Draw( m_mView, m_mProj, m_Light );
 
-	m_pPlayer->Draw( m_mView, m_mProj, m_Light, m_Camera );
+	m_pPlayer->Draw( m_mView, m_mProj, m_Light );
 
-	m_pShot->Draw( m_mView, m_mProj, m_Light, m_Camera );
+	m_pShot->Draw( m_mView, m_mProj, m_Light );
 
-	m_pEnemy->Draw( m_mView, m_mProj, m_Light, m_Camera );
+	m_pEnemy->Draw( m_mView, m_mProj, m_Light );
 
 #if 1
 	for( int No = 0; No < m_EnemyMax; No++ ){
-		m_ppEnemies[No]->Draw( m_mView, m_mProj, m_Light, m_Camera );
+		m_ppEnemies[No]->Draw( m_mView, m_mProj, m_Light );
 	}
 #else
 	for( int No = 0; No < ENEMY_MAX; No++ ){
-		m_pEnemies[No]->Draw( m_mView, m_mProj, m_Light, m_Camera );
+		m_pEnemies[No]->Draw( m_mView, m_mProj, m_Light );
 	}
 #endif
 
 	//----------------------------
 	//	スキンメッシュ.
 	//----------------------------
-	m_pZako->Draw( m_mView, m_mProj, m_Light, m_Camera );
+	m_pZako->Draw( m_mView, m_mProj, m_Light );
 //	//ボーン座標に合わせて球体を表示.
 //	m_pStaticMeshBSphere->SetPosition( m_ZakoBonePos );
 //	m_pStaticMeshBSphere->Render( m_mView, m_mProj, m_Light, m_Camera.Position );
 
 	//ザコ複数.
 	for (auto& e : m_Zako) {
-		e->Draw( m_mView, m_mProj, m_Light, m_Camera );
+		e->Draw( m_mView, m_mProj, m_Light );
 	}
 
 	//当たり判定の中心座標を更新する.
@@ -517,7 +491,7 @@ void CGame::Draw()
 #endif
 
 	//Effectクラス.
-	CEffect::GetInstance()->Draw( m_mView, m_mProj, m_Light, m_Camera );
+	CEffect::GetInstance()->Draw( m_mView, m_mProj, m_Light );
 
 	//レイの描画.
 	m_pRayY->Render( m_mView, m_mProj, m_pPlayer->GetRayY() );
@@ -535,70 +509,4 @@ void CGame::Draw()
 	TCHAR dbgText[64];
 	_stprintf_s( dbgText, _T("Float:%f, %f"), 1.0f, 2.2f );
 	m_pDbgText->Render( dbgText, 10, 110 );
-}
-
-//カメラ関数.
-//※カメラ専用のクラスを作成したら便利だよ.
-void CGame::Camera()
-{
-	D3DXVECTOR3 cam_pos	= m_Camera.Position;
-	D3DXVECTOR3 cam_look = m_Camera.Look;
-	D3DXVECTOR3	vUpVec( 0.0f, 1.0f, 0.0f );	//上方（ベクトル）.
-
-	//ビュー（カメラ）変換.
-	D3DXMatrixLookAtLH(
-		&m_mView,	//(out)ビュー計算結果.
-		&cam_pos, &cam_look, &vUpVec );
-}
-
-//プロジェクション関数.
-void CGame::Projection()
-{
-	//y方向の視野角。数値を大きくしたら視野が狭くなる.
-	float fov_y	 = static_cast<FLOAT>( D3DXToRadian( 45.0 ) );	//ラジアン値.
-	//アスペクト（幅÷高さ）.
-	float aspect = static_cast<FLOAT>( WND_W ) / static_cast<FLOAT>( WND_H );
-	float near_z = 0.1f;
-	float far_z	 = 100.0f;
-
-	//プロジェクション（射影）変換.
-	D3DXMatrixPerspectiveFovLH(
-		&m_mProj,	//(out)プロジェクション計算結果.
-		fov_y,		//視野角（FOV：Field of View）.
-		aspect,		//アスペクト.
-		near_z,		//近いビュー平面のz値.
-		far_z );	//遠いビュー平面のz値.
-}
-
-//三人称カメラ.
-void CGame::ThirdPersonCamera(
-	CAMERA* pCamera, const D3DXVECTOR3& TargetPos, float TargetRotY )
-{
-	//Z軸ベクトル.
-	D3DXVECTOR3 vecAxisZ( 0.0f, 0.0f, 1.0f );
-
-	//Y方向の回転行列.
-	D3DXMATRIX mRotationY;
-	//Y軸回転行列を作成.
-	D3DXMatrixRotationY(
-		&mRotationY,	//(out)行列.
-		TargetRotY );	//対象のY方向の回転値.
-
-	//Y軸回転行列を使ってZ軸ベクトルを座標変換する.
-	D3DXVec3TransformCoord(
-		&vecAxisZ,		//(out)Z軸ベクトル.
-		&vecAxisZ,		//(in)Z軸ベクトル.
-		&mRotationY );	//Y軸回転行列.
-
-	//カメラの位置、注視点を対象にそろえる.
-	pCamera->Position	= TargetPos;
-	pCamera->Look		= TargetPos;
-
-	//カメラの位置、注視点をZ軸ベクトルを用いて調整.
-	pCamera->Position	-= vecAxisZ * 4.0f;	//対象の背中側.
-	pCamera->Look		+= vecAxisZ * 3.0f;	//対象を挟んで向こう側.
-
-	//カメラの位置、注視点の高さをそれぞれ微調整.
-	pCamera->Position.y += 2.0f;
-	pCamera->Look.y		+= 0.5f;
 }

@@ -53,9 +53,8 @@ void CZako::Update()
 	m_pMesh->GetPosFromBone( "entotu_Joint", &m_BonePos );
 }
 
-void CZako::Draw(
-	D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light, CAMERA& Camera )
+void CZako::Draw(D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 {
 	m_pMesh->SetAnimSpeed( m_AnimSpeed );
-	CSkinMeshObject::Draw( View, Proj, Light, Camera );
+	CSkinMeshObject::Draw( View, Proj, Light );
 }

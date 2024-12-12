@@ -23,7 +23,6 @@ public:
 
 protected:
 	HWND		m_hWnd;		// ウィンドウハンドル.
-	CAMERA		m_Camera;	// カメラ情報.
 	LIGHT		m_Light;	// ライト情報.
 	D3DXMATRIX	m_mView;	// ビュー(カメラ)行列.
 	D3DXMATRIX	m_mProj;	// 射影（プロジェクション）行列.

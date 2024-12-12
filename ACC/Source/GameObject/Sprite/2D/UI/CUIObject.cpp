@@ -1,4 +1,6 @@
 #include "CUIObject.h"
+#include "DirectX//CDirectX11.h"
+
 
 CUIObject::CUIObject()
 	: m_pSprite		( nullptr )
@@ -32,13 +34,16 @@ void CUIObject::Draw()
 	//パターン番号を設定.
 	m_pSprite->SetPatternNo( m_PatternNo.x, m_PatternNo.y );
 
+
+	CDirectX11::GetInstance()->SetDepth(false);
 	//レンダリング.
 	m_pSprite->Render();
+	CDirectX11::GetInstance()->SetDepth(true);
 }
 
 void CUIObject::Draw(
 	D3DXMATRIX& View, D3DXMATRIX& Proj,
-	LIGHT& Light, CAMERA& Camera )
+	LIGHT& Light )
 {
 	Draw();
 }

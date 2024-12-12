@@ -11,7 +11,7 @@ public:
 
 	virtual void Update() = 0;
 	virtual void Draw( D3DXMATRIX& View, D3DXMATRIX& Proj,
-		LIGHT& Light, CAMERA& Camera ) = 0;
+		LIGHT& Light ) = 0;
 
 	//ç¿ïWê›íËä÷êî.
 	void SetPosition( float x, float y, float z ){

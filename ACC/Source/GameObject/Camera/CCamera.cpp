@@ -125,12 +125,9 @@ void CCamera::Update()
 void CCamera::Camera(
 	D3DXMATRIX& View)
 {
-	//自身のインスタンス
-	auto* This = CCamera::GetInstance();
-
-	D3DXVECTOR3 cam_pos = This->m_Camera.Position;
-	D3DXVECTOR3 cam_look = This->m_Camera.Look;
-	D3DXVECTOR3	vUpVec = This->m_Camera.UpVec;	//上方（ベクトル）.
+	D3DXVECTOR3 cam_pos	 = m_Camera.Position;
+	D3DXVECTOR3 cam_look = m_Camera.Look;
+	D3DXVECTOR3	vUpVec	 = m_Camera.UpVec;	//上方（ベクトル）.
 
 	//ビュー（カメラ）変換.
 	D3DXMatrixLookAtLH(

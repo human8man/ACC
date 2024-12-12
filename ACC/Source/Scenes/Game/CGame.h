@@ -43,17 +43,6 @@ public:
 	void Draw()		override;
 
 private:
-	//カメラ関数.
-	void Camera();
-	//プロジェクション関数.
-	void Projection();
-
-	//三人称カメラ.
-	void ThirdPersonCamera(
-		CAMERA* pCamera, const D3DXVECTOR3& TargetPos, float TargetRotY );
-
-
-private:
 	CDirectX9*		m_pDx9;
 	CDirectX11*		m_pDx11;
 
@@ -66,8 +55,6 @@ private:
 	//ウィンドウハンドル.
 	HWND			m_hWnd;
 
-	//カメラ情報.
-	CAMERA			m_Camera;
 	//ライト情報.
 	LIGHT			m_Light;
 

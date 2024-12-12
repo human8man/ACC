@@ -86,7 +86,6 @@ void CSceneManager::Update()
 void CSceneManager::Draw()
 {
 	m_pScene->Draw();
-	m_pFade->Draw();
 
 #ifdef _DEBUG
 

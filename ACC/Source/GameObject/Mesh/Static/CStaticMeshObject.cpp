@@ -1,4 +1,5 @@
 #include "CStaticMeshObject.h"
+#include "Camera/CCamera.h"
 
 CStaticMeshObject::CStaticMeshObject()
 	: m_pMesh		( nullptr )
@@ -22,7 +23,7 @@ void CStaticMeshObject::Update()
 
 void CStaticMeshObject::Draw(
 	D3DXMATRIX& View, D3DXMATRIX& Proj,
-	LIGHT& Light, CAMERA& Camera )
+	LIGHT& Light )
 {
 	if( m_pMesh == nullptr ){
 		return;
@@ -34,7 +35,7 @@ void CStaticMeshObject::Draw(
 	m_pMesh->SetScale( m_vScale );
 
 	//レンダリング.
-	m_pMesh->Render( View, Proj, Light, Camera.Position );
+	m_pMesh->Render( View, Proj, Light, CCamera::GetInstance()->GetPos() );
 }
 
 //レイとメッシュの当たり判定.

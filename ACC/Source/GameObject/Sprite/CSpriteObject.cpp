@@ -35,7 +35,7 @@ void CSpriteObject::Draw(
 
 void CSpriteObject::Draw(
 	D3DXMATRIX& View, D3DXMATRIX& Proj,
-	LIGHT& Light, CAMERA& Camera )
+	LIGHT& Light )
 {
 	Draw( View, Proj );
 }

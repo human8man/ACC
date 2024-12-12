@@ -131,13 +131,7 @@ void CUIFade::Draw()
 {
 	for ( size_t i = 0; i < m_pUIs.size(); ++i )
 	{
-		CDirectX11::GetInstance()->SetDepth(false);
-
-		// •`‰æ.
 		m_pUIs[i]->Draw();
-
-
-		CDirectX11::GetInstance()->SetDepth(true);
 	}
 }
 
