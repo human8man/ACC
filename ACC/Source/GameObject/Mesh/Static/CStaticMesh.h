@@ -107,7 +107,7 @@ public:
 	CStaticMesh();		//コンストラクタ.
 	~CStaticMesh();		//デストラクタ.
 
-	HRESULT Init( CDirectX9& pDx9, CDirectX11& pDx11, LPCTSTR lpFileName );
+	HRESULT Init( LPCTSTR lpFileName );
 
 	//解放関数.
 	void Release();

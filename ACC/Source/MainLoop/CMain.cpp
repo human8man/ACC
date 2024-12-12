@@ -2,6 +2,7 @@
 #include "DirectX/CDirectX9.h"
 #include "DirectX/CDirectX11.h"
 #include "Scenes/SceneManager/CSceneManager.h"
+#include "DirectSound/CSoundManager.h"
 
 // ImGuiはデバッグ時のみ使用する.
 #ifdef _DEBUG
@@ -20,20 +21,12 @@ const TCHAR APP_NAME[]	= _T( "3DSTG" );
 //		メインループクラス.
 //=================================================
 CMain::CMain()
-	//初期化リスト.
 	: m_hWnd	( nullptr )
-	, m_pDx9	( nullptr )
-	, m_pDx11	( nullptr )
 {
-	m_pDx9 = new CDirectX9();
-	m_pDx11 = new CDirectX11();
 }
 
 CMain::~CMain()
 {
-	SAFE_DELETE( m_pDx11 );
-	SAFE_DELETE( m_pDx9 );
-
 	DeleteObject( m_hWnd );
 }
 
@@ -43,17 +36,17 @@ CMain::~CMain()
 //=================================================
 void CMain::Update()
 {
-	//更新処理.
+	// 更新処理.
 	CSceneManager::GetInstance()->Update();
 
-	//バックバッファをクリアにする.
-	m_pDx11->ClearBackBuffer();
+	// バックバッファをクリアにする.
+	CDirectX11::GetInstance()->ClearBackBuffer();
 	
-	//描画処理.
+	// 描画処理.
 	CSceneManager::GetInstance()->Draw();
 
-	//画面に表示.
-	m_pDx11->Present();
+	// 画面に表示.
+	CDirectX11::GetInstance()->Present();
 }
 
 
@@ -82,12 +75,8 @@ HRESULT CMain::Create()
 //=================================================
 void CMain::Release()
 {
-	if( m_pDx11 != nullptr ){
-		m_pDx11->Release();
-	}
-	if( m_pDx9 != nullptr ){
-		m_pDx9->Release();
-	}
+	CSoundManager::GetInstance()->Release();
+	CSceneManager::GetInstance()->Release();
 }
 
 
@@ -97,23 +86,23 @@ void CMain::Release()
 void CMain::Loop()
 {
 	//------------------------------------------------
-	//	フレームレート調整準備.
+	//		フレームレート調整準備.
 	//------------------------------------------------
-	float Rate = 0.0f;	//レート.
-	DWORD sync_old = timeGetTime();			//過去時間.
-	DWORD sync_now;							//現在時間.
+	float Rate = 0.0f;	// レート.
+	DWORD sync_old = timeGetTime();			// 過去時間.
+	DWORD sync_now;							// 現在時間.
 
 	// 時間処理のため、最小単位を1ミリ秒に変更.
 	timeBeginPeriod( 1 );
-	Rate = 1000.0f / static_cast<float>(FPS); //理想時間を算出.
+	Rate = 1000.0f / static_cast<float>(FPS); // 理想時間を算出.
 
-	//メッセージループ.
+	// メッセージループ.
 	MSG msg = { 0 };
 	ZeroMemory( &msg, sizeof( msg ) );
 
 	while( msg.message != WM_QUIT )
 	{
-		sync_now = timeGetTime();	//現在の時間を取得.
+		sync_now = timeGetTime();	// 現在の時間を取得.
 
 		if( PeekMessage( &msg, nullptr, 0, 0, PM_REMOVE ) )
 		{
@@ -122,13 +111,13 @@ void CMain::Loop()
 		}
 		else if( sync_now - sync_old >= Rate )
 		{
-			sync_old = sync_now;	//現在時間に置き換え.
+			sync_old = sync_now;	// 現在時間に置き換え.
 
-			//更新処理.
+			// 更新処理.
 			Update();
 		}
 	}
-	//アプリケーションの終了.
+	// アプリケーションの終了.
 	Release();
 }
 
@@ -137,13 +126,13 @@ void CMain::Loop()
 //		ウィンドウ初期化関数.
 //=================================================
 HRESULT CMain::InitWindow(
-	HINSTANCE hInstance,	//インスタンス.
-	INT x, INT y,			//ウィンドウx,y座標.
-	INT width, INT height)	//ウィンドウ幅,高さ.
+	HINSTANCE hInstance,	// インスタンス.
+	INT x, INT y,			// ウィンドウx,y座標.
+	INT width, INT height)	// ウィンドウ幅,高さ.
 {
-	//ウィンドウの定義.
+	// ウィンドウの定義.
 	WNDCLASSEX wc;
-	ZeroMemory( &wc, sizeof( wc ) );//初期化(0を設定).
+	ZeroMemory( &wc, sizeof( wc ) ); // 初期化(0を設定).
 
 	wc.cbSize			= sizeof( wc );
 	wc.style			= CS_HREDRAW | CS_VREDRAW;
@@ -155,21 +144,21 @@ HRESULT CMain::InitWindow(
 	wc.lpszClassName	= APP_NAME;
 	wc.hIconSm			= LoadIcon( nullptr, IDI_APPLICATION );
 
-	//ウィンドウクラスをWindowsに登録.
+	// ウィンドウクラスをWindowsに登録.
 	if( !RegisterClassEx( &wc ) ) {
 		_ASSERT_EXPR( false, _T( "ウィンドウクラスの登録に失敗" ) );
 		return E_FAIL;
 	}
 
 	//--------------------------------------.
-	//	ウィンドウ表示位置の調整.
+	//		ウィンドウ表示位置の調整.
 	//--------------------------------------.
-	//この関数内でのみ使用する構造体をここで定義.
+	// この関数内でのみ使用する構造体をここで定義.
 	struct RECT_WND
 	{
 		INT x, y, w, h;
 		RECT_WND() : x(), y(), w(), h() {}
-	} rectWindow;//ここに変数宣言もする.
+	} rectWindow; // ここに変数宣言もする.
 
 #ifdef ENABLE_WINDOWS_CENTERING
 	//ディスプレイの幅、高さを取得.
@@ -184,20 +173,20 @@ HRESULT CMain::InitWindow(
 #endif//ENABLE_WINDOWS_CENTERING
 
 	//--------------------------------------.
-	//	ウィンドウ領域の調整.
+	//		ウィンドウ領域の調整.
 	//--------------------------------------.
-	RECT	rect;		//矩形構造体.
-	DWORD	dwStyle;	//ウィンドウスタイル.
-	rect.top = 0;			//上.
-	rect.left = 0;			//左.
-	rect.right = width;		//右.
-	rect.bottom = height;	//下.
-	dwStyle = WS_OVERLAPPEDWINDOW;	//ウィンドウ種別.
+	RECT	rect;			// 矩形構造体.
+	DWORD	dwStyle;		// ウィンドウスタイル.
+	rect.top = 0;			// 上.
+	rect.left = 0;			// 左.
+	rect.right = width;		// 右.
+	rect.bottom = height;	// 下.
+	dwStyle = WS_OVERLAPPEDWINDOW;	// ウィンドウ種別.
 
 	if( AdjustWindowRect(
-		&rect,			//(in)画面サイズが入った矩形構造体.(out)計算結果.
-		dwStyle,		//ウィンドウスタイル.
-		FALSE ) == 0 )	//メニューを持つかどうかの指定.
+		&rect,			// (in)画面サイズが入った矩形構造体.(out)計算結果.
+		dwStyle,		// ウィンドウスタイル.
+		FALSE ) == 0 )	// メニューを持つかどうかの指定.
 	{
 		MessageBox(
 			nullptr,
@@ -207,25 +196,25 @@ HRESULT CMain::InitWindow(
 		return 0;
 	}
 
-	//ウィンドウの幅高さ調節.
+	// ウィンドウの幅高さ調節.
 	rectWindow.w = rect.right - rect.left;
 	rectWindow.h = rect.bottom - rect.top;
 
-	//自宅テレワーク時のx,y座標.
+	// 自宅テレワーク時のx,y座標.
 	rectWindow.x = 100; //+ 1920;
 	rectWindow.y = 100;
 
 	//ウィンドウの作成.
 	m_hWnd = CreateWindow(
-		APP_NAME,					//アプリ名.
-		WND_TITLE,					//ウィンドウタイトル.
-		dwStyle,					//ウィンドウ種別(普通).
-		rectWindow.x, rectWindow.y,	//表示位置x,y座標.
-		rectWindow.w, rectWindow.h,	//ウィンドウ幅,高さ.
-		nullptr,					//親ウィンドウハンドル.
-		nullptr,					//メニュー設定.
-		hInstance,					//インスタンス番号.
-		nullptr );					//ウィンドウ作成時に発生するイベントに渡すデータ.
+		APP_NAME,					// アプリ名.
+		WND_TITLE,					// ウィンドウタイトル.
+		dwStyle,					// ウィンドウ種別(普通).
+		rectWindow.x, rectWindow.y,	// 表示位置x,y座標.
+		rectWindow.w, rectWindow.h,	// ウィンドウ幅,高さ.
+		nullptr,					// 親ウィンドウハンドル.
+		nullptr,					// メニュー設定.
+		hInstance,					// インスタンス番号.
+		nullptr );					// ウィンドウ作成時に発生するイベントに渡すデータ.
 	if( !m_hWnd ) {
 		_ASSERT_EXPR( false, _T( "ウィンドウ作成失敗" ) );
 		return E_FAIL;
@@ -246,25 +235,57 @@ LRESULT CALLBACK CMain::MsgProc(
 	HWND hWnd, UINT uMsg,
 	WPARAM wParam, LPARAM lParam )
 {
+#ifdef _DEBUG
+	if (CImGui::SetWin(hWnd, uMsg, wParam, lParam)) {
+		return true;
+	}
+#endif
+
 	switch( uMsg ) {
-	case WM_DESTROY://ウィンドウが破棄されたとき.
-		//アプリケーションの終了をWindowsに通知する.
+	case WM_DESTROY:// ウィンドウが破棄されたとき.
+		// アプリケーションの終了をWindowsに通知する.
 		PostQuitMessage( 0 );
 		break;
 
-	case WM_KEYDOWN://キーボードが押されたとき.
-		//キー別の処理.
+	case WM_KEYDOWN:// キーボードが押されたとき.
+		// キー別の処理.
 		switch( static_cast<char>( wParam ) ) {
-		case VK_ESCAPE:	//ESCｷｰ.
+		case VK_ESCAPE:	// ESCｷｰ.
 			if( MessageBox( nullptr,
 				_T( "ゲームを終了しますか？" ),
 				_T( "警告" ), MB_YESNO ) == IDYES )
 			{
-				//ウィンドウを破棄する.
+				// ウィンドウを破棄する.
 				DestroyWindow( hWnd );
 			}
 			break;
 		}
+		break;
+	case WM_DPICHANGED:// ウィンドウのDPI(Dot Per Inch)が変更されたとき.
+#ifdef _DEBUG
+		// ImGuiの設定フラグでDPIスケーリングが有効か確認.
+		if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_DpiEnableScaleViewports)
+		{
+			// 新しいDPIの値を取得
+			// const int dpi = HIWORD(wParam);
+
+			// DPI変更をログに出力
+			// printf("WM_DPICHANGED to %d (%.0f%%)\n", dpi, (float)dpi / 96.0f * 100.0f);
+
+			// lParamから新しいウィンドウの位置とサイズを示すRECT構造体を取得
+			const RECT* suggested_rect = (RECT*)lParam;
+
+			// SetWindowPos関数を使ってウィンドウの位置とサイズを更新
+			::SetWindowPos(
+				hWnd,											//ウィンドウハンドル.
+				nullptr,										//ウィンドウのレイヤーは変更しないためnull.
+				suggested_rect->left,							//新規の左座標を設定.
+				suggested_rect->top,							//新規の上座標を設定.
+				suggested_rect->right - suggested_rect->left,	//新規の幅を設定.
+				suggested_rect->bottom - suggested_rect->top,	//新規の高さを設定.
+				SWP_NOZORDER | SWP_NOACTIVATE);					//レイヤーを変更せず、ウィンドウをアクティブにしない.
+		}
+#endif
 		break;
 	}
 

@@ -44,11 +44,10 @@ CSprite3D::~CSprite3D()
 //	ID3D11Device* pDevice11 外部で作成して持ってくる。
 //	ID3D11DeviceContext* pContext11 外部で作成して持ってくる。
 HRESULT CSprite3D::Init(
-	CDirectX11& pDx11,
 	LPCTSTR lpFileName,
 	SPRITE_STATE& pSs)
 {
-	m_pDx11 = &pDx11;
+	m_pDx11 = CDirectX11::GetInstance();
 	m_pDevice11 = m_pDx11->GetDevice();		//実態は別のところにある.他とも共有している.
 	m_pContext11 = m_pDx11->GetContext();	//実態は別のところにある.他とも共有している.
 

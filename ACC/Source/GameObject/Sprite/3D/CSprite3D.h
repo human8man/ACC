@@ -49,7 +49,7 @@ public:
 	~CSprite3D();	//デストラクタ.
 
 	//初期化.
-	HRESULT Init(CDirectX11& pDx11, LPCTSTR lpFileName, SPRITE_STATE& pSs );
+	HRESULT Init( LPCTSTR lpFileName, SPRITE_STATE& pSs );
 
 	//解放.
 	void Release();

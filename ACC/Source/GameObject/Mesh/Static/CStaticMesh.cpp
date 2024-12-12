@@ -52,13 +52,12 @@ CStaticMesh::~CStaticMesh()
 }
 
 //‰Šú‰»ŠÖ”.
-HRESULT CStaticMesh::Init(
-	CDirectX9& pDx9, CDirectX11& pDx11, LPCTSTR lpFileName )
+HRESULT CStaticMesh::Init(LPCTSTR lpFileName )
 {
-	m_pDx9 = &pDx9;
+	m_pDx9 = CDirectX9::GetInstance();
 	m_pDevice9 = m_pDx9->GetDevice();
 
-	m_pDx11 = &pDx11;
+	m_pDx11 = CDirectX11::GetInstance();
 	m_pDevice11 = m_pDx11->GetDevice();
 	m_pContext11 = m_pDx11->GetContext();
 

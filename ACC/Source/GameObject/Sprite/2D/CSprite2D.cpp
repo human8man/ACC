@@ -47,8 +47,8 @@ HRESULT CSprite2D::Init(
 	SPRITE_STATE& pSs)
 {
 	m_pDx11 = CDirectX11::GetInstance();
-	m_pDevice11 = m_pDx11->GetDevice();		//実態は別のところにある.他とも共有している.
-	m_pContext11 = m_pDx11->GetContext();	//実態は別のところにある.他とも共有している.
+	m_pDevice11 = m_pDx11->GetDevice();
+	m_pContext11 = m_pDx11->GetContext();
 
 	m_SpriteState = pSs;
 
@@ -355,6 +355,8 @@ void CSprite2D::Render()
 	//ワールド座標変換.
 	//重要: 拡縮行列 * 回転行列 * 平行行列.
 	mWorld = mScale * mRot * mTrans;
+
+	m_pContext11 = CDirectX11::GetInstance()->GetContext();
 
 	//使用するシェーダの登録.
 	m_pContext11->VSSetShader( m_pVertexShader, nullptr, 0 );

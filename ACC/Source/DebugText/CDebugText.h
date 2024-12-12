@@ -45,7 +45,7 @@ public:
 	~CDebugText();	//デストラクタ.
 
 	//初期化.
-	HRESULT Init( CDirectX11& pDx11 );
+	HRESULT Init();
 
 	//解放.
 	void Release();

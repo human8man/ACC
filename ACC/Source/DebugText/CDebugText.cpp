@@ -35,11 +35,9 @@ CDebugText::~CDebugText()
 }
 
 //初期化.
-//	ID3D11Device* pDevice11 外部で作成して持ってくる。
-//	ID3D11DeviceContext* pContext11 外部で作成して持ってくる。
-HRESULT CDebugText::Init( CDirectX11& pDx11 )
+HRESULT CDebugText::Init()
 {
-	m_pDx11 = &pDx11;
+	m_pDx11 = CDirectX11::GetInstance();
 	m_pDevice11 = m_pDx11->GetDevice();		//実態は別のところにある.他とも共有している.
 	m_pContext11 = m_pDx11->GetContext();	//実態は別のところにある.他とも共有している.
 

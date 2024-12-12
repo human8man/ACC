@@ -122,13 +122,12 @@ CSkinMesh::~CSkinMesh()
 
 
 //‰Šú‰».
-HRESULT CSkinMesh::Init(
-	CDirectX9& pDx9, CDirectX11& pDx11, LPCTSTR FileName )
+HRESULT CSkinMesh::Init( LPCTSTR FileName )
 {
-	m_pDx9 = &pDx9;
+	m_pDx9 = CDirectX9::GetInstance();
 	m_pDevice9 = m_pDx9->GetDevice();
 
-	m_pDx11 = &pDx11;
+	m_pDx11 = CDirectX11::GetInstance();
 	m_pDevice11 = m_pDx11->GetDevice();
 	m_pContext11 = m_pDx11->GetContext();
 

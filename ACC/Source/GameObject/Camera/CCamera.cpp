@@ -9,7 +9,7 @@
 
 
 CCamera::CCamera()
-	: m_ViewAngle()
+	: m_ViewAngle(60)
 	, m_LookDirection()
 	, m_DirectionPos()
 	, m_Playerpos(0.0f, 0.0f, 0.0f)
@@ -203,12 +203,6 @@ void CCamera::Init()
 	m_Camera.Look = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_Camera.UpVec = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 	m_CameraRot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-
-	//Jsonから情報を読み込む
-	Json SetData = CJson::GetInstance()->LoadjsonFile("Data\\JsonData\\Setting\\SettingData");
-
-	m_ViewAngle = SetData.at("Fov").get<float>();
-	m_MouseSens = SetData.at("Sens").get<float>();
 
 	m_DefaultFov = m_ViewAngle;
 

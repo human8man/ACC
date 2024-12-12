@@ -64,7 +64,7 @@ public:
 	~CRay();	//デストラクタ.
 
 	//初期化.
-	HRESULT Init(CDirectX11& pDx11, RAY& pRay);
+	HRESULT Init( RAY& pRay);
 
 	//解放.
 	void Release();

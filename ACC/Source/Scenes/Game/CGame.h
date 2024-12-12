@@ -80,9 +80,6 @@ private:
 	CSprite3D*		m_pSpritePlayer;
 	CSprite3D*		m_pSpriteExplosion;
 
-	//スプライト2Dデータ(使いまわす資源).
-	CSprite2D*		m_pSprite2DPmon;
-
 	//スタティックメッシュ(使いまわす資源).
 	CStaticMesh*	m_pStaticMeshFighter;	//自機.
 	CStaticMesh*	m_pStaticMeshGround;	//地面.
@@ -100,12 +97,6 @@ private:
 	//スプライトオブジェクトクラス.
 	CSpriteObject*		m_pExplosion;
 	
-	//UIオブジェクトクラス.
-	CUIObject*		m_pPmon;
-	CUIObject*		m_pBeedrill;	//#015:スピアー.
-	CUIObject*		m_pParasect;	//#047:パラセクト.
-	CUIObject*		m_pScyther;		//#123:ストライク.
-
 	//スタティックメッシュオブジェクトクラス.
 	CStaticMeshObject*	m_pStcMeshObj;
 

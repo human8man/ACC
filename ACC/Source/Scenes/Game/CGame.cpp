@@ -22,8 +22,6 @@ CGame::CGame(HWND hWnd)
 	, m_pSpritePlayer		( nullptr )
 	, m_pSpriteExplosion	( nullptr )
 
-	, m_pSprite2DPmon		( nullptr )
-
 	, m_pStaticMeshFighter	( nullptr )
 	, m_pStaticMeshGround	( nullptr )
 	, m_pStaticMeshRoboA	( nullptr )
@@ -37,11 +35,6 @@ CGame::CGame(HWND hWnd)
 	, m_ZakoBonePos			()
 
 	, m_pExplosion			( nullptr )
-
-	, m_pPmon				( nullptr )
-	, m_pBeedrill			( nullptr )
-	, m_pParasect			( nullptr )
-	, m_pScyther			( nullptr )
 
 	, m_pStcMeshObj			( nullptr )
 	, m_pPlayer				( nullptr )
@@ -107,12 +100,6 @@ CGame::~CGame()
 	//スタティックメッシュオブジェクトの破棄.
 	SAFE_DELETE( m_pStcMeshObj );
 
-	//UIオブジェクトの破棄.
-	SAFE_DELETE( m_pScyther );
-	SAFE_DELETE( m_pParasect );
-	SAFE_DELETE( m_pBeedrill );
-	SAFE_DELETE( m_pPmon );
-
 	//爆発の破棄.
 	SAFE_DELETE( m_pExplosion );
 
@@ -126,9 +113,6 @@ CGame::~CGame()
 	SAFE_DELETE( m_pStaticMeshRoboA );
 	SAFE_DELETE( m_pStaticMeshGround );
 	SAFE_DELETE( m_pStaticMeshFighter );
-
-	//スプライト2Dの解放.
-	SAFE_DELETE( m_pSprite2DPmon );
 
 	//爆発スプライトの解放.
 	SAFE_DELETE( m_pSpriteExplosion );
@@ -148,8 +132,6 @@ CGame::~CGame()
 
 	//外部で作成しているので、ここで破棄しない.
 	m_hWnd = nullptr;
-	m_pDx11 = nullptr;
-	m_pDx9 = nullptr;
 }
 
 //構築.
@@ -169,9 +151,6 @@ void CGame::Create()
 	m_pSpritePlayer		= new CSprite3D();
 	m_pSpriteExplosion	= new CSprite3D();
 
-	//スプライト2Dのインスタンス作成.
-	m_pSprite2DPmon		= new CSprite2D();
-
 	//スタティックメッシュのインスタンス作成.
 	m_pStaticMeshFighter	= new CStaticMesh();
 	m_pStaticMeshGround		= new CStaticMesh();
@@ -185,12 +164,6 @@ void CGame::Create()
 
 	//スプライトオブジェクトクラスのインスタス作成.
 	m_pExplosion= new CExplosion();
-
-	//UIオブジェクトクラスのインスタンス作成.
-	m_pPmon		= new CUIObject();
-	m_pBeedrill	= new CUIObject();
-	m_pParasect	= new CUIObject();
-	m_pScyther	= new CUIObject();
 
 	//スタティックメッシュオブジェクトクラスのインスタンス作成.
 	m_pStcMeshObj = new CStaticMeshObject();
@@ -236,7 +209,7 @@ void CGame::Create()
 HRESULT CGame::LoadData()
 {
 	//デバッグテキストの読み込み.
-	if ( FAILED( m_pDbgText->Init( *m_pDx11 ) ) ) {
+	if ( FAILED( m_pDbgText->Init() ) ) {
 		return E_FAIL;
 	}
 	
@@ -252,11 +225,11 @@ HRESULT CGame::LoadData()
 
 	//レイ表示クラスの初期化.
 	RAY ray = m_pPlayer->GetRayY();
-	m_pRayY->Init( *m_pDx11, ray );
+	m_pRayY->Init( ray );
 
 	for (int dir = 0; dir < CROSSRAY::max; ++dir) {
 		ray = m_pPlayer->GetCrossRay().Ray[dir];
-		m_pCrossRay[dir]->Init(*m_pDx11, ray);
+		m_pCrossRay[dir]->Init(ray);
 	}
 
 	//地面スプライトの構造体.
@@ -268,49 +241,32 @@ HRESULT CGame::LoadData()
 	SSGround.Stride.w = 256.0f;
 	SSGround.Stride.h = 256.0f;
 	//地面スプライトの読み込み.
-	m_pSpriteGround->Init( *m_pDx11,
-		_T( "Data\\Texture\\Ground.png" ), SSGround );
+	m_pSpriteGround->Init( _T( "Data\\Texture\\Ground.png" ), SSGround );
 
 	//プレイヤースプライトの構造体.
 	CSprite3D::SPRITE_STATE SSPlayer = { 1.0f, 1.0f, 64.0f, 64.0f, 64.0f, 64.0f };
 	//プレイヤースプライトの読み込み.
-	m_pSpritePlayer->Init( *m_pDx11,
-		_T( "Data\\Texture\\Player.png" ), SSPlayer );
+	m_pSpritePlayer->Init( _T( "Data\\Texture\\Player.png" ), SSPlayer );
 
 	//爆発プライトの構造体.
 	CSprite3D::SPRITE_STATE SSExplosion = { 1.0f, 1.0f, 256.0f, 256.0f, 32.0f, 32.0f };
 	//爆発スプライトの読み込み.
-	m_pSpriteExplosion->Init( *m_pDx11,
-		_T( "Data\\Texture\\explosion.png" ), SSExplosion );
+	m_pSpriteExplosion->Init( _T( "Data\\Texture\\explosion.png" ), SSExplosion );
 
 	//スタティックメッシュの読み込み.
-	m_pStaticMeshFighter->Init( *m_pDx9, *m_pDx11,
-		_T("Data\\Mesh\\Static\\Fighter\\Fighter.x" ) );
-	m_pStaticMeshGround->Init( *m_pDx9, *m_pDx11,
-//		_T("Data\\Mesh\\Static\\Ground\\ground.x" ) );
-		_T("Data\\Mesh\\Static\\Stage\\stage.x" ) );
-	m_pStaticMeshRoboA->Init( *m_pDx9, *m_pDx11,
-		_T("Data\\Mesh\\Static\\Robo\\RobotA_pivot.x" ) );
-	m_pStaticMeshRoboB->Init( *m_pDx9, *m_pDx11,
-		_T("Data\\Mesh\\Static\\Robo\\RobotB_pivot.x" ) );
-	m_pStaticMeshBullet->Init( *m_pDx9, *m_pDx11,
-		_T("Data\\Mesh\\Static\\Bullet\\bullet.x" ) );
+	m_pStaticMeshFighter->Init( _T("Data\\Mesh\\Static\\Fighter\\Fighter.x" ) );
+	m_pStaticMeshGround->Init( _T("Data\\Mesh\\Static\\Stage\\stage.x" ) );
+	m_pStaticMeshRoboA->Init( _T("Data\\Mesh\\Static\\Robo\\RobotA_pivot.x" ) );
+	m_pStaticMeshRoboB->Init( _T("Data\\Mesh\\Static\\Robo\\RobotB_pivot.x" ) );
+	m_pStaticMeshBullet->Init( _T("Data\\Mesh\\Static\\Bullet\\bullet.x" ) );
 	//バウンディングスフィア(当たり判定用).
-	m_pStaticMeshBSphere->Init( *m_pDx9, *m_pDx11,
-		_T("Data\\Collision\\Sphere.x" ) );
+	m_pStaticMeshBSphere->Init( _T("Data\\Collision\\Sphere.x" ) );
 
 	//スキンメッシュの読み込み.
-	m_pSkinMeshZako->Init(*m_pDx9, *m_pDx11,
-		_T("Data\\Mesh\\Skin\\Zako\\zako.x"));
+	m_pSkinMeshZako->Init(_T("Data\\Mesh\\Skin\\Zako\\zako.x"));
 
 	//爆発スプライトを設定.
 	m_pExplosion->AttachSprite( *m_pSpriteExplosion );
-
-	//ポケモンスプライトを設定.
-	m_pPmon->AttachSprite( *m_pSprite2DPmon );
-	m_pBeedrill->AttachSprite( *m_pSprite2DPmon );
-	m_pParasect->AttachSprite( *m_pSprite2DPmon );
-	m_pScyther->AttachSprite( *m_pSprite2DPmon );
 
 	//スタティックメッシュを設定.
 	m_pStcMeshObj->AttachMesh( *m_pStaticMeshFighter );
@@ -336,11 +292,6 @@ HRESULT CGame::LoadData()
 
 		e->AttachMesh( *m_pSkinMeshZako );
 	}
-
-	//ポケモンそれぞれのパターンを設定.
-	m_pBeedrill->SetPatternNo( 14, 0 );
-	m_pParasect->SetPatternNo( 14, 2 );
-	m_pScyther->SetPatternNo( 10, 7 );
 
 	//バウンディングスフィアの作成.
 	m_pPlayer->CreateBSphereForMesh( *m_pStaticMeshBSphere );
@@ -368,14 +319,7 @@ HRESULT CGame::LoadData()
 		pE->SetPosition( -3.0f + ( No * 3.0f ), 1.0f, 10.0f );
 	}
 #endif
-
-	//ポケモンそれぞれの座標を設定.
-	const float size = 64.0f;
-	const float pos_y = static_cast<float>(WND_H) - size;
-	m_pBeedrill->SetPosition(	size * 0.0f, pos_y, 0.0f );
-	m_pParasect->SetPosition(	size * 1.0f, pos_y, 0.0f );
-	m_pScyther->SetPosition(	size * 2.0f, pos_y, 0.0f );
-
+	
 	return S_OK;
 }
 
@@ -454,24 +398,6 @@ void CGame::Update()
 
 	m_pExplosion->Update();
 
-#if 1
-	static POINTS PatternNo = { 0, 0 };
-	const static POINTS PatternMax = m_pSprite2DPmon->GetPatternMax();
-
-	if (GetAsyncKeyState('P') & 0x0001) {
-		PatternNo.x++;
-		if (PatternNo.x >= PatternMax.x) {
-			PatternNo.x = 0;
-			PatternNo.y++;
-			if (PatternNo.y >= PatternMax.y) {
-				PatternNo.y = 0;
-			}
-		}
-		m_pPmon->SetPatternNo( PatternNo.x, PatternNo.y );
-	}
-
-#endif
-
 	//----------------------------
 	//	スキンメッシュ.
 	//----------------------------
@@ -481,11 +407,6 @@ void CGame::Update()
 	for (auto& e : m_Zako) {
 		e->Update();
 	}
-
-	m_pPmon->Update();
-	m_pBeedrill->Update();
-	m_pParasect->Update();
-	m_pScyther->Update();
 
 	//Effect制御.
 	{
@@ -549,11 +470,6 @@ void CGame::Draw()
 		e->Draw( m_mView, m_mProj, m_Light, m_Camera );
 	}
 
-	m_pPmon->Draw();
-	m_pBeedrill->Draw();
-	m_pParasect->Draw();
-	m_pScyther->Draw();
-
 	//当たり判定の中心座標を更新する.
 	m_pPlayer->UpdateBSpherePos();
 	m_pEnemy->UpdateBSpherePos();
@@ -590,7 +506,6 @@ void CGame::Draw()
 		m_pGround,
 		m_pPlayer,
 		m_pExplosion,
-		m_pPmon,
 		m_pBeedrill,
 		m_pParasect,
 		m_pScyther
