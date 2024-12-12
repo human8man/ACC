@@ -409,6 +409,7 @@ void CGame::Update()
 void CGame::Draw()
 {
 	CCamera::GetInstance()->Camera(m_mView);
+	CSceneBase::Projection(m_mProj);
 
 //	m_pStcMeshObj->Draw( m_mView, m_mProj, m_Light, m_Camera );
 
