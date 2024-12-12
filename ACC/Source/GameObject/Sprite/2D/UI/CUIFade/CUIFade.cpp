@@ -24,7 +24,7 @@ CUIFade::~CUIFade()
 void CUIFade::Create()
 {
 	// スプライト情報を設定.
-	BlackFade = { WND_W,WND_H,WND_W,WND_H,WND_W,WND_H,	ZAROVEC3};
+	BlackFade = { WND_W,WND_H,WND_W,WND_H,WND_W,WND_H,	ZEROVEC3};
 
 	// ファイルパスとスプライトデータをまとめて準備.
 	SpriteDataList = {

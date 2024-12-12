@@ -14,39 +14,6 @@ CPlayer::~CPlayer()
 
 void CPlayer::Update()
 {
-#if 1
-	//前進.
-	if( GetAsyncKeyState( VK_UP ) & 0x8000 ){
-		m_MoveState = enMoveState::Forward;
-	}
-	//後退.
-	if( GetAsyncKeyState( VK_DOWN ) & 0x8000 ){
-		m_MoveState = enMoveState::Backward;
-	}
-	if( GetAsyncKeyState( VK_RIGHT ) & 0x8000 ){
-		m_vRotation.y += m_TurnSpeed;
-	}
-	if( GetAsyncKeyState( VK_LEFT ) & 0x8000 ){
-		m_vRotation.y -= m_TurnSpeed;
-	}
-
-	RadioControl();
-
-#else
-	float add_value = 0.1f;
-	if( GetAsyncKeyState( VK_UP ) & 0x8000 ){
-		m_vPosition.y += add_value;
-	}
-	if( GetAsyncKeyState( VK_DOWN ) & 0x8000 ){
-		m_vPosition.y -= add_value;
-	}
-	if( GetAsyncKeyState( VK_RIGHT ) & 0x8000 ){
-		m_vPosition.x += add_value;
-	}
-	if( GetAsyncKeyState( VK_LEFT ) & 0x8000 ){
-		m_vPosition.x -= add_value;
-	}
-#endif
 	//前回のフレームで弾を飛ばしているかも知れないのでfalseにする.
 	m_Shot = false;
 

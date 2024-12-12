@@ -247,14 +247,14 @@ HRESULT CGame::LoadData()
 	//爆発プライトの構造体.
 	CSprite3D::SPRITE_STATE SSExplosion = { 1.0f, 1.0f, 256.0f, 256.0f, 32.0f, 32.0f };
 	//爆発スプライトの読み込み.
-	m_pSpriteExplosion->Init( _T( "Data\\Texture\\explosion.png" ), SSExplosion );
+	m_pSpriteExplosion	->Init( _T( "Data\\Texture\\explosion.png" ), SSExplosion );
 
 	//スタティックメッシュの読み込み.
 	m_pStaticMeshFighter->Init( _T("Data\\Mesh\\Static\\Fighter\\Fighter.x" ) );
-	m_pStaticMeshGround->Init( _T("Data\\Mesh\\Static\\Stage\\stage.x" ) );
-	m_pStaticMeshRoboA->Init( _T("Data\\Mesh\\Static\\Robo\\RobotA_pivot.x" ) );
-	m_pStaticMeshRoboB->Init( _T("Data\\Mesh\\Static\\Robo\\RobotB_pivot.x" ) );
-	m_pStaticMeshBullet->Init( _T("Data\\Mesh\\Static\\Bullet\\bullet.x" ) );
+	m_pStaticMeshGround	->Init( _T("Data\\Mesh\\Static\\Stage\\stage.x" ) );
+	m_pStaticMeshRoboA	->Init( _T("Data\\Mesh\\Static\\Robo\\RobotA_pivot.x" ) );
+	m_pStaticMeshRoboB	->Init( _T("Data\\Mesh\\Static\\Robo\\RobotB_pivot.x" ) );
+	m_pStaticMeshBullet	->Init( _T("Data\\Mesh\\Static\\Bullet\\bullet.x" ) );
 	//バウンディングスフィア(当たり判定用).
 	m_pStaticMeshBSphere->Init( _T("Data\\Collision\\Sphere.x" ) );
 
@@ -317,7 +317,7 @@ HRESULT CGame::LoadData()
 #endif
 
 	CCamera::GetInstance()->Init();
-	CCamera::GetInstance()->GetPlayerInfo(m_pPlayer->GetPosition());
+	CCamera::SetPlayerPos(m_pPlayer->GetPosition());
 
 	return S_OK;
 }
@@ -337,7 +337,7 @@ void CGame::Init()
 void CGame::Update()
 {
 	CCamera::GetInstance()->Update();
-
+	
 //	m_pStcMeshObj->Update();
 
 //	float rotX = static_cast<float>( D3DXToRadian(90.0) );
@@ -411,7 +411,6 @@ void CGame::Draw()
 	CCamera::GetInstance()->Camera(m_mView);
 	CSceneBase::Projection(m_mProj);
 
-//	m_pStcMeshObj->Draw( m_mView, m_mProj, m_Light, m_Camera );
 
 #if 1
 	m_pGround->Draw( m_mView, m_mProj, m_Light );
@@ -436,9 +435,9 @@ void CGame::Draw()
 	//	スキンメッシュ.
 	//----------------------------
 	m_pZako->Draw( m_mView, m_mProj, m_Light );
-//	//ボーン座標に合わせて球体を表示.
-//	m_pStaticMeshBSphere->SetPosition( m_ZakoBonePos );
-//	m_pStaticMeshBSphere->Render( m_mView, m_mProj, m_Light, m_Camera.Position );
+	//ボーン座標に合わせて球体を表示.
+	m_pStaticMeshBSphere->SetPosition( m_ZakoBonePos );
+	m_pStaticMeshBSphere->Render( m_mView, m_mProj, m_Light );
 
 	//ザコ複数.
 	for (auto& e : m_Zako) {

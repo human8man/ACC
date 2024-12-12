@@ -1,6 +1,7 @@
 #include "CStaticMesh.h"
 #include "../DirectX/CDirectX9.h"
 #include "../DirectX/CDirectX11.h"
+#include "Camera/CCamera.h"
 
 #include <stdlib.h>	//マルチバイト文字→Unicode文字変換で必要.
 #include <locale.h>
@@ -612,7 +613,7 @@ HRESULT CStaticMesh::CreateConstantBuffer()
 //  最終的に画面に出力するのは別クラスのレンダリング関数がやる.
 void CStaticMesh::Render(
 	D3DXMATRIX& mView, D3DXMATRIX& mProj,
-	LIGHT& Light, D3DXVECTOR3& CamPos)
+	LIGHT& Light )
 {
 	//ワールド行列、スケール行列、回転行列、平行移動行列.
 	D3DXMATRIX mWorld, mScale, mRot, mTran;
@@ -656,6 +657,7 @@ void CStaticMesh::Render(
 		//コンスタントバッファ(フレーム用).
 		CBUFFER_PER_FRAME cb;
 
+		D3DXVECTOR3 CamPos = CCamera::GetInstance()->GetPos();
 		//カメラ位置.
 		cb.CameraPos = D3DXVECTOR4( CamPos.x, CamPos.y, CamPos.z, 0.0f );
 

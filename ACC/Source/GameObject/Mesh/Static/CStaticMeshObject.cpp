@@ -35,7 +35,7 @@ void CStaticMeshObject::Draw(
 	m_pMesh->SetScale( m_vScale );
 
 	//レンダリング.
-	m_pMesh->Render( View, Proj, Light, CCamera::GetInstance()->GetPos() );
+	m_pMesh->Render( View, Proj, Light );
 }
 
 //レイとメッシュの当たり判定.
