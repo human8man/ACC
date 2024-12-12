@@ -87,6 +87,6 @@ private:
 	POINT m_MousePos;	 // 今のマウス位置.
 	POINT m_OldMousePos; // 前のマウス位置.
 
-	D3DXVECTOR3 m_MouseMoveVolume;	// マウスの移動量.
-	D3DXVECTOR3 m_LookMoveVolume;	// 注視点の移動量.
+	D3DXVECTOR3 m_MouseMoveValue;	// マウスの移動量.
+	D3DXVECTOR3 m_LookMoveValue;	// 注視点の移動量.
 };

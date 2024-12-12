@@ -2,9 +2,9 @@
 #include "DirectSound/CSoundManager.h"
 
 CPlayer::CPlayer()
-	: m_TurnSpeed		( 0.1f )	//きっちりやりたい場合はラジアン値を設定すること.
-	, m_MoveSpeed		( 0.1f )
-	, m_MoveState		( Stop )
+	: m_TurnSpeed	( 0.1f )
+	, m_MoveSpeed	( 0.1f )
+	, m_MoveState	( Stop )
 {
 }
 
@@ -20,18 +20,15 @@ void CPlayer::Update()
 	//弾を飛ばしたい!!.
 	if( GetAsyncKeyState( 'Z' ) & 0x8000 ){
 		m_Shot = true;
-
-		//SEの再生.
-		CSoundManager::PlaySE( CSoundManager::SE_Jump );
 	}
 
-	//レイの位置をプレイヤーの座標にそろえる.
+	// レイの位置をプレイヤーの座標にそろえる.
 	m_pRayY->Position = m_vPosition;
-	//地面にめり込み回避のため、プレイヤーの位置よりも少し上にしておく.
+	// 地面にめり込み回避のため、プレイヤーの位置よりも少し上にしておく.
 	m_pRayY->Position.y += 0.2f;
 	m_pRayY->RotationY = m_vRotation.y;
 
-	//十字（前後左右に伸ばした）レイの設定.
+	// 十字（前後左右に伸ばした）レイの設定.
 	for (int dir = 0; dir < CROSSRAY::max; dir++)
 	{
 		m_pCrossRay->Ray[dir].Position = m_vPosition;

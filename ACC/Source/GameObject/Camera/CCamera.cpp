@@ -8,25 +8,18 @@ CCamera::CCamera()
 	, m_LookDirection	()
 	, m_DirectionPos	()
 	, m_Playerpos		( ZEROVEC3 )
-
 	, m_NowCurorPos		{ WND_W / 2, WND_H / 2 }
 	, m_BeforCursorPos	{ WND_W / 2, WND_H / 2 }
-
 	, m_MoveValue		( 0.1f )
-
 	, m_CameraYaw		( 0.f )
 	, m_CameraPitch		( 0.f )
-
 	, m_MouseMoveDis	{ 0.f, 0.f }
 	, m_MouseSens		( 0.03f )
-
 	, m_MoveMouse		( false )
-
 	, m_MousePos		()
 	, m_OldMousePos		()
-
-	, m_MouseMoveVolume	()
-	, m_LookMoveVolume	()
+	, m_MouseMoveValue	()
+	, m_LookMoveValue	()
 {
 	Init();
 }
@@ -43,9 +36,6 @@ void CCamera::Update()
 	InitMouseDis();
 	// キー入力.
 	KeyInput();
-
-	m_Camera.Position = m_Playerpos;
-	m_Camera.Position.y = m_Playerpos.y + 1.f;
 
 	// マウス座標の取得.
 	if (!CDInput::GetInstance()->GamePadConnect())
@@ -70,8 +60,7 @@ void CCamera::Update()
 			}
 		}
 	}
-	else
-	{
+	else {
 		m_MoveMouse = true;
 	}
 
@@ -81,11 +70,12 @@ void CCamera::Update()
 	{
 		MouseMove((GamePad->GetPadpos().lZ * m_MouseSens),(GamePad->GetPadpos().lRz * m_MouseSens));
 	}
+
+	DebugCamera();
 }
 
 // カメラ関数(ビュー行列計算).
-void CCamera::Camera(
-	D3DXMATRIX& View)
+void CCamera::Camera( D3DXMATRIX& View )
 {
 	D3DXVECTOR3 cam_pos	 = m_Camera.Position;
 	D3DXVECTOR3 cam_look = m_Camera.Look;
@@ -116,13 +106,13 @@ void CCamera::DebugCamera()
 	//if (m_IsDebug)
 	{
 		// マウスでの一人称視点カメラ移動.
-		//MouseFirstPersonCamera();
+		MouseFirstPersonCamera();
 	}
 }
 
 void CCamera::MouseFirstPersonCamera()
 {
-	m_MouseMoveVolume = ZEROVEC3;
+	m_MouseMoveValue = ZEROVEC3;
 
 	if (GetCursorPos(&m_MousePos))
 	{
@@ -133,21 +123,21 @@ void CCamera::MouseFirstPersonCamera()
 		||  m_MousePos.y != m_OldMousePos.y)
 		{
 			// マウスの移動量計算.
-			m_MouseMoveVolume.x = static_cast<float>(m_MousePos.x - m_OldMousePos.x);
-			m_MouseMoveVolume.y = static_cast<float>(m_MousePos.y - m_OldMousePos.y);
+			m_MouseMoveValue.x = static_cast<float>(m_MousePos.x - m_OldMousePos.x);
+			m_MouseMoveValue.y = static_cast<float>(m_MousePos.y - m_OldMousePos.y);
 
-			m_CameraRot.x -= m_MouseMoveVolume.y * 0.03f;
-			m_CameraRot.y -= m_MouseMoveVolume.x * 0.03f;
+			m_CameraRot.x -= m_MouseMoveValue.y * 0.03f;
+			m_CameraRot.y -= m_MouseMoveValue.x * 0.03f;
 
-			m_LookMoveVolume = ZEROVEC3;
+			m_LookMoveValue = ZEROVEC3;
 
-			m_LookMoveVolume.x = cosf(D3DXToRadian(m_CameraRot.y)) * cosf(D3DXToRadian(m_CameraRot.x));
-			m_LookMoveVolume.y = sinf(D3DXToRadian(m_CameraRot.x));
-			m_LookMoveVolume.z = sinf(D3DXToRadian(m_CameraRot.y)) * cosf(D3DXToRadian(m_CameraRot.x));
+			m_LookMoveValue.x = cosf(D3DXToRadian(m_CameraRot.y)) * cosf(D3DXToRadian(m_CameraRot.x));
+			m_LookMoveValue.y = sinf(D3DXToRadian(m_CameraRot.x));
+			m_LookMoveValue.z = sinf(D3DXToRadian(m_CameraRot.y)) * cosf(D3DXToRadian(m_CameraRot.x));
 
-			D3DXVec3Normalize(&m_LookMoveVolume, &m_LookMoveVolume);
+			D3DXVec3Normalize(&m_LookMoveValue, &m_LookMoveValue);
 
-			m_Camera.Look = m_Camera.Position + m_LookMoveVolume;
+			m_Camera.Look = m_Camera.Position + m_LookMoveValue;
 
 			// マウス位置を固定.
 			if (!CDInput::GetInstance()->GamePadConnect())
@@ -171,7 +161,7 @@ void CCamera::DebugCameraMove()
 	// 正規化.
 	D3DXVec3Normalize(&Direction, &Direction);
 
-	//--------------------キーボードのカメラ移動---------------//
+	//--------------------キーボードのカメラ移動--------------------//
 	//右方向ベクトル
 	D3DXVECTOR3 RightVec;
 	D3DXVec3Cross(&RightVec, &m_Camera.UpVec, &Direction);
@@ -209,19 +199,17 @@ void CCamera::DebugCameraMove()
 void CCamera::InitMouseDis()
 {
 	//マウスの移動量の初期化.
-	m_MouseMoveDis = { 0.0f, 0.0f };
+	m_MouseMoveDis = { 0.f, 0.f };
 }
 
-//キー入力.
+// キー入力.
 void CCamera::KeyInput()
 {
-	CKey* Key = CDInput::GetInstance()->CDKeyboard();
+	CKey*	  Key	  = CDInput::GetInstance()->CDKeyboard();
 	CGamePad* GamePad = CDInput::GetInstance()->CDGamePad();
 
-	m_Camera.Position = m_Playerpos;
-
-	//カメラ位置の移動量の初期化.
-	m_DirectionPos = { ZEROVEC3 };
+	// カメラ位置の移動量の初期化.
+	m_DirectionPos = ZEROVEC3;
 
 	//if (m_IsDebug == true)
 	{
@@ -230,7 +218,7 @@ void CCamera::KeyInput()
 		if (Key->IsKeyDown(DIK_RIGHT))	{ CameraMove(Left);		}
 		if (Key->IsKeyDown(DIK_LEFT))	{ CameraMove(Right);	}
 
-		//Y座標の調整.
+		// Y座標の調整.
 		if (Key->IsKeyDown(DIK_SPACE))
 		{
 			m_Camera.Position.y += m_MoveValue;
@@ -245,11 +233,11 @@ void CCamera::KeyInput()
 
 	if (Key->ISKeyAction(DIK_F2)) { m_MoveMouse = !m_MoveMouse; }
 
-	//マウスカーソルの表示.
+	// マウスカーソルの表示.
 	ShowCursor(m_MoveMouse);
 }
 
-//マウス移動量の計算.
+// マウス移動量の計算.
 void CCamera::MouseMath()
 {
 	// マウスの移動量.
@@ -265,10 +253,10 @@ void CCamera::MouseMove(float deltaX, float deltaY)
 	m_CameraRot.x -= deltaY * m_MouseSens;
 
 	// カメラピッチ角を制限.
-	if (m_CameraRot.x >= 89.0f )   { m_CameraRot.x =  89.0f; }
-	if (m_CameraRot.x <= -89.0f )  { m_CameraRot.x = -89.0f; }
-	if (m_CameraRot.y >= 360.0f )  { m_CameraRot.y =  0.0f;	 }
-	if (m_CameraRot.y <= -360.0f ) { m_CameraRot.y =  0.0f;	 }
+	if ( m_CameraRot.x >=  89.f  ) { m_CameraRot.x =  89.f; }
+	if ( m_CameraRot.x <= -89.f  ) { m_CameraRot.x = -89.f; }
+	if ( m_CameraRot.y >=  360.f ) { m_CameraRot.y =   0.f; }
+	if ( m_CameraRot.y <= -360.f ) { m_CameraRot.y =   0.f; }
 
 	// カメラ注視点の移動量の初期化.
 	m_LookDirection = ZEROVEC3;
@@ -335,17 +323,17 @@ void CCamera::CameraMove(int vec)
 	}
 }
 
-//マウス位置の初期化.
+// マウス位置の初期化.
 void CCamera::MousePosReset()
 {
-	//マウスカーソルを中央に固定.
+	// マウスカーソルを中央に固定.
 	SetCursorPos(WND_W / 2, WND_H / 2);
 
-	//現在のマウス位置を退避.
+	// 現在のマウス位置を退避.
 	m_BeforCursorPos = { WND_W / 2, WND_H / 2 };
 }
 
-//カーソル位置.
+// カーソル位置.
 void CCamera::MousePos(HDC hdc, POINT pos)
 {
 	int r = 10;

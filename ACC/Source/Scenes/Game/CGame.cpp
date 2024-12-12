@@ -50,59 +50,35 @@ CGame::CGame(HWND hWnd)
 	, m_pZako				( nullptr )
 	, m_Zako				()
 {
-	//ライト情報.
-	m_Light.vDirection	= D3DXVECTOR3( 1.5f, 1.0f, -1.0f );	//ライト方向.
+	// ライト情報.
+	m_Light.vDirection	= D3DXVECTOR3( 1.5f, 1.f, -1.f );	//ライト方向.
 }
 
 
 //デストラクタ.
 CGame::~CGame()
 {
-	//ザコ複数.
-	//rbegin()	:末尾を指す逆イテレータを取得.
-	//rend()	:先頭を指す逆イテレータを取得.
+	// ザコ複数.
 	for (auto it = m_Zako.rbegin(); it != m_Zako.rend(); ++it){
 		SAFE_DELETE( *it );
 	}
-
-	//ザコの破棄.
-	SAFE_DELETE( m_pZako );
-
-	//弾の破棄.
-	SAFE_DELETE( m_pShot );
-
-	//地面の破棄.
-	SAFE_DELETE( m_pGround );
-
-	//エネミーの破棄.
-#if 1
-	if( m_ppEnemies != nullptr ){
-		for( int No = m_EnemyMax - 1; No >= 0; No-- ){
-			SAFE_DELETE( m_ppEnemies[No] );
-		}
-		delete[] m_ppEnemies;
-		m_ppEnemies = nullptr;
-	}
-#else
+	
+	SAFE_DELETE( m_pZako );		// ザコの破棄.
+	SAFE_DELETE( m_pShot );		// 弾の破棄.
+	SAFE_DELETE( m_pGround );	// 地面の破棄.
+	
+	// エネミーの破棄.
 	for( int No = ENEMY_MAX - 1; No >= 0; No-- ){
 		SAFE_DELETE( m_pEnemies[No] );
 	}
-#endif
+
 	SAFE_DELETE( m_pEnemy );
+	SAFE_DELETE( m_pPlayer );		// プレイヤーの破棄.
+	SAFE_DELETE( m_pStcMeshObj );	// スタティックメッシュオブジェクトの破棄.
+	SAFE_DELETE( m_pExplosion );	// 爆発の破棄.
+	SAFE_DELETE( m_pSkinMeshZako );	// スキンメッシュの破棄.
 
-	//プレイヤーの破棄.
-	SAFE_DELETE( m_pPlayer );
-
-	//スタティックメッシュオブジェクトの破棄.
-	SAFE_DELETE( m_pStcMeshObj );
-
-	//爆発の破棄.
-	SAFE_DELETE( m_pExplosion );
-
-	//スキンメッシュの破棄.
-	SAFE_DELETE( m_pSkinMeshZako );
-
-	//スタティックメッシュの破棄.
+	// スタティックメッシュの破棄.
 	SAFE_DELETE( m_pStaticMeshBSphere );
 	SAFE_DELETE( m_pStaticMeshBullet );
 	SAFE_DELETE( m_pStaticMeshRoboB );
@@ -110,63 +86,45 @@ CGame::~CGame()
 	SAFE_DELETE( m_pStaticMeshGround );
 	SAFE_DELETE( m_pStaticMeshFighter );
 
-	//爆発スプライトの解放.
-	SAFE_DELETE( m_pSpriteExplosion );
-	//プレイヤースプライトの解放.
-	SAFE_DELETE( m_pSpritePlayer );
-	//地面スプライトの解放.
-	SAFE_DELETE( m_pSpriteGround );
+	SAFE_DELETE( m_pSpriteExplosion );	// 爆発スプライトの解放.
+	SAFE_DELETE( m_pSpritePlayer );		// プレイヤースプライトの解放.
+	SAFE_DELETE( m_pSpriteGround );		// 地面スプライトの解放.
 
-	//レイ表示クラスの破棄.
+	// レイ表示クラスの破棄.
 	for (int dir = CROSSRAY::max - 1; dir >= 0; --dir) {
 		SAFE_DELETE(m_pCrossRay[dir]);
 	}
-	SAFE_DELETE( m_pRayY );
 
-	//デバッグテキストの破棄.
-	SAFE_DELETE( m_pDbgText );
+	SAFE_DELETE( m_pRayY );
+	SAFE_DELETE( m_pDbgText );	// デバッグテキストの破棄.
 
 	//外部で作成しているので、ここで破棄しない.
 	m_hWnd = nullptr;
 }
 
-//構築.
+// 構築.
 void CGame::Create()
 {
-	//デバッグテキストのインスタンス作成.
 	m_pDbgText = new CDebugText();
-
-	//レイ表示クラスのインスタンス作成.
+	// レイ表示クラスのインスタンス作成.
 	m_pRayY = new CRay();
 	for (int dir = 0; dir < CROSSRAY::max; ++dir){
 		m_pCrossRay[dir] = new CRay();
 	}
-
-	//スプライトのインスタンス作成.
-	m_pSpriteGround		= new CSprite3D();
-	m_pSpritePlayer		= new CSprite3D();
-	m_pSpriteExplosion	= new CSprite3D();
-
-	//スタティックメッシュのインスタンス作成.
+	m_pSpriteGround			= new CSprite3D();
+	m_pSpritePlayer			= new CSprite3D();
+	m_pSpriteExplosion		= new CSprite3D();
 	m_pStaticMeshFighter	= new CStaticMesh();
 	m_pStaticMeshGround		= new CStaticMesh();
 	m_pStaticMeshRoboA		= new CStaticMesh();
 	m_pStaticMeshRoboB		= new CStaticMesh();
 	m_pStaticMeshBullet		= new CStaticMesh();
 	m_pStaticMeshBSphere	= new CStaticMesh();
-
-	//スキンメッシュのインスタンス作成.
 	m_pSkinMeshZako			= new CSkinMesh();
-
-	//スプライトオブジェクトクラスのインスタス作成.
-	m_pExplosion= new CExplosion();
-
-	//スタティックメッシュオブジェクトクラスのインスタンス作成.
-	m_pStcMeshObj = new CStaticMeshObject();
-
-	//キャラクタークラスのインスタンス作成.
-	m_pPlayer	= new CPlayer();
-	m_pEnemy	= new CEnemy();
+	m_pExplosion			= new CExplosion();
+	m_pStcMeshObj			= new CStaticMeshObject();
+	m_pPlayer				= new CPlayer();
+	m_pEnemy				= new CEnemy();
 #if 1
 	//エネミーを動的に確保.
 	m_EnemyMax = 3;
@@ -183,17 +141,11 @@ void CGame::Create()
 	//地面クラスのインスタンス作成.
 	m_pGround = new CGround();
 	m_pGround->SetPlayer(*m_pPlayer);
-
-	//弾クラスのインスタンス作成.
 	m_pShot = new CShot();
-
-	//ザコクラスのインスタンス作成.
 	m_pZako = new CZako();
 
 	//ザコ複数.
 	for (int i = 0; i < 3; i++) {
-		//push_back(値)	:配列の末尾へ要素を追加.
-		//size()		:配列の要素数を取得.
 		m_Zako.push_back( new CZako() );
 	}
 
@@ -201,25 +153,20 @@ void CGame::Create()
 	CEffect::GetInstance()->Create( m_pDx11->GetDevice(), m_pDx11->GetContext() );
 }
 
-//ロードデータ関数.
+// ロードデータ関数.
 HRESULT CGame::LoadData()
 {
-	//デバッグテキストの読み込み.
+	// デバッグテキストの読み込み.
 	if ( FAILED( m_pDbgText->Init() ) ) {
 		return E_FAIL;
 	}
-	
-	//サウンドデータの読み込み.
-	if( CSoundManager::GetInstance()->Load( m_hWnd ) == false ){
-		return E_FAIL;
-	}
 
-	//Effectクラス.
+	// Effectクラス.
 	if ( FAILED( CEffect::GetInstance()->LoadData() ) ) {
 		return E_FAIL;
 	}
 
-	//レイ表示クラスの初期化.
+	// レイ表示クラスの初期化.
 	RAY ray = m_pPlayer->GetRayY();
 	m_pRayY->Init( ray );
 
@@ -228,59 +175,52 @@ HRESULT CGame::LoadData()
 		m_pCrossRay[dir]->Init(ray);
 	}
 
-	//地面スプライトの構造体.
-	CSprite3D::SPRITE_STATE SSGround;
-	SSGround.Disp.w = 1.0f;
-	SSGround.Disp.h = 1.0f;
-	SSGround.Base.w = 256.0f;
-	SSGround.Base.h = 256.0f;
-	SSGround.Stride.w = 256.0f;
-	SSGround.Stride.h = 256.0f;
-	//地面スプライトの読み込み.
+	// 地面スプライトの構造体.
+	CSprite3D::SPRITE_STATE SSGround{ 1.f, 1.f, 256.f, 256.f, 256.f, 256.f };
+
+	// 地面スプライトの読み込み.
 	m_pSpriteGround->Init( _T( "Data\\Texture\\Ground.png" ), SSGround );
 
-	//プレイヤースプライトの構造体.
-	CSprite3D::SPRITE_STATE SSPlayer = { 1.0f, 1.0f, 64.0f, 64.0f, 64.0f, 64.0f };
-	//プレイヤースプライトの読み込み.
+	// プレイヤースプライトの構造体.
+	CSprite3D::SPRITE_STATE SSPlayer = { 1.f, 1.f, 64.f, 64.f, 64.f, 64.f };
+	// プレイヤースプライトの読み込み.
 	m_pSpritePlayer->Init( _T( "Data\\Texture\\Player.png" ), SSPlayer );
 
-	//爆発プライトの構造体.
-	CSprite3D::SPRITE_STATE SSExplosion = { 1.0f, 1.0f, 256.0f, 256.0f, 32.0f, 32.0f };
-	//爆発スプライトの読み込み.
+	// 爆発プライトの構造体.
+	CSprite3D::SPRITE_STATE SSExplosion = { 1.f, 1.f, 256.f, 256.f, 32.f, 32.f };
+	// 爆発スプライトの読み込み.
 	m_pSpriteExplosion	->Init( _T( "Data\\Texture\\explosion.png" ), SSExplosion );
 
-	//スタティックメッシュの読み込み.
+	// スタティックメッシュの読み込み.
 	m_pStaticMeshFighter->Init( _T("Data\\Mesh\\Static\\Fighter\\Fighter.x" ) );
 	m_pStaticMeshGround	->Init( _T("Data\\Mesh\\Static\\Stage\\stage.x" ) );
 	m_pStaticMeshRoboA	->Init( _T("Data\\Mesh\\Static\\Robo\\RobotA_pivot.x" ) );
 	m_pStaticMeshRoboB	->Init( _T("Data\\Mesh\\Static\\Robo\\RobotB_pivot.x" ) );
 	m_pStaticMeshBullet	->Init( _T("Data\\Mesh\\Static\\Bullet\\bullet.x" ) );
-	//バウンディングスフィア(当たり判定用).
+	// バウンディングスフィア(当たり判定用).
 	m_pStaticMeshBSphere->Init( _T("Data\\Collision\\Sphere.x" ) );
 
-	//スキンメッシュの読み込み.
+	// スキンメッシュの読み込み.
 	m_pSkinMeshZako->Init(_T("Data\\Mesh\\Skin\\Zako\\zako.x"));
 
-	//爆発スプライトを設定.
+	// 爆発スプライトを設定.
 	m_pExplosion->AttachSprite( *m_pSpriteExplosion );
 
-	//スタティックメッシュを設定.
-	m_pStcMeshObj->AttachMesh( *m_pStaticMeshFighter );
-	m_pPlayer->AttachMesh( *m_pStaticMeshFighter );
-	m_pEnemy->AttachMesh( *m_pStaticMeshRoboB );
-	m_pGround->AttachMesh( *m_pStaticMeshGround );
-	m_pShot->AttachMesh( *m_pStaticMeshBullet );
+	// スタティックメッシュを設定.
+	m_pStcMeshObj	->AttachMesh( *m_pStaticMeshFighter );
+	m_pPlayer		->AttachMesh( *m_pStaticMeshFighter );
+	m_pEnemy		->AttachMesh( *m_pStaticMeshRoboB );
+	m_pGround		->AttachMesh( *m_pStaticMeshGround );
+	m_pShot			->AttachMesh( *m_pStaticMeshBullet );
 
-	//スキンメッシュを設定.
+	// スキンメッシュを設定.
 	m_pZako->AttachMesh( *m_pSkinMeshZako );
 	m_pZako->SetScale( 0.002f, 0.002f, 0.002f );
-	m_pZako->SetPosition( 0.0f, 0.0f, 8.0f );
+	m_pZako->SetPosition( 0.f, 0.f, 8.f );
 
-	//ザコ複数.
-	//範囲for文.
-	//auto:自動で型を推論、&をつけると参照になり不要なコピーを避けれる.
+	// ザコ複数.
 	for (auto& e : m_Zako ) {
-		int i = static_cast<int>( &e - &m_Zako[0] );	//現在のインデックス番号算出.
+		int i = static_cast<int>( &e - &m_Zako[0] );
 
 		e->SetScale( 0.002f, 0.002f, 0.002f );
 		e->SetPosition(-3.0f + (i * 3.0f), 0.0f, 12.0f);
@@ -289,32 +229,22 @@ HRESULT CGame::LoadData()
 		e->AttachMesh( *m_pSkinMeshZako );
 	}
 
-	//バウンディングスフィアの作成.
+	// バウンディングスフィアの作成.
 	m_pPlayer->CreateBSphereForMesh( *m_pStaticMeshBSphere );
 	m_pEnemy->CreateBSphereForMesh( *m_pStaticMeshBSphere );
 	m_pShot->CreateBSphereForMesh( *m_pStaticMeshBullet );
 
-	//キャラクターの初期座標を設定.
-	m_pPlayer->SetPosition( 0.0f, 1.0f, 6.0f );
-	m_pEnemy->SetPosition( 0.0f, 1.0f, 16.0f );
+	// キャラクターの初期座標を設定.
+	m_pPlayer->SetPosition( 0.f, 1.f, 6.f  );
+	m_pEnemy ->SetPosition( 0.f, 1.f, 16.f );
 
-#if 1
-	//エネミー複数設定.
+	// エネミー複数設定.
 	for( int No = 0; No < m_EnemyMax; No++ ){
 		auto& pE = m_ppEnemies[No];
 		pE->AttachMesh( *m_pStaticMeshRoboA );
 		pE->CreateBSphereForMesh( *m_pStaticMeshBSphere );
-		pE->SetPosition( -3.0f + ( No * 3.0f ), 1.0f, 10.0f );
+		pE->SetPosition( -3.0f + ( No * 3.f ), 1.f, 10.f );
 	}
-#else
-	//エネミー複数設定.
-	for( int No = 0; No < ENEMY_MAX; No++ ){
-		auto& pE = m_pEnemies[No];
-		pE->AttachMesh( *m_pStaticMeshRoboA );
-		pE->CreateBSphereForMesh( *m_pStaticMeshBSphere );
-		pE->SetPosition( -3.0f + ( No * 3.0f ), 1.0f, 10.0f );
-	}
-#endif
 
 	CCamera::GetInstance()->Init();
 	CCamera::SetPlayerPos(m_pPlayer->GetPosition());
@@ -322,7 +252,7 @@ HRESULT CGame::LoadData()
 	return S_OK;
 }
 
-//解放関数.
+// 解放関数.
 void CGame::Release()
 {
 }
@@ -333,7 +263,7 @@ void CGame::Init()
 }
 
 
-//更新処理.
+// 更新処理.
 void CGame::Update()
 {
 	CCamera::GetInstance()->Update();
@@ -396,7 +326,7 @@ void CGame::Update()
 		static ::EsHandle hEffect = -1;
 
 		if (GetAsyncKeyState('Y') & 0x0001) {
-			hEffect = CEffect::Play( CEffect::Test0, D3DXVECTOR3( 0.0f, 1.0f, 0.0f ) );
+			hEffect = CEffect::Play( CEffect::Test0, D3DXVECTOR3( 0.f, 1.f, 0.f ) );
 		}
 
 		if (GetAsyncKeyState('T') & 0x0001) {
@@ -450,12 +380,10 @@ void CGame::Draw()
 	m_pShot->UpdateBSpherePos();
 
 	//プレイヤーとエネミーの当たり判定.
-	if( m_pPlayer->GetBSphere()->IsHit( *m_pEnemy->GetBSphere() ) )
-	{
+	if( m_pPlayer->GetBSphere()->IsHit( *m_pEnemy->GetBSphere() ) ){
 		SetWindowText(m_hWnd, _T("衝突しています"));
 	}
-	else
-	{
+	else{
 		SetWindowText(m_hWnd, _T(""));
 	}
 
@@ -467,9 +395,9 @@ void CGame::Draw()
 		dynamic_cast<CExplosion*>( m_pExplosion )->ResetAnimation();	//アニメーションリセット.
 		//弾.
 		m_pShot->SetDisplay( false );				//非表示.
-		m_pShot->SetPosition( 0.0f, -10.0f, 0.0f );	//地面に埋める.
+		m_pShot->SetPosition( 0.f, -10.f, 0.f );	//地面に埋める.
 		//エネミー.
-		m_pEnemy->SetPosition( 0.0f, 1.0f, 20.0f );	//奥へ再配置.
+		m_pEnemy->SetPosition( 0.f, 1.f, 20.f );	//奥へ再配置.
 	}
 	//爆発の表示.
 	m_pExplosion->Draw( m_mView, m_mProj );
@@ -501,12 +429,12 @@ void CGame::Draw()
 	}
 
 	//デバッグテキストの描画.
-	m_pDbgText->SetColor( 0.9f, 0.6f, 0.0f );	//色の設定.
+	m_pDbgText->SetColor( 0.9f, 0.6f, 0.f );	//色の設定.
 	m_pDbgText->Render( _T("ABCD"), 10, 100 );
 
 	//デバッグテキスト(数値入り)の描画.
-	m_pDbgText->SetColor( 1.0f, 0.0f, 0.0f );	//色の設定.
+	m_pDbgText->SetColor( 1.f, 0.f, 0.f );	//色の設定.
 	TCHAR dbgText[64];
-	_stprintf_s( dbgText, _T("Float:%f, %f"), 1.0f, 2.2f );
+	_stprintf_s( dbgText, _T("Float:%f, %f"), 1.f, 2.2f );
 	m_pDbgText->Render( dbgText, 10, 110 );
 }
