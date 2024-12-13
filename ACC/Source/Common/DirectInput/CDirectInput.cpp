@@ -45,6 +45,21 @@ HRESULT CDInput::Create(HWND hWnd, int useDevice)
 	return S_OK;
 }
 
+
+void CDInput::InputUpdate()
+{
+	if (!GamePadConnect())
+	{
+		m_Key.Update();
+		m_Mouse.Update();
+	}
+	else
+	{
+		m_GamePad.Update();
+	}
+}
+
+
 bool CDInput::GamePadConnect()
 {
 	if (!m_GamePad.IsValid())
