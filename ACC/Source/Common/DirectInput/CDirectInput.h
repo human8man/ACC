@@ -1,13 +1,13 @@
 ﻿#pragma once
-#define DIRECTINPUT_VERSION 0x0800  //DirectXのバージョン設定.
+#define DIRECTINPUT_VERSION 0x0800  // DirectXのバージョン設定.
 
 #pragma warning(disable : 28251)
-#include <dinput.h> //これを使うにはdinput8.lib dxguid.libのリンクも必用となる.
+#include <dinput.h> // これを使うにはdinput8.lib dxguid.libのリンクも必用となる.
 #pragma comment( lib, "dinput8.lib" )
 
 #include "Common/Singleton/CSingleton.h"
 
-//キーボード.
+// キーボード.
 class CKey
 {
 private:
@@ -15,20 +15,21 @@ private:
 
 	static constexpr int Button_MAX = 256;
 public:
-	//押し続けているかの判定する関数.
-	bool IsKeyDown(int key) { return m_KeyState[key]; }
-	//押した直後の判定関数.
-	bool ISKeyAction(int key) { return m_KeyAction[key]; }
+	// 押し続けているかの判定を返す.
+	bool IsKeyDown(int key)	  const { return m_KeyState[key];  }
+	// 押した瞬間の判定を返す.
+	bool IsKeyAction(int key) const { return m_KeyAction[key]; }
 
 	bool Init(CKey& Key, IDirectInput8* pDInput, HWND hWnd);
 private:
 	CKey();
 
 	bool Create(IDirectInput8* pDCInput, HWND hWnd);
+	void Update();
 	void Release();
-	void UpDate();
+
 private:
-	IDirectInputDevice8* m_pDIDevKB;	//デバイス(Dev:Development(開発)).
+	IDirectInputDevice8* m_pDIDevKB;	// デバイス(Dev:Development(開発)).
 	bool m_KeyState[Button_MAX];
 	bool m_KeyAction[Button_MAX];
 };
@@ -38,27 +39,27 @@ class CMouse
 private:
 	friend class CDInput;
 public:
-	//押した直後の判定関数.
-	bool ISLAction() { return m_LAction; }
-	bool ISRAction() { return m_RAction; }
-	bool ISMAction() { return m_MAction; }
+	// 押した直後の判定関数.
+	bool IsLAction() const { return m_LAction; }
+	bool IsRAction() const { return m_RAction; }
+	bool IsMAction() const { return m_MAction; }
 
-	//押している間の判定.
-	bool ISLDown() { return m_LDown; }
-	bool ISMDown() { return m_MDown; }
+	// 押している間の判定.
+	bool IsLDown() const { return m_LDown; }
+	bool IsMDown() const { return m_MDown; }
 private:
 	CMouse();
 
 	bool Create(IDirectInput8* pDInput, HWND hWnd);
-	void Release();
 	void Update();
+	void Release();
 
 private:
 	IDirectInputDevice8* m_pDIMouse;
 
 	HWND m_hWnd;
 
-	//---------UpDate時点のボタン状態---------.
+	//---------Update時点のボタン状態---------.
 	bool m_LDown;
 	bool m_RDown;
 	bool m_MDown;
@@ -79,26 +80,26 @@ public:
 	DIJOYSTATE GetPadpos() const { return m_Pad; }
 	//-------------他クラスでのボタン情報を取得する用------------
 	//ボタンが押されているかどうかを取得.
-	bool GetPadButton(int buttonIndex);
+	bool GetPadButton		(int buttonIndex)	const;
 	//ボタンが押された瞬間かどうか.
-	bool GetPadButtonDown(int buttonIndex);
+	bool GetPadButtonDown	(int buttonIndex)	const;
 	//十字キーが押されているかどうかを取得.//Direction = 0(上), 1(右), 2(下), 3(左).
-	bool GetPovAction(int Direction);
 	//十字キーが押されている間を取得.
-	bool GetPovDown(int Direction);
-	//接続が有効か.
+	bool GetPovAction		(int Direction);
+	bool GetPovDown			(int Direction);
+
+	// 接続中か.
 	bool IsValid() const;
 
-	HRESULT GetDeviceState();
+	HRESULT GetDeviceState() const;
 
 private:
-	//関数定義.
 	CGamePad();
-	void UpDate();
+
 	int  Create();
+	void Update();
 	void Release();
 private:
-	//変数宣言.
 	bool m_ButtonPressed[ButtonMAX];	//ボタン配列.
 	bool m_PreviousButtonPressed[32];	//前フレームのボタン状態.
 	bool m_BPOVButtonPressed[4];
@@ -129,7 +130,7 @@ public:
 	CDInput();
 	~CDInput();
 
-	bool Create(HWND hWnd, int useDevice = UseInputDevice_ALL);
+	HRESULT Create(HWND hWnd, int useDevice = UseInputDevice_ALL);
 
 	//コントローラー接続確認.
 	bool GamePadConnect();
@@ -137,16 +138,16 @@ public:
 	void Release();
 public:
 	//入力状態を更新する.
-	void InputUpDate()
+	void InputUpdate()
 	{
 		if (!GamePadConnect())
 		{
-			m_Key.UpDate();
+			m_Key.Update();
 			m_Mouse.Update();
 		}
 		else
 		{
-			m_GamePad.UpDate();
+			m_GamePad.Update();
 		}
 	}
 

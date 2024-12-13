@@ -27,7 +27,7 @@ public:
 	~CCamera();
 
 	void Update();
-	void Camera(D3DXMATRIX& View);
+	void Camera(D3DXMATRIX& View) const;
 	void Init();
 
 	//デバッグ用カメラ
@@ -79,7 +79,7 @@ private:
 
 	Point           m_MouseMoveDis;		// マウスの移動した距離.
 	float           m_MouseSens;		// マウス感度.
-	bool            m_MoveMouse;		// マウスデバック用.
+	bool            m_CanMoveMouse;		// マウスが自由に移動できるかどうか.
 
 	float m_DefaultFov; // デフォルトの視野角.
 

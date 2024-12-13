@@ -15,7 +15,7 @@ CCamera::CCamera()
 	, m_CameraPitch		( 0.f )
 	, m_MouseMoveDis	{ 0.f, 0.f }
 	, m_MouseSens		( 0.03f )
-	, m_MoveMouse		( false )
+	, m_CanMoveMouse	( false )
 	, m_MousePos		()
 	, m_OldMousePos		()
 	, m_MouseMoveValue	()
@@ -37,45 +37,42 @@ void CCamera::Update()
 	// キー入力.
 	KeyInput();
 
-	// マウス座標の取得.
-	if (!CDInput::GetInstance()->GamePadConnect())
+	// 接続されているときはマウスを移動できるようにする.
+	if (CDInput::GetInstance()->GamePadConnect()) { m_CanMoveMouse = true; }
+	else { m_CanMoveMouse = false; }
+	
+
+	// コントローラーが接続されていない場合、マウス座標の取得.
+	if ( !m_CanMoveMouse && GetCursorPos(&m_NowCurorPos))
 	{
-		if (GetCursorPos(&m_NowCurorPos))
+		ScreenToClient(GetConsoleWindow(), &m_NowCurorPos);
+		// 前回のマウス位置と違う場合.
+		if (m_BeforCursorPos.x != m_NowCurorPos.x 
+		||  m_BeforCursorPos.y != m_NowCurorPos.y)
 		{
-			ScreenToClient(GetConsoleWindow(), &m_NowCurorPos);
-			// 前回のマウス位置と違う場合新しく位置を入れなおす.
-			if (m_BeforCursorPos.x != m_NowCurorPos.x || m_BeforCursorPos.y != m_NowCurorPos.y)
-			{
-				if (!m_MoveMouse)
-				{
-					// マウス移動距離計算.
-					MouseMath();
+			// マウス移動距離計算.
+			MouseMath();
 
-					// ベクトル計算をし、注視点に代入.
-					MouseMove(m_MouseMoveDis.x, m_MouseMoveDis.y);
+			// ベクトル計算をし、注視点に代入.
+			MouseMove(m_MouseMoveDis.x, m_MouseMoveDis.y);
 
-					// マウス位置を初期化.
-					MousePosReset();
-				}
-			}
+			// マウス位置を初期化.
+			MousePosReset();
 		}
-	}
-	else {
-		m_MoveMouse = true;
 	}
 
 	// スティックによるカメラ操作.
 	if (GamePad->GetPadpos().lZ  >= STIC_LOW || GamePad->GetPadpos().lZ  <= -STIC_LOW
 	||  GamePad->GetPadpos().lRz >= STIC_LOW || GamePad->GetPadpos().lRz <= -STIC_LOW)
 	{
-		MouseMove((GamePad->GetPadpos().lZ * m_MouseSens),(GamePad->GetPadpos().lRz * m_MouseSens));
+		MouseMove((GamePad->GetPadpos().lZ * m_MouseSens), (GamePad->GetPadpos().lRz * m_MouseSens));
 	}
 
 	DebugCamera();
 }
 
 // カメラ関数(ビュー行列計算).
-void CCamera::Camera( D3DXMATRIX& View )
+void CCamera::Camera( D3DXMATRIX& View ) const
 {
 	D3DXVECTOR3 cam_pos	 = m_Camera.Position;
 	D3DXVECTOR3 cam_look = m_Camera.Look;
@@ -206,12 +203,11 @@ void CCamera::InitMouseDis()
 void CCamera::KeyInput()
 {
 	CKey*	  Key	  = CDInput::GetInstance()->CDKeyboard();
-	CGamePad* GamePad = CDInput::GetInstance()->CDGamePad();
 
 	// カメラ位置の移動量の初期化.
 	m_DirectionPos = ZEROVEC3;
 
-	//if (m_IsDebug == true)
+	if (m_CanMoveMouse)
 	{
 		if (Key->IsKeyDown(DIK_UP))		{ CameraMove(Straight); }
 		if (Key->IsKeyDown(DIK_DOWN))	{ CameraMove(Back);		}
@@ -231,10 +227,10 @@ void CCamera::KeyInput()
 		}
 	}
 
-	if (Key->ISKeyAction(DIK_F2)) { m_MoveMouse = !m_MoveMouse; }
+	if (Key->IsKeyAction(DIK_F2)) { m_CanMoveMouse = !m_CanMoveMouse; }
 
 	// マウスカーソルの表示.
-	ShowCursor(m_MoveMouse);
+	ShowCursor(!m_CanMoveMouse);
 }
 
 // マウス移動量の計算.
