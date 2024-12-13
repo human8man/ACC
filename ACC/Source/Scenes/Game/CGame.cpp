@@ -5,7 +5,9 @@
 #include "Effect/CEffect.h"	//Effekseerを使うためのクラス.
 #include <Camera/CCamera.h>
 
-//コンストラクタ.
+//============================================================================
+//		ゲームクラス.
+//============================================================================
 CGame::CGame(HWND hWnd)
 	: m_pDx9		( CDirectX9::GetInstance() )
 	, m_pDx11		( CDirectX11::GetInstance() )
@@ -54,8 +56,6 @@ CGame::CGame(HWND hWnd)
 	m_Light.vDirection	= D3DXVECTOR3( 1.5f, 1.f, -1.f );	//ライト方向.
 }
 
-
-//デストラクタ.
 CGame::~CGame()
 {
 	// ザコ複数.

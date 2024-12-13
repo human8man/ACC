@@ -33,13 +33,13 @@ CMain::~CMain()
 HRESULT CMain::Create() const
 {
 	// DirectX9構築.
-	if (FAILED(CDirectX9::GetInstance()->Create(m_hWnd))) { return E_FAIL; }
+	if (FAILED(CDirectX9::GetInstance()		->Create(m_hWnd))) { return E_FAIL; }
 	// DirectX11構築.
-	if (FAILED(CDirectX11::GetInstance()->Create(m_hWnd))) { return E_FAIL; }
+	if (FAILED(CDirectX11::GetInstance()	->Create(m_hWnd))) { return E_FAIL; }
 	// シーンマネージャー構築.
-	if (FAILED(CSceneManager::GetInstance()->Create(m_hWnd))) { return E_FAIL; }
+	if (FAILED(CSceneManager::GetInstance()	->Create(m_hWnd))) { return E_FAIL; }
 	// DirectInput構築.
-	if (FAILED(CDInput::GetInstance()->Create(m_hWnd))) { return E_FAIL; }
+	if (FAILED(CDInput::GetInstance()		->Create(m_hWnd))) { return E_FAIL; }
 
 #ifdef _DEBUG
 	// ImGuiの構築.
@@ -90,8 +90,8 @@ void CMain::Loop()
 	//		フレームレート調整準備.
 	//------------------------------------------------
 	float Rate = 0.0f;	// レート.
-	DWORD sync_old = timeGetTime();			// 過去時間.
-	DWORD sync_now;							// 現在時間.
+	DWORD sync_old = timeGetTime();	// 過去時間.
+	DWORD sync_now;					// 現在時間.
 
 	// 時間処理のため、最小単位を1ミリ秒に変更.
 	timeBeginPeriod( 1 );
