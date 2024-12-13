@@ -5,6 +5,9 @@ LPDIRECTINPUT8 lpDI8;
 LPDIRECTINPUTDEVICE8 lpJoystick;
 
 
+//==============================================================================
+//		ゲームパッドクラス.
+//==============================================================================
 CGamePad::CGamePad()
 	: m_ButtonPressed			()
 	, m_PreviousButtonPressed	()
@@ -15,12 +18,15 @@ CGamePad::CGamePad()
 {
 }
 
-// ジョイスティックデバイスの列挙時に呼ばれるコールバック関数.
+
+//--------------------------------------------------------------------------------
+//		ジョイスティックデバイスの列挙時に呼ばれるコールバック関数.
+//--------------------------------------------------------------------------------
 BOOL EnumJoyDeviceProc(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
 {
 	// ジョイスティックデバイスを作成.
 	HRESULT ret = lpDI8->CreateDevice(lpddi->guidInstance, &lpJoystick, NULL);
-	if (FAILED( ret )) { return DIENUM_STOP; }
+	if (FAILED(ret)) { return DIENUM_STOP; }
 
 	// データフォーマットの設定.
 	ret = lpJoystick->SetDataFormat(&c_dfDIJoystick);
@@ -31,12 +37,12 @@ BOOL EnumJoyDeviceProc(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
 	}
 
 	// 入力範囲設定（X, Y, Z, RX, RY, RZ 軸）.
-	DIPROPRANGE diprg		= {};
-	diprg.diph.dwSize		= sizeof(diprg);
+	DIPROPRANGE diprg = {};
+	diprg.diph.dwSize = sizeof(diprg);
 	diprg.diph.dwHeaderSize = sizeof(diprg.diph);
-	diprg.diph.dwHow		= DIPH_BYOFFSET;
-	diprg.lMax				=  1000; // 最大値.
-	diprg.lMin				= -1000; // 最小値.
+	diprg.diph.dwHow = DIPH_BYOFFSET;
+	diprg.lMax = 1000; // 最大値.
+	diprg.lMin = -1000; // 最小値.
 
 	// 各軸に対して範囲設定.
 	for (DWORD axis : {DIJOFS_X, DIJOFS_Y, DIJOFS_Z, DIJOFS_RX, DIJOFS_RY, DIJOFS_RZ})
@@ -56,6 +62,10 @@ BOOL EnumJoyDeviceProc(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
 	return DIENUM_STOP; // 次のデバイスを列挙したい場合は DIENUM_CONTINUE.
 }
 
+
+//==============================================================================
+//		更新.
+//==============================================================================
 void CGamePad::Update()
 {
 	// ジョイスティックがある状態なら.
@@ -104,6 +114,10 @@ void CGamePad::Update()
 	}
 }
 
+
+//==============================================================================
+//		作成.
+//==============================================================================
 int CGamePad::Create()
 {
 	//IDirectInput8の作成.
@@ -124,11 +138,13 @@ int CGamePad::Create()
 		return -1;
 	}
 
-	// デバイス情報.
-	//	ジョイスティックの中身がなかった場合は処理を飛ばす.
 	return 0;
 }
 
+
+//==============================================================================
+//		開放.
+//==============================================================================
 void CGamePad::Release()
 {
 	if (lpJoystick != NULL) {
@@ -137,6 +153,10 @@ void CGamePad::Release()
 	}
 }
 
+
+//==============================================================================
+//		十字キー入力時判定.
+//==============================================================================
 bool CGamePad::GetPovAction(int Direction)
 {
 	// Direction = 0(上), 1(右), 2(下), 3(左).
@@ -157,53 +177,48 @@ bool CGamePad::GetPovAction(int Direction)
 		break;
 	}
 
-	// 前回の状態（ボタンが押されていたかどうか）.
+	// 前回の状態を保存.
 	bool WasPressed = m_BPOVButtonPressed[Direction];
 
-	// 状態が変わった瞬間（前回は押されていなかった、今回押された）.
+	// 状態変化時.
 	if (!WasPressed && IsPressed)
 	{
-		// 状態が変わったので、現在押された状態として記録.
+		// 状態が変わったので、現在入力中として記録.
 		m_BPOVButtonPressed[Direction] = true;
-		return true;	// 押された瞬間のみ反応.
+		return true; // 入力時のみ反応.
 	}
 
 	// 前回押されていて、現在も押されている場合は何もしない.
 	// もし、現在押されていない場合、次回の判定のために状態をリセット.
-	if (IsPressed)
-	{
-		m_BPOVButtonPressed[Direction] = true;
-	}
-	else
-	{
-		m_BPOVButtonPressed[Direction] = false;
-	}
+	m_BPOVButtonPressed[Direction] = IsPressed;
 
-	return false;  // 継続的に押されている場合は反応しない.
+	return false; // 継続的に押されている場合は反応しない.
 }
 
+
+//==============================================================================
+//		十字キー入力中判定.
+//==============================================================================
 bool CGamePad::GetPovDown(int Direction)
 {
-	DWORD pov = m_Pad.rgdwPOV[0];   // POVは四方向の入力情報.
+	DWORD pov = m_Pad.rgdwPOV[0];	// POVは四方向の入力情報.
 
 	// 十字キーの各方向について押されたかどうかを確認.
-	// POV値を各方向にマッピングして判断.
-
-	// 0(上), 1(右), 2(下), 3(左).
+	//	POV値を各方向にマッピングして判断.
 	bool IsPressed = false;
 	switch (Direction)
 	{
-	case 0:
-		IsPressed = (pov == 0);		// 上.
+	case 0:	// 上.
+		IsPressed = (pov == 0);
 		break;
-	case 1:
-		IsPressed = (pov == 9000);	// 右.
+	case 1:	// 右.
+		IsPressed = (pov == 9000);
 		break;
-	case 2:
-		IsPressed = (pov == 18000);	// 下.
+	case 2:	// 下.
+		IsPressed = (pov == 18000);
 		break;
-	case 3:
-		IsPressed = (pov == 27000);	// 左.
+	case 3:	// 左.
+		IsPressed = (pov == 27000);
 		break;
 	}
 
@@ -218,28 +233,31 @@ bool CGamePad::GetPovDown(int Direction)
 	return false;
 }
 
+//==============================================================================
+//		値を返すだけの処理達.
+//			単純な処理の割に長いためここに中身を書く.
+//==============================================================================
+// ジョイスティックが作成されているか.
 bool CGamePad::IsValid() const
 {
-	// ゲームパッドが作成されているか確認.
 	return lpJoystick != nullptr;
 }
 
+// ゲームパッドが接続中か.
 HRESULT CGamePad::GetDeviceState() const
 {
 	if ( m_IsConect ) { return S_OK; }
 	return E_FAIL;
 }
 
-
-// 他クラスでボタンの情報を取得する用.
-bool CGamePad::GetPadButton(int buttonIndex) const
+// ボタンの情報を取得する.
+bool CGamePad::GetPadButtonAction(int buttonIndex) const
 {
-	// 外からどのボタンかを設定し、そのボタンが押されたらフラグが返るようになっている.
 	return m_ButtonPressed[buttonIndex];
 }
 
+// 押されているボタンの情報を取得.
 bool CGamePad::GetPadButtonDown(int buttonIndex)const
 {
-	// 押した瞬間用.
 	return !m_PreviousButtonPressed[buttonIndex] && m_ButtonPressed[buttonIndex];
 }
