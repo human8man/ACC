@@ -62,15 +62,15 @@ void CDInput::InputUpdate()
 
 bool CDInput::GamePadConnect()
 {
+	// ゲームパッドが作成されていないとき.
 	if (!m_GamePad.IsValid())
 	{
-		//ゲームパッドが作成されていないとき.
 		return false;
 	}
 
 	HRESULT hr = m_GamePad.GetDeviceState();
 
-	//失敗した場合、
+	// 失敗した場合、
 	if (FAILED(hr) || hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED)
 	{
 		return false;
@@ -81,7 +81,7 @@ bool CDInput::GamePadConnect()
 
 void CDInput::Release()
 {
-	//DirectInputオブジェクトの解放.
+	// DirectInputオブジェクトの解放.
 	if (m_pDCInput != NULL)
 	{
 		m_pDCInput->Release();

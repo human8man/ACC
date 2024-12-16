@@ -6,9 +6,9 @@
 #pragma comment ( lib, "dxguid.lib" )	// エフェクト用.
 
 
-//######################################################################################################################
-//	マクロ.
-//######################################################################################################################
+//===================================================
+//		マクロ.
+//===================================================
 #define SAFE_RELEASE(p)	{if(p!=nullptr){(p)->Release();(p)=nullptr;}}
 #define SAFE_DELETE(p)	{if(p!=nullptr){delete (p);(p)=nullptr;}}
 #define SAFE_DELETEARRAY(P)	{if(p!=nullptr){delete[] (p);(p)=nullptr;}}
@@ -51,7 +51,9 @@ enum class I3DL2_ENV_PRESET : int
 	NONE = -1,		// 未設定.
 };
 
-// WAVEファイルによる音声処理を制御するクラス.
+//==========================================================
+//		Soundクラス.
+//==========================================================
 class CSound
 {
 public:
@@ -62,7 +64,7 @@ public:
 		: VOLUME_DEFAULT(VolumeDefault), m_pDS(), m_pDSBuffer() {};	//コンストラクタ(初期音量設定可能版).
 	~CSound();	// デストラクタ.
 
-	// DirectSoundデバイス作成・解放.
+	// Soundデバイス作成・解放.
 	HRESULT CreateDevice( HWND hWnd );
 	HRESULT ReleaseDevice();
 
@@ -93,7 +95,7 @@ public:
 
 	// パンニングを設定する.
 	//	パンニング = 左右どちらかに音を偏らせる.
-	//  左 = -10000、右 = 10000.
+	//	左 = -10000、右 = 10000.
 	void SetPan( LONG pan );
 
 	// 周波数を設定する.
@@ -129,8 +131,7 @@ private:
 	LPWSTR ConvertLPSTRToLPWSTR(LPSTR lpstr);
 
 	// パンニング、周波数、音量が範囲外に設定されないようにする関数.
-	LONG RoundingPan( LONG pan );
+	LONG  RoundingPan( LONG pan );
 	DWORD RoundingFrequency( DWORD freq );
-	LONG RoundingVolume( LONG volume );
-	
+	LONG  RoundingVolume( LONG volume );
 };

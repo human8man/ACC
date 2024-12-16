@@ -120,7 +120,7 @@ void CGamePad::Update()
 //==============================================================================
 int CGamePad::Create()
 {
-	//IDirectInput8の作成.
+	// IDirectInput8の作成.
 	HRESULT ret = DirectInput8Create(GetModuleHandle(NULL), DIRECTINPUT_VERSION, IID_IDirectInput8, (LPVOID*)&lpDI8, NULL);
 	if (FAILED(ret)) { return -1; }
 
@@ -189,7 +189,7 @@ bool CGamePad::GetPovAction(int Direction)
 	}
 
 	// 前回押されていて、現在も押されている場合は何もしない.
-	// もし、現在押されていない場合、次回の判定のために状態をリセット.
+	//	もし、現在押されていない場合、次回の判定のために状態をリセット.
 	m_BPOVButtonPressed[Direction] = IsPressed;
 
 	return false; // 継続的に押されている場合は反応しない.

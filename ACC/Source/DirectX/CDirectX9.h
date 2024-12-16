@@ -16,7 +16,7 @@ class CDirectX9
 	: public CSingleton<CDirectX9>
 {
 private:
-	friend class CSingleton<CDirectX9>; // シングルトンクラスをフレンド宣言.
+	friend class CSingleton<CDirectX9>;
 
 public:
 	CDirectX9();
