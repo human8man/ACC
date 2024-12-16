@@ -81,7 +81,6 @@ class CGamePad
 private:
 	friend class CDInput;
 
-	//定数宣言.
 	static constexpr int ButtonMAX = 32;
 public:
 	DIJOYSTATE GetPadpos() const { return m_Pad; }
@@ -131,7 +130,7 @@ public:
 	~CDInput();
 
 	HRESULT Create(HWND hWnd, int useDevice = UseInputDevice_ALL);
-	bool GamePadConnect();	//コントローラー接続確認.
+	bool GamePadConnect();	// コントローラー接続確認.
 	void Release();
 public:
 	// 入力状態の更新.
@@ -147,7 +146,7 @@ private:
 	IDirectInput8* m_pDCInput;	// DirectInputオブジェクト.
 	int m_UseDevice;			// 使用するデバイス.
 
-	//各デバイスの変数宣言.
+	// 各デバイスの変数宣言.
 	CKey	 m_Key;
 	CMouse	 m_Mouse;
 	CGamePad m_GamePad;
