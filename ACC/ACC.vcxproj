@@ -289,6 +289,7 @@
     <ClInclude Include="Source\Collision\BoundingSphere\CBoundingSphere.h" />
     <ClInclude Include="Source\Collision\Ray\CRay.h" />
     <ClInclude Include="Source\Common\DirectInput\CDirectInput.h" />
+    <ClInclude Include="Source\Common\Easing\Easing.h" />
     <ClInclude Include="Source\Common\Global.h" />
     <ClInclude Include="Source\Common\ImGui\CImGui.h" />
     <ClInclude Include="Source\Common\ImGui\library\imconfig.h" />
@@ -333,6 +334,9 @@
     <ClInclude Include="Source\Scenes\CSceneBase.h" />
     <ClInclude Include="Source\Scenes\Game\CGame.h" />
     <ClInclude Include="Source\Scenes\SceneManager\CSceneManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Source\Common\Easing\Easing.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -118,6 +118,9 @@
     <Filter Include="Source\Common\DirectInput">
       <UniqueIdentifier>{d233fb9b-df9d-4a16-865c-c14f2a0ffec0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Common\Easing">
+      <UniqueIdentifier>{f516dcd3-d07b-438c-9739-2de3d15b2d12}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Data\Shader\Sprite3D.hlsl">
@@ -424,5 +427,13 @@
     <ClInclude Include="Source\Common\DirectInput\CDirectInput.h">
       <Filter>Source\Common\DirectInput</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Common\Easing\Easing.h">
+      <Filter>Source\Common\Easing</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Source\Common\Easing\Easing.inl">
+      <Filter>Source\Common\Easing</Filter>
+    </None>
   </ItemGroup>
 </Project>
