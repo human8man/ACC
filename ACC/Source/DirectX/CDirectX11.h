@@ -13,7 +13,7 @@ class CDirectX11
 	: public CSingleton<CDirectX11>
 {
 private:
-	friend class CSingleton<CDirectX11>; // シングルトンクラスをフレンド宣言.
+	friend class CSingleton<CDirectX11>;
 
 public:
 	CDirectX11();
@@ -77,6 +77,6 @@ private:
 	ID3D11BlendState*		m_pAlphaBlendOn;	// 有効設定.
 	ID3D11BlendState*		m_pAlphaBlendOff;	// 無効設定.
 
-	//ラスタライザ設定保存したいため
+	// ラスタライザ設定保存したいため
 	D3D11_RASTERIZER_DESC m_RasterizerDc;
 };

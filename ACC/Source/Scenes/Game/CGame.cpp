@@ -5,7 +5,9 @@
 #include "Effect/CEffect.h"	//Effekseerを使うためのクラス.
 #include <Camera/CCamera.h>
 
-//コンストラクタ.
+//============================================================================
+//		ゲームクラス.
+//============================================================================
 CGame::CGame(HWND hWnd)
 	: m_pDx9		( CDirectX9::GetInstance() )
 	, m_pDx11		( CDirectX11::GetInstance() )
@@ -54,8 +56,6 @@ CGame::CGame(HWND hWnd)
 	m_Light.vDirection	= D3DXVECTOR3( 1.5f, 1.f, -1.f );	//ライト方向.
 }
 
-
-//デストラクタ.
 CGame::~CGame()
 {
 	// ザコ複数.
@@ -379,12 +379,17 @@ void CGame::Draw()
 	m_pEnemy->UpdateBSpherePos();
 	m_pShot->UpdateBSpherePos();
 
+	HWND hStartMenu = FindWindow(L"Windows.UI.Core.CoreWindow", L"Start");
+
+	//HWND hForeground = GetForegroundWindow();
+	//HWND hDesktop = GetShellWindow();
+
 	//プレイヤーとエネミーの当たり判定.
-	if( m_pPlayer->GetBSphere()->IsHit( *m_pEnemy->GetBSphere() ) ){
-		SetWindowText(m_hWnd, _T("衝突しています"));
+	if(hStartMenu != NULL && IsWindowVisible(hStartMenu)){
+		SetWindowText(m_hWnd, _T("スタートメニューが表示されています"));
 	}
 	else{
-		SetWindowText(m_hWnd, _T(""));
+		SetWindowText(m_hWnd, _T("スタートメニューは表示されていません"));
 	}
 
 	//弾とエネミーの当たり判定.

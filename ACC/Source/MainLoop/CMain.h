@@ -10,8 +10,8 @@ public:
 	CMain();
 	~CMain();
 
+	HRESULT Create() const;
 	void Update();
-	HRESULT Create();
 	void Release();
 	void Loop();
 

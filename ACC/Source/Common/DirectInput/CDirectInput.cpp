@@ -2,85 +2,96 @@
 
 CDInput::CDInput()
 {
-    m_pDCInput = NULL;
-    m_hWnd = NULL;
-    m_UseDevice = 0;
+	m_pDCInput = NULL;
+	m_hWnd = NULL;
+	m_UseDevice = 0;
 }
 
 CDInput::~CDInput()
 {
-    Release();
+	Release();
 }
 
-bool CDInput::Create(HWND hWnd, int useDevice)
+HRESULT CDInput::Create(HWND hWnd, int useDevice)
 {
-    if (m_pDCInput)
-    {
-        Release();
-    }
-    m_hWnd = hWnd;
+	m_hWnd = hWnd;	// ウィンドウハンドルを保存
 
-    //DirectInputオブジェクトの生成.
-    HRESULT hr = DirectInput8Create(
-        ::GetModuleHandle(NULL),
-        DIRECTINPUT_VERSION,
-        IID_IDirectInput8,
-        (void**)&m_pDCInput,
-        NULL);
+	// すでに存在する場合は開放し初期化.
+	if (m_pDCInput) { Release(); }
 
-    if (FAILED(hr))
-    {
-        return false;
-    }
+	//DirectInputオブジェクトの生成.
+	HRESULT hr = DirectInput8Create(
+		::GetModuleHandle(NULL),	// アプリケーションのモジュールハンドル.
+		DIRECTINPUT_VERSION,		// 使用するDirectInputのバージョン.
+		IID_IDirectInput8,			// DirectInputのインターフェースID.
+		(void**)&m_pDCInput,		// 作成されたDirectInputオブジェクトを保存するポインタ.
+		NULL);						// 未使用の引数（NULLを指定）.
 
-    m_UseDevice = useDevice;
+	// 生成に失敗した場合.
+	if ( FAILED(hr) ) { return E_FAIL; }
 
-    if (useDevice & UseInputDevice_KEYBOARD)
-    {
-        m_Key.Create(m_pDCInput, hWnd);
-    }
-    if (useDevice & UseInputDevice_GAMEPAD)
-    {
-        m_Mouse.Create(m_pDCInput, hWnd);
-    }
+	// 使用するデバイスの設定を保存.
+	m_UseDevice = useDevice;
 
-    m_GamePad.Create();
+	if (useDevice & UseInputDevice_KEYBOARD) {
+		m_Key.Create(m_pDCInput, hWnd);
+	}
+	if (useDevice & UseInputDevice_GAMEPAD) {
+		m_Mouse.Create(m_pDCInput, hWnd);
+	}
 
-    return true;
+	m_GamePad.Create();
+
+	return S_OK;
 }
+
+
+void CDInput::InputUpdate()
+{
+	if (!GamePadConnect())
+	{
+		m_Key.Update();
+		m_Mouse.Update();
+	}
+	else
+	{
+		m_GamePad.Update();
+	}
+}
+
 
 bool CDInput::GamePadConnect()
 {
-    if (!m_GamePad.IsValid())
-    {
-        //ゲームパッドが作成されていないとき.
-        return false;
-    }
+	// ゲームパッドが作成されていないとき.
+	if (!m_GamePad.IsValid())
+	{
+		return false;
+	}
 
-    HRESULT hr = m_GamePad.GetDeviceState();
+	HRESULT hr = m_GamePad.GetDeviceState();
 
-    //失敗した場合、
-    if (FAILED(hr) || hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED)
-    {
-        return false;
-    }
+	// 失敗した場合、
+	if (FAILED(hr) || hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED)
+	{
+		return false;
+	}
 
-    return true;
+	return true;
 }
 
 void CDInput::Release()
 {
-    //DirectInputオブジェクトの解放.
-    if (m_pDCInput != NULL)
-    {
-        m_pDCInput->Release();
-        m_pDCInput = NULL;
-    }
+	// DirectInputオブジェクトの解放.
+	if (m_pDCInput != NULL)
+	{
+		m_pDCInput->Release();
+		m_pDCInput = NULL;
+	}
 
-    m_Key.Release();
-    m_Mouse.Release();
-    m_GamePad.Release();
+	m_Key.Release();
+	m_Mouse.Release();
+	m_GamePad.Release();
 
-    m_hWnd = NULL;
-    m_UseDevice = 0;
+	m_hWnd = NULL;
+	m_UseDevice = 0;
 }

@@ -16,25 +16,16 @@ public:
 		Straight,
 		Back,
 	};
-	// マウス座標をfloatで保存する用.
-	struct Point {
-		float x;
-		float y;
-	};
 
+	static constexpr int WND_HM = WND_H / 2;
+	static constexpr int WND_WM = WND_W / 2;
 public:
 	CCamera();
 	~CCamera();
 
 	void Update();
-	void Camera(D3DXMATRIX& View);
+	void Camera(D3DXMATRIX& View) const;
 	void Init();
-
-	//デバッグ用カメラ
-	void DebugCamera();
-	//デバッグ用カメラの視点移動と移動
-	void MouseFirstPersonCamera();
-	void DebugCameraMove();
 
 	static float GetSens()		  { return GetInstance()->m_MouseSens;		 }
 	static float GetViewAngle()   { return GetInstance()->m_ViewAngle;		 }
@@ -51,35 +42,32 @@ public:
 	static void SetPosition		(const D3DXVECTOR3& Pos) { GetInstance()->m_Camera.Position = Pos;	}
 
 private:
-	void KeyInput();							// キー入力.
-	void MouseMath();							// マウス移動量の計算.
-	void InitMouseDis();						// マウスの移動量の初期化.
-	void MousePosReset();						// マウス位置の初期化.
-	void CameraMove(int vec);					// カメラの移動.
-	void MousePos(HDC hdc, POINT pos);			// カーソル位置.
-	void MouseMove(float deltaX, float deltaY);	// マウスの移動量に応じてカメラの方向を変更.
+	void KeyInput();					// キー入力.
+	void MouseMath();					// マウス移動量の計算.
+	void MousePosReset();				// マウス位置の初期化.
+	void CameraMove(int vec);			// カメラの移動.
+	void MouseMove(D3DXVECTOR2 value);	// マウスの移動量に応じてカメラの方向を変更.
 
 private:
 	CAMERA			m_Camera;			// カメラ情報.
 	float			m_ViewAngle;		// 視野角.
 
-	D3DXVECTOR3     m_LookDirection;	// カメラ注視点の移動量.
-	D3DXVECTOR3     m_DirectionPos;		// カメラ位置の移動量.
-	D3DXVECTOR3     m_Playerpos;		// 外部からのプイレイヤー座標を保存する用.
+	D3DXVECTOR3		m_DirectionPos;		// カメラ位置の移動量.
+	D3DXVECTOR3		m_Playerpos;		// 外部からのプイレイヤー座標を保存する用.
 
 	//マウス位置情報.
-	POINT           m_NowCurorPos;		// 現在のマウスの位置.
-	POINT           m_BeforCursorPos;	// マウス位置の避難所.
+	POINT			m_NowCurorPos;		// 現在のマウスの位置.
+	POINT			m_BeforCursorPos;	// 過去のマウスの位置.
 	 
-	float           m_MoveValue;		// 移動量.
+	float			m_MoveValue;		// 移動量.
 
-	float           m_CameraYaw;		// カメラ角度x軸.
-	float           m_CameraPitch;		// カメラ角度y軸.
-	D3DXVECTOR3     m_CameraRot;		// カメラの回転軸.
+	float			m_CameraYaw;		// カメラ角度x軸.
+	float			m_CameraPitch;		// カメラ角度y軸.
+	D3DXVECTOR3		m_CameraRot;		// カメラの回転軸.
 
-	Point           m_MouseMoveDis;		// マウスの移動した距離.
-	float           m_MouseSens;		// マウス感度.
-	bool            m_MoveMouse;		// マウスデバック用.
+	D3DXVECTOR2		m_MouseMoveDis;		// マウスの移動した距離.
+	float			m_MouseSens;		// マウス感度.
+	bool			m_CanMoveMouse;		// マウスが自由に移動できるかどうか.
 
 	float m_DefaultFov; // デフォルトの視野角.
 

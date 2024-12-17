@@ -43,7 +43,7 @@ HRESULT CDirectX11::Create(HWND hWnd)
 	}
 
 	// 各種テクスチャとそれに付帯する各種ビュー（画面）を作成.
-	//	 バックバッファ準備：カラーバッファレンダーターゲットビュー.
+	//	バックバッファ準備：カラーバッファレンダーターゲットビュー.
 	if( FAILED(
 		CreateColorBackBufferRTV() ) )
 	{

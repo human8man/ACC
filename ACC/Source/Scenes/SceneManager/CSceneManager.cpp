@@ -5,16 +5,16 @@
 
 #include "Camera/CCamera.h"
 #include "Sprite/2D/UI/CUIFade/CUIFade.h"
-
 #include "DirectSound/CSoundManager.h"
 
 
 #ifdef _DEBUG
 	#include "Common/ImGui/CImGui.h"
-#endif // _DEBUG.
+#endif
 
-
-
+//======================================================================================================================
+//		シーンマネージャークラス.
+//======================================================================================================================
 CSceneManager::CSceneManager()
 	: m_hWnd		()
 	, m_pScene		()
@@ -27,7 +27,10 @@ CSceneManager::~CSceneManager()
 	Release();
 }
 
-//シーンマネージャー構築関数
+
+//======================================================================================================================
+//		シーンマネージャー構築関数.
+//======================================================================================================================
 HRESULT CSceneManager::Create(HWND hWnd)
 {
 	//自身のインスタンス
@@ -53,34 +56,34 @@ HRESULT CSceneManager::Create(HWND hWnd)
 	return S_OK;
 }
 
-//更新処理
+
+//======================================================================================================================
+//		更新処理.
+//======================================================================================================================
 void CSceneManager::Update()
 {
-
 #ifdef _DEBUG
-	// Debugでの実行時のみ更新.
+	// ここでのみImGuiのUpdateを回す.
 	CImGui::GetInstance()->Update();
-#endif
-	 
-	if (m_pFade->GetFadPeak()) {
- 		m_pScene.release();
-		m_pScene = CreateScene(m_NextSceneNo);
-		m_pScene->Create();
-		m_pScene->LoadData();
-	}
-
-#ifdef _DEBUG
 
 	ImGui::Begin("SceneSelect");
-	if (ImGui::Button("Game"))
-	{
+	if (ImGui::Button("Game")) {
 		GetInstance()->LoadScene(SceneList::Game);
 	}
 	ImGui::End();
 #endif
 
-	if (!m_pFade->GetFading()
-	|| m_pFade->GetFadPeak()) 
+	 // フェードのピーク時にシーンを切り替える.
+	if (m_pFade->GetFadePeak()) {
+		m_pScene.release();
+		m_pScene = CreateScene(m_NextSceneNo);
+		m_pScene->Create();
+		m_pScene->LoadData();
+	}
+
+	// フェード中でない間、Update()を回す.
+	//	フェードのピーク時に一度だけ通し、背景を作成する.
+	if (!m_pFade->GetFading() || m_pFade->GetFadePeak()) 
 	{
 		GetInstance()->m_pScene->Update();
 	}
@@ -88,35 +91,34 @@ void CSceneManager::Update()
 	m_pFade->Update();
 }
 
-//描画処理
+
+//======================================================================================================================
+//		描画処理.
+//======================================================================================================================
 void CSceneManager::Draw()
 {
 	m_pScene->Draw();
 
 #ifdef _DEBUG
-
-	ImGui::Begin("Camera");
-	float CameraViewAngle = CCamera::GetViewAngle();
-	ImGui::DragFloat("View Angle", &CameraViewAngle, 1.0f, 1.0f,120.0f);
-	float Sens = CCamera::GetInstance()->GetSens();
-	ImGui::DragFloat("Sens", &Sens, 1.0f, 0.01f, 1.0f);
-	CCamera::SetViewAngle(CameraViewAngle);
-	ImGui::End();
-
-	// Debugでの実行時のみ描画.
+	// ここでのみImGuiのDrawを回す.
 	CImGui::GetInstance()->Draw();
 #endif
 }
 
-//シーンマネージャー破棄
+
+//======================================================================================================================
+//		シーンマネージャー破棄.
+//======================================================================================================================
 void CSceneManager::Release()
 {
 	m_pScene->Release();
-
 	m_pFade->Release();
 }
 
-//指定したシーンを読み込む
+
+//======================================================================================================================
+//		指定したシーンを読み込む.
+//======================================================================================================================
 void CSceneManager::LoadScene(SceneList Scene)
 {
 	m_pFade->DoFade(120);
@@ -127,18 +129,19 @@ void CSceneManager::LoadScene(SceneList Scene)
 	CSoundManager::Stop(CSoundManager::SE_Move);
 }
 
-//指定されたシーンの生成
+
+//----------------------------------------------------------------------------------------------------------------------
+//		指定されたシーンの生成.
+//----------------------------------------------------------------------------------------------------------------------
 std::unique_ptr<CSceneBase> CSceneManager::CreateScene(SceneList No)
 {
 	switch (No)
 	{
-	case Game: 
-		ShowCursor(false);
-
+	case Game:
 		return std::make_unique<CGame>( m_hWnd );
 
 
 	default:return nullptr;
 	}
-    return nullptr;
+	return nullptr;
 }

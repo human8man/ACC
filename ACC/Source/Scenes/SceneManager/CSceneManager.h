@@ -19,7 +19,7 @@ class CSceneManager
 	: public CSingleton<CSceneManager>
 {
 private:
-	friend class CSingleton<CSceneManager>; // シングルトンクラスをフレンド宣言.
+	friend class CSingleton<CSceneManager>;
 
 public:
 	CSceneManager();
@@ -38,6 +38,6 @@ private:
 private:
 	HWND m_hWnd;
 	SceneList m_NextSceneNo;
-	std::unique_ptr<CUIFade>		m_pFade;		 // フェードクラス.
-	std::unique_ptr<CSceneBase>		m_pScene;		 // シーンクラスのポインタ.
+	std::unique_ptr<CUIFade>	m_pFade;	// フェードクラス.
+	std::unique_ptr<CSceneBase>	m_pScene;	// シーンクラスのポインタ.
 };

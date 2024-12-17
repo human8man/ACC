@@ -23,14 +23,15 @@
 #include "GameObject/Mesh/Skin/CSkinMesh.h"
 #include "Collision/Ray/CRay.h"
 
-/********************************************************************************
-*	ゲームクラス.
-**/
+
+//============================================================================
+//		ゲームクラス.
+//============================================================================
 class CGame
 	: public CSceneBase
 {
 public:
-	static constexpr int ENEMY_MAX = 3;	//エネミーの最大数.
+	static constexpr int ENEMY_MAX = 3;
 
 	CGame( HWND hWnd );
 	~CGame();
@@ -46,63 +47,63 @@ private:
 	CDirectX9*		m_pDx9;
 	CDirectX11*		m_pDx11;
 
-	CDebugText*		m_pDbgText;	//デバッグテキスト.
+	CDebugText*		m_pDbgText;	// デバッグテキスト.
 
-	//レイ表示クラス.
-	CRay*	m_pRayY;					//Y方向(垂直).
-	CRay*	m_pCrossRay[CROSSRAY::max];	//十字(前後左右).
+	// レイ表示クラス.
+	CRay*	m_pRayY;					// Y方向(垂直).
+	CRay*	m_pCrossRay[CROSSRAY::max];	// 十字(前後左右).
 
-	//ウィンドウハンドル.
+	// ウィンドウハンドル.
 	HWND			m_hWnd;
 
-	//ライト情報.
+	// ライト情報.
 	LIGHT			m_Light;
 
-	//行列.
-	D3DXMATRIX		m_mView;	//ビュー(カメラ)行列.
-	D3DXMATRIX		m_mProj;	//射影（プロジェクション）行列.
+	// 行列.
+	D3DXMATRIX		m_mView;	// ビュー(カメラ)行列.
+	D3DXMATRIX		m_mProj;	// 射影（プロジェクション）行列.
 
-	//ゲームで扱うスプライトデータ(使いまわす資源).
+	// ゲームで扱うスプライトデータ(使いまわす資源).
 	CSprite3D*		m_pSpriteGround;
 	CSprite3D*		m_pSpritePlayer;
 	CSprite3D*		m_pSpriteExplosion;
 
-	//スタティックメッシュ(使いまわす資源).
-	CStaticMesh*	m_pStaticMeshFighter;	//自機.
-	CStaticMesh*	m_pStaticMeshGround;	//地面.
-	CStaticMesh*	m_pStaticMeshRoboA;		//ロボA.
-	CStaticMesh*	m_pStaticMeshRoboB;		//ロボB.
-	CStaticMesh*	m_pStaticMeshBullet;	//弾.
-	CStaticMesh*	m_pStaticMeshBSphere;	//バウンディングスフィア(当たり判定用).
+	// スタティックメッシュ(使いまわす資源).
+	CStaticMesh*	m_pStaticMeshFighter;	// 自機.
+	CStaticMesh*	m_pStaticMeshGround;	// 地面.
+	CStaticMesh*	m_pStaticMeshRoboA;		// ロボA.
+	CStaticMesh*	m_pStaticMeshRoboB;		// ロボB.
+	CStaticMesh*	m_pStaticMeshBullet;	// 弾.
+	CStaticMesh*	m_pStaticMeshBSphere;	// バウンディングスフィア(当たり判定用).
 
-	//スキンメッシュ(使いまわす資源).
-	CSkinMesh*		m_pSkinMeshZako;		//ザコ.
-	int				m_ZakoAnimNo;			//ザコ：アニメーション番号.
-	double			m_ZakoAnimTime;			//ザコ：アニメーション経過時間.
-	D3DXVECTOR3		m_ZakoBonePos;			//ザコ：ボーン座標.
+	// スキンメッシュ(使いまわす資源).
+	CSkinMesh*		m_pSkinMeshZako;		// ザコ.
+	int				m_ZakoAnimNo;			// ザコ：アニメーション番号.
+	double			m_ZakoAnimTime;			// ザコ：アニメーション経過時間.
+	D3DXVECTOR3		m_ZakoBonePos;			// ザコ：ボーン座標.
 
-	//スプライトオブジェクトクラス.
+	// スプライトオブジェクトクラス.
 	CSpriteObject*		m_pExplosion;
 	
-	//スタティックメッシュオブジェクトクラス.
+	// スタティックメッシュオブジェクトクラス.
 	CStaticMeshObject*	m_pStcMeshObj;
 
-	//キャラクタークラス.
+	// キャラクタークラス.
 	CCharacter*			m_pPlayer;
 	CCharacter*			m_pEnemy;
 	CCharacter*			m_pEnemies[ENEMY_MAX];
 	CCharacter**		m_ppEnemies;
 	int					m_EnemyMax;
 
-	//地面クラス.
+	// 地面クラス.
 	CGround*			m_pGround;
 
-	//弾クラス.
+	// 弾クラス.
 	CShot*				m_pShot;
 
-	//ザコクラス.
+	// ザコクラス.
 	CZako*				m_pZako;
 
-	//std::vector<宣言したい型名> 変数名.
+	// std::vector<宣言したい型名> 変数名.
 	std::vector<CZako*>	m_Zako;
 };

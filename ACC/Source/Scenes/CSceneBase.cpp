@@ -5,6 +5,10 @@
 //		シーンベースクラス.
 //===================================================
 CSceneBase::CSceneBase()
+	:m_hWnd		()
+	,m_Light	()
+	,m_mView	()
+	,m_mProj	()
 {
 }
 
@@ -18,7 +22,7 @@ CSceneBase::~CSceneBase()
 void CSceneBase::Projection( D3DXMATRIX& Proj )
 {
 	// y方向の視野角。数値を大きくしたら視野が狭くなる.
-	float fov_y = static_cast<FLOAT>(D3DXToRadian(CCamera::GetViewAngle()));	//ラジアン値.
+	float fov_y = static_cast<FLOAT>(D3DXToRadian(CCamera::GetViewAngle()));
 	
 	// アスペクト（幅÷高さ）.
 	float aspect = static_cast<FLOAT>(WND_W) / static_cast<FLOAT>(WND_H);

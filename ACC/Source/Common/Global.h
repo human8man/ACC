@@ -37,14 +37,14 @@
 //=================================================
 //		定数.
 //=================================================
-constexpr int WND_W = 1280;	// ウィンドウの幅.
-constexpr int WND_H = 720;	// ウィンドウの高さ.
-constexpr int FPS   = 60;	// フレームレート.
+constexpr int WND_W = 1280;	 // ウィンドウの幅.
+constexpr int WND_H = 720;	 // ウィンドウの高さ.
+constexpr int FPS   = 60;	 // フレームレート.
+constexpr int STIC_LOW = 60; // スティック入力のデッドゾーン.
 
 // 0にする定数(初期化などに使用).
 const D3DXVECTOR3 ZEROVEC3( 0.f,0.f,0.f );
 const D3DXVECTOR2 ZEROVEC2( 0.f,0.f );
-constexpr int STIC_LOW = 60;
 
 //=================================================
 //		構造体.
