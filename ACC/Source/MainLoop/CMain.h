@@ -27,6 +27,11 @@ private:
 		HWND hWnd,	   UINT uMsg,
 		WPARAM wParam, LPARAM lParam );
 
+	bool setUseImmersiveDarkMode(HWND hwnd, bool dark_mode);
+	void SetRainbowBorder(HWND hwnd);
+
 private:
 	HWND	m_hWnd;	// ウィンドウハンドル.
+
+	int		m_ColorStep;
 };

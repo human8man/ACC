@@ -20,7 +20,7 @@ public:
 	// WND_WM(M = MID)は全体で使わなさそうなのでここで宣言.
 	static constexpr int WND_HM = WND_H / 2;
 	static constexpr int WND_WM = WND_W / 2;
-	static constexpr POINT RESETPOS = { WND_HM, WND_WM };
+	static constexpr POINT RESETPOS = { WND_WM, WND_HM };
 public:
 	CCamera();
 	~CCamera();
@@ -37,6 +37,7 @@ public:
 	static D3DXVECTOR3& GetVec()  { return GetInstance()->m_Camera.UpVec; }
 	static D3DXVECTOR3& GetRot()  { return GetInstance()->m_CameraRot;	  }
 
+	static void SetUsePad	 (const float& Use)		  { GetInstance()->m_UsePad = Use;		}
 	static void SetViewAngle (const float& Fov)		  { GetInstance()->m_Fov = Fov;			}
 	static void SetSens		 (const float& Sens)	  { GetInstance()->m_MouseSens = Sens;	}
 	static void SetPlayerPos (const D3DXVECTOR3& Pos) { GetInstance()->m_Playerpos = Pos;	}
@@ -66,4 +67,5 @@ private:
 	float	m_MouseSens;		// マウス感度.
 
 	bool	m_CanMoveMouse;		// マウスが自由に移動できるかどうか.
+	bool	m_UsePad;			// コントローラーを使用するか.
 };

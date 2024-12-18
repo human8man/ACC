@@ -10,6 +10,13 @@
 #include "Common/ImGui/CImGui.h"
 #endif
 
+#include <iostream>
+#include <thread>
+#include <chrono>
+#include <cmath>
+#include <dwmapi.h>	//ダークモード？.
+#pragma comment(lib, "dwmapi.lib")
+
 const TCHAR WND_TITLE[] = _T( "ACC" );
 const TCHAR APP_NAME[]	= _T( "ACC" );
 
@@ -17,7 +24,8 @@ const TCHAR APP_NAME[]	= _T( "ACC" );
 //		メインループクラス.
 //=================================================
 CMain::CMain()
-	: m_hWnd	( nullptr )
+	: m_hWnd	  ( nullptr )
+	, m_ColorStep (0)
 {
 }
 
@@ -101,6 +109,9 @@ void CMain::Loop()
 	MSG msg = { 0 };
 	ZeroMemory( &msg, sizeof( msg ) );
 
+	// ダークモードに変更.
+	setUseImmersiveDarkMode( m_hWnd, true );
+
 	while( msg.message != WM_QUIT )
 	{
 		sync_now = timeGetTime();	// 現在の時間を取得.
@@ -113,6 +124,9 @@ void CMain::Loop()
 		else if( sync_now - sync_old >= Rate )
 		{
 			sync_old = sync_now;	// 現在時間に置き換え.
+
+			// ウィンドウのボーダーを虹色にする.
+			SetRainbowBorder(m_hWnd);
 
 			// 更新処理.
 			Update();
@@ -243,12 +257,23 @@ LRESULT CALLBACK CMain::MsgProc(
 #endif
 
 	switch( uMsg ) {
-	case WM_DESTROY:// ウィンドウが破棄されたとき.
+	//---------------------------------------------------------------
+	//		タイトルバーのカスタマイズ（デフォルトのものを非表示にする）
+	//---------------------------------------------------------------
+	case WM_CREATE:
+		break;
+	//---------------------------------------------------------------
+	//		ウィンドウが破棄されたとき.
+	//---------------------------------------------------------------
+	case WM_DESTROY:
 		// アプリケーションの終了をWindowsに通知する.
 		PostQuitMessage( 0 );
 		break;
 
-	case WM_KEYDOWN:// キーボードが押されたとき.
+	//---------------------------------------------------------------
+	//		キーボードが押されたとき.
+	//---------------------------------------------------------------
+	case WM_KEYDOWN:
 		// キー別の処理.
 		switch( static_cast<char>( wParam ) ) {
 		case VK_ESCAPE:	// ESCｷｰ.
@@ -262,7 +287,10 @@ LRESULT CALLBACK CMain::MsgProc(
 			break;
 		}
 		break;
-	case WM_DPICHANGED:// ウィンドウのDPI(Dot Per Inch)が変更されたとき.
+	//---------------------------------------------------------------
+	//		ウィンドウのDPI(Dot Per Inch)が変更されたとき.
+	//---------------------------------------------------------------
+	case WM_DPICHANGED:
 #ifdef _DEBUG
 		// ImGuiの設定フラグでDPIスケーリングが有効か確認.
 		if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_DpiEnableScaleViewports)
@@ -292,4 +320,44 @@ LRESULT CALLBACK CMain::MsgProc(
 
 	//メインに返す情報.
 	return DefWindowProc( hWnd, uMsg, wParam, lParam );
+}
+
+bool CMain::setUseImmersiveDarkMode(HWND hwnd, bool dark_mode)
+{
+	// ダークモードにする.
+	BOOL value = dark_mode;
+	DwmSetWindowAttribute(hwnd, 
+		DWMWA_USE_IMMERSIVE_DARK_MODE, 
+		&value, 
+		sizeof(value));
+
+	// ボタンの位置とサイズ.
+	RECT buttonBounds = { 100, 100, 200, 200 };
+	DwmSetWindowAttribute(hwnd, 
+		DWMWA_CAPTION_BUTTON_BOUNDS, 
+		&buttonBounds, 
+		sizeof(buttonBounds));
+
+	return false;
+}
+
+void CMain::SetRainbowBorder(HWND hwnd)
+{
+	// sin関数を使用して、赤、緑、青の色成分を計算
+	COLORREF color = RGB(
+		static_cast<BYTE>((sin(m_ColorStep * 0.3) * 127) + 128),  // 赤
+		static_cast<BYTE>((sin(m_ColorStep * 0.3 + 2) * 127) + 128),  // 緑
+		static_cast<BYTE>((sin(m_ColorStep * 0.3 + 4) * 127) + 128)   // 青
+	);
+
+	// ウィンドウの枠線の色を変更
+	DwmSetWindowAttribute(hwnd, DWMWA_BORDER_COLOR, &color, sizeof(color));
+	
+	// ステップを進めることで色が変化
+	m_ColorStep++;
+
+	// 一定数のステップでリセットして色を最初に戻す
+	if (m_ColorStep > 1000) {
+		m_ColorStep = 0;
+	}
 }

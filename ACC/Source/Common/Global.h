@@ -43,6 +43,9 @@ constexpr int FPS   = 60;	 // フレームレート.
 constexpr int STIC_LOW = 60; // スティック入力のデッドゾーン.
 
 // 0にする定数(初期化などに使用).
+constexpr float ZEROFLOAT3[3] = { 0.f,0.f,0.f };
+constexpr float ZEROFLOAT2[2] = { 0.f,0.f };
+
 const D3DXVECTOR3 ZEROVEC3( 0.f,0.f,0.f );
 const D3DXVECTOR2 ZEROVEC2( 0.f,0.f );
 
