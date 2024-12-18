@@ -7,16 +7,23 @@
 //		カメラクラス.
 //===================================================================
 CCamera::CCamera()
-	: m_ViewAngle		( 60 )
-	, m_DirectionPos	()
-	, m_Playerpos		( ZEROVEC3 )
+	: m_Camera			()
+	
 	, m_NowCurorPos		( RESETPOS )
 	, m_BeforCursorPos	( RESETPOS )
-	, m_MoveValue		( 0.1f )
-	, m_CameraYaw		( 0.f )
-	, m_CameraPitch		( 0.f )
+
 	, m_MouseMoveDis	( ZEROVEC2 )
+	, m_CameraRot		( ZEROVEC3 )
+	, m_Playerpos		( ZEROVEC3 )
+	, m_DirectionPos	( ZEROVEC3 )
+
+	, m_Fov				( 60.0f )
+	, m_DefaultFov		( 60.0f )
+	, m_MoveValue		(  0.1f )
+	, m_CameraYaw		(  0.0f )
+	, m_CameraPitch		(  0.0f )
 	, m_MouseSens		( 0.03f )
+
 	, m_CanMoveMouse	( false )
 {
 	Init();
@@ -33,12 +40,12 @@ CCamera::~CCamera()
 void CCamera::Init()
 {
 	// 上方ベクトルの初期化.
-	m_CameraRot			= ZEROVEC3;
-	m_Camera.Look		= ZEROVEC3;
-	m_Camera.UpVec		= D3DXVECTOR3(0.f, 1.f, 0.f);
-	m_Camera.Position	= D3DXVECTOR3(0.f, 3.f, 0.f);
+	m_CameraRot		= ZEROVEC3;
+	m_Camera.Look	= ZEROVEC3;
+	m_Camera.UpVec	= D3DXVECTOR3(0.f, 1.f, 0.f);
+	m_Camera.Pos	= D3DXVECTOR3(0.f, 3.f, 0.f);
 
-	m_DefaultFov = m_ViewAngle;
+	 m_Fov = m_DefaultFov;
 
 	MouseMove(ZEROVEC2);	// カメラの回転の初期化.
 }
@@ -97,7 +104,7 @@ void CCamera::Update()
 //===================================================================
 void CCamera::Camera( D3DXMATRIX& View ) const
 {
-	D3DXVECTOR3 pos	 = m_Camera.Position;
+	D3DXVECTOR3 pos	 = m_Camera.Pos;
 	D3DXVECTOR3 look = m_Camera.Look;
 	D3DXVECTOR3	vec	 = m_Camera.UpVec;
 
@@ -127,8 +134,8 @@ void CCamera::KeyInput()
 		if ( Key->IsKeyDown(DIK_SPACE) )  { Yvalue =  m_MoveValue; }
 		if ( Key->IsKeyDown(DIK_LSHIFT) ) { Yvalue = -m_MoveValue; }
 
-		m_Camera.Position.y += Yvalue;
-		m_Camera.Look.y		+= Yvalue;
+		m_Camera.Pos.y  += Yvalue;
+		m_Camera.Look.y += Yvalue;
 	}
 
 	if ( Key->IsKeyAction(DIK_F2) ) { m_CanMoveMouse = !m_CanMoveMouse; }
@@ -165,7 +172,7 @@ void CCamera::MouseMove(D3DXVECTOR2 value)
 	D3DXVec3Normalize(&LookDirection, &LookDirection);
 
 	// カメラの位置を更新.
-	m_Camera.Look = m_Camera.Position + LookDirection;
+	m_Camera.Look = m_Camera.Pos + LookDirection;
 }
 
 
@@ -178,7 +185,7 @@ void CCamera::CameraMove(int vec)
 	D3DXVECTOR3 rightVector = ZEROVEC3; // 左右ベクトル用.
 
 	// カメラ位置から注視点へのベクトルを計算する.
-	m_DirectionPos = m_Camera.Look - m_Camera.Position;
+	m_DirectionPos = m_Camera.Look - m_Camera.Pos;
 
 	// Y軸の値をなくし、水平方向ベクトルにする.
 	m_DirectionPos.y = 0.f;
@@ -199,20 +206,20 @@ void CCamera::CameraMove(int vec)
 	switch (vec)
 	{
 	case CCamera::Right:
-		m_Camera.Position += rightVector * m_MoveValue;
-		m_Camera.Look	  += rightVector * m_MoveValue;
+		m_Camera.Pos  += rightVector * m_MoveValue;
+		m_Camera.Look += rightVector * m_MoveValue;
 		break;
 	case CCamera::Left:
-		m_Camera.Position -= rightVector * m_MoveValue;
-		m_Camera.Look	  -= rightVector * m_MoveValue;
+		m_Camera.Pos  -= rightVector * m_MoveValue;
+		m_Camera.Look -= rightVector * m_MoveValue;
 		break;
 	case CCamera::Straight:
-		m_Camera.Position += m_DirectionPos * m_MoveValue;
-		m_Camera.Look	  += m_DirectionPos * m_MoveValue;
+		m_Camera.Pos  += m_DirectionPos * m_MoveValue;
+		m_Camera.Look += m_DirectionPos * m_MoveValue;
 		break;
 	case CCamera::Back:
-		m_Camera.Position -= m_DirectionPos * m_MoveValue;
-		m_Camera.Look	  -= m_DirectionPos * m_MoveValue;
+		m_Camera.Pos  -= m_DirectionPos * m_MoveValue;
+		m_Camera.Look -= m_DirectionPos * m_MoveValue;
 		break;
 	default: break;
 	}

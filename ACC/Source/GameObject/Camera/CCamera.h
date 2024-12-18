@@ -29,19 +29,18 @@ public:
 	void Camera(D3DXMATRIX& View) const;
 	void Init();
 
-	static float GetSens()		  { return GetInstance()->m_MouseSens;		 }
-	static float GetViewAngle()   { return GetInstance()->m_ViewAngle;		 }
-	static float GetDefaultFov()  { return GetInstance()->m_DefaultFov;		 }
-	static D3DXVECTOR3& GetLook() { return GetInstance()->m_Camera.Look;	 }
-	static D3DXVECTOR3& GetPos()  { return GetInstance()->m_Camera.Position; }
-	static D3DXVECTOR3& GetVec()  { return GetInstance()->m_Camera.UpVec;	 }
-	static D3DXVECTOR3& GetRot()  { return GetInstance()->m_CameraRot;		 }
+	static float& GetSens()		  { return GetInstance()->m_MouseSens;	  }
+	static float& GetViewAngle()  { return GetInstance()->m_Fov;		  }
+	static float& GetDefaultFov() { return GetInstance()->m_DefaultFov;	  }
+	static D3DXVECTOR3& GetLook() { return GetInstance()->m_Camera.Look;  }
+	static D3DXVECTOR3& GetPos()  { return GetInstance()->m_Camera.Pos;	  }
+	static D3DXVECTOR3& GetVec()  { return GetInstance()->m_Camera.UpVec; }
+	static D3DXVECTOR3& GetRot()  { return GetInstance()->m_CameraRot;	  }
 
-	static void SetSens			(float Value)			 { GetInstance()->m_MouseSens = Value;		}
-	static void SetViewAngle	(float Angle)			 { GetInstance()->m_ViewAngle = Angle;		}
-	static void SetPlayerPos	(D3DXVECTOR3 Pos)		 { GetInstance()->m_Playerpos = Pos;		}
-	static void SetDafualtFov	(float ViewAngle)		 { GetInstance()->m_DefaultFov = ViewAngle;	}
-	static void SetPosition		(const D3DXVECTOR3& Pos) { GetInstance()->m_Camera.Position = Pos;	}
+	static void SetViewAngle (const float& Fov)		  { GetInstance()->m_Fov = Fov;			}
+	static void SetSens		 (const float& Sens)	  { GetInstance()->m_MouseSens = Sens;	}
+	static void SetPlayerPos (const D3DXVECTOR3& Pos) { GetInstance()->m_Playerpos = Pos;	}
+	static void SetPosition	 (const D3DXVECTOR3& Pos) { GetInstance()->m_Camera.Pos = Pos;	}
 
 private:
 	void KeyInput();					// キー入力.
@@ -49,22 +48,22 @@ private:
 	void MouseMove(D3DXVECTOR2 value);	// マウスの移動量に応じてカメラの方向を変更.
 
 private:
-	CAMERA	m_Camera;	// カメラ情報.
+	CAMERA	m_Camera;			// カメラ情報.
 
 	POINT	m_NowCurorPos;		// 現在のマウスの位置.
 	POINT	m_BeforCursorPos;	// 過去のマウスの位置.
 
-	D3DXVECTOR2 m_MouseMoveDis;		// マウスの移動した距離.
-	D3DXVECTOR3 m_CameraRot;		// カメラの回転軸.
-	D3DXVECTOR3 m_Playerpos;		// プイレイヤー座標.
-	D3DXVECTOR3 m_DirectionPos;		// カメラ座標～注視点のベクトル.
+	D3DXVECTOR2 m_MouseMoveDis;	// マウスの移動した距離.
+	D3DXVECTOR3 m_CameraRot;	// カメラの回転軸.
+	D3DXVECTOR3 m_Playerpos;	// プイレイヤー座標.
+	D3DXVECTOR3 m_DirectionPos;	// カメラ座標～注視点のベクトル.
 
-	float	m_ViewAngle;	// 視野角.
-	float	m_MoveValue;	// 移動量.
-	float	m_CameraYaw;	// カメラ角度x軸.
-	float	m_CameraPitch;	// カメラ角度y軸.
-	float	m_MouseSens;	// マウス感度.
-	float	m_DefaultFov;	// デフォルトの視野角.
+	float	m_Fov;				// 視野角.
+	float	m_DefaultFov;		// デフォルトの視野角.
+	float	m_MoveValue;		// 移動量.
+	float	m_CameraYaw;		// カメラ角度x軸.
+	float	m_CameraPitch;		// カメラ角度y軸.
+	float	m_MouseSens;		// マウス感度.
 
-	bool	m_CanMoveMouse;	// マウスが自由に移動できるかどうか.
+	bool	m_CanMoveMouse;		// マウスが自由に移動できるかどうか.
 };
