@@ -52,9 +52,9 @@ const D3DXVECTOR2 ZEROVEC2( 0.f,0.f );
 
 // カメラ情報.
 struct CAMERA {
-	D3DXVECTOR3	Position;	// 視点.
-	D3DXVECTOR3 Look;		// 注視点.
-	D3DXVECTOR3 UpVec;		// 情報ベクトル.
+	D3DXVECTOR3	Pos;	// 視点.
+	D3DXVECTOR3 Look;	// 注視点.
+	D3DXVECTOR3 UpVec;	// 情報ベクトル.
 };
 
 // ライト情報.
