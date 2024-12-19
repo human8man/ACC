@@ -121,6 +121,9 @@
     <Filter Include="Source\Common\Easing">
       <UniqueIdentifier>{f516dcd3-d07b-438c-9739-2de3d15b2d12}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Scenes\Title">
+      <UniqueIdentifier>{6cf3da2e-2534-40ab-8403-6960a7a0a15b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Data\Shader\Sprite3D.hlsl">
@@ -284,6 +287,9 @@
     <ClCompile Include="Source\Common\DirectInput\CMouse.cpp">
       <Filter>Source\Common\DirectInput</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Scenes\Title\CTitle.cpp">
+      <Filter>Source\Scenes\Title</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Collision\BoundingSphere\CBoundingSphere.h">
@@ -429,6 +435,9 @@
     </ClInclude>
     <ClInclude Include="Source\Common\Easing\Easing.h">
       <Filter>Source\Common\Easing</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scenes\Title\CTitle.h">
+      <Filter>Source\Scenes\Title</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -2,11 +2,11 @@
 
 #include "Scenes/CSceneBase.h"
 #include "Scenes/Game/CGame.h"
+#include "Scenes/Title/CTitle.h"
 
 #include "Camera/CCamera.h"
 #include "Sprite/2D/UI/CUIFade/CUIFade.h"
 #include "DirectSound/CSoundManager.h"
-
 
 #ifdef _DEBUG
 	#include "Common/ImGui/CImGui.h"
@@ -39,7 +39,7 @@ HRESULT CSceneManager::Create(HWND hWnd)
 	This->m_hWnd = hWnd;
 
 	//初めて呼び出されたときにインスタンス生成
-	This->m_pScene = This->CreateScene(SceneList::Game);
+	This->m_pScene = This->CreateScene(SceneList::Title);
 	This->m_pScene->Create();
 	This->m_pScene->Init();
 	This->m_pScene->LoadData();
@@ -70,6 +70,9 @@ void CSceneManager::Update()
 	if (ImGui::Button("Game")) {
 		GetInstance()->LoadScene(SceneList::Game);
 	}
+	if (ImGui::Button("Title")) {
+		GetInstance()->LoadScene(SceneList::Title);
+	}
 	ImGui::End();
 #endif
 
@@ -82,7 +85,7 @@ void CSceneManager::Update()
 	}
 
 	// フェード中でない間、Update()を回す.
-	//	フェードのピーク時に一度だけ通し、背景を作成する.
+	//	フェードのピーク時に一度だけ通し、フェード明け用の背景を作成する.
 	if (!m_pFade->GetFading() || m_pFade->GetFadePeak()) 
 	{
 		GetInstance()->m_pScene->Update();
@@ -98,6 +101,7 @@ void CSceneManager::Update()
 void CSceneManager::Draw()
 {
 	m_pScene->Draw();
+	m_pFade->Draw();
 
 #ifdef _DEBUG
 	// ここでのみImGuiのDrawを回す.
@@ -135,12 +139,13 @@ void CSceneManager::LoadScene(SceneList Scene)
 //----------------------------------------------------------------------------------------------------------------------
 std::unique_ptr<CSceneBase> CSceneManager::CreateScene(SceneList No)
 {
+	m_SceneNo = No;
 	switch (No)
 	{
+	case Title:
+		return std::make_unique<CTitle>( m_hWnd );
 	case Game:
 		return std::make_unique<CGame>( m_hWnd );
-
-
 	default:return nullptr;
 	}
 	return nullptr;

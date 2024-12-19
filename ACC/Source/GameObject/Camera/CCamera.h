@@ -37,12 +37,12 @@ public:
 	static D3DXVECTOR3& GetVec()  { return GetInstance()->m_Camera.UpVec; }
 	static D3DXVECTOR3& GetRot()  { return GetInstance()->m_CameraRot;	  }
 
-	static void SetUsePad	 (const float& Use)		  { GetInstance()->m_UsePad = Use;		}
-	static void SetViewAngle (const float& Fov)		  { GetInstance()->m_Fov = Fov;			}
-	static void SetSens		 (const float& Sens)	  { GetInstance()->m_MouseSens = Sens;	}
-	static void SetPlayerPos (const D3DXVECTOR3& Pos) { GetInstance()->m_Playerpos = Pos;	}
-	static void SetPosition	 (const D3DXVECTOR3& Pos) { GetInstance()->m_Camera.Pos = Pos;	}
-
+	static void SetUseMouse	 (const bool& Use)		  { GetInstance()->m_CanMoveMouse = Use; }
+	static void SetUsePad	 (const bool& Use)		  { GetInstance()->m_UsePad = Use;		 }
+	static void SetViewAngle (const float& Fov)		  { GetInstance()->m_Fov = Fov;			 }
+	static void SetSens		 (const float& Sens)	  { GetInstance()->m_MouseSens = Sens;	 }
+	static void SetPlayerPos (const D3DXVECTOR3& Pos) { GetInstance()->m_Playerpos = Pos;	 }
+	static void SetPosition	 (const D3DXVECTOR3& Pos) { GetInstance()->m_Camera.Pos = Pos;	 }
 private:
 	void KeyInput();					// キー入力.
 	void CameraMove(int vec);			// カメラの移動.

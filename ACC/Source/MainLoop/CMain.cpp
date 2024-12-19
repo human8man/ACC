@@ -4,6 +4,7 @@
 #include "Scenes/SceneManager/CSceneManager.h"
 #include "Common/DirectInput/CDirectInput.h"
 #include "DirectSound/CSoundManager.h"
+#include "Camera/CCamera.h"
 
 // ImGuiはデバッグ時のみ使用する.
 #ifdef _DEBUG
@@ -86,6 +87,7 @@ void CMain::Release()
 {
 	CSoundManager::GetInstance()->Release();
 	CSceneManager::GetInstance()->Release();
+	CDInput::GetInstance()->Release();
 }
 
 
@@ -126,7 +128,7 @@ void CMain::Loop()
 			sync_old = sync_now;	// 現在時間に置き換え.
 
 			// ウィンドウのボーダーを虹色にする.
-			SetRainbowBorder(m_hWnd);
+			// SetRainbowBorder(m_hWnd);
 
 			// 更新処理.
 			Update();
@@ -285,6 +287,21 @@ LRESULT CALLBACK CMain::MsgProc(
 				DestroyWindow( hWnd );
 			}
 			break;
+		}
+		break;
+	//---------------------------------------------------------------
+	//		ウィンドウが起動中の場合.
+	//---------------------------------------------------------------
+	case WM_ACTIVATE:
+		// ウィンドウがアクティブの場合.
+		if (LOWORD(wParam) == WA_INACTIVE) {
+			// マウスの操作を有効.
+			CCamera::GetInstance()->SetUseMouse(true);
+		}
+		// ウィンドウが非アクティブの場合.
+		else {
+			// マウスの操作を無効.
+			CCamera::GetInstance()->SetUseMouse(false);
 		}
 		break;
 	//---------------------------------------------------------------

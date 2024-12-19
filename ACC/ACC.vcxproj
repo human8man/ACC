@@ -284,6 +284,7 @@
     <ClCompile Include="Source\Scenes\CSceneBase.cpp" />
     <ClCompile Include="Source\Scenes\Game\CGame.cpp" />
     <ClCompile Include="Source\Scenes\SceneManager\CSceneManager.cpp" />
+    <ClCompile Include="Source\Scenes\Title\CTitle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Collision\BoundingSphere\CBoundingSphere.h" />
@@ -334,6 +335,7 @@
     <ClInclude Include="Source\Scenes\CSceneBase.h" />
     <ClInclude Include="Source\Scenes\Game\CGame.h" />
     <ClInclude Include="Source\Scenes\SceneManager\CSceneManager.h" />
+    <ClInclude Include="Source\Scenes\Title\CTitle.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Common\Easing\Easing.inl" />

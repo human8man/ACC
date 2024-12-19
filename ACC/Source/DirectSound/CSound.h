@@ -5,15 +5,6 @@
 #pragma comment ( lib, "dsound.lib" )	// DirectSound.
 #pragma comment ( lib, "dxguid.lib" )	// エフェクト用.
 
-
-//===================================================
-//		マクロ.
-//===================================================
-#define SAFE_RELEASE(p)	{if(p!=nullptr){(p)->Release();(p)=nullptr;}}
-#define SAFE_DELETE(p)	{if(p!=nullptr){delete (p);(p)=nullptr;}}
-#define SAFE_DELETEARRAY(P)	{if(p!=nullptr){delete[] (p);(p)=nullptr;}}
-#define ERR_MSG(str, title)	{MessageBox( nullptr, str, title, MB_OK );}
-
 enum class I3DL2_ENV_PRESET : int
 {
 	DEFAULT,		// 標準.
