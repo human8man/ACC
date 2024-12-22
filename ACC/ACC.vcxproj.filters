@@ -106,9 +106,6 @@
     <Filter Include="Source\GameObject\Sprite\2D\UI\CUIFade">
       <UniqueIdentifier>{d22dc98d-1be9-44e2-b0ba-c5bf8c2dfd7f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Common\Json">
-      <UniqueIdentifier>{165976b9-bd5d-4da0-b6d7-b58b4455b60a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\Common\Singleton">
       <UniqueIdentifier>{c22bd6b5-c9bf-42e7-8f84-cc59e19351d7}</UniqueIdentifier>
     </Filter>
@@ -123,6 +120,12 @@
     </Filter>
     <Filter Include="Source\Scenes\Title">
       <UniqueIdentifier>{6cf3da2e-2534-40ab-8403-6960a7a0a15b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Common\FileManager">
+      <UniqueIdentifier>{6c6279af-dd69-430c-9586-4f3b2be4e954}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Common\FileManager\LoadImage">
+      <UniqueIdentifier>{a54edffe-bb53-4fcb-b438-c594423495a2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -269,9 +272,6 @@
     <ClCompile Include="Source\GameObject\Sprite\2D\UI\CUIFade\CUIFade.cpp">
       <Filter>Source\GameObject\Sprite\2D\UI\CUIFade</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Common\Json\CJson.cpp">
-      <Filter>Source\Common\Json</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Common\XInput\CXInput.cpp">
       <Filter>Source\Common\XInput</Filter>
     </ClCompile>
@@ -289,6 +289,12 @@
     </ClCompile>
     <ClCompile Include="Source\Scenes\Title\CTitle.cpp">
       <Filter>Source\Scenes\Title</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Common\FileManager\FileManager.cpp">
+      <Filter>Source\Common\FileManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Common\FileManager\LoadImage\LoadImage.cpp">
+      <Filter>Source\Common\FileManager\LoadImage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -424,9 +430,6 @@
     <ClInclude Include="Source\GameObject\Sprite\2D\UI\CUIFade\CUIFade.h">
       <Filter>Source\GameObject\Sprite\2D\UI\CUIFade</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Common\Json\CJson.h">
-      <Filter>Source\Common\Json</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Common\XInput\CXInput.h">
       <Filter>Source\Common\XInput</Filter>
     </ClInclude>
@@ -438,6 +441,12 @@
     </ClInclude>
     <ClInclude Include="Source\Scenes\Title\CTitle.h">
       <Filter>Source\Scenes\Title</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Common\FileManager\FileManager.h">
+      <Filter>Source\Common\FileManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Common\FileManager\LoadImage\LoadImage.h">
+      <Filter>Source\Common\FileManager\LoadImage</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
