@@ -3,7 +3,7 @@
 #include "DirectSound/CSoundManager.h"
 
 #include "Effect/CEffect.h"	//Effekseerを使うためのクラス.
-#include <Camera/CCamera.h>
+#include "../GameObject/Camera/CCamera.h"
 
 //============================================================================
 //		ゲームクラス.

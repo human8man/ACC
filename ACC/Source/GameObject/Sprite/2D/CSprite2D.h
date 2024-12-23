@@ -56,7 +56,7 @@ public:
 	~CSprite2D();	//デストラクタ.
 
 	//初期化.
-	HRESULT Init( LPCTSTR lpFileName, SPRITE_STATE& pSs );
+	HRESULT Init( const std::string& lpFileName );
 
 	//解放.
 	void Release();
@@ -105,6 +105,7 @@ public:
 	}
 	//最大パターン数(マス目)を取得.
 	POINTS GetPatternMax() const { return m_PatternMax; }
+	SPRITE_STATE GetSpriteData() const { return m_SpriteState; }
 
 private:
 	CDirectX11*				m_pDx11;

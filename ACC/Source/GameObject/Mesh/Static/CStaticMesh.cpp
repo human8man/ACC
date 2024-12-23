@@ -1,7 +1,7 @@
 #include "CStaticMesh.h"
 #include "../DirectX/CDirectX9.h"
 #include "../DirectX/CDirectX11.h"
-#include "Camera/CCamera.h"
+#include "../GameObject/Camera/CCamera.h"
 
 #include <stdlib.h>	//マルチバイト文字→Unicode文字変換で必要.
 #include <locale.h>

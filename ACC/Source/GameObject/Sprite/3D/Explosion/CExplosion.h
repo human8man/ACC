@@ -1,5 +1,5 @@
 #pragma once
-#include "Sprite/CSpriteObject.h"
+#include "../GameObject/Sprite/CSpriteObject.h"
 
 /**************************************************
 *	”š”­ƒNƒ‰ƒX.

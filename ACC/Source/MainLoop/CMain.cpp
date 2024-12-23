@@ -4,7 +4,7 @@
 #include "Scenes/SceneManager/CSceneManager.h"
 #include "Common/DirectInput/CDirectInput.h"
 #include "DirectSound/CSoundManager.h"
-#include "Camera/CCamera.h"
+#include "../GameObject/Camera/CCamera.h"
 
 // ImGuiはデバッグ時のみ使用する.
 #ifdef _DEBUG

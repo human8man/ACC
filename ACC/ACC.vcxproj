@@ -86,6 +86,8 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>Source;Source\Common;Source\Common\Json;Source\Effect\Effekseer\include;Source\GameObject;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -102,6 +104,8 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>Source;Source\Common;Source\Common\Json;Source\Effect\Effekseer\include;Source\GameObject;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -119,8 +123,9 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
-      <AdditionalIncludeDirectories>Source;Source\Common;Source\Common\Json;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Source;Source\Common;Source\Common\Json;Source\Effect\Effekseer\include;Source\GameObject;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -139,8 +144,9 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
-      <AdditionalIncludeDirectories>Source\Effect\Effekseer\include;Source\Common;Source;Source\GameObject;Source\Common\Json;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Source;Source\Common;Source\Common\Json;Source\Effect\Effekseer\include;Source\GameObject;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -234,7 +240,12 @@
   <ItemGroup>
     <ClCompile Include="Source\Collision\BoundingSphere\CBoundingSphere.cpp" />
     <ClCompile Include="Source\Collision\Ray\CRay.cpp" />
-    <ClCompile Include="Source\Common\DirectInput\CDirectInput.cpp" />
+    <ClCompile Include="Source\Common\DirectInput\CDirectInput.cpp">
+      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdcpp20</LanguageStandard>
+      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdcpp20</LanguageStandard>
+      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">stdcpp20</LanguageStandard>
+      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|x64'">stdcpp20</LanguageStandard>
+    </ClCompile>
     <ClCompile Include="Source\Common\DirectInput\CGamePad.cpp" />
     <ClCompile Include="Source\Common\DirectInput\CKey.cpp" />
     <ClCompile Include="Source\Common\DirectInput\CMouse.cpp" />
@@ -248,6 +259,7 @@
     <ClCompile Include="Source\Common\ImGui\library\imgui_impl_win32.cpp" />
     <ClCompile Include="Source\Common\ImGui\library\imgui_tables.cpp" />
     <ClCompile Include="Source\Common\ImGui\library\imgui_widgets.cpp" />
+    <ClCompile Include="Source\Common\Resource\SpriteResource\SpriteResource.cpp" />
     <ClCompile Include="Source\Common\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -305,6 +317,7 @@
     <ClInclude Include="Source\Common\ImGui\library\imstb_textedit.h" />
     <ClInclude Include="Source\Common\ImGui\library\imstb_truetype.h" />
     <ClInclude Include="Source\Common\MyMacro.h" />
+    <ClInclude Include="Source\Common\Resource\SpriteResource\SpriteResource.h" />
     <ClInclude Include="Source\Common\Singleton\CSingleton.h" />
     <ClInclude Include="Source\Common\stdafx.h" />
     <ClInclude Include="Source\Common\XInput\CXInput.h" />

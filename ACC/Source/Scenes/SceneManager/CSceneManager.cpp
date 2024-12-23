@@ -4,8 +4,8 @@
 #include "Scenes/Game/CGame.h"
 #include "Scenes/Title/CTitle.h"
 
-#include "Camera/CCamera.h"
-#include "Sprite/2D/UI/CUIFade/CUIFade.h"
+#include "../GameObject/Camera/CCamera.h"
+#include "../GameObject/Sprite/2D/UI/CUIFade/CUIFade.h"
 #include "DirectSound/CSoundManager.h"
 
 #ifdef _DEBUG

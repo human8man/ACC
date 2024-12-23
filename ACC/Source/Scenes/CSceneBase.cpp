@@ -1,5 +1,5 @@
 #include "CSceneBase.h"
-#include "Camera/CCamera.h"
+#include "../GameObject/Camera/CCamera.h"
 
 //===================================================
 //		シーンベースクラス.

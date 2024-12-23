@@ -1,6 +1,5 @@
 ﻿#include "CCamera.h"
 #include "Common/DirectInput/CDirectInput.h"
-#include "Common/Json/CJson.h"
 
 
 //===================================================================

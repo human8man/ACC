@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Scenes/CSceneBase.h"
-#include "Sprite/2D/CSprite2D.h"
+#include "..//GameObject/Sprite/2D/CSprite2D.h"
 #include "DirectInput/CDirectInput.h"
 
 //‘O•ûéŒ¾

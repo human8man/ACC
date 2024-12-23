@@ -1,5 +1,5 @@
 #include "GameObject/Mesh/Skin/CSkinMeshObject.h"
-#include "Camera/CCamera.h"
+#include "../GameObject/Camera/CCamera.h"
 
 CSkinMeshObject::CSkinMeshObject()
 	: m_pMesh		( nullptr )

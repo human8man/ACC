@@ -1,14 +1,10 @@
 #pragma once
 #include "Global.h"
 
-/************************************************
-*	画像ファイルの幅、高さを取得する.
-*		﨑田友輝.
-**/
-namespace LoadImage {
+
+namespace LoadImageF {
 	// 画像ファイルの幅、高さを取得する.
 	D3DXVECTOR2 GetImageSize( const std::string& FilePath );
-
 
 	// jpgファイルの幅、高さを取得する.
 	D3DXVECTOR2 GetJpgImageSize( const std::string& FilePath );

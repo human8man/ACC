@@ -29,7 +29,7 @@ namespace {
 //---------------------------.
 // 画像ファイルの幅、高さを取得する.
 //---------------------------.
-D3DXVECTOR2 LoadImage::GetImageSize( const std::string& FilePath )
+D3DXVECTOR2 LoadImageF::GetImageSize( const std::string& FilePath )
 {
 	// 拡張子を見て判断して対応した関数を使用する.
 	std::string Extension = FilePath;
@@ -45,7 +45,7 @@ D3DXVECTOR2 LoadImage::GetImageSize( const std::string& FilePath )
 //---------------------------.
 // jpgファイルの幅、高さを取得する.
 //---------------------------.
-D3DXVECTOR2 LoadImage::GetJpgImageSize( const std::string& FilePath )
+D3DXVECTOR2 LoadImageF::GetJpgImageSize( const std::string& FilePath )
 {
 	SJpgData Image;
 
@@ -125,7 +125,7 @@ D3DXVECTOR2 LoadImage::GetJpgImageSize( const std::string& FilePath )
 //---------------------------.
 // pngファイルの幅、高さを取得する.
 //---------------------------.
-D3DXVECTOR2 LoadImage::GetPngImageSize( const std::string& FilePath )
+D3DXVECTOR2 LoadImageF::GetPngImageSize( const std::string& FilePath )
 {
 	SData Image;
 
@@ -166,7 +166,7 @@ D3DXVECTOR2 LoadImage::GetPngImageSize( const std::string& FilePath )
 //---------------------------.
 // jpgファイルの幅、高さを取得する.
 //---------------------------.
-D3DXVECTOR2 LoadImage::GetBmpImageSize( const std::string& FilePath )
+D3DXVECTOR2 LoadImageF::GetBmpImageSize( const std::string& FilePath )
 {
 	SData Image;
 

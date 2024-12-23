@@ -1,8 +1,8 @@
 #pragma once
 
-#include "GameObject/CGameObject.h"
+#include "CGameObject.h"
 
-#include "GameObject/Sprite/3D/CSprite3D.h"
+#include "Sprite/3D/CSprite3D.h"
 
 /************************************************************
 *	スプライトオブジェクトクラス.

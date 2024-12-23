@@ -1,5 +1,5 @@
 #include "CStaticMeshObject.h"
-#include "Camera/CCamera.h"
+#include "../GameObject/Camera/CCamera.h"
 
 CStaticMeshObject::CStaticMeshObject()
 	: m_pMesh		( nullptr )

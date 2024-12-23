@@ -1,5 +1,5 @@
 #include "CEffect.h"
-#include "Camera/CCamera.h"
+#include "../GameObject/Camera/CCamera.h"
 
 //描画スプライト最大数.
 constexpr int RENDER_SPRITE_MAX = 8000;

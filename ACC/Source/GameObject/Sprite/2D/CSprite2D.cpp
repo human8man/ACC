@@ -1,5 +1,8 @@
 #include "CSprite2D.h"
 #include "DirectX/CDirectX11.h"
+#include "FileManager\LoadImage\LoadImage.h"
+#include <string>
+#include <locale>
 
 //シェーダファイル名（ディレクトリも含む）.
 const TCHAR SHADER_NAME[] = _T( "Data\\Shader\\Sprite2D.hlsl" );
@@ -42,36 +45,38 @@ CSprite2D::~CSprite2D()
 //初期化.
 //	ID3D11Device* pDevice11 外部で作成して持ってくる。
 //	ID3D11DeviceContext* pContext11 外部で作成して持ってくる。
-HRESULT CSprite2D::Init(
-	LPCTSTR lpFileName,
-	SPRITE_STATE& pSs)
+HRESULT CSprite2D::Init(const std::string& lpFileName)
 {
 	m_pDx11 = CDirectX11::GetInstance();
 	m_pDevice11 = m_pDx11->GetDevice();
 	m_pContext11 = m_pDx11->GetContext();
 
-	m_SpriteState = pSs;
-
+	const D3DXVECTOR2& BaseSize = LoadImageF::GetImageSize( lpFileName );
+	m_SpriteState.Base.h	= BaseSize.y;
+	m_SpriteState.Base.w	= BaseSize.x;
+	m_SpriteState.Disp.h	= BaseSize.y;
+	m_SpriteState.Disp.w	= BaseSize.x;
+	m_SpriteState.Stride.h	= BaseSize.y;
+	m_SpriteState.Stride.w	= BaseSize.x;
+	m_SpriteState.Pos.y = 0.f;
+	m_SpriteState.Pos.x = 0.f;
+	m_SpriteState.Pos.z = 0.f;
+	
 	//シェーダ作成.
-	if( FAILED( CreateShader() ))
-	{
-		return E_FAIL;
-	}
+	if (FAILED(CreateShader())) { return E_FAIL; }
 	//板ポリゴン作成.
-	if( FAILED( CreateModel() ))
-	{
-		return E_FAIL;
-	}
-	//テクスチャ作成.
-	if( FAILED( CreateTexture( lpFileName ) ) )
-	{
-		return E_FAIL;
-	}
+	if( FAILED( CreateModel() )){ return E_FAIL; }
+	//テクスチャ作成(パスの型を変換後).
+	std::wstring wideStr;
+    int bufferSize = MultiByteToWideChar(CP_UTF8, 0, lpFileName.c_str(), -1, nullptr, 0);
+	 if (bufferSize <= 0) { return E_FAIL; }
+	wideStr.resize(bufferSize);
+	MultiByteToWideChar(CP_UTF8, 0, lpFileName.c_str(), -1, &wideStr[0], bufferSize);
+
+
+	if( FAILED( CreateTexture( wideStr.c_str() ) ) ){ return E_FAIL; }
 	//サンプラ作成.
-	if( FAILED( CreateSampler() ) )
-	{
-		return E_FAIL;
-	}
+	if( FAILED( CreateSampler() ) ){ return E_FAIL; }
 
 	return S_OK;
 }
