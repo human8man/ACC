@@ -28,13 +28,13 @@ void CUIFade::Create()
 
 	// ファイルパスとスプライトデータをまとめて準備.
 	SpriteDataList = {
-		{ _T("Data\\Texture\\other\\Black.png"), BlackFade},
+		{ "Data\\Texture\\other\\Black.png", BlackFade},
 	};
 
 	// 各2DSpriteオブジェクトの初期設定をする.
 	for (size_t i = 0; i < SpriteDataList.size(); ++i) {
 		m_pSprite2Ds.push_back(new CSprite2D());
-//		m_pSprite2Ds[i]->Init(SpriteDataList[i].first.c_str(), SpriteDataList[i].second);
+		m_pSprite2Ds[i]->Init(SpriteDataList[i].first.c_str());
 	}
 
 	// 各UIオブジェクトの初期設定をする.

@@ -1,0 +1,15 @@
+{
+  "Base": {
+    "h": 45.0,
+    "w": 308.0
+  },
+  "Disp": {
+    "h": 45.0,
+    "w": 154.0
+  },
+  "FilePath": "Data\\Texture\\title\\StartButton.json",
+  "Stride": {
+    "h": 45.0,
+    "w": 154.0
+  }
+}

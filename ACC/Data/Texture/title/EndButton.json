@@ -1,0 +1,15 @@
+{
+  "Base": {
+    "h": 43.0,
+    "w": 246.0
+  },
+  "Disp": {
+    "h": 43.0,
+    "w": 123.0
+  },
+  "FilePath": "Data\\Texture\\title\\EndButton.json",
+  "Stride": {
+    "h": 43.0,
+    "w": 123.0
+  }
+}

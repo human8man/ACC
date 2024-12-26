@@ -1,0 +1,15 @@
+{
+  "Base": {
+    "h": 216.0,
+    "w": 492.0
+  },
+  "Disp": {
+    "h": 216.0,
+    "w": 492.0
+  },
+  "FilePath": "Data\\Texture\\title\\TitleFont.json",
+  "Stride": {
+    "h": 216.0,
+    "w": 492.0
+  }
+}

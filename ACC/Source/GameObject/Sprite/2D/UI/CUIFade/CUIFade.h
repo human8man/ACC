@@ -32,7 +32,7 @@ public:
 	bool GetFadePeak()	const { return m_FadePeak; } // フェードのピークを知らせる.
 	bool GetFadeEnd()	const { return m_FadeEnd;  } // フェードの終了を知らせる.
 private:
-	std::vector<std::pair<std::wstring, CSprite2D::SPRITE_STATE>> SpriteDataList;	// スプライト情報をまとめる.
+	std::vector<std::pair<std::string, CSprite2D::SPRITE_STATE>> SpriteDataList;	// スプライト情報をまとめる.
 	std::vector<CUIObject*> m_pUIs;			// UIクラス.
 	std::vector<CSprite2D*> m_pSprite2Ds;	// Sprite2Dクラス.
 

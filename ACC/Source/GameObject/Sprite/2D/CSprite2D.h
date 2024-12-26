@@ -103,6 +103,12 @@ public:
 		m_PatternNo.x = x;
 		m_PatternNo.y = y;
 	}
+
+
+	// スプライト情報の取得.
+	HRESULT SpriteStateDataLoad(const std::string& FilePath);
+	HRESULT CreateSpriteState(const std::string& FilePath);
+
 	//最大パターン数(マス目)を取得.
 	POINTS GetPatternMax() const { return m_PatternMax; }
 	SPRITE_STATE GetSpriteData() const { return m_SpriteState; }
@@ -112,26 +118,26 @@ private:
 	ID3D11Device*			m_pDevice11;
 	ID3D11DeviceContext*	m_pContext11;
 
-	ID3D11VertexShader*		m_pVertexShader;	//頂点シェーダ.
-	ID3D11InputLayout*		m_pVertexLayout;	//頂点レイアウト.
-	ID3D11PixelShader*		m_pPixelShader;		//ピクセルシェーダ.
-	ID3D11Buffer*			m_pConstantBuffer;	//コンスタントバッファ.
+	ID3D11VertexShader*		m_pVertexShader;	// 頂点シェーダ.
+	ID3D11InputLayout*		m_pVertexLayout;	// 頂点レイアウト.
+	ID3D11PixelShader*		m_pPixelShader;		// ピクセルシェーダ.
+	ID3D11Buffer*			m_pConstantBuffer;	// コンスタントバッファ.
 
-	ID3D11Buffer*			m_pVertexBuffer;	//頂点バッファ.
+	ID3D11Buffer*			m_pVertexBuffer;	// 頂点バッファ.
 
-	ID3D11ShaderResourceView*	m_pTexture;			//テクスチャ.
-	ID3D11SamplerState*			m_pSampleLinear;	//サンプラ:テクスチャに各種フィルタをかける.
+	ID3D11ShaderResourceView*	m_pTexture;		// テクスチャ.
+	ID3D11SamplerState*			m_pSampleLinear;// サンプラ:テクスチャに各種フィルタをかける.
 
-	D3DXVECTOR3		m_vPosition;	//座標.
-	D3DXVECTOR3		m_vRotation;	//回転
-	D3DXVECTOR3		m_vScale;		//拡縮.
+	D3DXVECTOR3		m_vPosition;	// 座標.
+	D3DXVECTOR3		m_vRotation;	// 回転
+	D3DXVECTOR3		m_vScale;		// 拡縮.
 
-	D3DXVECTOR2		m_UV;		//テクスチャUV座標.
+	D3DXVECTOR2		m_UV;		// テクスチャUV座標.
 
-	float			m_Alpha;	//α値(0:透明、1:完全不透明).
+	float			m_Alpha;	// α値(0:透明、1:完全不透明).
 
-	SPRITE_STATE	m_SpriteState;	//スプライト情報.
-	POINTS			m_PatternNo;	//パターン番号(マス目).
-	POINTS			m_PatternMax;	//最大パターン(マスの最大値).
+	SPRITE_STATE	m_SpriteState;		// スプライト情報.
+	POINTS			m_PatternNo;		// パターン番号(マス目).
+	POINTS			m_PatternMax;		// 最大パターン(マスの最大値).
 
 };

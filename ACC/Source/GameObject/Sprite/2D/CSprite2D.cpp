@@ -1,6 +1,7 @@
 #include "CSprite2D.h"
 #include "DirectX/CDirectX11.h"
 #include "FileManager\LoadImage\LoadImage.h"
+#include "FileManager\FileManager.h"
 #include <string>
 #include <locale>
 
@@ -51,17 +52,9 @@ HRESULT CSprite2D::Init(const std::string& lpFileName)
 	m_pDevice11 = m_pDx11->GetDevice();
 	m_pContext11 = m_pDx11->GetContext();
 
-	const D3DXVECTOR2& BaseSize = LoadImageF::GetImageSize( lpFileName );
-	m_SpriteState.Base.h	= BaseSize.y;
-	m_SpriteState.Base.w	= BaseSize.x;
-	m_SpriteState.Disp.h	= BaseSize.y;
-	m_SpriteState.Disp.w	= BaseSize.x;
-	m_SpriteState.Stride.h	= BaseSize.y;
-	m_SpriteState.Stride.w	= BaseSize.x;
-	m_SpriteState.Pos.y = 0.f;
-	m_SpriteState.Pos.x = 0.f;
-	m_SpriteState.Pos.z = 0.f;
-	
+	// スプライト情報の取得.
+	if (FAILED(SpriteStateDataLoad( lpFileName ))) return E_FAIL;
+
 	//シェーダ作成.
 	if (FAILED(CreateShader())) { return E_FAIL; }
 	//板ポリゴン作成.
@@ -429,4 +422,68 @@ void CSprite2D::Render()
 	//アルファブレンド無効にする.
 	m_pDx11->SetAlphaBlend( false );
 
+}
+
+HRESULT CSprite2D::SpriteStateDataLoad(const std::string& FilePath)
+{
+	Json	m_SpriteStateData = nullptr;	// スプライト情報データ.
+
+	// 補正値テキストの読み込み.
+	std::string TextPath = FilePath;
+	TextPath.erase(TextPath.rfind("\\"), TextPath.size()) += "\\OffSet.json";
+	Json OffSetData = FileManager::JsonLoad(TextPath);
+
+	// 同じ名前のテキストの読み込み.
+	TextPath = FilePath;
+	TextPath.erase(TextPath.find("."), TextPath.size()) += ".json";
+	m_SpriteStateData = FileManager::JsonLoad(TextPath);
+
+	// ファイルが無いためファイルを作成する.
+	if (m_SpriteStateData.empty()) {
+		if (FAILED(CreateSpriteState(FilePath))) return E_FAIL;
+
+		// 作成できたためもう一度読み込み直す.
+		SpriteStateDataLoad(FilePath);
+		return S_OK;
+	}
+	
+	// スプライト情報の取得.
+	m_SpriteState.Disp.w = m_SpriteStateData["Disp"]["w"];
+	m_SpriteState.Disp.h = m_SpriteStateData["Disp"]["h"];
+	m_SpriteState.Base.w = m_SpriteStateData["Base"]["w"];
+	m_SpriteState.Base.h = m_SpriteStateData["Base"]["h"];
+	m_SpriteState.Stride.w = m_SpriteStateData["Stride"]["w"];
+	m_SpriteState.Stride.h = m_SpriteStateData["Stride"]["h"];
+
+#if _DEBUG
+	// ファイルパスを更新する.
+	m_SpriteStateData["FilePath"] = TextPath;
+	if (FAILED(FileManager::JsonSave(TextPath, m_SpriteStateData))) return E_FAIL;
+#endif	// #if _DEBUG.
+	return S_OK;
+}
+
+HRESULT CSprite2D::CreateSpriteState(const std::string& FilePath)
+{
+	// 作成するファイルパス.
+	std::string TextPath = FilePath;
+	TextPath.erase(TextPath.find("."), TextPath.size()) += ".json";
+
+	// 画像の幅、高さの取得.
+	const D3DXVECTOR2& BaseSize = LoadImageFile::GetImageSize(FilePath);
+
+	// 情報を追加していく.
+	Json SpriteState;
+	SpriteState["Disp"]["w"] = BaseSize.x;
+	SpriteState["Disp"]["h"] = BaseSize.y;
+	SpriteState["Base"]["w"] = BaseSize.x;
+	SpriteState["Base"]["h"] = BaseSize.y;
+	SpriteState["Stride"]["w"] = BaseSize.x;
+	SpriteState["Stride"]["h"] = BaseSize.y;
+
+	// スプライト情報の作成.
+	if (FAILED(FileManager::JsonSave(TextPath, SpriteState))) return E_FAIL;
+
+	// 作成成功.
+	return S_OK;
 }

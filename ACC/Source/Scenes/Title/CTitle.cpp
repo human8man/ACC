@@ -42,15 +42,15 @@ void CTitle::Create()
 
 	// ファイルパスとスプライトデータをまとめて準備.
 	SpriteDataList = {
-		{_T("Data\\Texture\\other\\Black.png"),			st_FullScreen		},
-		{_T("Data\\Texture\\title\\Button.png"),		st_Button3			},
-		{_T("Data\\Texture\\title\\TitleButtons.png"),	st_Button2			},
-		{_T("Data\\Texture\\title\\TitleButtons.png"),	st_Button			},
-		{_T("Data\\Texture\\title\\OptionButton.png"),	st_ButtonText3		},
-		{_T("Data\\Texture\\title\\EndButton.png"),		st_ButtonText2		},
-		{_T("Data\\Texture\\title\\StartButton.png"),	st_ButtonText		},
-		{_T("Data\\Texture\\title\\BestTime.png"),		st_BestTimeText		},
-		{_T("Data\\Texture\\title\\TitleFont.png"),		st_TitleText		}
+		{ "Data\\Texture\\other\\Black.png",		 st_FullScreen	 },
+		{ "Data\\Texture\\title\\Button.png",		 st_Button3		 },
+		{ "Data\\Texture\\title\\TitleButtons.png",	 st_Button2		 },
+		{ "Data\\Texture\\title\\TitleButtons.png",	 st_Button		 },
+		{ "Data\\Texture\\title\\OptionButton.png",	 st_ButtonText3	 },
+		{ "Data\\Texture\\title\\EndButton.png",	 st_ButtonText2	 },
+		{ "Data\\Texture\\title\\StartButton.png",	 st_ButtonText	 },
+		{ "Data\\Texture\\title\\BestTime.png",		 st_BestTimeText },
+		{ "Data\\Texture\\title\\TitleFont.png",	 st_TitleText	 }
 	};
 }
 
@@ -59,7 +59,7 @@ HRESULT CTitle::LoadData()
 	// 各2DSpriteオブジェクトの初期設定をする.
 	for (size_t i = 0; i < SpriteDataList.size(); ++i) {
 		m_pSprite2Ds.push_back(new CSprite2D());
-		//m_pSprite2Ds[i]->Init(SpriteDataList[i].first.c_str(), SpriteDataList[i].second);
+		m_pSprite2Ds[i]->Init(SpriteDataList[i].first.c_str());
 	}
 
 	// 各UIオブジェクトの初期設定をする.
