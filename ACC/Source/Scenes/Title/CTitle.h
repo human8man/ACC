@@ -44,7 +44,6 @@ private:
 	bool PointInSquare(POINT ppos, D3DXVECTOR2 spos, D3DXVECTOR2 sposs);
 
 private:
-	HWND		m_hwnd;
 	LIGHT		m_Light;
 	D3DXMATRIX	m_mView;
 	D3DXMATRIX	m_mProj;

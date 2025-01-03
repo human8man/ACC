@@ -5,6 +5,7 @@
 #include "Common/DirectInput/CDirectInput.h"
 #include "DirectSound/CSoundManager.h"
 #include "../GameObject/Camera/CCamera.h"
+#include "Effect/CEffect.h"	//Effekseerを使うためのクラス.
 
 // ImGuiはデバッグ時のみ使用する.
 #ifdef _DEBUG
@@ -49,6 +50,17 @@ HRESULT CMain::Create() const
 	if (FAILED(CSceneManager::GetInstance()	->Create(m_hWnd))) { return E_FAIL; }
 	// DirectInput構築.
 	if (FAILED(CDInput::GetInstance()		->Create(m_hWnd))) { return E_FAIL; }
+
+	// EffectManagerの構築.
+	if (FAILED(CEffect::GetInstance()->Create(
+		CDirectX11::GetInstance()->GetDevice(),
+		CDirectX11::GetInstance()->GetContext()))) 
+	{
+		return E_FAIL;
+	}
+
+	// EffectManagerのデータ読み込み.
+	if (FAILED(CEffect::GetInstance()->LoadData())) { return E_FAIL; }
 
 #ifdef _DEBUG
 	// ImGuiの構築.

@@ -21,10 +21,17 @@ namespace {
 //		タイトルクラス.
 //======================================================================================================================
 CTitle::CTitle(HWND hWnd)
-	: m_pUIs		()
-	, m_pSprite2Ds	()
+	: m_Light			()
+	, m_mView			()
+	, m_mProj			()
+	, m_SpriteDataList	()
+	, m_SpritePosList	()
+	, m_pUIs			()
+	, m_pSprite2Ds		()
+	, m_pEgg			()
 {
 	m_hWnd = hWnd;
+	m_Light.vDirection = D3DXVECTOR3(1.f, 5.f, 0.f);	//ライト方向.
 }
 
 CTitle::~CTitle()
