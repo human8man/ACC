@@ -52,67 +52,58 @@ public:
 	};
 
 public:
-	CSprite2D();	//コンストラクタ.
-	~CSprite2D();	//デストラクタ.
+	CSprite2D();
+	~CSprite2D();
 
-	//初期化.
+	// 初期化.
 	HRESULT Init( const std::string& lpFileName );
 
-	//解放.
+	// 解放.
 	void Release();
 
-	//シェーダ作成.
+	// シェーダ作成.
 	HRESULT CreateShader();
-	//モデル作成.
+	// モデル作成.
 	HRESULT CreateModel();
-	//テクスチャ作成.
+	// テクスチャ作成.
 	HRESULT CreateTexture( LPCTSTR lpFileName );
-	//サンプラ作成.
+	// サンプラ作成.
 	HRESULT CreateSampler();
 
-	//レンダリング用.
+	// レンダリング用.
 	void Render();
 
-	//座標情報を設定.
+	// 座標情報を設定.
 	void SetPosition(const D3DXVECTOR3& vPos) {	m_vPosition = vPos;	}
-	//座標xを設定.
 	void SetPositionX( float x ){ m_vPosition.x = x; }
-	//座標yを設定.
 	void SetPositionY( float y ){ m_vPosition.y = y; }
-	//座標zを設定.
 	void SetPositionZ( float z ){ m_vPosition.z = z; }
 
-	//回転情報を設定.
+	// 回転情報を設定.
 	void SetRotation(const D3DXVECTOR3& vRot){	m_vRotation = vRot;	}
-	//回転軸Yを設定(Yaw).
-	void SetRotationY(float y){	m_vRotation.y = y;	}
-	//回転軸Xを設定(Pitch).
-	void SetRotationX(float x){	m_vRotation.x = x;	}
-	//回転軸Zを設定(Roll).
-	void SetRotationZ(float z){	m_vRotation.z = z;	}
+	void SetRotationY( float y ){ m_vRotation.y = y; }
+	void SetRotationX( float x ){ m_vRotation.x = x; }
+	void SetRotationZ( float z ){ m_vRotation.z = z; }
 
-	//拡縮情報を設定.
+	// 拡縮情報を設定.
 	void SetScale(const D3DXVECTOR3& vScale) { m_vScale = vScale; }
 
-	//α値を設定.
+	// α値を設定.
 	void SetAlpha(float alpha) { m_Alpha = alpha; }
 
-	//パターン番号(マス目)を設定.
-	void SetPatternNo(SHORT x, SHORT y)
-	{
+	// パターン番号(マス目)を設定.
+	void SetPatternNo(SHORT x, SHORT y) {
 		m_PatternNo.x = x;
 		m_PatternNo.y = y;
 	}
-
 
 	// スプライト情報の取得.
 	HRESULT SpriteStateDataLoad(const std::string& FilePath);
 	HRESULT CreateSpriteState(const std::string& FilePath);
 
-	//最大パターン数(マス目)を取得.
+	// 最大パターン数(マス目)を取得.
 	POINTS GetPatternMax() const { return m_PatternMax; }
 	SPRITE_STATE GetSpriteData() const { return m_SpriteState; }
-
 private:
 	CDirectX11*				m_pDx11;
 	ID3D11Device*			m_pDevice11;

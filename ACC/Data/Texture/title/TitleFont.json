@@ -8,6 +8,11 @@
     "w": 492.0
   },
   "FilePath": "Data\\Texture\\title\\TitleFont.json",
+  "Pos": {
+    "x": 50.0,
+    "y": 150.0,
+    "z": 0.0
+  },
   "Stride": {
     "h": 216.0,
     "w": 492.0

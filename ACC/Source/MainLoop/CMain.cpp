@@ -218,7 +218,7 @@ HRESULT CMain::InitWindow(
 	rectWindow.h = rect.bottom - rect.top;
 
 	// 自宅テレワーク時のx,y座標.
-	rectWindow.x = 100; //+ 1920;
+	rectWindow.x = 100;
 	rectWindow.y = 100;
 
 	//ウィンドウの作成.

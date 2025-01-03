@@ -63,30 +63,15 @@ HRESULT CStaticMesh::Init(LPCTSTR lpFileName )
 	m_pContext11 = m_pDx11->GetContext();
 
 	//ファイル読み込み.
-	if( FAILED( LoadXMesh( lpFileName ) ))
-	{
-		return E_FAIL;
-	}
+	if( FAILED( LoadXMesh( lpFileName ) )){ return E_FAIL; }
 	//モデル作成.
-	if( FAILED( CreateModel() ) )
-	{
-		return E_FAIL;
-	}
+	if( FAILED( CreateModel() ) ){ return E_FAIL; }
 	//シェーダ作成.
-	if( FAILED(CreateShader() ))
-	{
-		return E_FAIL;
-	}
+	if( FAILED(CreateShader() )){ return E_FAIL; }
 	//コンスタントバッファ作成.
-	if( FAILED( CreateConstantBuffer() ) )
-	{
-		return E_FAIL;
-	}
+	if( FAILED( CreateConstantBuffer() ) ){ return E_FAIL; }
 	//サンプラ作成.
-	if( FAILED( CreateSampler() ) )
-	{
-		return E_FAIL;
-	}
+	if( FAILED( CreateSampler() ) ){ return E_FAIL; }
 
 	return S_OK;
 }

@@ -14,17 +14,16 @@ class CTitle
 	: public CSceneBase
 {
 public:
-	// Titleで使用するスプライト名を追加していく.
-	//	追加する際はレイヤーを考えた順にする.
+	// Titleで使用するスプライト名を追加していく(名前順).
 	enum TitleSprite {
 		FullScreen,
+		BestTimeText,
 		Button3,
-		Button2,
+		ButtonText2,
 		Button,
 		ButtonText3,
-		ButtonText2,
 		ButtonText,
-		BestTimeText,
+		Button2,
 		TitleText,
 	};
 
@@ -50,20 +49,10 @@ private:
 	void EmptyInput();
 
 private:
-	// Sprite情報まとめクラス(FileManagerきてから使いそう).
-	//std::vector<CSprite2D::SPRITE_STATE*> m_pSpriteDatas;
-	CSprite2D::SPRITE_STATE st_TitleText;
-	CSprite2D::SPRITE_STATE st_BestTimeText;
-	CSprite2D::SPRITE_STATE st_Button;
-	CSprite2D::SPRITE_STATE st_Button2;
-	CSprite2D::SPRITE_STATE st_Button3;
-	CSprite2D::SPRITE_STATE st_ButtonText;
-	CSprite2D::SPRITE_STATE st_ButtonText2;
-	CSprite2D::SPRITE_STATE st_ButtonText3;
-	CSprite2D::SPRITE_STATE st_FullScreen;
-	
 	// 画像情報リスト.
-	std::vector<std::pair<std::string, CSprite2D::SPRITE_STATE>> SpriteDataList;	//スプライト情報をまとめるやつ.
+	std::vector<std::string> m_SpriteDataList;//スプライト情報をまとめる配列.
+
+	std::vector<D3DXVECTOR3> m_SpritePosList;	//スプライト座標をまとめる配列.
 
 	std::vector<CUIObject*> m_pUIs;			// UIクラス.
 	std::vector<CSprite2D*> m_pSprite2Ds;	// Sprite2Dクラス.
@@ -74,6 +63,6 @@ private:
 	float m_OptionScale;	//オプションボタンのスケール値.
 	float m_OpTextDefScale; //オプションテキストの初期スケール値.
 
-	int m_SelectButton;	//コントローラーもしくはキーボードでボタンを選択するときに使う.
-	bool m_SelectOther;	//ほかの選択肢で遷移処理をしたとき用.
+	int  m_SelectButton; //コントローラーもしくはキーボードでボタンを選択するときに使う.
+	bool m_SelectOther;	 //ほかの選択肢で遷移処理をしたとき用.
 };

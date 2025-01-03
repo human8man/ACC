@@ -448,6 +448,9 @@ HRESULT CSprite2D::SpriteStateDataLoad(const std::string& FilePath)
 	}
 	
 	// スプライト情報の取得.
+	m_SpriteState.Pos.x = m_SpriteStateData["Pos"]["x"].get<float>();
+	m_SpriteState.Pos.y = m_SpriteStateData["Pos"]["y"].get<float>();
+	m_SpriteState.Pos.z = m_SpriteStateData["Pos"]["z"].get<float>();
 	m_SpriteState.Disp.w = m_SpriteStateData["Disp"]["w"];
 	m_SpriteState.Disp.h = m_SpriteStateData["Disp"]["h"];
 	m_SpriteState.Base.w = m_SpriteStateData["Base"]["w"];
@@ -474,6 +477,9 @@ HRESULT CSprite2D::CreateSpriteState(const std::string& FilePath)
 
 	// 情報を追加していく.
 	Json SpriteState;
+	SpriteState["Pos"]["x"] = 0.0;
+	SpriteState["Pos"]["y"] = 0.0;
+	SpriteState["Pos"]["z"] = 0.0;
 	SpriteState["Disp"]["w"] = BaseSize.x;
 	SpriteState["Disp"]["h"] = BaseSize.y;
 	SpriteState["Base"]["w"] = BaseSize.x;

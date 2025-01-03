@@ -5,6 +5,11 @@
 #include "Common/DirectInput/CDirectInput.h"
 #include "DirectSound/CSoundManager.h"
 
+namespace {
+	constexpr char TitleImagePath[] = "Data\\Texture\\title";
+	using State_map = std::unordered_map<std::string, CUIObject*>;
+}
+
 CTitle::CTitle(HWND hWnd)
 	: m_pUIs			()
 	, m_pSprite2Ds		()
@@ -27,58 +32,61 @@ CTitle::~CTitle()
 
 void CTitle::Create()
 {
-	// UIそれぞれの構造体.
-	st_TitleText	= { 492,216, 492,216, 492,216,	D3DXVECTOR3(50.f,  150.f, 1.f) };
-	st_BestTimeText = { 314,47,  314,47,  314,47,	D3DXVECTOR3(100.f, 500.f, 1.f) };
-	st_Button		= { 338,270, 338,270, 169,270,	D3DXVECTOR3(850.f, 160.f, 0.f) }; // Option.
-	st_Button2		= { 338,270, 338,270, 169,270,	D3DXVECTOR3(575.f, 400.f, 0.f) }; // Start.
-	st_Button3		= { 256,64,  512,64,  256,64,	D3DXVECTOR3(875.f, 500.f, 0.f) }; // End.
+	// UIそれぞれの構造体(a~zの順に宣言).
+	// m_SpritePosList = {
+	//	D3DXVECTOR3(100.f, 500.f, 1.f),	// BestTime.
+	//	D3DXVECTOR3( ZEROVEC3 ),		// Black.
 
-	st_ButtonText	= { 154,45,308,45,154,45,		D3DXVECTOR3(665.f, 200.f, 1.f) }; // Start.
-	st_ButtonText2	= { 123,43,246,43,123,43,		D3DXVECTOR3(945.f, 510.f, 1.f) }; // End.
-	st_ButtonText3	= { 256,64,512,64,256,64,		D3DXVECTOR3(920.f, 300.f, 1.f) }; // Option.
-	st_FullScreen	= { WND_W,WND_H,WND_W,WND_W };
+	//	D3DXVECTOR3(875.f, 500.f, 0.f),	// Button3(End).
+	//	D3DXVECTOR3(945.f, 510.f, 1.f),	// ButtonText2(End).
 
+	//	D3DXVECTOR3(920.f, 300.f, 1.f),	// ButtonText3(Option).
+	//	D3DXVECTOR3(665.f, 200.f, 1.f),	// ButtonText(Start).
 
-	// ファイルパスとスプライトデータをまとめて準備.
-	SpriteDataList = {
-		{ "Data\\Texture\\other\\Black.png",		 st_FullScreen	 },
-		{ "Data\\Texture\\title\\Button.png",		 st_Button3		 },
-		{ "Data\\Texture\\title\\TitleButtons.png",	 st_Button2		 },
-		{ "Data\\Texture\\title\\TitleButtons.png",	 st_Button		 },
-		{ "Data\\Texture\\title\\OptionButton.png",	 st_ButtonText3	 },
-		{ "Data\\Texture\\title\\EndButton.png",	 st_ButtonText2	 },
-		{ "Data\\Texture\\title\\StartButton.png",	 st_ButtonText	 },
-		{ "Data\\Texture\\title\\BestTime.png",		 st_BestTimeText },
-		{ "Data\\Texture\\title\\TitleFont.png",	 st_TitleText	 }
-	};
+	//	D3DXVECTOR3(575.f, 400.f, 0.f),	// Button2(Start).
+	//	D3DXVECTOR3(850.f, 160.f, 0.f),	// Button(Option).
+
+	//	D3DXVECTOR3(50.f,  150.f, 1.f),	// Title.
+
+	//};
 }
 
 HRESULT CTitle::LoadData()
 {
-	// 各2DSpriteオブジェクトの初期設定をする.
-	for (size_t i = 0; i < SpriteDataList.size(); ++i) {
-		m_pSprite2Ds.push_back(new CSprite2D());
-		m_pSprite2Ds[i]->Init(SpriteDataList[i].first.c_str());
-	}
+	int index = 0;
 
-	// 各UIオブジェクトの初期設定をする.
-	for (size_t i = 0; i < SpriteDataList.size(); ++i) {
-		m_pUIs.push_back(new CUIObject());
-		m_pUIs[i]->AttachSprite(*m_pSprite2Ds[i]);
 
-		m_pUIs[i]->SetPosition(SpriteDataList[i].second.Pos);
+	try 
+	{
+		// 指定したディレクトリ内を走査.
+		for (const auto& entry : std::filesystem::directory_iterator(TitleImagePath)) {
+			// jsonの場合やり直す.
+			std::string Extension = entry.path().string();
+			Extension.erase(0, entry.path().string().rfind("."));
+			if (Extension == ".json") continue;
+
+			m_pSprite2Ds.push_back(new CSprite2D());
+			m_pUIs.push_back(new CUIObject());
+
+			m_pSprite2Ds[index]->Init(entry.path().string());
+			m_pUIs[index]->AttachSprite(*m_pSprite2Ds[index]);
+			m_pUIs[index]->SetPosition(m_pSprite2Ds[index]->GetSpriteData().Pos);
+			m_SpritePosList.push_back(m_pUIs[index]->GetPosition());
+			index++;
+		}
 	}
+	catch (const std::exception& e) { return E_FAIL; }
+
 
 	return S_OK;
 }
 
 void CTitle::Release()
 {
-	for (size_t i = 0; i < SpriteDataList.size(); ++i) {
+	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) {
 		SAFE_DELETE(m_pUIs[i]);
 	}
-	for (size_t i = 0; i < SpriteDataList.size(); ++i) {
+	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) {
 		SAFE_DELETE(m_pSprite2Ds[i]);
 	}
 }
@@ -170,6 +178,11 @@ void CTitle::Draw()
 void CTitle::StartButtonUpdate(CKey* key, CGamePad* pad)
 {
 	float scale;
+	int sp1 = TitleSprite::Button2;
+	int sp2 = TitleSprite::ButtonText;
+
+	D3DXVECTOR2 sp1_data = { m_pSprite2Ds[sp1]->GetSpriteData().Disp.w,m_pSprite2Ds[sp1]->GetSpriteData().Disp.h };
+	D3DXVECTOR2 sp2_data = { m_pSprite2Ds[sp2]->GetSpriteData().Disp.w,m_pSprite2Ds[sp2]->GetSpriteData().Disp.h };
 
 	if (m_SelectButton == 1)
 	{
@@ -180,23 +193,23 @@ void CTitle::StartButtonUpdate(CKey* key, CGamePad* pad)
 		scale = 1.f + m_StartScale;
 
 		// 画像の種類変更.
-		m_pUIs[TitleSprite::Button2]->SetPatternNo(1, 0);
-		m_pUIs[TitleSprite::ButtonText]->SetPatternNo(1, 0);
+		m_pUIs[sp1]->SetPatternNo(1, 0);
+		m_pUIs[sp2]->SetPatternNo(1, 0);
 
 		// スケール値を変更(Button2は上下反転のためマイナス).
-		m_pUIs[TitleSprite::Button2]->SetScale(scale, -scale, 1.f);
-		m_pUIs[TitleSprite::ButtonText]->SetScale(scale, scale, 1.f);
+		m_pUIs[sp1]->SetScale(scale, -scale, 1.f);
+		m_pUIs[sp2]->SetScale(scale,  scale, 1.f);
 
 		// 拡大時に座標をずらしセンタリングする.
-		m_pUIs[TitleSprite::Button2]
+		m_pUIs[sp1]
 			->SetPosition(
-				st_Button2.Pos.x - (st_Button2.Disp.w * m_StartScale / 2), 
-				st_Button2.Pos.y + (st_Button2.Disp.h * m_StartScale / 2), 0.f);
+				m_SpritePosList[sp1].x - (sp1_data.x * m_StartScale / 2),
+				m_SpritePosList[sp1].y + (sp1_data.y * m_StartScale / 2), 0.f);
 
-		m_pUIs[TitleSprite::ButtonText]
+		m_pUIs[sp2]
 			->SetPosition(
-				st_ButtonText.Pos.x - (st_ButtonText.Disp.w * m_StartScale / 2), 
-				st_ButtonText.Pos.y - (st_ButtonText.Disp.h * m_StartScale / 2), 0.f);
+				m_SpritePosList[sp2].x - (sp2_data.x * m_StartScale / 2),
+				m_SpritePosList[sp2].y - (sp2_data.y * m_StartScale / 2), 0.f);
 
 		//ゲームメインへ遷移.
 		if (key->IsKeyAction(DIK_SPACE) || pad->GetPadButtonDown(2))
@@ -219,30 +232,35 @@ void CTitle::StartButtonUpdate(CKey* key, CGamePad* pad)
 		scale = 1.f + m_StartScale;
 
 		// 画像の種類変更.
-		m_pUIs[TitleSprite::ButtonText]->SetPatternNo(0, 0);
-		m_pUIs[TitleSprite::Button2]->SetPatternNo(0, 0);
+		m_pUIs[sp2]->SetPatternNo(0, 0);
+		m_pUIs[sp1]->SetPatternNo(0, 0);
 
 		// スケール値を変更(Button2は上下反転のためマイナス).
-		m_pUIs[TitleSprite::Button2]->SetScale(scale, -scale, 1.f);
-		m_pUIs[TitleSprite::ButtonText]->SetScale(scale, scale, 1.f);
+		m_pUIs[sp1]->SetScale(scale, -scale, 1.f);
+		m_pUIs[sp2]->SetScale(scale, scale, 1.f);
 	}
 
 	// 拡大時に座標をずらしセンタリングする.
-	m_pUIs[TitleSprite::Button2]
+	m_pUIs[sp1]
 		->SetPosition(
-		st_Button2.Pos.x - (st_Button2.Disp.w * m_StartScale / 2),
-		st_Button2.Pos.y + (st_Button2.Disp.h * m_StartScale / 2), 0.f);
+			m_SpritePosList[sp1].x - (sp1_data.x * m_StartScale / 2),
+			m_SpritePosList[sp1].y + (sp1_data.y * m_StartScale / 2), 0.f);
 
-	m_pUIs[TitleSprite::ButtonText]
+	m_pUIs[sp2]
 		->SetPosition(
-		st_ButtonText.Pos.x - (st_ButtonText.Disp.w * m_StartScale / 2),
-		st_ButtonText.Pos.y - (st_ButtonText.Disp.h * m_StartScale / 2), 0.f);
+			m_SpritePosList[sp2].x - (sp2_data.x * m_StartScale / 2),
+			m_SpritePosList[sp2].y - (sp2_data.y * m_StartScale / 2), 0.f);
 }
 
 void CTitle::OptionButtonUpdate(CKey* key, CGamePad* pad)
 {
 	float scale;
 	float butscale;
+	int sp1 = TitleSprite::Button;
+	int sp2 = TitleSprite::ButtonText3;
+
+	D3DXVECTOR2 sp1_data = { m_pSprite2Ds[sp1]->GetSpriteData().Disp.w,m_pSprite2Ds[sp1]->GetSpriteData().Disp.h };
+	D3DXVECTOR2 sp2_data = { m_pSprite2Ds[sp2]->GetSpriteData().Disp.w,m_pSprite2Ds[sp2]->GetSpriteData().Disp.h };
 
 	if (m_SelectButton == 2)
 	{
@@ -254,12 +272,12 @@ void CTitle::OptionButtonUpdate(CKey* key, CGamePad* pad)
 		butscale = m_OptionScale + 1.f;
 
 		// 画像の種類変更.
-		m_pUIs[TitleSprite::Button]->SetPatternNo(1, 0);
-		m_pUIs[TitleSprite::ButtonText3]->SetPatternNo(1, 0);
+		m_pUIs[sp1]->SetPatternNo(1, 0);
+		m_pUIs[sp2]->SetPatternNo(1, 0);
 
 		// スケール値を変更.
-		m_pUIs[TitleSprite::Button]->SetScale(butscale, butscale, 1.f);
-		m_pUIs[TitleSprite::ButtonText3]->SetScale(scale, scale, 1.f);
+		m_pUIs[sp1]->SetScale(butscale, butscale, 1.f);
+		m_pUIs[sp2]->SetScale(scale, scale, 1.f);
 	}
 	else
 	{
@@ -271,29 +289,34 @@ void CTitle::OptionButtonUpdate(CKey* key, CGamePad* pad)
 		butscale = m_OptionScale + 1.f;
 
 		// 画像の種類変更.
-		m_pUIs[TitleSprite::Button]->SetPatternNo(0, 0);
-		m_pUIs[TitleSprite::ButtonText3]->SetPatternNo(0, 0);
+		m_pUIs[sp1]->SetPatternNo(0, 0);
+		m_pUIs[sp2]->SetPatternNo(0, 0);
 
 		// スケール値を変更.
-		m_pUIs[TitleSprite::Button]->SetScale(butscale, butscale, 1.f);
-		m_pUIs[TitleSprite::ButtonText3]->SetScale(scale, scale, 1.f);
+		m_pUIs[sp1]->SetScale(butscale, butscale, 1.f);
+		m_pUIs[sp2]->SetScale(scale, scale, 1.f);
 	}
 
 	// 拡大時に座標をずらしセンタリングする.
-	m_pUIs[TitleSprite::Button]
+	m_pUIs[sp1]
 		->SetPosition(
-			st_Button.Pos.x - (st_Button.Disp.w * m_OptionScale / 2),
-			st_Button.Pos.y - (st_Button.Disp.h * m_OptionScale / 2), 0.f);
+			m_SpritePosList[sp1].x - (sp1_data.x * m_OptionScale / 2),
+			m_SpritePosList[sp1].y - (sp1_data.y * m_OptionScale / 2), 0.f);
 
-	m_pUIs[TitleSprite::ButtonText3]
+	m_pUIs[sp2]
 		->SetPosition(
-			st_ButtonText3.Pos.x - (st_ButtonText3.Disp.w * m_OptionScale / 2),
-			st_ButtonText3.Pos.y - (st_ButtonText3.Disp.h * m_OptionScale / 2), 0.f);
+			m_SpritePosList[sp2].x - (sp2_data.x * m_OptionScale / 2),
+			m_SpritePosList[sp2].y - (sp2_data.y * m_OptionScale / 2), 0.f);
 }
 
 void CTitle::EndButtonUpdate(CKey* key, CGamePad* pad)
 {
 	float scale;
+	int sp1 = TitleSprite::Button3;
+	int sp2 = TitleSprite::ButtonText2;
+
+	D3DXVECTOR2 sp1_data = { m_pSprite2Ds[sp1]->GetSpriteData().Disp.w,m_pSprite2Ds[sp1]->GetSpriteData().Disp.h };
+	D3DXVECTOR2 sp2_data = { m_pSprite2Ds[sp2]->GetSpriteData().Disp.w,m_pSprite2Ds[sp2]->GetSpriteData().Disp.h };
 
 	if (m_SelectButton == 3)
 	{
@@ -304,12 +327,12 @@ void CTitle::EndButtonUpdate(CKey* key, CGamePad* pad)
 		scale = 1.f + m_EndScale;
 
 		// 画像の種類変更.
-		m_pUIs[TitleSprite::Button3]->SetPatternNo(1, 0);
-		m_pUIs[TitleSprite::ButtonText2]->SetPatternNo(1, 0);
+		m_pUIs[sp1]->SetPatternNo(1, 0);
+		m_pUIs[sp2]->SetPatternNo(1, 0);
 
 		// スケール値を変更.
-		m_pUIs[TitleSprite::Button3]->SetScale(scale, scale, 1.f);
-		m_pUIs[TitleSprite::ButtonText2]->SetScale(scale, scale, 1.f);
+		m_pUIs[sp1]->SetScale(scale, scale, 1.f);
+		m_pUIs[sp2]->SetScale(scale, scale, 1.f);
 
 		// ゲームを終了させる.
 		if (key->IsKeyAction(DIK_SPACE) || pad->GetPadButtonDown(2))
@@ -328,23 +351,23 @@ void CTitle::EndButtonUpdate(CKey* key, CGamePad* pad)
 		scale = 1.f + m_EndScale;
 
 		// 画像の種類変更.
-		m_pUIs[TitleSprite::Button3]->SetPatternNo(0, 0);
-		m_pUIs[TitleSprite::ButtonText2]->SetPatternNo(0, 0);
+		m_pUIs[sp1]->SetPatternNo(0, 0);
+		m_pUIs[sp2]->SetPatternNo(0, 0);
 
 		// スケール値を変更.
-		m_pUIs[TitleSprite::Button3]->SetScale(scale, scale, 1.f);
-		m_pUIs[TitleSprite::ButtonText2]->SetScale(scale, scale, 1.f);
+		m_pUIs[sp1]->SetScale(scale, scale, 1.f);
+		m_pUIs[sp2]->SetScale(scale, scale, 1.f);
 	}
 
 	// 拡大時に座標をずらしセンタリングする.
-	m_pUIs[TitleSprite::Button3]
+	m_pUIs[sp1]
 		->SetPosition(
-			st_Button3.Pos.x - (st_Button3.Disp.w * m_EndScale / 2),
-			st_Button3.Pos.y - (st_Button3.Disp.h * m_EndScale / 2), 0.f);
-	m_pUIs[TitleSprite::ButtonText2]
+			m_SpritePosList[sp1].x - (sp1_data.x * m_EndScale / 2),
+			m_SpritePosList[sp1].y - (sp1_data.y * m_EndScale / 2), 0.f);
+	m_pUIs[sp2]
 		->SetPosition(
-			st_ButtonText2.Pos.x - (st_ButtonText2.Disp.w * m_EndScale / 2),
-			st_ButtonText2.Pos.y - (st_ButtonText2.Disp.h * m_EndScale / 2), 0.f);
+			m_SpritePosList[sp2].x  - (sp2_data.x * m_EndScale / 2),
+			m_SpritePosList[sp2].y  - (sp2_data.y * m_EndScale / 2), 0.f);
 }
 
 void CTitle::EmptyInput()

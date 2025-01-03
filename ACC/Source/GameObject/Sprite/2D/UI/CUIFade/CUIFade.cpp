@@ -1,6 +1,9 @@
 #include "CUIFade.h"
 #include "DirectX/CDirectX11.h"	// Depthで使用.
 #include "DirectSound/CSoundManager.h"
+namespace {
+	constexpr char TitleImagePath[] = "Data\\Texture\\other";
+}
 
 CUIFade::CUIFade()
 	: m_FadeStart	( false )
@@ -23,26 +26,47 @@ CUIFade::~CUIFade()
 
 void CUIFade::Create()
 {
-	// スプライト情報を設定.
-	BlackFade = { WND_W,WND_H,WND_W,WND_H,WND_W,WND_H,	ZEROVEC3};
+	int index = 0;
 
-	// ファイルパスとスプライトデータをまとめて準備.
-	SpriteDataList = {
-		{ "Data\\Texture\\other\\Black.png", BlackFade},
-	};
+	try
+	{
+		// 指定したディレクトリ内を走査.
+		for (const auto& entry : std::filesystem::directory_iterator(TitleImagePath)) {
+			// jsonの場合やり直す.
+			std::string Extension = entry.path().string();
+			Extension.erase(0, entry.path().string().rfind("."));
+			if (Extension == ".json") continue;
 
-	// 各2DSpriteオブジェクトの初期設定をする.
-	for (size_t i = 0; i < SpriteDataList.size(); ++i) {
-		m_pSprite2Ds.push_back(new CSprite2D());
-		m_pSprite2Ds[i]->Init(SpriteDataList[i].first.c_str());
+			m_pSprite2Ds.push_back(new CSprite2D());
+			m_pUIs.push_back(new CUIObject());
+
+			m_pSprite2Ds[index]->Init(entry.path().string());
+			m_pUIs[index]->AttachSprite(*m_pSprite2Ds[index]);
+			index++;
+		}
 	}
+	catch (const std::exception& e) { return; }
 
-	// 各UIオブジェクトの初期設定をする.
-	for (size_t i = 0; i < SpriteDataList.size(); ++i) {
-		m_pUIs.push_back(new CUIObject());
-		m_pUIs[i]->AttachSprite(*m_pSprite2Ds[i]);
-		m_pUIs[i]->SetPosition(SpriteDataList[i].second.Pos);
-	}
+	//// スプライト情報を設定.
+	//BlackFade = { WND_W,WND_H,WND_W,WND_H,WND_W,WND_H,	ZEROVEC3};
+
+	//// ファイルパスとスプライトデータをまとめて準備.
+	//SpriteDataList = {
+	//	{ "Data\\Texture\\other\\Black.png", BlackFade},
+	//};
+
+	//// 各2DSpriteオブジェクトの初期設定をする.
+	//for (size_t i = 0; i < SpriteDataList.size(); ++i) {
+	//	m_pSprite2Ds.push_back(new CSprite2D());
+	//	m_pSprite2Ds[i]->Init(SpriteDataList[i].first.c_str());
+	//}
+
+	//// 各UIオブジェクトの初期設定をする.
+	//for (size_t i = 0; i < SpriteDataList.size(); ++i) {
+	//	m_pUIs.push_back(new CUIObject());
+	//	m_pUIs[i]->AttachSprite(*m_pSprite2Ds[i]);
+	//	m_pUIs[i]->SetPosition(SpriteDataList[i].second.Pos);
+	//}
 }
 
 void CUIFade::Update()
