@@ -6,6 +6,7 @@
 
 //前方宣言
 class CUIObject;
+class CStaticMesh;
 
 /********************************************************************************
 *	タイトルシーンクラス.
@@ -17,14 +18,13 @@ public:
 	// Titleで使用するスプライト名を追加していく(名前順).
 	enum TitleSprite {
 		FullScreen,
-		BestTimeText,
-		Button3,
-		ButtonText2,
-		Button,
-		ButtonText3,
-		ButtonText,
-		Button2,
-		TitleText,
+		Select1,
+		Select2,
+		Select3,
+		Select4,
+		Select5,
+		StartButton,
+		Training,
 	};
 
 public:
@@ -40,15 +40,15 @@ public:
 	void Draw() override;
 
 private:
-	// 見づらいのでボタンごとに処理をまとめる.
-	void StartButtonUpdate(CKey* key, CGamePad* pad);
-	void OptionButtonUpdate(CKey* key, CGamePad* pad);
-	void EndButtonUpdate(CKey* key, CGamePad* pad);
 
-	// Win側のキー入力空打ち(テスト用なので隙があれば変更すべき).
-	void EmptyInput();
+	bool PointInSquare(POINT ppos, D3DXVECTOR2 spos, D3DXVECTOR2 sposs);
 
 private:
+	HWND		m_hwnd;
+	LIGHT		m_Light;
+	D3DXMATRIX	m_mView;
+	D3DXMATRIX	m_mProj;
+
 	// 画像情報リスト.
 	std::vector<std::string> m_SpriteDataList;//スプライト情報をまとめる配列.
 
@@ -57,12 +57,5 @@ private:
 	std::vector<CUIObject*> m_pUIs;			// UIクラス.
 	std::vector<CSprite2D*> m_pSprite2Ds;	// Sprite2Dクラス.
 
-	float m_ScaleDef;		//スケールの初期値.
-	float m_StartScale;		//スタートボタンのスケール値.
-	float m_EndScale;		//エンドボタンのスケール値.
-	float m_OptionScale;	//オプションボタンのスケール値.
-	float m_OpTextDefScale; //オプションテキストの初期スケール値.
-
-	int  m_SelectButton; //コントローラーもしくはキーボードでボタンを選択するときに使う.
-	bool m_SelectOther;	 //ほかの選択肢で遷移処理をしたとき用.
+	CStaticMesh* m_pEgg;	// 卵.
 };

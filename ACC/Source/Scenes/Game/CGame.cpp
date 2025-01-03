@@ -192,7 +192,7 @@ HRESULT CGame::LoadData()
 	m_pSpriteExplosion	->Init( _T( "Data\\Texture\\explosion.png" ), SSExplosion );
 
 	// スタティックメッシュの読み込み.
-	m_pStaticMeshFighter->Init( _T("Data\\Mesh\\Static\\Fighter\\egg.x" ) );
+	m_pStaticMeshFighter->Init( _T("Data\\Mesh\\Static\\Player\\egg.x" ) );
 	m_pStaticMeshGround	->Init( _T("Data\\Mesh\\Static\\Stage\\stage.x" ) );
 	m_pStaticMeshRoboA	->Init( _T("Data\\Mesh\\Static\\Robo\\RobotA_pivot.x" ) );
 	m_pStaticMeshRoboB	->Init( _T("Data\\Mesh\\Static\\Robo\\RobotB_pivot.x" ) );
@@ -378,19 +378,6 @@ void CGame::Draw()
 	m_pPlayer->UpdateBSpherePos();
 	m_pEnemy->UpdateBSpherePos();
 	m_pShot->UpdateBSpherePos();
-
-	HWND hStartMenu = FindWindow(L"Windows.UI.Core.CoreWindow", L"Start");
-
-	//HWND hForeground = GetForegroundWindow();
-	//HWND hDesktop = GetShellWindow();
-
-	//プレイヤーとエネミーの当たり判定.
-	if(hStartMenu != NULL && IsWindowVisible(hStartMenu)){
-		SetWindowText(m_hWnd, _T("スタートメニューが表示されています"));
-	}
-	else{
-		SetWindowText(m_hWnd, _T("スタートメニューは表示されていません"));
-	}
 
 	//弾とエネミーの当たり判定.
 	if( m_pShot->GetBSphere()->IsHit( *m_pEnemy->GetBSphere() ) )

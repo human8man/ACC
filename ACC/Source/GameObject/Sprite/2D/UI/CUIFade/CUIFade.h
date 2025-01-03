@@ -5,14 +5,12 @@
 class CUIFade
 {
 public:
-	// 情報まとめる用.
-	struct FileData {
-		std::string filepath;			// ファイルのパス.
-		CSprite2D::SPRITE_STATE sprite;	// スプライト情報.
-	};
 	// 画像種類ごとに番号を振り当てる.
-	enum SpriteNum {
-		Black = 0,
+	enum FadeSprite {
+		Black,
+		Gray,
+		Number,
+		White,
 	};
 
 public:
@@ -31,12 +29,13 @@ public:
 	bool GetFading()	const { return m_Fading;   } // フェード中かを知らせる.
 	bool GetFadePeak()	const { return m_FadePeak; } // フェードのピークを知らせる.
 	bool GetFadeEnd()	const { return m_FadeEnd;  } // フェードの終了を知らせる.
+
 private:
-	std::vector<std::pair<std::string, CSprite2D::SPRITE_STATE>> SpriteDataList;	// スプライト情報をまとめる.
+	std::vector<std::string> m_SpriteDataList;	//スプライト情報をまとめる配列.
+	std::vector<D3DXVECTOR3> m_SpritePosList;	//スプライト座標をまとめる配列.
+
 	std::vector<CUIObject*> m_pUIs;			// UIクラス.
 	std::vector<CSprite2D*> m_pSprite2Ds;	// Sprite2Dクラス.
-
-	CSprite2D::SPRITE_STATE BlackFade;		// 黒フェード.
 
 	bool	m_FadeStart;	// フェード開始.
 	bool	m_Fading;		// フェード中.

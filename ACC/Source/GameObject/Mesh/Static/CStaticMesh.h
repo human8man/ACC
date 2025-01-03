@@ -146,8 +146,10 @@ public:
 	LPD3DXMESH GetMesh() const { return m_Model.pMesh; }
 	//レイとの当たり判定用のメッシュを取得.
 	LPD3DXMESH GetMeshForRay() const { return m_ModelForRay.pMesh; }
-	
-
+	// メッシュ位置を取得.
+	D3DXVECTOR3 GetPos()const { return m_Position; }
+	// メッシュ角度を取得.
+	D3DXVECTOR3 GetRot()const { return m_Rotation; }
 private:
 	//メッシュ読み込み.
 	HRESULT LoadXMesh( LPCTSTR lpFileName );

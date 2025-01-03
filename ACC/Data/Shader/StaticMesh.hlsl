@@ -87,7 +87,8 @@ float4 PS_Main( VS_OUTPUT input ) : SV_Target
 
 	//ŠgU”½ËŒõ ¦‚Q.
 	float NL = saturate( dot( input.Normal, input.Light ) );
-	float4 diffuse = ( g_Diffuse / 2 + texColor / 2 )*NL;
+	NL = max(NL, 0.2); // ƒoƒCƒAƒX‚ğ 0.2 ‚Æİ’è
+	float4 diffuse = ( g_Diffuse / 2 + texColor / 2 ) * NL;
 
 	//‹¾–Ê”½ËŒõ ¦‚R.
 	float3 reflect = normalize( 2 * NL * input.Normal - input.Light );
@@ -142,6 +143,7 @@ float4 PS_NoTex( VS_OUTPUT input ) : SV_Target
 
 	//ŠgU”½ËŒõ ¦‚Q.
 	float NL = saturate( dot( input.Normal, input.Light ) );
+	NL = max(NL, 0.6); // ƒoƒCƒAƒX‚ğ 0.2 ‚Æİ’è
 	float4 diffuse = g_Diffuse * NL;
 
 	//‹¾–Ê”½ËŒõ ¦‚R.

@@ -33,6 +33,10 @@ public:
 		m_PatternNo.y = y;
 	}
 
+
+	POINTS GetPatternNo() const { return m_PatternNo; }
+	CSprite2D::SPRITE_STATE GetSpriteData() const { return m_pSprite->GetSpriteData(); }
+
 protected:
 	//CGameObject‚©‚çoverride‚µ‚½ŠÖ”.
 	//final ‚±‚êˆÈ~‚Íoverride‚³‚¹‚È‚¢.

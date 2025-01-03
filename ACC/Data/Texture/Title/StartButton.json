@@ -1,0 +1,20 @@
+{
+  "Base": {
+    "h": 256.0,
+    "w": 1024.0
+  },
+  "Disp": {
+    "h": 256.0,
+    "w": 512.0
+  },
+  "FilePath": "Data\\Texture\\Title\\StartButton.json",
+  "Pos": {
+    "x": 640.0,
+    "y": 192.0,
+    "z": 0.0
+  },
+  "Stride": {
+    "h": 256.0,
+    "w": 512.0
+  }
+}
