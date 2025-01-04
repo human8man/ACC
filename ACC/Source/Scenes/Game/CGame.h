@@ -55,9 +55,10 @@ private:
 	D3DXMATRIX		m_mProj;	// 射影（プロジェクション）行列.
 
 	// スタティックメッシュ(使いまわす資源).
-	CStaticMesh*	m_pStaticMeshFighter;	// 自機.
-	CStaticMesh*	m_pStaticMeshGround;	// 地面.
-	CStaticMesh*	m_pStaticMeshBullet;	// 弾.
+	CStaticMesh*	m_pMeshFighter;	// 自機.
+	CStaticMesh*	m_pMeshGround;	// 地面.
+	CStaticMesh*	m_pMeshBullet;	// 弾.
+	CStaticMesh*	m_pMeshGun;	// 弾.
 		
 	// キャラクタークラス.
 	CCharacter*			m_pPlayer;
