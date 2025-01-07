@@ -102,6 +102,9 @@ HRESULT CStaticMesh::LoadXMesh( LPCTSTR lpFileName )
 		return E_FAIL;
 	}
 
+	// 頂点情報の保存.
+	SaveVertices(m_Model.pMesh);
+
 	//Xファイルのロード(レイとの判定用に別設定で読み込む).
 	if( FAILED( D3DXLoadMeshFromX(
 		lpFileName,						//ファイル名.
@@ -370,20 +373,10 @@ HRESULT CStaticMesh::CreateSampler()
 void CStaticMesh::Release()
 {
 	//インデックスバッファ解放.	←バグるので調査必要.
-	if( m_ppIndexBuffer != nullptr ){
-		for( int No = m_Model.NumMaterials-1; No >= 0; No-- ){
-			if( m_ppIndexBuffer[No] != nullptr ){
-				SAFE_RELEASE( m_ppIndexBuffer[No] );
-			}
-		}
-		delete[] m_ppIndexBuffer;
-		m_ppIndexBuffer = nullptr;
-	}
+	SAFE_DELETE_ARRAY(m_ppIndexBuffer);
 	//マテリアル解放.
-	if( m_pMaterials != nullptr ){
-		delete[] m_pMaterials;
-		m_pMaterials = nullptr;
-	}
+	SAFE_DELETE_ARRAY(m_pMaterials);
+
 	//メッシュデータの解放.
 	SAFE_RELEASE( m_Model.pD3DXMtrlBuffer );
 	SAFE_RELEASE( m_Model.pMesh );
@@ -775,4 +768,32 @@ void CStaticMesh::RenderMesh(
 		m_pContext11->DrawIndexed(
 			m_pMaterials[m_AttrID[No]].dwNumFace * 3, 0, 0 );
 	}
+}
+
+void CStaticMesh::SaveVertices(LPD3DXMESH pMesh)
+{
+	if (!pMesh) return;
+
+	// 頂点バッファをロックしてデータへのアクセスを確保.
+	void* pVertices = nullptr;
+	if (FAILED(pMesh->LockVertexBuffer(D3DLOCK_READONLY, &pVertices))) { return; }
+
+	// 頂点数と頂点1つあたりのバイトサイズを取得
+	DWORD numVertices = pMesh->GetNumVertices();		// 総頂点数.
+	DWORD vertexSize = pMesh->GetNumBytesPerVertex();	// 各頂点のバイト数.
+
+	// 保存先の頂点リストをクリア（再利用時の安全策）.
+	m_Vertices.clear();
+
+	// 頂点バッファから全頂点を取得.
+	for (DWORD i = 0; i < numVertices; ++i) {
+		// 現在の頂点の位置を計算.
+		BYTE* pVertex = static_cast<BYTE*>(pVertices) + i * vertexSize;
+		// 頂点の位置を取得.
+		D3DXVECTOR3 position = *(D3DXVECTOR3*)pVertex;
+		m_Vertices.push_back(position);
+	}
+
+	// 頂点バッファのロックを解除.
+	pMesh->UnlockVertexBuffer();
 }

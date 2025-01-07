@@ -16,14 +16,13 @@ public:
 	virtual void Update() override;
 	virtual void Draw(D3DXMATRIX& View, D3DXMATRIX& Proj,LIGHT& Light) override;
 
-	//弾を飛ばしたいか確認.
+	// 弾を飛ばしたいか確認.
 	bool IsShot() const { return m_Shot; }
 
-	//Y軸方向へ伸ばしたレイを取得.
+	// Y軸方向へ伸ばしたレイを取得.
 	RAY GetRayY() const { return *m_pRayY;  }
-	//十字レイを取得.
+	// 十字レイを取得.
 	CROSSRAY GetCrossRay() const { return *m_pCrossRay;  }
-
 protected:
 	bool		m_Shot;			//弾を飛ばすフラグ.
 

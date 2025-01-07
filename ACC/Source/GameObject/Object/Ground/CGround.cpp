@@ -12,12 +12,6 @@ CGround::~CGround()
 
 void CGround::Update()
 {
-//	//地面をスクロールさせる.
-//	m_vPosition.z -= 0.2f;
-//	if( m_vPosition.z < -100.0f ){
-//		m_vPosition.z = 0.0f;
-//	}
-	
 	//-------------------------
 	//	Y軸のレイ処理.
 	//-------------------------

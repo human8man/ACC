@@ -37,12 +37,11 @@ public:
 	static D3DXVECTOR3& GetVec()  { return GetInstance()->m_Camera.UpVec; }
 	static D3DXVECTOR3& GetRot()  { return GetInstance()->m_CameraRot;	  }
 
-	static void SetUseMouse	 (const bool& Use)		  { GetInstance()->m_CanMoveMouse = Use; }
-	static void SetUsePad	 (const bool& Use)		  { GetInstance()->m_UsePad = Use;		 }
-	static void SetViewAngle (const float& Fov)		  { GetInstance()->m_Fov = Fov;			 }
-	static void SetSens		 (const float& Sens)	  { GetInstance()->m_MouseSens = Sens;	 }
-	static void SetPlayerPos (const D3DXVECTOR3& Pos) { GetInstance()->m_Playerpos = Pos;	 }
-	static void SetPosition	 (const D3DXVECTOR3& Pos) { GetInstance()->m_Camera.Pos = Pos;	 }
+	static void SetUseMouse	 (const bool& Use)		  { GetInstance()->m_CanMoveMouse = Use;  }
+	static void SetCanMove	 (const bool& can)		  { GetInstance()->m_CanMoveCamera = can; }
+	static void SetViewAngle (const float& Fov)		  { GetInstance()->m_Fov = Fov;			  }
+	static void SetSens		 (const float& Sens)	  { GetInstance()->m_MouseSens = Sens;	  }
+	static void SetPosition	 (const D3DXVECTOR3& Pos) { GetInstance()->m_Camera.Pos = Pos;	  }
 private:
 	void KeyInput();					// キー入力.
 	void CameraMove(int vec);			// カメラの移動.
@@ -56,7 +55,6 @@ private:
 
 	D3DXVECTOR2 m_MouseMoveDis;	// マウスの移動した距離.
 	D3DXVECTOR3 m_CameraRot;	// カメラの回転軸.
-	D3DXVECTOR3 m_Playerpos;	// プイレイヤー座標.
 	D3DXVECTOR3 m_DirectionPos;	// カメラ座標～注視点のベクトル.
 
 	float	m_Fov;				// 視野角.
@@ -66,6 +64,6 @@ private:
 	float	m_CameraPitch;		// カメラ角度y軸.
 	float	m_MouseSens;		// マウス感度.
 
+	bool	m_CanMoveCamera;	// カメラのキー操作が可能か.
 	bool	m_CanMoveMouse;		// マウスが自由に移動できるかどうか.
-	bool	m_UsePad;			// コントローラーを使用するか.
 };

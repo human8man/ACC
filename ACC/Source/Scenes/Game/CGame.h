@@ -4,25 +4,17 @@
 #include "DirectX/CDirectX11.h"
 
 #include "DebugText/CDebugText.h"
+#include "Collision/GJK/CGJK.h"
 
-#include "GameObject/Sprite/CSpriteObject.h"
-#include "GameObject/Sprite/2D/CSprite2D.h"
-#include "GameObject/Sprite/2D/UI/CUIObject.h"
-#include "GameObject/Sprite/3D/CSprite3D.h"
-#include "GameObject/Sprite/3D/Explosion/CExplosion.h"
 
-#include "GameObject/Character/CCharacter.h"
-#include "GameObject/Character/Player/CPlayer.h"
-#include "GameObject/Character/Enemy/CEnemy.h"
-#include "GameObject/Character/Zako/CZako.h"
-
-#include "GameObject/Object/Ground/CGround.h"
-#include "GameObject/Object/Shot/CShot.h"
-#include "GameObject/Mesh/Static/CStaticMesh.h"
-#include "GameObject/Mesh/Static/CStaticMeshObject.h"
-#include "GameObject/Mesh/Skin/CSkinMesh.h"
-#include "Collision/Ray/CRay.h"
-
+class CStaticMesh;
+class CGJK;
+class MeshCollider;
+class CGround;
+class CShot;
+class CEnemy;
+class CPlayer;
+class CCharacter;
 
 //============================================================================
 //		ゲームクラス.
@@ -31,8 +23,6 @@ class CGame
 	: public CSceneBase
 {
 public:
-	static constexpr int ENEMY_MAX = 3;
-
 	CGame( HWND hWnd );
 	~CGame();
 
@@ -43,29 +33,36 @@ public:
 	void Update()	override;
 	void Draw()		override;
 
+
 private:
-	// ウィンドウハンドル.
-	HWND			m_hWnd;
+	// 当たり判定関数.
+	void CollisionJudge();
 
-	// ライト情報.
-	LIGHT			m_Light;
+private:
+	HWND	m_hWnd;	// ウィンドウハンドル.
+	LIGHT	m_Light;// ライト情報.
 
-	// 行列.
-	D3DXMATRIX		m_mView;	// ビュー(カメラ)行列.
-	D3DXMATRIX		m_mProj;	// 射影（プロジェクション）行列.
+	D3DXMATRIX	m_mView;	// ビュー(カメラ)行列.
+	D3DXMATRIX	m_mProj;	// 射影（プロジェクション）行列.
 
-	// スタティックメッシュ(使いまわす資源).
 	CStaticMesh*	m_pMeshFighter;	// 自機.
 	CStaticMesh*	m_pMeshGround;	// 地面.
 	CStaticMesh*	m_pMeshBullet;	// 弾.
 	CStaticMesh*	m_pMeshGun;	// 弾.
 		
-	// キャラクタークラス.
-	CCharacter*			m_pPlayer;
+	CCharacter*	m_pPlayer;
+	CGround*	m_pGround;
+	CShot*		m_pShot;
 
-	// 地面クラス.
-	CGround*			m_pGround;
 
-	// 弾クラス.
-	CShot*				m_pShot;
+	// GJKクラス.
+	std::unique_ptr<CGJK>		m_pGJK;
+	MeshCollider m_MeshA;
+	MeshCollider m_MeshB;
+
+	// カメラに位置を渡す際にプレイヤーのサイズを足す.
+	D3DXVECTOR3 m_PLayerSize;
+
+	// カメラが自由に動かせるか.
+	bool m_FreeCameraMove;
 };

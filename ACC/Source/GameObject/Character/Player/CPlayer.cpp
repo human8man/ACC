@@ -14,7 +14,7 @@ CPlayer::~CPlayer()
 
 void CPlayer::Update()
 {
-	//前回のフレームで弾を飛ばしているかも知れないのでfalseにする.
+	// 前回のフレームで弾を飛ばしているかも知れないのでfalseにする.
 	m_Shot = false;
 
 	//弾を飛ばしたい!!.

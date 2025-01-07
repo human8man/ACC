@@ -19,6 +19,5 @@ public:
 	void SetPlayer(CCharacter& pPlayer) { m_pPlayer = &pPlayer; }
 
 protected:
-	CCharacter*		m_pPlayer;
+	CCharacter*	m_pPlayer;
 };
-

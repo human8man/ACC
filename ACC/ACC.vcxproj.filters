@@ -127,6 +127,12 @@
     <Filter Include="Source\Common\FileManager\LoadImage">
       <UniqueIdentifier>{a54edffe-bb53-4fcb-b438-c594423495a2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Collision\GJK">
+      <UniqueIdentifier>{18f96188-2579-4537-b8f8-b21622e48bbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GameObject\Object\Gun">
+      <UniqueIdentifier>{08624e15-233a-442b-95e9-b0e1a757c827}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Data\Shader\Sprite3D.hlsl">
@@ -181,9 +187,6 @@
     </ClCompile>
     <ClCompile Include="Source\GameObject\Character\Enemy\CEnemy.cpp">
       <Filter>Source\GameObject\Character\Enemy</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\GameObject\Character\Zako\CZako.cpp">
-      <Filter>Source\GameObject\Character\Zako</Filter>
     </ClCompile>
     <ClCompile Include="Source\GameObject\Character\Player\CPlayer.cpp">
       <Filter>Source\GameObject\Character\Player</Filter>
@@ -296,6 +299,11 @@
     <ClCompile Include="Source\Common\FileManager\LoadImage\LoadImage.cpp">
       <Filter>Source\Common\FileManager\LoadImage</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Common\Resource\SpriteResource\SpriteResource.cpp" />
+    <ClCompile Include="Source\Collision\GJK\CGJK.cpp">
+      <Filter>Source\Collision\GJK</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GameObject\Object\Gun\CGun.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Collision\BoundingSphere\CBoundingSphere.h">
@@ -336,9 +344,6 @@
     </ClInclude>
     <ClInclude Include="Source\GameObject\Character\Enemy\CEnemy.h">
       <Filter>Source\GameObject\Character\Enemy</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GameObject\Character\Zako\CZako.h">
-      <Filter>Source\GameObject\Character\Zako</Filter>
     </ClInclude>
     <ClInclude Include="Source\GameObject\Character\Player\CPlayer.h">
       <Filter>Source\GameObject\Character\Player</Filter>
@@ -448,6 +453,11 @@
     <ClInclude Include="Source\Common\FileManager\LoadImage\LoadImage.h">
       <Filter>Source\Common\FileManager\LoadImage</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Common\Resource\SpriteResource\SpriteResource.h" />
+    <ClInclude Include="Source\Collision\GJK\CGJK.h">
+      <Filter>Source\Collision\GJK</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameObject\Object\Gun\CGun.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Common\Easing\Easing.inl">

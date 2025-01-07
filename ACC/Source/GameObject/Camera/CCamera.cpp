@@ -13,7 +13,6 @@ CCamera::CCamera()
 
 	, m_MouseMoveDis	( ZEROVEC2 )
 	, m_CameraRot		( ZEROVEC3 )
-	, m_Playerpos		( ZEROVEC3 )
 	, m_DirectionPos	( ZEROVEC3 )
 
 	, m_Fov				( 60.0f )
@@ -24,7 +23,7 @@ CCamera::CCamera()
 	, m_MouseSens		( 0.03f )
 
 	, m_CanMoveMouse	( false )
-	, m_UsePad			( false )
+	, m_CanMoveCamera	( true )
 {
 	Init();
 }
@@ -56,52 +55,33 @@ void CCamera::Init()
 //===================================================================
 void CCamera::Update()
 {
-	CGamePad* GamePad = CDInput::GetInstance()->CDGamePad();
-	
 	// マウスの移動量の初期化.
 	m_MouseMoveDis = ZEROVEC2;
-		
-	// キー入力.
-	KeyInput();
-	
-	// コントローラーの接続状況に応じてマウスを移動できるようにする.
-	if ( CDInput::GetInstance()->GamePadConnect() )
+
+	// キー入力での操作が可能か.
+	if( m_CanMoveCamera ) { KeyInput(); }
+
+	// マウスが自由な状態の場合.
+	if ( !m_CanMoveMouse )
 	{
-		// コントローラーを使用している.
-		m_UsePad = true;
+		// マウス座標の取得.
+		GetCursorPos(&m_NowCurorPos);
+		ScreenToClient(GetConsoleWindow(), &m_NowCurorPos);
 
-		// スティックによるカメラ操作.
-		if (GamePad->GetPadpos().lZ  >= STIC_LOW || GamePad->GetPadpos().lZ  <= -STIC_LOW
-		||  GamePad->GetPadpos().lRz >= STIC_LOW || GamePad->GetPadpos().lRz <= -STIC_LOW)
+		// 前回のマウス位置と違う場合.
+		if (m_BeforCursorPos.x != m_NowCurorPos.x
+		||  m_BeforCursorPos.y != m_NowCurorPos.y)
 		{
-			D3DXVECTOR2 Distance = { GamePad->GetPadpos().lZ * m_MouseSens, GamePad->GetPadpos().lRz * m_MouseSens };
-			MouseMove(Distance);
-		}
-	}
-	else if (!CDInput::GetInstance()->GamePadConnect())
-	{
-		// コントローラーを使用していない.
-		m_UsePad = false;
+			// マウス移動距離計算.
+			m_MouseMoveDis.x = static_cast<float>(m_NowCurorPos.x - m_BeforCursorPos.x);
+			m_MouseMoveDis.y = static_cast<float>(m_NowCurorPos.y - m_BeforCursorPos.y);
 
-		// マウスが自由な状態の場合マウス座標の取得.
-		if (!m_CanMoveMouse && GetCursorPos(&m_NowCurorPos))
-		{
-			ScreenToClient(GetConsoleWindow(), &m_NowCurorPos);
-			// 前回のマウス位置と違う場合.
-			if (m_BeforCursorPos.x != m_NowCurorPos.x
-			||  m_BeforCursorPos.y != m_NowCurorPos.y)
-			{
-				// マウス移動距離計算.
-				m_MouseMoveDis.x = static_cast<float>(m_NowCurorPos.x - m_BeforCursorPos.x);
-				m_MouseMoveDis.y = static_cast<float>(m_NowCurorPos.y - m_BeforCursorPos.y);
+			// ベクトル計算をし、注視点に代入.
+			MouseMove(m_MouseMoveDis);
 
-				// ベクトル計算をし、注視点に代入.
-				MouseMove(m_MouseMoveDis);
-
-				// マウス位置を画面中央に初期化.
-				SetCursorPos(WND_WM, WND_HM); // 現在のマウス位置リセット.
-				m_BeforCursorPos = RESETPOS;	// 過去のマウス位置リセット.
-			}
+			// マウス位置を画面中央に初期化.
+			SetCursorPos(WND_WM, WND_HM); // 現在のマウス位置リセット.
+			m_BeforCursorPos = RESETPOS;	// 過去のマウス位置リセット.
 		}
 	}
 }

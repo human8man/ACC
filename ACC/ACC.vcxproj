@@ -239,6 +239,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Collision\BoundingSphere\CBoundingSphere.cpp" />
+    <ClCompile Include="Source\Collision\GJK\CGJK.cpp" />
     <ClCompile Include="Source\Collision\Ray\CRay.cpp" />
     <ClCompile Include="Source\Common\DirectInput\CDirectInput.cpp">
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdcpp20</LanguageStandard>
@@ -278,13 +279,13 @@
     <ClCompile Include="Source\GameObject\Character\CCharacter.cpp" />
     <ClCompile Include="Source\GameObject\Character\Enemy\CEnemy.cpp" />
     <ClCompile Include="Source\GameObject\Character\Player\CPlayer.cpp" />
-    <ClCompile Include="Source\GameObject\Character\Zako\CZako.cpp" />
     <ClCompile Include="Source\GameObject\Mesh\Skin\CSkinMesh.cpp" />
     <ClCompile Include="Source\GameObject\Mesh\Skin\CSkinMeshObject.cpp" />
     <ClCompile Include="Source\GameObject\Mesh\Skin\CSkinMeshParser.cpp" />
     <ClCompile Include="Source\GameObject\Mesh\Static\CStaticMesh.cpp" />
     <ClCompile Include="Source\GameObject\Mesh\Static\CStaticMeshObject.cpp" />
     <ClCompile Include="Source\GameObject\Object\Ground\CGround.cpp" />
+    <ClCompile Include="Source\GameObject\Object\Gun\CGun.cpp" />
     <ClCompile Include="Source\GameObject\Object\Shot\CShot.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\2D\CSprite2D.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\2D\UI\CUIFade\CUIFade.cpp" />
@@ -301,6 +302,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Collision\BoundingSphere\CBoundingSphere.h" />
+    <ClInclude Include="Source\Collision\GJK\CGJK.h" />
     <ClInclude Include="Source\Collision\Ray\CRay.h" />
     <ClInclude Include="Source\Common\DirectInput\CDirectInput.h" />
     <ClInclude Include="Source\Common\Easing\Easing.h" />
@@ -332,13 +334,13 @@
     <ClInclude Include="Source\GameObject\Character\CCharacter.h" />
     <ClInclude Include="Source\GameObject\Character\Enemy\CEnemy.h" />
     <ClInclude Include="Source\GameObject\Character\Player\CPlayer.h" />
-    <ClInclude Include="Source\GameObject\Character\Zako\CZako.h" />
     <ClInclude Include="Source\GameObject\Mesh\Skin\CSkinMesh.h" />
     <ClInclude Include="Source\GameObject\Mesh\Skin\CSkinMeshObject.h" />
     <ClInclude Include="Source\GameObject\Mesh\Skin\CSkinMeshParser.h" />
     <ClInclude Include="Source\GameObject\Mesh\Static\CStaticMesh.h" />
     <ClInclude Include="Source\GameObject\Mesh\Static\CStaticMeshObject.h" />
     <ClInclude Include="Source\GameObject\Object\Ground\CGround.h" />
+    <ClInclude Include="Source\GameObject\Object\Gun\CGun.h" />
     <ClInclude Include="Source\GameObject\Object\Shot\CShot.h" />
     <ClInclude Include="Source\GameObject\Sprite\2D\CSprite2D.h" />
     <ClInclude Include="Source\GameObject\Sprite\2D\UI\CUIFade\CUIFade.h" />

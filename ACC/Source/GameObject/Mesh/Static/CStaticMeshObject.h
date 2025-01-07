@@ -50,6 +50,7 @@ public:
 	//壁からの位置を計算する.
 	void CalculatePositionFromWall( CROSSRAY* pCrossRay );
 
+	CStaticMesh GetMesh() const { return *m_pMesh; }
 private:
 	//交差位置のポリゴンの頂点を見つける.
 	HRESULT FindVerticesOnPoly(
