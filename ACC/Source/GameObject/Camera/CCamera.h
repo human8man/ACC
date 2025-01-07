@@ -29,6 +29,8 @@ public:
 	void Camera(D3DXMATRIX& View) const;
 	void Init();
 
+	static bool& GetMoveMouse()	  { return GetInstance()->m_CanMoveMouse; }
+	static bool& GetMoveCamera()  { return GetInstance()->m_CanMoveCamera;}
 	static float& GetSens()		  { return GetInstance()->m_MouseSens;	  }
 	static float& GetViewAngle()  { return GetInstance()->m_Fov;		  }
 	static float& GetDefaultFov() { return GetInstance()->m_DefaultFov;	  }
@@ -36,9 +38,12 @@ public:
 	static D3DXVECTOR3& GetPos()  { return GetInstance()->m_Camera.Pos;	  }
 	static D3DXVECTOR3& GetVec()  { return GetInstance()->m_Camera.UpVec; }
 	static D3DXVECTOR3& GetRot()  { return GetInstance()->m_CameraRot;	  }
+	
+	static void SetUseMouse	 (const bool& Use) { GetInstance()->m_CanMoveMouse = Use;  }
+	static void SetCanMove	 (const bool& can) { GetInstance()->m_CanMoveCamera = can; }
+	static void ChangeUseMouse() { GetInstance()->m_CanMoveMouse  = !GetInstance()->m_CanMoveMouse; }
+	static void ChangeCanMove () { GetInstance()->m_CanMoveCamera = !GetInstance()->m_CanMoveCamera;}
 
-	static void SetUseMouse	 (const bool& Use)		  { GetInstance()->m_CanMoveMouse = Use;  }
-	static void SetCanMove	 (const bool& can)		  { GetInstance()->m_CanMoveCamera = can; }
 	static void SetViewAngle (const float& Fov)		  { GetInstance()->m_Fov = Fov;			  }
 	static void SetSens		 (const float& Sens)	  { GetInstance()->m_MouseSens = Sens;	  }
 	static void SetPosition	 (const D3DXVECTOR3& Pos) { GetInstance()->m_Camera.Pos = Pos;	  }

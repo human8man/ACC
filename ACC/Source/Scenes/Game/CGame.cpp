@@ -11,6 +11,10 @@
 #include "GameObject/Character/Player/CPlayer.h"
 #include "GameObject/Object/Shot/CShot.h"
 
+#if _DEBUG
+	#include "ImGui/CImGui.h"
+#endif
+
 //============================================================================
 //		ゲームクラス.
 //============================================================================
@@ -30,7 +34,6 @@ CGame::CGame(HWND hWnd)
 	, m_pShot			( nullptr )
 	, m_pGJK			( nullptr )
 	, m_PLayerSize		{ 0.f, 2.f,0.f, }
-	, m_FreeCameraMove	( false )
 	, m_MeshA	()
 	, m_MeshB	()
 {
@@ -125,24 +128,49 @@ void CGame::Update()
 	CCamera::GetInstance()->Update();
 
 	// カメラ側のキー操作を無効にする.
-	if (Key->IsKeyAction(DIK_F2)) { m_FreeCameraMove = !m_FreeCameraMove; }
-	CCamera::GetInstance()->SetCanMove(m_FreeCameraMove);
+	if (Key->IsKeyAction(DIK_F2)) { CCamera::GetInstance()->ChangeCanMove(); }
+	if (Key->IsKeyAction(DIK_F3)) { CCamera::GetInstance()->ChangeUseMouse(); }
+	
 
 	// プレイヤーの更新.
 	m_pPlayer->Update();
 
 	// プレイヤーの更新後にプレイヤー座標にカメラをセット.
-	if ( !m_FreeCameraMove ) { CCamera::GetInstance()->SetPosition(m_pPlayer->GetPosition() + m_PLayerSize); }
+	if ( !CCamera::GetInstance()->GetMoveCamera())
+	{	  CCamera::GetInstance()->SetPosition(m_pPlayer->GetPosition() + m_PLayerSize); }
 
 	// 弾を飛ばす.
-	if( m_pPlayer->IsShot() ){
-		m_pShot->Reload(
-			m_pPlayer->GetPosition(),
-			m_pPlayer->GetRotation().y );
-	}
+	//if( m_pPlayer->IsShot() ){
+
+	//	D3DXVECTOR3 playerpos = {
+	//		m_pPlayer->GetPosition().x,
+	//		m_pPlayer->GetPosition().y + 1.0f,
+	//		m_pPlayer->GetPosition().z };
+
+	//	m_pShot->Reload(
+	//		playerpos,
+	//		m_pPlayer->GetRotation().y );
+	//}
 
 	// 弾の更新.
-	m_pShot->Update();
+	//m_pShot->Update();
+
+
+#if _DEBUG
+	ImGui::Begin("BulletWindow");
+
+	D3DXVECTOR3 Bullet = m_pShot->GetPosition();
+
+	ImGui::Text("%f,%f,%f",Bullet.x,Bullet.y,Bullet.z);
+
+	ImGui::DragFloat3("##Position", Bullet, 0.1f);
+
+	m_pShot->SetPosition(Bullet);
+
+	ImGui::End();
+#endif
+
+
 }
 
 
@@ -154,9 +182,9 @@ void CGame::Draw()
 	CCamera::GetInstance()->Camera(m_mView);
 	CSceneBase::Projection(m_mProj);
 
-	//m_pShot		->Draw( m_mView, m_mProj, m_Light );
+	m_pShot		->Draw( m_mView, m_mProj, m_Light );
 	m_pGround	->Draw( m_mView, m_mProj, m_Light );
-	//m_pPlayer	->Draw( m_mView, m_mProj, m_Light );
+	m_pPlayer	->Draw( m_mView, m_mProj, m_Light );
 	m_pMeshGun	->Render(m_mView, m_mProj, m_Light);
 
 	// エフェクトの描画.
@@ -176,19 +204,22 @@ void CGame::CollisionJudge()
 		m_pShot->GetPosition(),
 		m_pShot->GetRotation(),
 		m_pShot->GetScale(),
-		m_pShot->GetMesh().GetVertices());
+		m_pMeshBullet->GetVertices());
 
 	m_MeshA.SetVertex(
 		m_pPlayer->GetPosition(),
 		m_pPlayer->GetRotation(),
 		m_pPlayer->GetScale(),
-		m_pPlayer->GetMesh().GetVertices());
+		m_pMeshFighter->GetVertices());
 
 
-	//CollisionPoints points = m_pGJK->GJK(MeshA, MeshB);
+	CollisionPoints points = m_pGJK->GJK(m_MeshA, m_MeshB);
 
-	//if (!points.HasCollision)
-	//{
-	//	m_FreeCameraMove = !m_FreeCameraMove;
-	//}
+	if (points.HasCollision)
+	{
+		SetWindowText(m_hWnd, L"yes");
+	}
+	else {
+		SetWindowText(m_hWnd, L"no");
+	}
 }

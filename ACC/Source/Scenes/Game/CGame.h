@@ -56,13 +56,10 @@ private:
 
 
 	// GJKクラス.
-	std::unique_ptr<CGJK>		m_pGJK;
+	std::unique_ptr<CGJK> m_pGJK;
 	MeshCollider m_MeshA;
 	MeshCollider m_MeshB;
 
 	// カメラに位置を渡す際にプレイヤーのサイズを足す.
 	D3DXVECTOR3 m_PLayerSize;
-
-	// カメラが自由に動かせるか.
-	bool m_FreeCameraMove;
 };

@@ -23,7 +23,7 @@ CCamera::CCamera()
 	, m_MouseSens		( 0.03f )
 
 	, m_CanMoveMouse	( false )
-	, m_CanMoveCamera	( true )
+	, m_CanMoveCamera	( false )
 {
 	Init();
 }

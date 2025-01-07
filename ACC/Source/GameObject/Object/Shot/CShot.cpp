@@ -1,7 +1,7 @@
 #include "CShot.h"
 
 CShot::CShot()
-	: m_Display			( false )
+	: m_Display			( true )
 	, m_MoveDirection	()
 	, m_MoveSpeed		()
 	, m_DisplayTime		()
