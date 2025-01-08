@@ -1,11 +1,11 @@
 #pragma once
 
-#include "GameObject/Mesh/Static/CStaticMeshObject.h"
-#include "GameObject/Character/CCharacter.h"
+#include "Mesh/Static/CStaticMeshObject.h"
+#include "Character/CCharacter.h"
 
-/**************************************************
-*	地面クラス.
-**/
+//============================================================================
+//		地面クラス.
+//============================================================================
 class CGround
 	: public CStaticMeshObject
 {
@@ -15,7 +15,7 @@ public:
 
 	virtual void Update() override;
 
-	//プレイヤーを設定.
+	// プレイヤー情報を設定.
 	void SetPlayer(CCharacter& pPlayer) { m_pPlayer = &pPlayer; }
 
 protected:

@@ -1,6 +1,10 @@
 #include "CPlayer.h"
 #include "DirectSound/CSoundManager.h"
+#include "Common/DirectInput/CDirectInput.h"
 
+//============================================================================
+//		プレイヤークラス.
+//============================================================================
 CPlayer::CPlayer()
 	: m_TurnSpeed	( 0.1f )
 	, m_MoveSpeed	( 0.1f )
@@ -12,15 +16,21 @@ CPlayer::~CPlayer()
 {
 }
 
+
+//============================================================================
+//		更新処理.
+//============================================================================
 void CPlayer::Update()
 {
+	CKey* Key = CDInput::GetInstance()->CDKeyboard();
+
+	RadioControl();
+
 	// 前回のフレームで弾を飛ばしているかも知れないのでfalseにする.
 	m_Shot = false;
 
-	//弾を飛ばしたい!!.
-	if( GetAsyncKeyState( 'Z' ) & 0x8000 ){
-		m_Shot = true;
-	}
+	// 弾を飛ばす.
+	if( Key->IsKeyAction( DIK_Z )){ m_Shot = true; }
 
 	// レイの位置をプレイヤーの座標にそろえる.
 	m_pRayY->Position = m_vPosition;
@@ -39,32 +49,31 @@ void CPlayer::Update()
 	CCharacter::Update();
 }
 
-void CPlayer::Draw(
-	D3DXMATRIX& View, D3DXMATRIX& Proj,
-	LIGHT& Light )
+
+//============================================================================
+//		描画処理.
+//============================================================================
+void CPlayer::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 {
 	CCharacter::Draw( View, Proj, Light );
 }
 
-//ラジコン操作.
+
+//============================================================================
+//		ラジコン操作.
+//============================================================================
 void CPlayer::RadioControl()
 {
-	//Z軸ベクトル（Z+方向への単位ベクトル）.
-	//※長さ（大きさ）が１のベクトルを単位ベクトルという.
-	D3DXVECTOR3 vecAxisZ( 0.0f, 0.0f, 1.0f );
+	// Z軸ベクトル（Z+方向への単位ベクトル）.
+	D3DXVECTOR3 vecAxisZ( 0.f, 0.f, 1.f );
 
-	//Y方向の回転行列.
+	// Y方向の回転行列.
 	D3DXMATRIX mRotationY;
-	//Y軸回転行列を作成.
-	D3DXMatrixRotationY(
-		&mRotationY,		//(out)行列.
-		m_vRotation.y );	//プレイヤーのY方向の回転値.
+	// Y軸回転行列を作成.
+	D3DXMatrixRotationY( &mRotationY, m_vRotation.y );
 
-	//Y軸回転行列を使ってZ軸ベクトルを座標変換する.
-	D3DXVec3TransformCoord(
-		&vecAxisZ,		//(out)Z軸ベクトル.
-		&vecAxisZ,		//(in)Z軸ベクトル.
-		&mRotationY );	//Y軸回転行列.
+	// Y軸回転行列を使ってZ軸ベクトルを座標変換する.
+	D3DXVec3TransformCoord( &vecAxisZ, &vecAxisZ, &mRotationY );
 
 	switch( m_MoveState ){
 	case enMoveState::Forward:	//前進.
@@ -76,6 +85,7 @@ void CPlayer::RadioControl()
 	default:
 		break;
 	}
-	//上記の移動処理が終われば停止状態にしておく.
+
+	// 上記の移動処理が終われば停止状態にしておく.
 	m_MoveState = enMoveState::Stop;
 }
