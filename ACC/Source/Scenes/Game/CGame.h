@@ -11,7 +11,7 @@ class CStaticMesh;
 class CGJK;
 class MeshCollider;
 class CGround;
-class CShot;
+class CBullet;
 class CEnemy;
 class CPlayer;
 class CCharacter;
@@ -52,7 +52,10 @@ private:
 		
 	CCharacter*	m_pPlayer;
 	CGround*	m_pGround;
-	CShot*		m_pShot;
+	CBullet*	m_pBullet;	// 弾配列に入れるデータを保存する用.
+
+	// 弾配列.
+	std::vector<CBullet*>	m_pBullets;
 
 
 	// GJKクラス.

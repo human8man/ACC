@@ -1,11 +1,12 @@
 #pragma once
 
-#include "GameObject/Mesh/Static/CStaticMeshObject.h"
+#include "Mesh/Static/CStaticMeshObject.h"
 #include "Collision/Ray/CRay.h"
 
-/**************************************************
-*	キャラクタークラス.
-**/
+
+//============================================================================
+//		キャラクタークラス.
+//============================================================================
 class CCharacter
 	: public CStaticMeshObject
 {
@@ -24,9 +25,8 @@ public:
 	// 十字レイを取得.
 	CROSSRAY GetCrossRay() const { return *m_pCrossRay;  }
 protected:
-	bool		m_Shot;			//弾を飛ばすフラグ.
-
-	RAY*		m_pRayY;		//Y方向へ伸ばしたレイ.
-	CROSSRAY*	m_pCrossRay;	//十字（前後左右に伸ばした）レイ
+	bool		m_Shot;			// 弾を飛ばすフラグ.
+	RAY*		m_pRayY;		// Y方向へ伸ばしたレイ.
+	CROSSRAY*	m_pCrossRay;	// 十字（前後左右に伸ばした）レイ
 };
 

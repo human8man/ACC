@@ -260,7 +260,6 @@
     <ClCompile Include="Source\Common\ImGui\library\imgui_impl_win32.cpp" />
     <ClCompile Include="Source\Common\ImGui\library\imgui_tables.cpp" />
     <ClCompile Include="Source\Common\ImGui\library\imgui_widgets.cpp" />
-    <ClCompile Include="Source\Common\Resource\SpriteResource\SpriteResource.cpp" />
     <ClCompile Include="Source\Common\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -286,7 +285,7 @@
     <ClCompile Include="Source\GameObject\Mesh\Static\CStaticMeshObject.cpp" />
     <ClCompile Include="Source\GameObject\Object\Ground\CGround.cpp" />
     <ClCompile Include="Source\GameObject\Object\Gun\CGun.cpp" />
-    <ClCompile Include="Source\GameObject\Object\Shot\CShot.cpp" />
+    <ClCompile Include="Source\GameObject\Object\Bullet\CBullet.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\2D\CSprite2D.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\2D\UI\CUIFade\CUIFade.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\2D\UI\CUIObject.cpp" />
@@ -319,7 +318,6 @@
     <ClInclude Include="Source\Common\ImGui\library\imstb_textedit.h" />
     <ClInclude Include="Source\Common\ImGui\library\imstb_truetype.h" />
     <ClInclude Include="Source\Common\MyMacro.h" />
-    <ClInclude Include="Source\Common\Resource\SpriteResource\SpriteResource.h" />
     <ClInclude Include="Source\Common\Singleton\CSingleton.h" />
     <ClInclude Include="Source\Common\stdafx.h" />
     <ClInclude Include="Source\Common\XInput\CXInput.h" />
@@ -341,7 +339,7 @@
     <ClInclude Include="Source\GameObject\Mesh\Static\CStaticMeshObject.h" />
     <ClInclude Include="Source\GameObject\Object\Ground\CGround.h" />
     <ClInclude Include="Source\GameObject\Object\Gun\CGun.h" />
-    <ClInclude Include="Source\GameObject\Object\Shot\CShot.h" />
+    <ClInclude Include="Source\GameObject\Object\Bullet\CBullet.h" />
     <ClInclude Include="Source\GameObject\Sprite\2D\CSprite2D.h" />
     <ClInclude Include="Source\GameObject\Sprite\2D\UI\CUIFade\CUIFade.h" />
     <ClInclude Include="Source\GameObject\Sprite\2D\UI\CUIObject.h" />

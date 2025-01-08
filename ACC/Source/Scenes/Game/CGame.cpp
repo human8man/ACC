@@ -2,14 +2,14 @@
 
 #include "DirectSound/CSoundManager.h"
 #include "Scenes/SceneManager/CSceneManager.h"
-#include "Common/DirectInput/CDirectInput.h"
+#include "DirectInput/CDirectInput.h"
 
 #include "Effect/CEffect.h"
 
-#include "../GameObject/Camera/CCamera.h"
-#include "GameObject/Object/Ground/CGround.h"
-#include "GameObject/Character/Player/CPlayer.h"
-#include "GameObject/Object/Shot/CShot.h"
+#include "Camera/CCamera.h"
+#include "Object/Ground/CGround.h"
+#include "Character/Player/CPlayer.h"
+#include "Object/Bullet/CBullet.h"
 
 #if _DEBUG
 	#include "ImGui/CImGui.h"
@@ -31,14 +31,17 @@ CGame::CGame(HWND hWnd)
 
 	, m_pPlayer			( nullptr )
 	, m_pGround			( nullptr )
-	, m_pShot			( nullptr )
+	, m_pBullet			( nullptr )
+	, m_pBullets		()
+
 	, m_pGJK			( nullptr )
-	, m_PLayerSize		{ 0.f, 2.f,0.f, }
+
+	, m_PLayerSize		{ 0.f, 2.f, 0.f, }
 	, m_MeshA	()
 	, m_MeshB	()
 {
 	// ライト情報.
-	m_Light.vDirection	= D3DXVECTOR3( 1.5f, 1.f, -1.f );	//ライト方向.
+	m_Light.vDirection	= D3DXVECTOR3( 1.5f, 1.f, -1.f );
 }
 
 CGame::~CGame()
@@ -58,10 +61,10 @@ void CGame::Create()
 	m_pMeshGun		= new CStaticMesh();
 	m_pPlayer		= new CPlayer();
 
-	//地面クラスのインスタンス作成.
+	// 地面クラスのインスタンス作成.
 	m_pGround = new CGround();
 	m_pGround->SetPlayer(*m_pPlayer);
-	m_pShot = new CShot();
+	m_pBullet = new CBullet();
 }
 
 //============================================================================
@@ -75,9 +78,9 @@ HRESULT CGame::LoadData()
 	m_pMeshGround	->Init( _T("Data\\Mesh\\Static\\Stage\\stage.x" ) );
 	m_pMeshBullet	->Init( _T("Data\\Mesh\\Static\\Bullet\\bullet.x" ) );
 
-	m_pPlayer	->AttachMesh( *m_pMeshFighter );
-	m_pGround	->AttachMesh( *m_pMeshGround );
-	m_pShot		->AttachMesh( *m_pMeshBullet );
+	m_pPlayer->AttachMesh( *m_pMeshFighter );
+	m_pGround->AttachMesh( *m_pMeshGround );
+	m_pBullet->AttachMesh( *m_pMeshBullet );
 
 	// キャラクターの初期座標を設定.
 	m_pPlayer->SetPosition( 0.f, 0.f, 6.f  );
@@ -93,7 +96,10 @@ HRESULT CGame::LoadData()
 //============================================================================
 void CGame::Release()
 {
-	SAFE_DELETE(m_pShot);
+	for (size_t i = 0; i < m_pBullets.size(); ++i) {
+		SAFE_DELETE(m_pBullets[i]);
+	}
+	
 	SAFE_DELETE(m_pGround);
 
 	SAFE_DELETE(m_pPlayer);
@@ -122,7 +128,8 @@ void CGame::Init()
 //============================================================================
 void CGame::Update()
 {
-	CKey* Key = CDInput::GetInstance()->CDKeyboard();
+	CKey*	Key	  = CDInput::GetInstance()->CDKeyboard();
+	CMouse* Mouse = CDInput::GetInstance()->CDMouse();
 
 	// カメラの更新.
 	CCamera::GetInstance()->Update();
@@ -131,6 +138,13 @@ void CGame::Update()
 	if (Key->IsKeyAction(DIK_F2)) { CCamera::GetInstance()->ChangeCanMove(); }
 	if (Key->IsKeyAction(DIK_F3)) { CCamera::GetInstance()->ChangeUseMouse(); }
 	
+	// 左クリック.
+	if (Mouse->IsLAction()) { 
+		m_pBullets.push_back(m_pBullet); 
+
+		// 初期位置,移動方向の単位ベクトル,弾の向き,速度がいるため保留.
+		// m_pBullets.back()->Init();
+	}
 
 	// プレイヤーの更新.
 	m_pPlayer->Update();
@@ -139,33 +153,26 @@ void CGame::Update()
 	if ( !CCamera::GetInstance()->GetMoveCamera())
 	{	  CCamera::GetInstance()->SetPosition(m_pPlayer->GetPosition() + m_PLayerSize); }
 
-	// 弾を飛ばす.
-	//if( m_pPlayer->IsShot() ){
-
-	//	D3DXVECTOR3 playerpos = {
-	//		m_pPlayer->GetPosition().x,
-	//		m_pPlayer->GetPosition().y + 1.0f,
-	//		m_pPlayer->GetPosition().z };
-
-	//	m_pShot->Reload(
-	//		playerpos,
-	//		m_pPlayer->GetRotation().y );
-	//}
-
 	// 弾の更新.
-	//m_pShot->Update();
+	for (size_t i = 0; i < m_pBullets.size(); ++i) {
+		m_pBullets[i]->Update();
+
+		// 削除可能な場合削除.
+		if(m_pBullets[i]->DeleteBullet()){
+			SAFE_DELETE(m_pBullets[i]);
+		}
+	}
 
 
 #if _DEBUG
 	ImGui::Begin("BulletWindow");
 
-	D3DXVECTOR3 Bullet = m_pShot->GetPosition();
-
-	ImGui::Text("%f,%f,%f",Bullet.x,Bullet.y,Bullet.z);
-
-	ImGui::DragFloat3("##Position", Bullet, 0.1f);
-
-	m_pShot->SetPosition(Bullet);
+	for (size_t i = 0; i < m_pBullets.size(); ++i) {
+		D3DXVECTOR3 Bullet = m_pBullets[i]->GetPosition();
+		ImGui::Text("%f,%f,%f", Bullet.x, Bullet.y, Bullet.z);
+		ImGui::DragFloat3("##Position", Bullet, 0.1f);
+		m_pBullets[i]->SetPosition(Bullet);
+	}
 
 	ImGui::End();
 #endif
@@ -182,10 +189,13 @@ void CGame::Draw()
 	CCamera::GetInstance()->Camera(m_mView);
 	CSceneBase::Projection(m_mProj);
 
-	m_pShot		->Draw( m_mView, m_mProj, m_Light );
-	m_pGround	->Draw( m_mView, m_mProj, m_Light );
-	m_pPlayer	->Draw( m_mView, m_mProj, m_Light );
-	m_pMeshGun	->Render(m_mView, m_mProj, m_Light);
+	for (size_t i = 0; i < m_pBullets.size(); ++i) {
+		m_pBullets[i]->Draw(m_mView, m_mProj, m_Light);
+	}
+
+	m_pGround->Draw( m_mView, m_mProj, m_Light );
+	m_pPlayer->Draw( m_mView, m_mProj, m_Light );
+	m_pMeshGun->Render(m_mView, m_mProj, m_Light);
 
 	// エフェクトの描画.
 	CEffect::GetInstance()->Draw( m_mView, m_mProj, m_Light );
@@ -199,27 +209,29 @@ void CGame::Draw()
 //-----------------------------------------------------------------------------
 void CGame::CollisionJudge()
 {
+	for (size_t i = 0; i < m_pBullets.size(); ++i) {
 
-	m_MeshB.SetVertex(
-		m_pShot->GetPosition(),
-		m_pShot->GetRotation(),
-		m_pShot->GetScale(),
-		m_pMeshBullet->GetVertices());
+		m_MeshB.SetVertex(
+			m_pBullets[i]->GetPosition(),
+			m_pBullets[i]->GetRotation(),
+			m_pBullets[i]->GetScale(),
+			m_pMeshBullet->GetVertices());
 
-	m_MeshA.SetVertex(
-		m_pPlayer->GetPosition(),
-		m_pPlayer->GetRotation(),
-		m_pPlayer->GetScale(),
-		m_pMeshFighter->GetVertices());
+		m_MeshA.SetVertex(
+			m_pPlayer->GetPosition(),
+			m_pPlayer->GetRotation(),
+			m_pPlayer->GetScale(),
+			m_pMeshFighter->GetVertices());
 
 
-	CollisionPoints points = m_pGJK->GJK(m_MeshA, m_MeshB);
+		CollisionPoints points = m_pGJK->GJK(m_MeshA, m_MeshB);
 
-	if (points.HasCollision)
-	{
-		SetWindowText(m_hWnd, L"yes");
-	}
-	else {
-		SetWindowText(m_hWnd, L"no");
+		if (points.HasCollision)
+		{
+			SetWindowText(m_hWnd, L"yes");
+		}
+		else {
+			SetWindowText(m_hWnd, L"no");
+		}
 	}
 }
