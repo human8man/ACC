@@ -209,6 +209,7 @@ void CGame::Draw()
 //-----------------------------------------------------------------------------
 void CGame::CollisionJudge()
 {
+	// íeÇ∆ÉvÉåÉCÉÑÅ[ÇÃîªíË.
 	for (size_t i = 0; i < m_pBullets.size(); ++i) {
 
 		m_MeshB.SetVertex(
@@ -226,12 +227,25 @@ void CGame::CollisionJudge()
 
 		CollisionPoints points = m_pGJK->GJK(m_MeshA, m_MeshB);
 
-		if (points.HasCollision)
-		{
-			SetWindowText(m_hWnd, L"yes");
-		}
-		else {
-			SetWindowText(m_hWnd, L"no");
-		}
+		//if (points.HasCollision)
+		//{
+		//	SetWindowText(m_hWnd, L"Ç†Ç†Ç†Ç†Ç†Ç†Ç†Ç†Ç†Ç†Ç†");
+		//}
+		//else {
+		//	SetWindowText(m_hWnd, L"no");
+		//}
 	}
+
+	auto [hit, hitpos, length] = m_pGround->IsHitForRay(CCamera::GetInstance()->GetRay());
+	
+#if _DEBUG
+	ImGui::Begin("ColWindow");
+
+	if(hit) { ImGui::Text("true");	}
+	else	{ ImGui::Text("false");	}
+	ImGui::Text("%f,%f,%f",hitpos.x,hitpos.y,hitpos.z );
+	ImGui::Text("%f",length );
+
+	ImGui::End();
+#endif
 }

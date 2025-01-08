@@ -1,6 +1,8 @@
 #include "CGameObject.h"
 
-//コンストラクタ.
+//===================================================================
+//		ゲームオブジェクトクラス.
+//===================================================================
 CGameObject::CGameObject()
 	: m_vPosition	()
 	, m_vRotation	()
@@ -9,7 +11,6 @@ CGameObject::CGameObject()
 {
 }
 
-//デストラクタ.
 CGameObject::~CGameObject()
 {
 }

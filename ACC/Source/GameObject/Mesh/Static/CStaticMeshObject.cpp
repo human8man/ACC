@@ -53,36 +53,22 @@ void CStaticMeshObject::Draw(
 //============================================================================
 //		レイとメッシュの当たり判定.
 //============================================================================
-bool CStaticMeshObject::IsHitForRay(
-	const RAY& pRay,			// レイ構造体.
-	float* pfDistance,			// (out)距離.
-	D3DXVECTOR3* pvIntersect )	// (out)交差点.
+std::tuple<bool, D3DXVECTOR3, FLOAT> CStaticMeshObject::IsHitForRay(const RAY& pRay )
 {
-	D3DXVECTOR3 vAxis;		// 軸ベクトル.
-	D3DXMATRIX	mRotationY;	// Y軸回転行列.
+	FLOAT vDistance;
+	D3DXVECTOR3 vAxis, StartPoint, EndPoint, vIntersect;
+	D3DXMATRIX mTran, mRot, mScale, mWorld, mInverseWorld, mYaw, mPitch, mRoll;
 
-	// Y軸回転行列.
-	D3DXMatrixRotationY( &mRotationY, pRay.RotationY );
-	// Y軸回転行列を使って軸ベクトルの座標変換する.
-	D3DXVec3TransformCoord( &vAxis, &pRay.Axis, &mRotationY );
+	// レイの方向ベクトルと位置を設定.
+	vAxis = pRay.Axis;  // レイの方向（軸ベクトル）.
+	StartPoint = pRay.Position;  // レイの開始位置.
+	EndPoint = StartPoint + (vAxis * pRay.Length);  // レイの終点を計算.
 
-	// レイの始点と終点.
-	D3DXVECTOR3 StartPoint, EndPoint;
-	StartPoint	= pRay.Position;
-	EndPoint	= pRay.Position + ( vAxis * pRay.Length );	// レイの終点を設定.
-
-	// レイを当てたいメッシュが移動している場合でも
-	//	対象のWorld行列の逆行列を用いれば正しくレイが当たる.
-	D3DXMATRIX mWorld, mInverseWorld;
 	// 移動処理.
-	D3DXMATRIX mTran;
-	D3DXMatrixTranslation(
-		&mTran,
-		m_vPosition.x, m_vPosition.y, m_vPosition.z);
+	D3DXMatrixTranslation( &mTran, m_vPosition.x, m_vPosition.y, m_vPosition.z);
 
 	// 回転処理.
 	//	※この行列計算は「CStaicMesh::Render()関数」と同じにする必要あり.
-	D3DXMATRIX mRot, mYaw, mPitch, mRoll;
 	D3DXMatrixRotationY(&mYaw, m_vRotation.y);	// Y軸回転行列作成.
 	D3DXMatrixRotationX(&mPitch, m_vRotation.x);// X軸回転行列作成.
 	D3DXMatrixRotationZ(&mRoll, m_vRotation.z);	// Z軸回転行列作成.
@@ -90,11 +76,10 @@ bool CStaticMeshObject::IsHitForRay(
 	mRot = mYaw * mPitch * mRoll;
 
 	// 拡縮処理.
-	D3DXMATRIX mScale;
 	D3DXMatrixScaling(&mScale, m_vScale.x, m_vScale.y, m_vScale.z);
 
 	// ワールド行列計算.
-	mWorld = mScale * mRot * mTran;
+	mWorld = mScale * mTran;
 
 	// 逆行列を求める.
 	D3DXMatrixInverse( &mInverseWorld, nullptr, &mWorld );
@@ -118,27 +103,27 @@ bool CStaticMeshObject::IsHitForRay(
 		&bHit,						// (out)判定結果.
 		&dwIndex,// (out)bHitがTRUE時にレイの始点に最も近くの面のインデックス値へのポインタ.					
 		&U, &V,						// (out)重心ヒット座標.
-		pfDistance,					// (out)メッシュとの距離.
+		&vDistance,					// (out)メッシュとの距離.
 		nullptr, nullptr);
 
 	// 無限に伸びるレイのどこかでメッシュが当たっていたら.
-	if (bHit == TRUE)
+	if (bHit)
 	{
 		// 命中した時.
 		FindVerticesOnPoly( m_pMesh->GetMeshForRay(), dwIndex, Vertex );
 
 		// 重心座標から交点を算出.
 		// ローカル交点は v0 + U*(v1-v0) + V*(v2-v0) で求まる.
-		*pvIntersect = Vertex[0] + U * (Vertex[1] - Vertex[0]) + V * (Vertex[2] - Vertex[0]);
+		vIntersect = Vertex[0] + U * (Vertex[1] - Vertex[0]) + V * (Vertex[2] - Vertex[0]);
 
 		// モデルデータが「拡縮」「回転」「移動」していれば行列が必要.
-		D3DXVec3TransformCoord( pvIntersect, pvIntersect, &mWorld );
+		D3DXVec3TransformCoord( &vIntersect, &vIntersect, &mWorld );
 
-		// EndPointから見た距離で1.0fより小さければ当たっている.
-		if (*pfDistance < 1.f) { return true; }
+		// Hit状態と交差点を返す.
+		return { true, vIntersect ,vDistance }; 
 	}
 
-	return false; // 外れている.
+	return { false, ZEROVEC3, 0.f };
 }
 
 
@@ -152,7 +137,9 @@ void CStaticMeshObject::CalculatePositionFromWall(CROSSRAY* pCrossRay)
 
 	// レイの向きにより当たる壁までの距離を求める.軸ベクトル（前後左右）.
 	for (int i = 0; i < CROSSRAY::max; i++) {
-		IsHitForRay(pCrossRay->Ray[i], &Distance[i], &Intersect[i]);
+		auto [hit, hitPoint, length] = IsHitForRay(pCrossRay->Ray[i]);
+		Intersect[i] = hitPoint;
+		Distance[i]  = length;
 	}
 
 	float RotY;
