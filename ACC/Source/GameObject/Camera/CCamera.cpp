@@ -1,5 +1,6 @@
 ﻿#include "CCamera.h"
 #include "Common/DirectInput/CDirectInput.h"
+#include "Collision/Ray/CRay.h"
 
 
 //===================================================================
@@ -51,17 +52,18 @@ void CCamera::Init()
 
 
 //===================================================================
-//		更新.
+//		更新処理.
 //===================================================================
 void CCamera::Update()
 {
-	// マウスの移動量の初期化.
+	// マウス移動量の初期化.
 	m_MouseMoveDis = ZEROVEC2;
 
-	// キー入力での操作が可能か.
+	// カメラの操作が可能な場合、キー入力処理を通る.
 	if( m_CanMoveCamera ) { KeyInput(); }
 
-	// マウスが自由な状態の場合.
+
+	// マウスが操作可能な場合.
 	if ( !m_CanMoveMouse )
 	{
 		// マウス座標の取得.
@@ -80,14 +82,20 @@ void CCamera::Update()
 			MouseMove(m_MouseMoveDis);
 
 			// マウス位置を画面中央に初期化.
-			SetCursorPos(WND_WM, WND_HM); // 現在のマウス位置リセット.
+			SetCursorPos(WND_WM, WND_HM);	// 現在のマウス位置リセット.
 			m_BeforCursorPos = RESETPOS;	// 過去のマウス位置リセット.
 		}
 	}
+
+	// レイに値を入れる.
+	m_pRay.Position = m_Camera.Pos;
+	m_CamDirection = m_Camera.Look - m_Camera.Pos;
+	D3DXVec3Normalize(&m_CamDirection, &m_CamDirection);
+	m_pRay.Axis = m_CamDirection;
 }
 
 //===================================================================
-// カメラ関数(ビュー行列計算).
+//		カメラ関数(ビュー行列計算).
 //===================================================================
 void CCamera::Camera( D3DXMATRIX& View ) const
 {
@@ -96,9 +104,7 @@ void CCamera::Camera( D3DXMATRIX& View ) const
 	D3DXVECTOR3	vec	 = m_Camera.UpVec;
 
 	// ビュー（カメラ）変換.
-	D3DXMatrixLookAtLH(
-		&View,	// (out)ビュー計算結果.
-		&pos, &look, &vec);
+	D3DXMatrixLookAtLH( &View, &pos, &look, &vec );
 }
 
 
@@ -181,8 +187,7 @@ void CCamera::CameraMove(int vec)
 	D3DXVec3Normalize(&m_DirectionPos, &m_DirectionPos);
 
 	// 左右移動の場合.
-	if(vec == Right 
-	|| vec == Left)
+	if(vec == Right || vec == Left)
 	{
 		// カメラの右方向ベクトルを計算する.
 		D3DXVec3Cross(&rightVector, &m_Camera.UpVec, &m_DirectionPos);

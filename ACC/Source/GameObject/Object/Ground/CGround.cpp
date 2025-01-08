@@ -27,10 +27,11 @@ void CGround::Update()
 	D3DXVECTOR3 Intersect( 0.0f, 0.0f, 0.0f );
 
 	// プレイヤーとレイと当たり判定.
-	if (IsHitForRay(ray, &Distance, &Intersect) == true)
+	auto [hit, hitpos, length] = IsHitForRay(ray);
+	if ( hit )
 	{
 		D3DXVECTOR3 Pos = m_pPlayer->GetPosition();
-		Pos.y = Intersect.y + 1.0f;	// 1.0fで少し上へ補正.
+		Pos.y = hitpos.y + 1.0f;	// 1.0fで少し上へ補正.
 		m_pPlayer->SetPosition( Pos );
 	}
 

@@ -11,11 +11,11 @@ public:
 	// ˆÚ“®ó‘Ô—ñ‹“Œ^.
 	enum enMoveState
 	{
-		Stop	= 0,	// ’â~.
-		Forward,		// ‘Oi.
-		Backward,		// Œã‘Ş.
-		TurnLeft,		// ¶‰ñ“].
-		TurnRight,		// ‰E‰ñ“].
+		Stop	= 0, // ’â~.
+		Forward,	 // ‘Oi.
+		Backward,	 // Œã‘Ş.
+		TurnLeft,	 // ¶‰ñ“].
+		TurnRight,	 // ‰E‰ñ“].
 	};
 
 public:
@@ -29,7 +29,7 @@ public:
 	void RadioControl();
 
 private:
-	float		m_TurnSpeed;	// ‰ñ“]‘¬“x.
-	float		m_MoveSpeed;	// ˆÚ“®‘¬“x.
-	enMoveState	m_MoveState;	// ˆÚ“®ó‘Ô.
+	float		m_TurnSpeed; // ‰ñ“]‘¬“x.
+	float		m_MoveSpeed; // ˆÚ“®‘¬“x.
+	enMoveState	m_MoveState; // ˆÚ“®ó‘Ô.
 };

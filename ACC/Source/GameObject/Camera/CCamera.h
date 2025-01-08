@@ -2,6 +2,8 @@
 #include "Common/Global.h"
 #include "Common/Singleton/CSingleton.h"
 
+class RAY;
+
 class CCamera
 	: public CSingleton<CCamera>
 {
@@ -29,15 +31,17 @@ public:
 	void Camera(D3DXMATRIX& View) const;
 	void Init();
 
-	static bool& GetMoveMouse()	  { return GetInstance()->m_CanMoveMouse; }
-	static bool& GetMoveCamera()  { return GetInstance()->m_CanMoveCamera;}
-	static float& GetSens()		  { return GetInstance()->m_MouseSens;	  }
-	static float& GetViewAngle()  { return GetInstance()->m_Fov;		  }
-	static float& GetDefaultFov() { return GetInstance()->m_DefaultFov;	  }
-	static D3DXVECTOR3& GetLook() { return GetInstance()->m_Camera.Look;  }
-	static D3DXVECTOR3& GetPos()  { return GetInstance()->m_Camera.Pos;	  }
-	static D3DXVECTOR3& GetVec()  { return GetInstance()->m_Camera.UpVec; }
-	static D3DXVECTOR3& GetRot()  { return GetInstance()->m_CameraRot;	  }
+	static bool& GetMoveMouse()		{ return GetInstance()->m_CanMoveMouse;	}
+	static bool& GetMoveCamera()	{ return GetInstance()->m_CanMoveCamera;}
+	static float& GetSens()			{ return GetInstance()->m_MouseSens;	}
+	static float& GetViewAngle()	{ return GetInstance()->m_Fov;			}
+	static float& GetDefaultFov()	{ return GetInstance()->m_DefaultFov;	}
+	static RAY&	  GetRay()			{ return GetInstance()->m_pRay;			}
+	static D3DXVECTOR3& GetLook()	{ return GetInstance()->m_Camera.Look;	}
+	static D3DXVECTOR3& GetPos()	{ return GetInstance()->m_Camera.Pos;	}
+	static D3DXVECTOR3& GetVec()	{ return GetInstance()->m_Camera.UpVec;	}
+	static D3DXVECTOR3& GetRot()	{ return GetInstance()->m_CameraRot;	}
+	static D3DXVECTOR3& GetCamDir()	{ return GetInstance()->m_CamDirection;	}
 	
 	static void SetUseMouse	 (const bool& Use) { GetInstance()->m_CanMoveMouse = Use;  }
 	static void SetCanMove	 (const bool& can) { GetInstance()->m_CanMoveCamera = can; }
@@ -47,6 +51,8 @@ public:
 	static void SetViewAngle (const float& Fov)		  { GetInstance()->m_Fov = Fov;			  }
 	static void SetSens		 (const float& Sens)	  { GetInstance()->m_MouseSens = Sens;	  }
 	static void SetPosition	 (const D3DXVECTOR3& Pos) { GetInstance()->m_Camera.Pos = Pos;	  }
+
+
 private:
 	void KeyInput();					// キー入力.
 	void CameraMove(int vec);			// カメラの移動.
@@ -54,13 +60,14 @@ private:
 
 private:
 	CAMERA	m_Camera;			// カメラ情報.
-
+	RAY		m_pRay;				// カメラの向きレイ.
 	POINT	m_NowCurorPos;		// 現在のマウスの位置.
 	POINT	m_BeforCursorPos;	// 過去のマウスの位置.
 
 	D3DXVECTOR2 m_MouseMoveDis;	// マウスの移動した距離.
 	D3DXVECTOR3 m_CameraRot;	// カメラの回転軸.
 	D3DXVECTOR3 m_DirectionPos;	// カメラ座標～注視点のベクトル.
+	D3DXVECTOR3 m_CamDirection;	// カメラ座標～注視点のベクトル取得用.
 
 	float	m_Fov;				// 視野角.
 	float	m_DefaultFov;		// デフォルトの視野角.
