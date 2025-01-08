@@ -1,6 +1,5 @@
 ﻿#include "CCamera.h"
 #include "Common/DirectInput/CDirectInput.h"
-#include "Collision/Ray/CRay.h"
 
 
 //===================================================================

@@ -1,8 +1,8 @@
 ﻿#pragma once
 #include "Common/Global.h"
 #include "Common/Singleton/CSingleton.h"
+#include "Collision/Ray/CRay.h"
 
-class RAY;
 
 class CCamera
 	: public CSingleton<CCamera>

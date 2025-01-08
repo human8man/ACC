@@ -25,8 +25,9 @@ public:
 	virtual void Update() override;
 	virtual void Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light ) override;
 
-	// ラジコン操作.
-	void RadioControl();
+private:
+	// キー入力処理.
+	void KeyInput();
 
 private:
 	float		m_TurnSpeed; // 回転速度.
