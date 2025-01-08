@@ -1,6 +1,7 @@
 #include "CPlayer.h"
 #include "DirectSound/CSoundManager.h"
 #include "Common/DirectInput/CDirectInput.h"
+#include "Camera/CCamera.h"
 
 //============================================================================
 //		プレイヤークラス.
@@ -22,16 +23,12 @@ CPlayer::~CPlayer()
 //============================================================================
 void CPlayer::Update()
 {
-	CKey* Key = CDInput::GetInstance()->CDKeyboard();
 
-	RadioControl();
+	KeyInput();
 
 	// 前回のフレームで弾を飛ばしているかも知れないのでfalseにする.
 	m_Shot = false;
-
-	// 弾を飛ばす.
-	if( Key->IsKeyAction( DIK_Z )){ m_Shot = true; }
-
+	
 	// レイの位置をプレイヤーの座標にそろえる.
 	m_pRayY->Position = m_vPosition;
 	// 地面にめり込み回避のため、プレイヤーの位置よりも少し上にしておく.
@@ -59,33 +56,43 @@ void CPlayer::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 }
 
 
-//============================================================================
-//		ラジコン操作.
-//============================================================================
-void CPlayer::RadioControl()
+//-----------------------------------------------------------------------------
+//		キー入力処理.
+//-----------------------------------------------------------------------------
+void CPlayer::KeyInput()
 {
-	// Z軸ベクトル（Z+方向への単位ベクトル）.
-	D3DXVECTOR3 vecAxisZ( 0.f, 0.f, 1.f );
+	CKey* Key = CDInput::GetInstance()->CDKeyboard();
+	
+	// 弾を飛ばす.
+	if( Key->IsKeyAction( DIK_Z )){ m_Shot = true; }
 
-	// Y方向の回転行列.
-	D3DXMATRIX mRotationY;
-	// Y軸回転行列を作成.
-	D3DXMatrixRotationY( &mRotationY, m_vRotation.y );
 
-	// Y軸回転行列を使ってZ軸ベクトルを座標変換する.
-	D3DXVec3TransformCoord( &vecAxisZ, &vecAxisZ, &mRotationY );
+	//----------------------------------------
+	//		移動処理.
+	//----------------------------------------
+	
+	// カメラの向きベクトルを取得.
+	D3DXVECTOR3 camDir = CCamera::GetInstance()->GetCamDir();
+	D3DXVec3Normalize(&camDir, &camDir); // 正規化.
+	
+	float moveSpeed = 1.f;	// プレイヤーの移動速度.
+	
+	// 移動する方向ベクトル.
+	D3DXVECTOR3 forward(ZEROVEC3);
+	D3DXVECTOR3 right(ZEROVEC3);
+	
+	D3DXVec3Cross(&right, &camDir, &D3DXVECTOR3(0, 1, 0));
+	D3DXVec3Normalize(&right, &right);
 
-	switch( m_MoveState ){
-	case enMoveState::Forward:	//前進.
-		m_vPosition += vecAxisZ * m_MoveSpeed;
-		break;
-	case enMoveState::Backward:	//後退.
-		m_vPosition -= vecAxisZ * m_MoveSpeed;
-		break;
-	default:
-		break;
-	}
+	// WASDで移動.
+	if (Key->IsKeyDown( DIK_W )) { forward += camDir; }
+	if (Key->IsKeyDown( DIK_S )) { forward -= camDir; }
+	if (Key->IsKeyDown( DIK_A )) { forward -= right; }
+	if (Key->IsKeyDown( DIK_D )) { forward += right; }
 
-	// 上記の移動処理が終われば停止状態にしておく.
-	m_MoveState = enMoveState::Stop;
+	// 最終的な移動方向を速度ベクトルに変換.
+	D3DXVECTOR3 velocity = forward * moveSpeed;
+
+	// 位置を更新.
+	m_vPosition += velocity;
 }
