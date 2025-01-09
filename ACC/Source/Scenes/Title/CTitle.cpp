@@ -59,8 +59,8 @@ void CTitle::Create()
 
 		m_pSprite2Ds[index]->Init(entry.path().string());
 		m_pUIs[index]->AttachSprite(*m_pSprite2Ds[index]);
-		m_pUIs[index]->SetPosition(m_pSprite2Ds[index]->GetSpriteData().Pos);
-		m_SpritePosList.push_back(m_pUIs[index]->GetPosition());
+		m_pUIs[index]->SetPos(m_pSprite2Ds[index]->GetSpriteData().Pos);
+		m_SpritePosList.push_back(m_pUIs[index]->GetPos());
 		index++;
 	}
 	m_pEgg = new CStaticMesh();
@@ -74,7 +74,7 @@ void CTitle::Create()
 HRESULT CTitle::LoadData()
 {
 	m_pEgg->Init(_T("Data\\Mesh\\Static\\Player\\egg.x"));
-	m_pEgg->SetPosition(D3DXVECTOR3(5.f, 1.f, 2.5f));
+	m_pEgg->SetPos(D3DXVECTOR3(5.f, 1.f, 2.5f));
 
 
 	return S_OK;
@@ -142,7 +142,7 @@ void CTitle::Update()
 
 		// 四角の座標.
 		D3DXVECTOR2 SquarePos = D3DXVECTOR2(
-			m_pUIs[i]->GetPosition().x, m_pUIs[i]->GetPosition().y);
+			m_pUIs[i]->GetPos().x, m_pUIs[i]->GetPos().y);
 
 		// 四角の表示範囲.
 		D3DXVECTOR2 SquareDisp = D3DXVECTOR2(

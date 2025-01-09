@@ -73,22 +73,25 @@ void CPlayer::KeyInput()
 	
 	// カメラの向きベクトルを取得.
 	D3DXVECTOR3 camDir = CCamera::GetInstance()->GetCamDir();
+	camDir.y = 0.f;	//Y情報があると飛び始めるのでYの要素を抜く.
 	D3DXVec3Normalize(&camDir, &camDir); // 正規化.
-	
-	float moveSpeed = 1.f;	// プレイヤーの移動速度.
+
+	float moveSpeed = 0.1f;	// プレイヤーの移動速度.
 	
 	// 移動する方向ベクトル.
 	D3DXVECTOR3 forward(ZEROVEC3);
-	D3DXVECTOR3 right(ZEROVEC3);
-	
-	D3DXVec3Cross(&right, &camDir, &D3DXVECTOR3(0, 1, 0));
-	D3DXVec3Normalize(&right, &right);
+	D3DXVECTOR3 left(ZEROVEC3);
+	D3DXVECTOR3 upvec(0, 1, 0);
+
+	// 左ベクトルを求める.
+	D3DXVec3Cross(&left, &camDir, &upvec);
+	D3DXVec3Normalize(&left, &left);
 
 	// WASDで移動.
 	if (Key->IsKeyDown( DIK_W )) { forward += camDir; }
 	if (Key->IsKeyDown( DIK_S )) { forward -= camDir; }
-	if (Key->IsKeyDown( DIK_A )) { forward -= right; }
-	if (Key->IsKeyDown( DIK_D )) { forward += right; }
+	if (Key->IsKeyDown( DIK_A )) { forward += left; }
+	if (Key->IsKeyDown( DIK_D )) { forward -= left; }
 
 	// 最終的な移動方向を速度ベクトルに変換.
 	D3DXVECTOR3 velocity = forward * moveSpeed;

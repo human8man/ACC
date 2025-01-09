@@ -13,14 +13,14 @@ public:
 	virtual void Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light ) = 0;
 
 	// ç¿ïWê›íËä÷êî.
-	void SetPosition( float x, float y, float z ){
+	void SetPos( float x, float y, float z ){
 		m_vPosition.x = x;
 		m_vPosition.y = y;
 		m_vPosition.z = z;
 	};
 
 	// âÒì]ê›íËä÷êî.
-	void SetRotation( float x, float y, float z ){
+	void SetRot( float x, float y, float z ){
 		m_vRotation.x = x;
 		m_vRotation.y = y;
 		m_vRotation.z = z;
@@ -34,13 +34,13 @@ public:
 	}
 
 	void SetAlpha	( float alpha )			  { m_Alpha = alpha; }
-	void SetPosition( const D3DXVECTOR3& pos ){ m_vPosition = pos;}
-	void SetRotation( const D3DXVECTOR3& rot ){ m_vRotation = rot; }
+	void SetPos		( const D3DXVECTOR3& pos ){ m_vPosition = pos;}
+	void SetRot		( const D3DXVECTOR3& rot ){ m_vRotation = rot; }
 	void SetScale	( float xyz )			  { m_vScale = D3DXVECTOR3( xyz, xyz, xyz ); }
 
 	const D3DXVECTOR3& GetScale()	 const { return m_vScale;	 }
-	const D3DXVECTOR3& GetPosition() const { return m_vPosition; }
-	const D3DXVECTOR3& GetRotation() const { return m_vRotation; }
+	const D3DXVECTOR3& GetPos()		 const { return m_vPosition; }
+	const D3DXVECTOR3& GetRot()		 const { return m_vRotation; }
 
 protected:
 	D3DXVECTOR3	m_vPosition;

@@ -110,22 +110,22 @@ public:
 		LIGHT& Light );
 
 	// À•Wî•ñ‚ğİ’è.
-	void SetPosition( const D3DXVECTOR3& Pos ) { m_Position = Pos; }
+	void SetPos( const D3DXVECTOR3& Pos ) { m_Position = Pos; }
 	// À•Wx‚ğİ’è.
-	void SetPositionX( float x ){ m_Position.x = x; }
+	void SetPosX( float x ){ m_Position.x = x; }
 	// À•Wy‚ğİ’è.
-	void SetPositionY( float y ){ m_Position.y = y; }
+	void SetPosY( float y ){ m_Position.y = y; }
 	// À•Wz‚ğİ’è.
-	void SetPositionZ( float z ){ m_Position.z = z; }
+	void SetPosZ( float z ){ m_Position.z = z; }
 
 	// ‰ñ“]î•ñ‚ğİ’è.
-	void SetRotation( const D3DXVECTOR3& Rot ) { m_Rotation = Rot;	}
+	void SetRot( const D3DXVECTOR3& Rot ) { m_Rotation = Rot;	}
 	// ‰ñ“]²Y‚ğİ’è(Yaw).
-	void SetRotationY( float y ){ m_Rotation.y = y; }
+	void SetRotY( float y ){ m_Rotation.y = y; }
 	// ‰ñ“]²X‚ğİ’è(Pitch).
-	void SetRotationX( float x ){ m_Rotation.x = x; }
+	void SetRotX( float x ){ m_Rotation.x = x; }
 	// ‰ñ“]²Z‚ğİ’è(Roll).
-	void SetRotationZ( float z ){ m_Rotation.z = z; }
+	void SetRotZ( float z ){ m_Rotation.z = z; }
 
 	// Šgkî•ñ‚ğİ’è.
 	void SetScale( const D3DXVECTOR3& Scale ) {	m_Scale = Scale;	}

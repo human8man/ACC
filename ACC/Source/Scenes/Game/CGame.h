@@ -9,6 +9,7 @@
 
 class CStaticMesh;
 class CGJK;
+class CRay;
 class MeshCollider;
 class CGround;
 class CBullet;
@@ -37,7 +38,12 @@ public:
 private:
 	// 当たり判定関数.
 	void CollisionJudge();
-
+	void UpdateSatellitePosition(
+		const D3DXVECTOR3& center,	// Aの位置.
+		D3DXVECTOR3& pos,			// Bの位置（out）.
+		float radius,				// AからBまでの距離.
+		float angle					// 回転角度（度数法）.
+	);
 private:
 	HWND	m_hWnd;	// ウィンドウハンドル.
 	LIGHT	m_Light;// ライト情報.
@@ -63,6 +69,10 @@ private:
 	MeshCollider m_MeshA;
 	MeshCollider m_MeshB;
 
+	CRay* m_pCamRay;
+
 	// カメラに位置を渡す際にプレイヤーのサイズを足す.
 	D3DXVECTOR3 m_PLayerSize;
+
+	float m_Angle;
 };

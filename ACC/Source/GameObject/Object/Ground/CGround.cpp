@@ -30,9 +30,9 @@ void CGround::Update()
 	auto [hit, hitpos, length] = IsHitForRay(ray);
 	if ( hit )
 	{
-		D3DXVECTOR3 Pos = m_pPlayer->GetPosition();
+		D3DXVECTOR3 Pos = m_pPlayer->GetPos();
 		Pos.y = hitpos.y + 1.0f;	// 1.0f‚Å­‚µã‚Ö•â³.
-		m_pPlayer->SetPosition( Pos );
+		m_pPlayer->SetPos( Pos );
 	}
 
 
@@ -42,8 +42,8 @@ void CGround::Update()
 	CROSSRAY CrossRay = m_pPlayer->GetCrossRay();
 	// •Ç‚Æ‚Ì“–‚½‚è”»’è.
 	CalculatePositionFromWall( &CrossRay );
-	D3DXVECTOR3 Pos = m_pPlayer->GetPosition();
+	D3DXVECTOR3 Pos = m_pPlayer->GetPos();
 	Pos.x = CrossRay.Ray[CROSSRAY::XL].Position.x;
 	Pos.z = CrossRay.Ray[CROSSRAY::XL].Position.z;
-	m_pPlayer->SetPosition( Pos );
+	m_pPlayer->SetPos( Pos );
 }

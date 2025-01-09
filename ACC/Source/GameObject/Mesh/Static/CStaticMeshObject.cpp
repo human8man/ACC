@@ -32,17 +32,15 @@ void CStaticMeshObject::Update()
 //============================================================================
 //		描画処理.
 //============================================================================
-void CStaticMeshObject::Draw(
-	D3DXMATRIX& View, D3DXMATRIX& Proj,
-	LIGHT& Light )
+void CStaticMeshObject::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 {
 	if( m_pMesh == nullptr ){
 		return;
 	}
 
 	//描画直前で座標や回転情報などを更新.
-	m_pMesh->SetPosition( m_vPosition );
-	m_pMesh->SetRotation( m_vRotation );
+	m_pMesh->SetPos( m_vPosition );
+	m_pMesh->SetRot( m_vRotation );
 	m_pMesh->SetScale( m_vScale );
 
 	//レンダリング.
@@ -60,9 +58,9 @@ std::tuple<bool, D3DXVECTOR3, FLOAT> CStaticMeshObject::IsHitForRay(const RAY& p
 	D3DXMATRIX mTran, mRot, mScale, mWorld, mInverseWorld, mYaw, mPitch, mRoll;
 
 	// レイの方向ベクトルと位置を設定.
-	vAxis = pRay.Axis;  // レイの方向（軸ベクトル）.
-	StartPoint = pRay.Position;  // レイの開始位置.
-	EndPoint = StartPoint + (vAxis * pRay.Length);  // レイの終点を計算.
+	vAxis		= pRay.Axis;	 // レイの方向（軸ベクトル）.
+	StartPoint	= pRay.Position; // レイの開始位置.
+	EndPoint = StartPoint + (vAxis * pRay.Length); // レイの終点を計算.
 
 	// 移動処理.
 	D3DXMatrixTranslation( &mTran, m_vPosition.x, m_vPosition.y, m_vPosition.z);
@@ -113,7 +111,7 @@ std::tuple<bool, D3DXVECTOR3, FLOAT> CStaticMeshObject::IsHitForRay(const RAY& p
 		FindVerticesOnPoly( m_pMesh->GetMeshForRay(), dwIndex, Vertex );
 
 		// 重心座標から交点を算出.
-		// ローカル交点は v0 + U*(v1-v0) + V*(v2-v0) で求まる.
+		//	ローカル交点は v0 + U*(v1-v0) + V*(v2-v0) で求まる.
 		vIntersect = Vertex[0] + U * (Vertex[1] - Vertex[0]) + V * (Vertex[2] - Vertex[0]);
 
 		// モデルデータが「拡縮」「回転」「移動」していれば行列が必要.

@@ -91,6 +91,7 @@ void CCamera::Update()
 	m_CamDirection = m_Camera.Look - m_Camera.Pos;
 	D3DXVec3Normalize(&m_CamDirection, &m_CamDirection);
 	m_pRay.Axis = m_CamDirection;
+	m_pRay.Length = 1.f;
 }
 
 //===================================================================
