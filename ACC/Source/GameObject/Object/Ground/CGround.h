@@ -15,9 +15,7 @@ public:
 
 	virtual void Update() override;
 
-	// ƒvƒŒƒCƒ„[î•ñ‚ğİ’è.
-	void SetPlayer(CCharacter& pPlayer) { m_pPlayer = &pPlayer; }
-
 protected:
-	CCharacter*	m_pPlayer;
+
+
 };

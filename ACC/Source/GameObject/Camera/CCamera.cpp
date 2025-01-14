@@ -58,11 +58,12 @@ void CCamera::Update()
 	// マウス移動量の初期化.
 	m_MouseMoveDis = ZEROVEC2;
 
+
 	// カメラの操作が可能な場合、キー入力処理を通る.
 	if( m_CanMoveCamera ) { KeyInput(); }
 
 
-	// マウスが操作可能な場合.
+	// マウスが操作可能か.
 	if ( !m_CanMoveMouse )
 	{
 		// マウス座標の取得.
@@ -77,14 +78,14 @@ void CCamera::Update()
 			m_MouseMoveDis.x = static_cast<float>(m_NowCurorPos.x - m_BeforCursorPos.x);
 			m_MouseMoveDis.y = static_cast<float>(m_NowCurorPos.y - m_BeforCursorPos.y);
 
-			// ベクトル計算をし、注視点に代入.
-			MouseMove(m_MouseMoveDis);
-
 			// マウス位置を画面中央に初期化.
 			SetCursorPos(WND_WM, WND_HM);	// 現在のマウス位置リセット.
 			m_BeforCursorPos = RESETPOS;	// 過去のマウス位置リセット.
 		}
 	}
+
+	// ベクトル計算をし、注視点に代入.
+	MouseMove(m_MouseMoveDis);
 
 	// レイに値を入れる.
 	m_pRay.Position = m_Camera.Pos;
@@ -118,10 +119,10 @@ void CCamera::KeyInput()
 	// マウスの操作ができない場合(マウスが画面中央に固定されている場合).
 	if (!m_CanMoveMouse)
 	{
-		if ( Key->IsKeyDown(DIK_W) ) { CameraMove(Straight); }
-		if ( Key->IsKeyDown(DIK_S) ) { CameraMove(Back);	 }
-		if ( Key->IsKeyDown(DIK_A) ) { CameraMove(Left);	 }
-		if ( Key->IsKeyDown(DIK_D) ) { CameraMove(Right);	 }
+		if ( Key->IsKeyDown(DIK_W) ){ CameraMove(Straight);	}
+		if ( Key->IsKeyDown(DIK_S) ){ CameraMove(Back);		}
+		if ( Key->IsKeyDown(DIK_A) ){ CameraMove(Left);		}
+		if ( Key->IsKeyDown(DIK_D) ){ CameraMove(Right);	}
 
 		float Yvalue = 0.f;
 		if ( Key->IsKeyDown(DIK_SPACE) )  { Yvalue =  m_MoveValue; }
@@ -130,8 +131,6 @@ void CCamera::KeyInput()
 		m_Camera.Pos.y  += Yvalue;
 		m_Camera.Look.y += Yvalue;
 	}
-
-	if ( Key->IsKeyAction(DIK_F2) ) { m_CanMoveMouse = !m_CanMoveMouse; }
 
 	// マウスカーソルの表示.
 	ShowCursor(m_CanMoveMouse);
@@ -160,8 +159,7 @@ void CCamera::MouseMove(D3DXVECTOR2 value)
 	LookDirection.y = sin(D3DXToRadian(m_CameraRot.x));
 	LookDirection.z = sin(D3DXToRadian(m_CameraRot.y)) * cos(D3DXToRadian(m_CameraRot.x));
 
-	// ノーマライズ(正常化).
-	//	ベクトルの大きさを1に固定すること.
+	// 正規化.
 	D3DXVec3Normalize(&LookDirection, &LookDirection);
 
 	// カメラの位置を更新.

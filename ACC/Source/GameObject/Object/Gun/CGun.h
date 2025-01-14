@@ -15,5 +15,13 @@ public:
 	virtual void Update() override;
 	virtual void Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light ) override;
 
+	// ”­ËˆÊ’u‚Ìİ’è.
+	void SetShootPos(D3DXVECTOR3& pos) { m_ShootPoint = pos; }
+
+	// ”­ËˆÊ’u‚Ìæ“¾.
+	D3DXVECTOR3 GetShootPos() const { return m_ShootPoint; }
+
 private:
+	D3DXVECTOR3 m_ShootPoint;
+
 };

@@ -23,25 +23,7 @@ CPlayer::~CPlayer()
 //============================================================================
 void CPlayer::Update()
 {
-
 	KeyInput();
-
-	// 前回のフレームで弾を飛ばしているかも知れないのでfalseにする.
-	m_Shot = false;
-	
-	// レイの位置をプレイヤーの座標にそろえる.
-	m_pRayY->Position = m_vPosition;
-	// 地面にめり込み回避のため、プレイヤーの位置よりも少し上にしておく.
-	m_pRayY->Position.y += 0.2f;
-	m_pRayY->RotationY = m_vRotation.y;
-
-	// 十字（前後左右に伸ばした）レイの設定.
-	for (int dir = 0; dir < CROSSRAY::max; dir++)
-	{
-		m_pCrossRay->Ray[dir].Position = m_vPosition;
-		m_pCrossRay->Ray[dir].Position.y += 0.2f;
-		m_pCrossRay->Ray[dir].RotationY = m_vRotation.y;
-	}
 
 	CCharacter::Update();
 }
@@ -63,9 +45,6 @@ void CPlayer::KeyInput()
 {
 	CKey* Key = CDInput::GetInstance()->CDKeyboard();
 	
-	// 弾を飛ばす.
-	if( Key->IsKeyAction( DIK_Z )){ m_Shot = true; }
-
 
 	//----------------------------------------
 	//		移動処理.

@@ -10,6 +10,7 @@
 #include "Object/Ground/CGround.h"
 #include "Character/Player/CPlayer.h"
 #include "Object/Bullet/CBullet.h"
+#include "Object/Gun/CGun.h"
 
 #if _DEBUG
 	#include "ImGui/CImGui.h"
@@ -31,7 +32,7 @@ CGame::CGame(HWND hWnd)
 
 	, m_pPlayer			( nullptr )
 	, m_pGround			( nullptr )
-	, m_pBullet			( nullptr )
+	, m_pGun			( nullptr )
 	, m_pBullets		()
 
 	, m_pGJK			( nullptr )
@@ -64,11 +65,10 @@ void CGame::Create()
 	m_pMeshBullet	= new CStaticMesh();
 	m_pMeshGun		= new CStaticMesh();
 	m_pPlayer		= new CPlayer();
+	m_pGun			= new CGun();
 
 	// 地面クラスのインスタンス作成.
 	m_pGround = new CGround();
-	m_pGround->SetPlayer(*m_pPlayer);
-	m_pBullet = new CBullet();
 
 	m_pCamRay = new CRay();
 }
@@ -86,11 +86,10 @@ HRESULT CGame::LoadData()
 
 	m_pPlayer->AttachMesh( *m_pMeshFighter );
 	m_pGround->AttachMesh( *m_pMeshGround );
-	m_pBullet->AttachMesh( *m_pMeshBullet );
+	m_pGun	 ->AttachMesh( *m_pMeshGun );
 
 	// キャラクターの初期座標を設定.
 	m_pPlayer->SetPos( 0.f, 0.f, 6.f  );
-	m_pBullet->SetPos(0.f, -1000.f, 6.f);
 
 	CCamera::GetInstance()->Init();
 
@@ -114,6 +113,7 @@ void CGame::Release()
 
 	SAFE_DELETE(m_pGround);
 
+	SAFE_DELETE(m_pGun);
 	SAFE_DELETE(m_pPlayer);
 
 	SAFE_DELETE(m_pMeshGun);
@@ -140,17 +140,39 @@ void CGame::Init()
 //============================================================================
 void CGame::Update()
 {
-	D3DXVECTOR3 Bpos = m_pMeshGun->GetPos();
-	float radius = 5.f;	// 半径.
-	m_Angle += 1.f;		// 回転角度（フレームごとに増加）.
-	UpdateSatellitePosition(m_pPlayer->GetPos(), Bpos, radius, m_Angle);	// 衛星Bの位置を更新.
-	m_pMeshGun->SetPos(Bpos);
+
 
 	CKey*	Key	  = CDInput::GetInstance()->CDKeyboard();
 	CMouse* Mouse = CDInput::GetInstance()->CDMouse();
 
+	// プレイヤーの更新.
+	m_pPlayer->Update();
+
+	// プレイヤーの更新後にプレイヤー座標にカメラをセット.
+	if (!CCamera::GetInstance()->GetMoveCamera()) {
+		 CCamera::GetInstance()->SetPosition(m_pPlayer->GetPos() + m_PLayerSize);
+	}
+
 	// カメラの更新.
 	CCamera::GetInstance()->Update();
+	D3DXVECTOR3 direction = CCamera::GetInstance()->GetCamDir();
+
+
+	// クォータニオンで銃を回す処理.
+	D3DXVECTOR3 Bpos = m_pGun->GetPos();
+	float radius = 1.f;	// 半径.
+	m_Angle += 1.f;		// 回転角度（フレームごとに増加）.
+
+	UpdateGunPosition(
+		m_pPlayer->GetPos(),
+		Bpos,
+		radius,
+		D3DXToRadian(CCamera::GetInstance()->GetRot().y));
+
+	m_pGun->SetPos(Bpos);
+	// Yaw（Y軸回転）の計算.
+	float yaw = atan2f(direction.z, direction.x);
+	m_pGun->SetRot( 0.f, -D3DXToRadian(CCamera::GetInstance()->GetRot().y)-1.5f, 0.f );
 
 	// カメラ側のキー操作を無効にする.
 	if (Key->IsKeyAction(DIK_F2)) { CCamera::GetInstance()->ChangeCanMove(); }
@@ -163,25 +185,27 @@ void CGame::Update()
 		m_pBullets.back()->AttachMesh(*m_pMeshBullet);
 		m_pBullets.back()->SetPos(0.f, -1000.f, 0.f);
 
-		D3DXVECTOR3 direction = CCamera::GetInstance()->GetCamDir();
-		float yaw = atan2(direction.x, direction.z);
-		float pitch = atan2(direction.y, sqrt(direction.x * direction.x + direction.z * direction.z));
-		D3DXVECTOR3 rot(pitch,yaw,0.f);
+		// ベクトルのノーマライズ（方向のみを抽出）.
+		D3DXVec3Normalize(&direction, &direction);
+
+		// Pitch（X軸回転）の計算.
+		float pitch = asinf(direction.y); // Y方向から計算.
+
+		// ラジアンから角度へ変換.
+		yaw		= D3DXToDegree(yaw);
+		pitch	= D3DXToDegree(pitch);
+
+		D3DXVECTOR3 rot( pitch, yaw, 0.f );
 
 		// 初期位置,移動方向の単位ベクトル,弾の向き,速度がいるため保留.
 		m_pBullets.back()->Init(
-			CCamera::GetInstance()->GetPos(),
+			m_pGun->GetShootPos(),
 			CCamera::GetInstance()->GetCamDir(),
-			rot,
+			direction,
 			0.01f );
 	}
 
-	// プレイヤーの更新.
-	m_pPlayer->Update();
 
-	// プレイヤーの更新後にプレイヤー座標にカメラをセット.
-	if ( !CCamera::GetInstance()->GetMoveCamera())
-	{	  CCamera::GetInstance()->SetPosition(m_pPlayer->GetPos() + m_PLayerSize); }
 
 	// 弾の更新.
 	for (size_t i = 0; i < m_pBullets.size(); ++i) {
@@ -211,8 +235,8 @@ void CGame::Draw()
 	}
 
 	m_pGround->Draw( m_mView, m_mProj, m_Light );
-	m_pPlayer->Draw( m_mView, m_mProj, m_Light );
-	m_pMeshGun->Render(m_mView, m_mProj, m_Light);
+	//m_pPlayer->Draw( m_mView, m_mProj, m_Light );
+	m_pGun->Draw(m_mView, m_mProj, m_Light);
 
 	m_pCamRay->Render(m_mView, m_mProj, CCamera::GetInstance()->GetRay());
 
@@ -256,16 +280,41 @@ void CGame::CollisionJudge()
 	auto [hit, hitpos, length] = m_pGround->IsHitForRay(CCamera::GetInstance()->GetRay());
 	
 #if _DEBUG
+	// 銃ウィンドウ.
+	ImGui::Begin("CameraWindow");
+
+	D3DXVECTOR3 camrot = CCamera::GetInstance()->GetRot();
+	ImGui::Text("%f,%f,%f", camrot.x, camrot.y, camrot.z);
+	ImGui::DragFloat3("##Position", camrot, 0.1f);
+
+	ImGui::End();
+
+
+	// 銃ウィンドウ.
+	ImGui::Begin("BulletWindow");
+
+	D3DXVECTOR3 shootpos = m_pGun->GetPos();
+	ImGui::Text("%f,%f,%f", shootpos.x, shootpos.y, shootpos.z);
+	ImGui::DragFloat3("##Position", shootpos, 0.1f);
+	m_pGun->SetPos(shootpos);
+
+	ImGui::End();
+
+
+	// 弾のウィンドウ.
 	ImGui::Begin("BulletWindow");
 
 	for (size_t i = 0; i < m_pBullets.size(); ++i) {
-		D3DXVECTOR3 Bullet = m_pBullets[i]->GetPos();
-		ImGui::Text("%f,%f,%f", Bullet.x, Bullet.y, Bullet.z);
-		ImGui::DragFloat3("##Position", Bullet, 0.1f);
-		m_pBullets[i]->SetPos(Bullet);
+		D3DXVECTOR3 rot = m_pBullets[i]->GetRot();
+		D3DXVECTOR3 pos = m_pBullets[i]->GetPos();
+		ImGui::Text("------------------------------------");
+		ImGui::DragFloat3("rot", rot, 0.01f);
+		ImGui::DragFloat3("pos", pos, 0.01f);
 	}
 	ImGui::End();
 
+
+	// レイの当たり判定のウィンドウ.
 	ImGui::Begin("ColWindow");
 
 	if(hit) { ImGui::Text("true");	}
@@ -291,7 +340,7 @@ void CGame::UpdateSatellitePosition(
 	D3DXVECTOR3 rotationAxis(0.f, 1.f, 0.f);
 
 	// 初期位置（BがAからradius離れた位置）.
-	D3DXVECTOR3 initialPosition(radius, 0.f, 0.f);
+	D3DXVECTOR3 initialPosition( radius, 0.f, 0.f );
 
 	// クォータニオンを使って回転を計算.
 	D3DXQUATERNION rotationQuat;
@@ -303,5 +352,31 @@ void CGame::UpdateSatellitePosition(
 	D3DXVec3TransformCoord(&rotatedPosition, &initialPosition, &rotationMatrix);
 
 	// Aを基準に座標を加算.
+	pos = center + rotatedPosition;
+}
+
+void CGame::UpdateGunPosition(
+	const D3DXVECTOR3& center, 
+	D3DXVECTOR3& pos, 
+	float radius,
+	float playerYaw)
+{
+	// 初期位置（プレイヤーの右方向にradius分だけ離れた位置）.
+	D3DXVECTOR3 initialPosition(radius, 0.f, 0.f);
+	D3DXVECTOR3 Upvec(0.f, -1.f, 0.f);
+
+	// プレイヤーのyaw回転を表すクォータニオン.
+	D3DXQUATERNION playerYawQuat;
+	D3DXQuaternionRotationAxis(&playerYawQuat, &Upvec, playerYaw);
+
+	// クォータニオンを回転行列に変換.
+	D3DXMATRIX rotationMatrix;
+	D3DXMatrixRotationQuaternion(&rotationMatrix, &playerYawQuat);
+
+	// 初期位置を回転して最終的な位置を計算.
+	D3DXVECTOR3 rotatedPosition;
+	D3DXVec3TransformCoord(&rotatedPosition, &initialPosition, &rotationMatrix);
+
+	// プレイヤーの位置を基準に最終位置を計算.
 	pos = center + rotatedPosition;
 }

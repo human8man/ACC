@@ -13,6 +13,7 @@ class CRay;
 class MeshCollider;
 class CGround;
 class CBullet;
+class CGun;
 class CEnemy;
 class CPlayer;
 class CCharacter;
@@ -44,6 +45,13 @@ private:
 		float radius,				// AからBまでの距離.
 		float angle					// 回転角度（度数法）.
 	);
+
+	void UpdateGunPosition(
+		const D3DXVECTOR3& center,
+		D3DXVECTOR3& pos,
+		float radius,
+		float playerYaw);
+
 private:
 	HWND	m_hWnd;	// ウィンドウハンドル.
 	LIGHT	m_Light;// ライト情報.
@@ -58,7 +66,7 @@ private:
 		
 	CCharacter*	m_pPlayer;
 	CGround*	m_pGround;
-	CBullet*	m_pBullet;	// 弾配列に入れるデータを保存する用.
+	CGun*		m_pGun;
 
 	// 弾配列.
 	std::vector<CBullet*>	m_pBullets;
