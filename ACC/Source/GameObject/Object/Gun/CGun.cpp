@@ -28,3 +28,25 @@ void CGun::Draw(D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light)
 {
 	CStaticMeshObject::Draw( View, Proj, Light );
 }
+
+void CGun::UpdateGunPos(const D3DXVECTOR3& center, float radius, float playerYaw)
+{
+	// 初期位置（プレイヤーの右方向にradius分だけ離れた位置）.
+	D3DXVECTOR3 initialPosition(radius, 0.f, 0.f);
+	D3DXVECTOR3 Upvec(0.f, -1.f, 0.f);	// 逆回転にする.
+
+	// プレイヤーのyaw回転を表すクォータニオン.
+	D3DXQUATERNION playerYawQuat;
+	D3DXQuaternionRotationAxis(&playerYawQuat, &Upvec, playerYaw);
+
+	// クォータニオンを回転行列に変換.
+	D3DXMATRIX rotationMatrix;
+	D3DXMatrixRotationQuaternion(&rotationMatrix, &playerYawQuat);
+
+	// 初期位置を回転して最終的な位置を計算.
+	D3DXVECTOR3 rotatedPosition;
+	D3DXVec3TransformCoord(&rotatedPosition, &initialPosition, &rotationMatrix);
+
+	// プレイヤーの位置を基準に最終位置を計算.
+	m_vPosition = center + rotatedPosition;
+}

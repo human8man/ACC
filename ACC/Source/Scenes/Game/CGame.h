@@ -10,10 +10,7 @@
 class CStaticMesh;
 class CGJK;
 class CRay;
-class MeshCollider;
 class CGround;
-class CBullet;
-class CGun;
 class CEnemy;
 class CPlayer;
 class CCharacter;
@@ -39,19 +36,6 @@ public:
 private:
 	// 当たり判定関数.
 	void CollisionJudge();
-	void UpdateSatellitePosition(
-		const D3DXVECTOR3& center,	// Aの位置.
-		D3DXVECTOR3& pos,			// Bの位置（out）.
-		float radius,				// AからBまでの距離.
-		float angle					// 回転角度（度数法）.
-	);
-
-	void UpdateGunPosition(
-		const D3DXVECTOR3& center,
-		D3DXVECTOR3& pos,
-		float radius,
-		float playerYaw);
-
 private:
 	HWND	m_hWnd;	// ウィンドウハンドル.
 	LIGHT	m_Light;// ライト情報.
@@ -61,16 +45,9 @@ private:
 
 	CStaticMesh*	m_pMeshFighter;	// 自機.
 	CStaticMesh*	m_pMeshGround;	// 地面.
-	CStaticMesh*	m_pMeshBullet;	// 弾.
-	CStaticMesh*	m_pMeshGun;	// 弾.
 		
 	CCharacter*	m_pPlayer;
 	CGround*	m_pGround;
-	CGun*		m_pGun;
-
-	// 弾配列.
-	std::vector<CBullet*>	m_pBullets;
-
 
 	// GJKクラス.
 	std::unique_ptr<CGJK> m_pGJK;
@@ -78,9 +55,6 @@ private:
 	MeshCollider m_MeshB;
 
 	CRay* m_pCamRay;
-
-	// カメラに位置を渡す際にプレイヤーのサイズを足す.
-	D3DXVECTOR3 m_PLayerSize;
 
 	float m_Angle;
 };
