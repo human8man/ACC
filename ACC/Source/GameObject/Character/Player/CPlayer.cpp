@@ -10,7 +10,8 @@ CPlayer::CPlayer()
 	: m_TurnSpeed	( 0.1f )
 	, m_MoveSpeed	( 0.1f )
 	, m_CamRevision	( 2.f )
-	, m_MoveState	( Stop )
+	, m_JumpPower	( 117.6f )
+	, m_State		( Stop )
 {
 }
 

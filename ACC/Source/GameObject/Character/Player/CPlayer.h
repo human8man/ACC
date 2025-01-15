@@ -8,17 +8,6 @@ class CPlayer
 	: public CCharacter
 {
 public:
-	// 移動状態列挙型.
-	enum enMoveState
-	{
-		Stop	= 0, // 停止.
-		Forward,	 // 前進.
-		Backward,	 // 後退.
-		TurnLeft,	 // 左回転.
-		TurnRight,	 // 右回転.
-	};
-
-public:
 	CPlayer();
 	virtual ~CPlayer() override;
 
@@ -30,8 +19,8 @@ private:
 	void KeyInput();
 
 private:
-	float		m_TurnSpeed;	// 回転速度.
-	float		m_MoveSpeed;	// 移動速度.
-	float		m_CamRevision;	// カメラ座標の補正値.
-	enMoveState	m_MoveState;	// 移動状態.
+	float m_TurnSpeed;	 // 回転速度.
+	float m_MoveSpeed;	 // 移動速度.
+	float m_CamRevision; // カメラ座標の補正値.
+	float m_JumpPower;	 // ジャンプ力.
 };
