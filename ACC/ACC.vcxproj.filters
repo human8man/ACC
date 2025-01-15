@@ -61,9 +61,6 @@
     <Filter Include="Source\GameObject\Character\Enemy">
       <UniqueIdentifier>{5150d283-8dde-45ac-bccb-648ad11d1a57}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\GameObject\Character\Zako">
-      <UniqueIdentifier>{175081f5-bc92-4ba0-84d4-f8eaeb7d29ed}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\GameObject\Mesh\Skin">
       <UniqueIdentifier>{4d86a69e-25d3-4e59-9cda-0b4ad8331e36}</UniqueIdentifier>
     </Filter>
@@ -224,9 +221,6 @@
     <ClCompile Include="Source\GameObject\Object\Ground\CGround.cpp">
       <Filter>Source\GameObject\Object\Ground</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GameObject\Object\Shot\CShot.cpp">
-      <Filter>Source\GameObject\Object\Shot</Filter>
-    </ClCompile>
     <ClCompile Include="Source\MainLoop\CMain.cpp">
       <Filter>Source\MainLoop</Filter>
     </ClCompile>
@@ -299,11 +293,15 @@
     <ClCompile Include="Source\Common\FileManager\LoadImage\LoadImage.cpp">
       <Filter>Source\Common\FileManager\LoadImage</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Common\Resource\SpriteResource\SpriteResource.cpp" />
     <ClCompile Include="Source\Collision\GJK\CGJK.cpp">
       <Filter>Source\Collision\GJK</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GameObject\Object\Gun\CGun.cpp" />
+    <ClCompile Include="Source\GameObject\Object\Gun\CGun.cpp">
+      <Filter>Source\GameObject\Object\Gun</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GameObject\Object\Bullet\CBullet.cpp">
+      <Filter>Source\GameObject\Object\Shot</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Collision\BoundingSphere\CBoundingSphere.h">
@@ -381,9 +379,6 @@
     <ClInclude Include="Source\GameObject\Object\Ground\CGround.h">
       <Filter>Source\GameObject\Object\Ground</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameObject\Object\Shot\CShot.h">
-      <Filter>Source\GameObject\Object\Shot</Filter>
-    </ClInclude>
     <ClInclude Include="Source\MainLoop\CMain.h">
       <Filter>Source\MainLoop</Filter>
     </ClInclude>
@@ -453,11 +448,15 @@
     <ClInclude Include="Source\Common\FileManager\LoadImage\LoadImage.h">
       <Filter>Source\Common\FileManager\LoadImage</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Common\Resource\SpriteResource\SpriteResource.h" />
     <ClInclude Include="Source\Collision\GJK\CGJK.h">
       <Filter>Source\Collision\GJK</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameObject\Object\Gun\CGun.h" />
+    <ClInclude Include="Source\GameObject\Object\Gun\CGun.h">
+      <Filter>Source\GameObject\Object\Gun</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameObject\Object\Bullet\CBullet.h">
+      <Filter>Source\GameObject\Object\Shot</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Common\Easing\Easing.inl">

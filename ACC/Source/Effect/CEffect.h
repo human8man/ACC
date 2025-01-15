@@ -1,7 +1,10 @@
 #pragma once
 
-//警告についてのコード分析を無効にする.4005:再定義.
+//警告についてのコード分析を無効にする.
 #pragma warning( disable : 4005 )
+#pragma warning( disable : 4099 )
+#pragma warning( disable : 26495 )
+#pragma warning( disable : 6385 )
 
 //---------------------------------------.
 //	Effekseer関係ヘッダ、ライブラリ.

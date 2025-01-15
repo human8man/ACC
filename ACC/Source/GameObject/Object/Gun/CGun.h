@@ -20,8 +20,12 @@ public:
 
 	// 発射位置の取得.
 	D3DXVECTOR3 GetShootPos() const { return m_ShootPoint; }
-
+	
+	// 銃の位置をプレイヤーに合わせて変更する.
+	void UpdateGunPos(
+		const D3DXVECTOR3& center,	// 基準点（プレイヤー）.
+		float radius,				// 半径.
+		float playerYaw);			// プレイヤーのYaw軸（rot.y）.
 private:
 	D3DXVECTOR3 m_ShootPoint;
-
 };

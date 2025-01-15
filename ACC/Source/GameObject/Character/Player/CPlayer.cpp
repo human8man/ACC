@@ -9,6 +9,7 @@
 CPlayer::CPlayer()
 	: m_TurnSpeed	( 0.1f )
 	, m_MoveSpeed	( 0.1f )
+	, m_CamRevision	( 2.f )
 	, m_MoveState	( Stop )
 {
 }
@@ -23,7 +24,19 @@ CPlayer::~CPlayer()
 //============================================================================
 void CPlayer::Update()
 {
+	// カメラに向きを合わせる.
+	m_vRotation.y = CCamera::GetInstance()->GetRot().y;
+	
+	// 入力処理.
 	KeyInput();
+
+	// 入力処理後にカメラ座標をセット.
+	if (!CCamera::GetInstance()->GetMoveCamera()) {
+		// プレイヤー位置 + プレイヤーの高さを含んだ座標を渡す.
+		D3DXVECTOR3 campos = m_vPosition;
+		campos.y += m_CamRevision;
+		 CCamera::GetInstance()->SetPosition(campos);
+	}
 
 	CCharacter::Update();
 }
@@ -34,7 +47,14 @@ void CPlayer::Update()
 //============================================================================
 void CPlayer::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 {
-	CCharacter::Draw( View, Proj, Light );
+	// プレイヤーは描画しない.
+	// CCharacter::Draw( View, Proj, Light );
+	
+	// 弾の描画.
+	for (size_t i = 0; i < m_pBullets.size(); ++i) { m_pBullets[i]->Draw(View, Proj, Light); }
+
+	// 銃の描画.
+	m_pGun->Draw(View, Proj, Light);
 }
 
 
@@ -44,15 +64,16 @@ void CPlayer::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 void CPlayer::KeyInput()
 {
 	CKey* Key = CDInput::GetInstance()->CDKeyboard();
+	CMouse* Mouse = CDInput::GetInstance()->CDMouse();
 	
 
-	//----------------------------------------
+	//----------------------------------------------------------------------
 	//		移動処理.
-	//----------------------------------------
+	//----------------------------------------------------------------------
 	
 	// カメラの向きベクトルを取得.
 	D3DXVECTOR3 camDir = CCamera::GetInstance()->GetCamDir();
-	camDir.y = 0.f;	//Y情報があると飛び始めるのでYの要素を抜く.
+	camDir.y = 0.f;	// Y情報があると飛び始めるのでYの要素を抜く.
 	D3DXVec3Normalize(&camDir, &camDir); // 正規化.
 
 	float moveSpeed = 0.1f;	// プレイヤーの移動速度.
@@ -77,4 +98,26 @@ void CPlayer::KeyInput()
 
 	// 位置を更新.
 	m_vPosition += velocity;
+
+	//----------------------------------------------------------------------
+	//		左クリックで射撃.
+	//----------------------------------------------------------------------
+	if (Mouse->IsLAction()) {
+		// カメラの向きベクトルを取得.
+		D3DXVECTOR3 direction = CCamera::GetInstance()->GetCamDir();
+		m_pBullets.push_back(new CBullet());	// m_pBullets に追加.
+
+		m_pBullets.back()->AttachMesh(*m_pMeshBullet);	// メッシュを設定.
+		m_pBullets.back()->SetPos(0.f, -1000.f, 0.f);	//初期位置を仮設定.
+
+		// ベクトルのノーマライズ（方向のみを抽出）.
+		D3DXVec3Normalize(&direction, &direction);
+
+		// 初期位置,移動方向の単位ベクトル,弾の向き,速度がいるため保留.
+		m_pBullets.back()->Init(
+			m_pGun->GetShootPos(),
+			CCamera::GetInstance()->GetCamDir(),
+			direction,
+			0.01f );
+	}
 }
