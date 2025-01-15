@@ -172,7 +172,7 @@ void CTitle::Update()
 	}
 	
 
-#if _DEBUG]
+#if _DEBUG
 	ImGui::Begin("MousePos");
 	POINT pos;
 	if (GetCursorPos(&pos)) 

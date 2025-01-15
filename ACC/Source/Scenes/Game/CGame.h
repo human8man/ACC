@@ -43,7 +43,7 @@ private:
 	D3DXMATRIX	m_mView;	// ビュー(カメラ)行列.
 	D3DXMATRIX	m_mProj;	// 射影（プロジェクション）行列.
 
-	CStaticMesh*	m_pMeshFighter;	// 自機.
+	CStaticMesh*	m_pMeshEgg;		// たまご.
 	CStaticMesh*	m_pMeshGround;	// 地面.
 		
 	CCharacter*	m_pPlayer;

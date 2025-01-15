@@ -8,12 +8,15 @@
 CCharacter::CCharacter()
 	: m_pRayY			( nullptr )
 	, m_pCrossRay		( nullptr )
+
 	, m_pBullets		()
 	, m_pGun			( nullptr )
 	, m_pMeshBullet		( nullptr )
 	, m_pMeshGun		( nullptr )
+
 	, m_GunRadius		( 1.f )
 	, m_GunRotRevision	( -1.5f )
+	, m_Gravity			( 0.098f )
 {
 	// ƒŒƒC‚ÌÝ’è.
 	m_pRayY			= new RAY();
@@ -51,7 +54,7 @@ CCharacter::~CCharacter()
 void CCharacter::Update()
 {
 	CStaticMeshObject::Update();
-	
+
 	// e‚ðƒLƒƒƒ‰‚ÌŽü‚è‚Å‰ñ‚·ˆ—.
 	m_pGun->UpdateGunPos(
 		m_vPosition,

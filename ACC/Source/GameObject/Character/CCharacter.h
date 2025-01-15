@@ -12,6 +12,32 @@ class CCharacter
 	: public CStaticMeshObject
 {
 public:
+	// キャラ状態列挙体.
+	enum CharaState
+	{
+		None = 0,
+		// ここに状態とか書いていく.
+	};
+	// チート状態列挙.
+	enum CheatState
+	{
+		None = 0,
+		// ここに使うチートとか書いていく.
+	};
+
+	// キャラ情報構造体.
+	struct CharaInfo
+	{
+		int HP;
+		int Ammo;
+		int MaxAmmo;
+		CharaState Status;
+		CheatState UsingCheat1;
+		CheatState UsingCheat2;
+		CheatState UsingCheat3;
+		CheatState UsingCheat4;
+	};
+public:
 	CCharacter();
 	virtual ~CCharacter();
 
@@ -19,9 +45,12 @@ public:
 	virtual void Draw(D3DXMATRIX& View, D3DXMATRIX& Proj,LIGHT& Light) override;
 
 	// Y軸方向へ伸ばしたレイを取得.
-	RAY GetRayY() const { return *m_pRayY;  }
+	RAY GetRayY() const { return *m_pRayY; }
 	// 十字レイを取得.
-	CROSSRAY GetCrossRay() const { return *m_pCrossRay;  }
+	CROSSRAY GetCrossRay() const { return *m_pCrossRay; }
+
+	// キャラの情報を取得.
+	CharaInfo GetCharaInfo() const { return m_CharaInfo;  }
 protected:
 	RAY*		m_pRayY;		// Y方向へ伸ばしたレイ.
 	CROSSRAY*	m_pCrossRay;	// 十字（前後左右に伸ばした）レイ
@@ -33,4 +62,7 @@ protected:
 
 	float m_GunRadius;		// 銃の半径.
 	float m_GunRotRevision;	// 銃の向き補正値.
+	float m_Gravity;		// 重力.
+
+	CharaInfo m_CharaInfo;	// キャラの情報.
 };

@@ -51,8 +51,6 @@ public:
 	static void SetViewAngle (const float& Fov)		  { GetInstance()->m_Fov = Fov;			  }
 	static void SetSens		 (const float& Sens)	  { GetInstance()->m_MouseSens = Sens;	  }
 	static void SetPosition	 (const D3DXVECTOR3& Pos) { GetInstance()->m_Camera.Pos = Pos;	  }
-
-
 private:
 	void KeyInput();					// キー入力.
 	void CameraMove(int vec);			// カメラの移動.
@@ -77,5 +75,5 @@ private:
 	float	m_MouseSens;		// マウス感度.
 
 	bool	m_CanMoveCamera;	// カメラのキー操作が可能か.
-	bool	m_CanMoveMouse;		// マウスが自由に移動できるかどうか.
+	bool	m_CanMoveMouse;		// マウスが自由に移動できるか.
 };
