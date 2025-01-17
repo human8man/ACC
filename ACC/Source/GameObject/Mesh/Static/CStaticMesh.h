@@ -110,7 +110,13 @@ public:
 		LIGHT& Light );
 
 	// 座標情報を設定.
-	void SetPos( const D3DXVECTOR3& Pos ) { m_Position = Pos; }
+	void SetPos( const D3DXVECTOR3& pos ) { m_Position = pos; }
+	void SetPos(float x, float y, float z) {
+		m_Position.x = x;
+		m_Position.y = y;
+		m_Position.z = z;
+	};
+
 	// 座標xを設定.
 	void SetPosX( float x ){ m_Position.x = x; }
 	// 座標yを設定.
@@ -119,7 +125,12 @@ public:
 	void SetPosZ( float z ){ m_Position.z = z; }
 
 	// 回転情報を設定.
-	void SetRot( const D3DXVECTOR3& Rot ) { m_Rotation = Rot;	}
+	void SetRot( const D3DXVECTOR3& rot ) { m_Rotation = rot;	}
+	void SetRot(float rot) {
+		m_Rotation.x = rot;
+		m_Rotation.y = rot;
+		m_Rotation.z = rot;
+	}
 	// 回転軸Yを設定(Yaw).
 	void SetRotY( float y ){ m_Rotation.y = y; }
 	// 回転軸Xを設定(Pitch).
@@ -128,7 +139,7 @@ public:
 	void SetRotZ( float z ){ m_Rotation.z = z; }
 
 	// 拡縮情報を設定.
-	void SetScale( const D3DXVECTOR3& Scale ) {	m_Scale = Scale;	}
+	void SetScale( const D3DXVECTOR3& scale ) {	m_Scale = scale;	}
 	void SetScale( float scale ){
 		m_Scale.x = scale;
 		m_Scale.y = scale;
@@ -143,6 +154,8 @@ public:
 	D3DXVECTOR3 GetPos()const { return m_Position; }
 	// メッシュ角度を取得.
 	D3DXVECTOR3 GetRot()const { return m_Rotation; }
+	// サイズを取得.
+	D3DXVECTOR3 GetScale()const { return m_Scale; }
 	// メッシュの頂点情報を取得.
 	std::vector<D3DXVECTOR3>GetVertices() const { return m_Vertices; }
 

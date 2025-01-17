@@ -2,6 +2,9 @@
 
 #include "GameObject/CGameObject.h"
 
+#if _DEBUG
+#include "ImGui/CImGui.h"
+#endif
 D3DXVECTOR3 MeshCollider::FindFurthestPoint(D3DXVECTOR3 Direction) const
 {
 	D3DXVECTOR3 MaxPoint;
@@ -117,22 +120,28 @@ void BoxCollider::SetVertex(
 	for (int i = 0; i < vertex.size(); i++)
 	{
 		m_Vertices[i] = vertex[i];
-		//D3DXVec3TransformCoord(&m_Vertices[i], &m_Vertices[i], &mWorld);
+		D3DXVec3TransformCoord(&m_Vertices[i], &m_Vertices[i], &mWorld);
 	}
 }
 
-//二つのコライダーと方向でミンコフスキー差の頂点を返す
+//======================================================================================
+//		二つのコライダーと方向でミンコフスキー差の頂点を返す
+//======================================================================================
 D3DXVECTOR3 CGJK::Support(const Collider& ColliderA, const Collider& ColliderB, D3DXVECTOR3 Direction)
 {
 	return ColliderA.FindFurthestPoint(Direction) - ColliderB.FindFurthestPoint(-Direction);
 }
 
+
+//======================================================================================
+// 
+//======================================================================================
 CollisionPoints CGJK::GJK(const Collider& ColliderA, const Collider& ColliderB)
 {
 	CollisionPoints outPoints;
 
 	D3DXVECTOR3 sup = Support(ColliderA, ColliderB, D3DXVECTOR3(1.0f, 0.0f, 0.0f));
-	sup = sup + D3DXVECTOR3(0.001f, 0.001f, 0.001f);
+	//sup = sup + D3DXVECTOR3(0.001f, 0.001f, 0.001f);
 
 	Simplex points;
 	points.Push_Front(sup);
@@ -148,7 +157,7 @@ CollisionPoints CGJK::GJK(const Collider& ColliderA, const Collider& ColliderB)
 			return outPoints;
 		}
 		sup = Support(ColliderA, ColliderB, Direction);
-		sup = sup + D3DXVECTOR3(0.001f, 0.001f, 0.001f);
+		//sup = sup + D3DXVECTOR3(0.001f, 0.001f, 0.001f);
 
 		if (D3DXVec3Dot(&sup, &Direction) <= 0.0f) {
 			return outPoints;
@@ -166,6 +175,10 @@ CollisionPoints CGJK::GJK(const Collider& ColliderA, const Collider& ColliderB)
 	return outPoints;
 }
 
+
+//======================================================================================
+//		EPA
+//======================================================================================
 CollisionPoints CGJK::EPA(
 	const Simplex& simplex, 
 	const Collider& colliderA,
@@ -283,11 +296,15 @@ CollisionPoints CGJK::EPA(
 
 	points.Normal = minNormal;
 	points.Depth = minDistance + 0.001f;
-	points.HasCollision = true;
+	points.Col = true;
 
 	return points;
 }
 
+
+//======================================================================================
+// 
+//======================================================================================
 std::tuple<std::vector<D3DXVECTOR4>, size_t> CGJK::GetFaceNormals(
 	const std::vector<D3DXVECTOR3>& Poly,
 	const std::vector<size_t>& Faces)
@@ -326,7 +343,10 @@ std::tuple<std::vector<D3DXVECTOR4>, size_t> CGJK::GetFaceNormals(
 	return { Normals,minTriangle };
 }
 
-//エッジの逆方向がリストに存在するか確認し、存在する場合削除
+
+//======================================================================================
+//		エッジの逆方向がリストに存在するか確認し、存在する場合削除.
+//======================================================================================
 void CGJK::AddIfUniqueEdge(
 	std::vector<std::pair<size_t, size_t>>& Edges, //エッジ
 	const std::vector<size_t>& Faces,			  //インデックス
@@ -346,7 +366,10 @@ void CGJK::AddIfUniqueEdge(
 	}
 }
 
-//送られた頂点情報で一番低い位置にある頂点の位置情報を送る
+
+//======================================================================================
+//		送られた頂点情報で一番低い位置にある頂点の位置情報を送る
+//======================================================================================
 float CGJK::SendMinVertexPosY(D3DXVECTOR3 _Pos, D3DXVECTOR3 _Rot, D3DXVECTOR3 _Scale, std::vector<D3DXVECTOR3> vertex)
 {
 	std::vector<D3DXVECTOR3> Vertex;
@@ -393,6 +416,10 @@ float CGJK::SendMinVertexPosY(D3DXVECTOR3 _Pos, D3DXVECTOR3 _Rot, D3DXVECTOR3 _S
 	return MinPosY;
 }
 
+
+//======================================================================================
+// 
+//======================================================================================
 bool CGJK::NextSimplex(Simplex& points, D3DXVECTOR3& Direction)
 {
 	switch (points.Size())
@@ -405,11 +432,19 @@ bool CGJK::NextSimplex(Simplex& points, D3DXVECTOR3& Direction)
 	return false;
 }
 
+
+//======================================================================================
+// 
+//======================================================================================
 bool CGJK::SameDirection(const D3DXVECTOR3& Direction, const D3DXVECTOR3& ao)
 {
 	return D3DXVec3Dot(&Direction,&ao) > 0.0f;
 }
 
+
+//======================================================================================
+// 
+//======================================================================================
 bool CGJK::Line(Simplex& points, D3DXVECTOR3& Direction)
 {
 	D3DXVECTOR3 a = points[0];
@@ -432,6 +467,10 @@ bool CGJK::Line(Simplex& points, D3DXVECTOR3& Direction)
 	return false;
 }
 
+
+//======================================================================================
+// 
+//======================================================================================
 bool CGJK::Triangle(Simplex& points, D3DXVECTOR3& Direction)
 {
 	D3DXVECTOR3 a = points[0];
@@ -487,6 +526,10 @@ bool CGJK::Triangle(Simplex& points, D3DXVECTOR3& Direction)
 
 }
 
+
+//======================================================================================
+// 
+//======================================================================================
 bool CGJK::Tetrahedron(Simplex& points, D3DXVECTOR3& Direction)
 {
 	D3DXVECTOR3 a = points[0];

@@ -15,13 +15,11 @@ public:
 	// キャラ状態列挙体.
 	enum CharaState
 	{
-		None = 0,
 		// ここに状態とか書いていく.
 	};
 	// チート状態列挙.
 	enum CheatState
 	{
-		None = 0,
 		// ここに使うチートとか書いていく.
 	};
 
@@ -44,13 +42,21 @@ public:
 	virtual void Update() override;
 	virtual void Draw(D3DXMATRIX& View, D3DXMATRIX& Proj,LIGHT& Light) override;
 
+
+	void UseGravity() { m_vPosition.y -= m_Gravity; }
+
+
+
+
+
+
+
 	// Y軸方向へ伸ばしたレイを取得.
 	RAY GetRayY() const { return *m_pRayY; }
 	// 十字レイを取得.
 	CROSSRAY GetCrossRay() const { return *m_pCrossRay; }
-
 	// キャラの情報を取得.
-	CharaInfo GetCharaInfo() const { return m_CharaInfo;  }
+	CharaInfo GetCharaInfo() const { return m_CharaInfo; }
 protected:
 	RAY*		m_pRayY;		// Y方向へ伸ばしたレイ.
 	CROSSRAY*	m_pCrossRay;	// 十字（前後左右に伸ばした）レイ

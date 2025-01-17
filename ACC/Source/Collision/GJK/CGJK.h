@@ -86,13 +86,13 @@ private:
 //衝突点構造体
 struct CollisionPoints {
 	D3DXVECTOR3 Normal	= ZEROVEC3;
-	float  Depth		= 0.0f;
-	bool   HasCollision	= false;
+	float  Depth	= 0.0f;
+	bool   Col		= false;
 };
 
-//================================//
-//　GJKクラス
-//================================//
+//================================================================
+//		GJKクラス.
+//================================================================
 class CGJK
 {
 public:

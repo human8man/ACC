@@ -11,8 +11,9 @@ CPlayer::CPlayer()
 	, m_MoveSpeed	( 0.1f )
 	, m_CamRevision	( 2.f )
 	, m_JumpPower	( 117.6f )
-	, m_State		( Stop )
+	, m_SumVec		(ZEROVEC3)
 {
+	m_CharaInfo.HP = 8;
 }
 
 CPlayer::~CPlayer()
@@ -25,6 +26,9 @@ CPlayer::~CPlayer()
 //============================================================================
 void CPlayer::Update()
 {
+	// 毎フレームリセットする.
+	m_SumVec = ZEROVEC3;
+
 	// カメラに向きを合わせる.
 	m_vRotation.y = CCamera::GetInstance()->GetRot().y;
 	
@@ -94,11 +98,9 @@ void CPlayer::KeyInput()
 	if (Key->IsKeyDown( DIK_A )) { forward += left; }
 	if (Key->IsKeyDown( DIK_D )) { forward -= left; }
 
-	// 最終的な移動方向を速度ベクトルに変換.
-	D3DXVECTOR3 velocity = forward * moveSpeed;
+	// 最終的な移動方向を速度ベクトルに変換し合計の移動量に渡す.
+	m_SumVec += forward * moveSpeed;
 
-	// 位置を更新.
-	m_vPosition += velocity;
 
 	//----------------------------------------------------------------------
 	//		左クリックで射撃.
@@ -121,4 +123,7 @@ void CPlayer::KeyInput()
 			direction,
 			0.01f );
 	}
+
+	// 合計のベクトル量分位置を更新.
+	m_vPosition += m_SumVec;
 }
