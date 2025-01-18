@@ -19,6 +19,7 @@ public:
 	const D3DXVECTOR3& GetMoveVec() { return m_SumVec; }
 	// 移動量の追加.
 	void AddVec(D3DXVECTOR3 vec) { m_vPosition += vec; }
+	void JumpPowerDec() { if (m_JumpPower > 0) { m_JumpPower -= m_Gravity; } }
 
 private:
 	// キー入力処理.
@@ -28,7 +29,6 @@ private:
 	float m_TurnSpeed;	 // 回転速度.
 	float m_MoveSpeed;	 // 移動速度.
 	float m_CamRevision; // カメラ座標の補正値.
-	float m_JumpPower;	 // ジャンプ力.
 
 	D3DXVECTOR3 m_SumVec; // 合計のベクトル量.
 };

@@ -16,7 +16,13 @@ CCharacter::CCharacter()
 
 	, m_GunRadius		( 1.f )
 	, m_GunRotRevision	( -1.5f )
-	, m_Gravity			( 0.098f )
+	, m_GunPosRevision	( -30.f )
+	, m_Gravity			( 0.0098f )
+	, m_GravityValue	( 0.0098f )
+
+	, m_JumpPower		( 0.f )
+	, m_JumpPowerMax	( 0.784f )
+	, m_CanJump			( false )
 {
 	// レイの設定.
 	m_pRayY			= new RAY();
@@ -59,10 +65,12 @@ void CCharacter::Update()
 	m_pGun->UpdateGunPos(
 		m_vPosition,
 		m_GunRadius,
-		D3DXToRadian(m_vRotation.y));
+		D3DXToRadian(m_vRotation.y + m_GunPosRevision));
+
+	D3DXVECTOR3 camrot = CCamera::GetInstance()->GetRot();
 
 	// 銃の角度をプレイヤーの向き + 補正値に設定.
-	m_pGun->SetRot( 0.f, -D3DXToRadian(m_vRotation.y) + m_GunRotRevision, 0.f );
+	m_pGun->SetRot( 0.f, -D3DXToRadian(m_vRotation.y) + m_GunRotRevision, 0.f);
 
 	// 弾の更新.
 	for (size_t i = 0; i < m_pBullets.size(); ++i) {

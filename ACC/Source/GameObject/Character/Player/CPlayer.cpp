@@ -8,9 +8,8 @@
 //============================================================================
 CPlayer::CPlayer()
 	: m_TurnSpeed	( 0.1f )
-	, m_MoveSpeed	( 0.1f )
+	, m_MoveSpeed	( 1.5f )
 	, m_CamRevision	( 2.f )
-	, m_JumpPower	( 117.6f )
 	, m_SumVec		(ZEROVEC3)
 {
 	m_CharaInfo.HP = 8;
@@ -73,7 +72,7 @@ void CPlayer::KeyInput()
 	
 
 	//----------------------------------------------------------------------
-	//		移動処理.
+	//		WASDで移動.
 	//----------------------------------------------------------------------
 	
 	// カメラの向きベクトルを取得.
@@ -92,36 +91,41 @@ void CPlayer::KeyInput()
 	D3DXVec3Cross(&left, &camDir, &upvec);
 	D3DXVec3Normalize(&left, &left);
 
-	// WASDで移動.
-	if (Key->IsKeyDown( DIK_W )) { forward += camDir; }
-	if (Key->IsKeyDown( DIK_S )) { forward -= camDir; }
-	if (Key->IsKeyDown( DIK_A )) { forward += left; }
-	if (Key->IsKeyDown( DIK_D )) { forward -= left; }
+	if (Key->IsKeyDown( DIK_W )) { forward += camDir * m_MoveSpeed; }
+	if (Key->IsKeyDown( DIK_S )) { forward -= camDir * m_MoveSpeed; }
+	if (Key->IsKeyDown( DIK_A )) { forward += left * m_MoveSpeed; }
+	if (Key->IsKeyDown( DIK_D )) { forward -= left * m_MoveSpeed; }
 
 	// 最終的な移動方向を速度ベクトルに変換し合計の移動量に渡す.
 	m_SumVec += forward * moveSpeed;
 
 
 	//----------------------------------------------------------------------
+	//		ジャンプ処理.
+	//----------------------------------------------------------------------
+	if (Key->IsKeyAction(DIK_SPACE) && m_CanJump)
+	{
+		m_JumpPower = m_JumpPowerMax; 
+		m_CanJump = false; 
+	}
+	m_vPosition.y += m_JumpPower;
+
+
+	//----------------------------------------------------------------------
 	//		左クリックで射撃.
 	//----------------------------------------------------------------------
 	if (Mouse->IsLAction()) {
-		// カメラの向きベクトルを取得.
-		D3DXVECTOR3 direction = CCamera::GetInstance()->GetCamDir();
-		m_pBullets.push_back(new CBullet());	// m_pBullets に追加.
+		m_pBullets.push_back(new CBullet());
 
 		m_pBullets.back()->AttachMesh(*m_pMeshBullet);	// メッシュを設定.
-		m_pBullets.back()->SetPos(0.f, -1000.f, 0.f);	//初期位置を仮設定.
+		m_pBullets.back()->SetPos(0.f, -1000.f, 0.f);	// 初期位置を仮設定.
+		m_pBullets.back()->SetScale(10.f, 10.f, 10.f);	// サイズを仮設定.
 
-		// ベクトルのノーマライズ（方向のみを抽出）.
-		D3DXVec3Normalize(&direction, &direction);
-
-		// 初期位置,移動方向の単位ベクトル,弾の向き,速度がいるため保留.
+		// 弾の初期位置,移動方向の単位ベクトル,速度を設定.
 		m_pBullets.back()->Init(
 			m_pGun->GetShootPos(),
 			CCamera::GetInstance()->GetCamDir(),
-			direction,
-			0.01f );
+			1.f );
 	}
 
 	// 合計のベクトル量分位置を更新.

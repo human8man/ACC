@@ -49,4 +49,15 @@ void CGun::UpdateGunPos(const D3DXVECTOR3& center, float radius, float playerYaw
 
 	// プレイヤーの位置を基準に最終位置を計算.
 	m_vPosition = center + rotatedPosition;
+
+	// 銃口の相対位置を指定.
+	// X: 銃の右方向（銃の幅が必要なら考慮）、Y: 銃の高さ、Z: 銃の前方向（銃身の長さ）.
+	D3DXVECTOR3 barrelOffset(3.f, 0.7f, 1.f);
+
+	// オフセットを銃の回転に基づいて回転させる.
+	D3DXVECTOR3 rotatedBarrelOffset;
+	D3DXVec3TransformCoord(&rotatedBarrelOffset, &barrelOffset, &rotationMatrix);
+
+	// 銃口の最終位置を計算.
+	m_ShootPoint = m_vPosition + rotatedBarrelOffset;
 }

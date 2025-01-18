@@ -42,14 +42,13 @@ public:
 	virtual void Update() override;
 	virtual void Draw(D3DXMATRIX& View, D3DXMATRIX& Proj,LIGHT& Light) override;
 
+	// ジャンプ関連.
+	void CanJump() { m_CanJump = true; } // ジャンプを可能にする.
 
-	void UseGravity() { m_vPosition.y -= m_Gravity; }
-
-
-
-
-
-
+	// 重力関連.
+	void ResetGravity()	{ m_Gravity		 = m_GravityValue; } // 重力をリセットする.
+	void AddGravity()	{ m_Gravity		+= m_GravityValue; } // 重力を加算していく.
+	void UseGravity()	{ m_vPosition.y -= m_Gravity;	   } // 加算した重力をキャラのY値に減算.
 
 	// Y軸方向へ伸ばしたレイを取得.
 	RAY GetRayY() const { return *m_pRayY; }
@@ -68,7 +67,13 @@ protected:
 
 	float m_GunRadius;		// 銃の半径.
 	float m_GunRotRevision;	// 銃の向き補正値.
-	float m_Gravity;		// 重力.
+	float m_GunPosRevision;	// 銃の回転座標補正値(度).
+	float m_Gravity;		// 実際に掛かる重力.
+	float m_GravityValue;	// 重力（定数）.
+
+	float m_JumpPower;		// ジャンプ力.
+	float m_JumpPowerMax;	// 最大ジャンプ力.
+	bool m_CanJump;			// ジャンプが可能か.
 
 	CharaInfo m_CharaInfo;	// キャラの情報.
 };

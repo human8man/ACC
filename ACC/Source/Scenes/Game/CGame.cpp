@@ -71,11 +71,11 @@ HRESULT CGame::LoadData()
 	m_pCylinder	->Init( _T("Data\\Mesh\\Static\\Stage\\Rectangular.x"	));
 
 	// メッシュをアタッチする.
-	m_pPlayer->AttachMesh( *m_pEgg);
-	m_pGround->AttachMesh( *m_pFloor);
+	m_pPlayer->AttachMesh( *m_pEgg );
+	m_pGround->AttachMesh( *m_pFloor );
 
 	// キャラクターの初期座標を設定.
-	m_pPlayer->SetPos( 0.f, 14.f, 6.f );
+	m_pPlayer->SetPos( 0.f, 1.f, 6.f );
 	m_pCylinder->SetPos( 10.f, -0.3f, 10.f );
 
 	// カメラの初期化.
@@ -223,8 +223,6 @@ void CGame::CollisionJudge()
 		m_pPlayer->GetScale(),
 		m_pEgg->GetVertices());
 
-	// プレイヤーに重力を加える.
-	m_pPlayer->UseGravity();
 
 	// 卵と床の判定を返す.
 	CollisionPoints pointsef = m_pGJK->GJK(Egg,Floor);
@@ -233,6 +231,8 @@ void CGame::CollisionJudge()
 
 	if (pointsef.Col)
 	{
+		// プレイヤーにかかる重力をリセットする.
+		m_pPlayer->ResetGravity();
 		if (pointsef.Normal.y < 0.f) // 法線が下方向を向いている場合（地面に衝突している）.
 		{
 			// 衝突深度に基づいてプレイヤーを押し戻す.
@@ -259,6 +259,17 @@ void CGame::CollisionJudge()
 			m_pPlayer->AddVec(PlayerMove);
 		}
 	}
+	else {
+		// プレイヤーにかかる重力を増やす.
+		m_pPlayer->AddGravity();
+		// ジャンプを可能にする.
+		m_pPlayer->CanJump();
+		// ジャンプで加算される値を減らす.
+		m_pPlayer->JumpPowerDec();
+	}
+
+	// プレイヤーに重力を加える.
+	m_pPlayer->UseGravity();
 
 
 	if (pointsec.Col) {

@@ -15,11 +15,10 @@ public:
 	virtual void Update() override;
 	virtual void Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light ) override;
 
-	// 初期化(初期位置,移動方向の単位ベクトル,弾の向き,速度).
+	// 初期化(初期位置,移動方向の単位ベクトル,速度).
 	void Init(
 		const D3DXVECTOR3& pos,
 		const D3DXVECTOR3& vector,
-		const D3DXVECTOR3& bulletvector,
 		const float& speed );
 
 	// 弾が削除可能か.

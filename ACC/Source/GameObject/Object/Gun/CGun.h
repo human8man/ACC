@@ -17,6 +17,11 @@ public:
 
 	// ”­ËˆÊ’u‚Ìİ’è.
 	void SetShootPos(D3DXVECTOR3& pos) { m_ShootPoint = pos; }
+	void SetShootPos(float x, float y, float z) {
+		m_ShootPoint.x = x;
+		m_ShootPoint.y = y;
+		m_ShootPoint.z = z;
+	};
 
 	// ”­ËˆÊ’u‚Ìæ“¾.
 	D3DXVECTOR3 GetShootPos() const { return m_ShootPoint; }
