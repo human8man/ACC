@@ -23,6 +23,10 @@ CCharacter::CCharacter()
 	, m_JumpPower		( 0.f )
 	, m_JumpPowerMax	( 0.784f )
 	, m_CanJump			( false )
+
+	, m_EggAirRoomY		( 0.5f )
+
+	, m_CharaInfo		()
 {
 	// ƒŒƒC‚Ìİ’è.
 	m_pRayY			= new RAY();

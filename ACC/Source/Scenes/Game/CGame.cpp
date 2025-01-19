@@ -9,6 +9,7 @@
 #include "Camera/CCamera.h"
 #include "Object/Ground/CGround.h"
 #include "Character/Player/CPlayer.h"
+#include "Character/Enemy/CEnemy.h"
 
 #if _DEBUG
 	#include "ImGui/CImGui.h"
@@ -28,6 +29,7 @@ CGame::CGame(HWND hWnd)
 	, m_pCylinder	( nullptr )
 	
 	, m_pPlayer		( nullptr )
+	, m_pEnemy		( nullptr )
 	, m_pGround		( nullptr )
 
 	, m_pGJK		( nullptr )
@@ -51,13 +53,13 @@ CGame::~CGame()
 void CGame::Create()
 {
 	// インスタンス生成.
-	m_pEgg		= new CStaticMesh();
-	m_pFloor	= new CStaticMesh();
-	m_pCylinder = new CStaticMesh();
-
-	m_pPlayer	= new CPlayer();
-	m_pGround	= new CGround();
-	m_pCamRay	= new CRay();
+	m_pEgg		= std::make_unique<CStaticMesh>();
+	m_pFloor	= std::make_unique<CStaticMesh>();
+	m_pCylinder = std::make_unique<CStaticMesh>();
+	m_pPlayer	= std::make_unique<CPlayer>();
+	m_pEnemy	= std::make_unique<CEnemy>();
+	m_pGround	= std::make_unique<CGround>();
+	m_pCamRay	= std::make_unique<CRay>();
 }
 
 //============================================================================
@@ -72,10 +74,12 @@ HRESULT CGame::LoadData()
 
 	// メッシュをアタッチする.
 	m_pPlayer->AttachMesh( *m_pEgg );
+	m_pEnemy->AttachMesh( *m_pEgg );
 	m_pGround->AttachMesh( *m_pFloor );
 
 	// キャラクターの初期座標を設定.
 	m_pPlayer->SetPos( 0.f, 1.f, 6.f );
+	m_pEnemy->SetPos( 10.f, 1.f, 6.f );
 	m_pCylinder->SetPos( 10.f, -0.3f, 10.f );
 
 	// カメラの初期化.
@@ -92,12 +96,13 @@ HRESULT CGame::LoadData()
 //============================================================================
 void CGame::Release()
 {
-	SAFE_DELETE(m_pCamRay);
-	SAFE_DELETE(m_pGround);
-	SAFE_DELETE(m_pPlayer);
-	SAFE_DELETE(m_pCylinder);
-	SAFE_DELETE(m_pEgg);
-	SAFE_DELETE(m_pFloor);
+	m_pCamRay.reset();
+	m_pGround.reset();
+	m_pEnemy.reset();
+	m_pPlayer.reset();
+	m_pCylinder.reset();
+	m_pEgg.reset();
+	m_pFloor.reset();
 
 	// 外部で作成しているので、ここで破棄しない.
 	m_hWnd = nullptr;
@@ -136,12 +141,13 @@ void CGame::Update()
 	}
 
 	// 敵のHPが０になったとき.
-	//if(m_pEnemy->GetCharaInfo().HP == 0)
-	//{
-	//	CSceneManager::GetInstance()->LoadScene(SceneList::Title);
-	//}
+	if(m_pEnemy->GetCharaInfo().HP == 0)
+	{
+		CSceneManager::GetInstance()->LoadScene(SceneList::Title);
+	}
 
 	CollisionJudge();
+
 
 #if _DEBUG
 	// カメラ側のキー操作を無効にする.
@@ -161,6 +167,7 @@ void CGame::Draw()
 
 	m_pGround->Draw( m_mView, m_mProj, m_Light );
 	m_pPlayer->Draw( m_mView, m_mProj, m_Light );
+	m_pEnemy->Draw( m_mView, m_mProj, m_Light );
 	m_pCylinder->Render( m_mView, m_mProj, m_Light );
 
 	// エフェクトの描画.
@@ -173,35 +180,7 @@ void CGame::Draw()
 //-----------------------------------------------------------------------------
 void CGame::CollisionJudge()
 {
-	//		プレイヤーとか敵クラスにいつか実装する内容ではあるが
-	//		今はその時ではないので "内容" を忘れ "ないよう" にコメント化.
-	
-	//// 弾とプレイヤーの判定.
-	//for (size_t i = 0; i < m_pBullets.size(); ++i) {
-
-	//	m_MeshB.SetVertex(
-	//		m_pBullets[i]->GetPos(),
-	//		m_pBullets[i]->GetRot(),
-	//		m_pBullets[i]->GetScale(),
-	//		m_pMeshBullet->GetVertices());
-
-	//	m_MeshA.SetVertex(
-	//		m_pPlayer->GetPos(),
-	//		m_pPlayer->GetRot(),
-	//		m_pPlayer->GetScale(),
-	//		m_pMeshEgg->GetVertices());
-
-	//	CollisionPoints points = m_pGJK->GJK(m_MeshA, m_MeshB);
-
-	//	// あたった場合削除.
-	//	if (points.HasCollision)
-	//	{
-	//		SAFE_DELETE(m_pBullets[i]);
-	//		m_pBullets.erase(m_pBullets.begin() + i);
-	//		--i;
-	//	}
-	//}
-	MeshCollider Egg,Floor,Cylinder;
+	MeshCollider PlayerEgg, Floor, Cylinder;
 
 	Cylinder.SetVertex(
 		m_pCylinder->GetPos(),
@@ -217,7 +196,7 @@ void CGame::CollisionJudge()
 		m_pFloor->GetVertices());
 
 	// プレイヤーデータ設定.
-	Egg.SetVertex(
+	PlayerEgg.SetVertex(
 		m_pPlayer->GetPos(),
 		m_pPlayer->GetRot(),
 		m_pPlayer->GetScale(),
@@ -225,45 +204,47 @@ void CGame::CollisionJudge()
 
 
 	// 卵と床の判定を返す.
-	CollisionPoints pointsef = m_pGJK->GJK(Egg,Floor);
+	CollisionPoints pointspef = m_pGJK->GJK(PlayerEgg, Floor);
 	// 卵と円柱の判定を返す.
-	CollisionPoints pointsec = m_pGJK->GJK(Cylinder, Egg);
+	CollisionPoints pointspec = m_pGJK->GJK(Cylinder, PlayerEgg);
 
-	if (pointsef.Col)
+
+	//------------------------------------------------------------------------------
+	//		卵と床の判定処理.
+	//------------------------------------------------------------------------------
+	if (pointspef.Col)
 	{
 		// プレイヤーにかかる重力をリセットする.
 		m_pPlayer->ResetGravity();
-		if (pointsef.Normal.y < 0.f) // 法線が下方向を向いている場合（地面に衝突している）.
+		// ジャンプを可能にする.
+		m_pPlayer->CanJump();
+
+		// 法線が下方向を向いている場合（地面に衝突している）.
+		if (pointspef.Normal.y < 0.f)
 		{
 			// 衝突深度に基づいてプレイヤーを押し戻す.
-			D3DXVECTOR3 SetPos = m_pPlayer->GetPos() - pointsef.Normal * pointsef.Depth;
+			D3DXVECTOR3 SetPos = m_pPlayer->GetPos() - pointspef.Normal * pointspef.Depth;
 
 			// プレイヤーの位置を修正後の座標に更新.
 			m_pPlayer->SetPos(SetPos);
 		}
-		else // 法線が下方向以外（壁や斜面）を向いている場合.
-		{
-			// 法線を正規化して単位ベクトルにする（計算精度を高めるため）.
-			D3DXVec3Normalize(&pointsef.Normal, &pointsef.Normal);
+		// 法線が下方向以外（壁や斜面）を向いている場合.
+		else {
+			D3DXVec3Normalize(&pointspef.Normal, &pointspef.Normal);	// 正規化.
 
 			// プレイヤーの現在の移動ベクトルを取得.
 			D3DXVECTOR3 PlayerMove = m_pPlayer->GetMoveVec();
-
 			// プレイヤーの移動ベクトルと法線ベクトルの内積を計算（進行方向と法線の重なり具合を取得）.
-			float Dot = D3DXVec3Dot(&PlayerMove, &pointsef.Normal);
-
+			float Dot = D3DXVec3Dot(&PlayerMove, &pointspef.Normal);
 			// 法線方向の移動成分を除去して、壁に沿った移動成分のみを残す.
-			PlayerMove = PlayerMove - Dot * pointsef.Normal;
-
-			// 修正した移動ベクトルをプレイヤーに適用.
+			PlayerMove = PlayerMove - Dot * pointspef.Normal;
+			// 修正した移動ベクトルをプレイヤーに加算.
 			m_pPlayer->AddVec(PlayerMove);
 		}
 	}
 	else {
 		// プレイヤーにかかる重力を増やす.
 		m_pPlayer->AddGravity();
-		// ジャンプを可能にする.
-		m_pPlayer->CanJump();
 		// ジャンプで加算される値を減らす.
 		m_pPlayer->JumpPowerDec();
 	}
@@ -272,32 +253,64 @@ void CGame::CollisionJudge()
 	m_pPlayer->UseGravity();
 
 
-	if (pointsec.Col) {
+	//------------------------------------------------------------------------------
+	//		卵と柱の判定処理.
+	//------------------------------------------------------------------------------
+	if (pointspec.Col) {
 		// 法線を正規化して単位ベクトルにする（計算精度を高めるため）.
-		D3DXVec3Normalize(&pointsec.Normal, &pointsec.Normal);
+		D3DXVec3Normalize(&pointspec.Normal, &pointspec.Normal);
 
 		// プレイヤーの現在の移動ベクトルを取得.
 		D3DXVECTOR3 PlayerMove = m_pPlayer->GetMoveVec();
-
 		// プレイヤーの移動ベクトルと法線ベクトルの内積を計算（進行方向と法線の重なり具合を取得）.
-		float Dot = D3DXVec3Dot(&PlayerMove, &pointsec.Normal);
-
+		float Dot = D3DXVec3Dot(&PlayerMove, &pointspec.Normal);
 		// 法線方向の移動成分を除去して、壁に沿った移動成分のみを残す.
-		PlayerMove = PlayerMove - Dot * pointsec.Normal;
+		PlayerMove = PlayerMove - Dot * pointspec.Normal;
+
 
 		// 修正した移動ベクトルをプレイヤーに適用.
 		m_pPlayer->AddVec(PlayerMove);
-		m_pPlayer->SetPos(m_pPlayer->GetPos() + pointsec.Normal * pointsec.Depth);
+		m_pPlayer->SetPos(m_pPlayer->GetPos() + pointspec.Normal * pointspec.Depth);
 
-		if (pointsec.Depth < 0.05f){
+		if (pointspec.Depth < 0.05f) {
 			m_pPlayer->AddVec(-m_pPlayer->GetMoveVec());
 		}
 	}
- 
-	// 地面とカメラレイの判定(弾の到着地点に使用する).
+
+	//------------------------------------------------------------------------------
+	//		地面とカメラレイの判定(弾の到着地点に使用する).
+	//------------------------------------------------------------------------------
 	auto [hit, hitpos, length] = m_pGround->IsHitForRay(CCamera::GetInstance()->GetRay());
-	
+	if( hit ) { 
+		CCamera::GetInstance()->SetRayHit(hitpos); 
+	}
+	else {
+		//auto [hit, hitpos, length] = m_pCylinder->IsHitForRay(CCamera::GetInstance()->GetRay());
+		CCamera::GetInstance()->SetRayHit(hitpos);
+	}
+
+	//------------------------------------------------------------------------------
+	//		プレイヤーの当たり判定処理をする.
+	//------------------------------------------------------------------------------
+	m_pPlayer->Collision(m_pEnemy, Floor, Cylinder);
+
+
+
+
 #if _DEBUG
+	//-----------------------------------------------------
+	// キャラクターウィンドウ.
+	//-----------------------------------------------------
+
+	ImGui::Begin("CharaWindow");
+
+	ImGui::Text("%d", m_pPlayer->GetCharaInfo().HP);
+	ImGui::Text("%d", m_pEnemy->GetCharaInfo().HP);
+
+	ImGui::End();
+
+
+
 	//-----------------------------------------------------
 	// プレイヤーウィンドウ.
 	//-----------------------------------------------------
@@ -317,23 +330,6 @@ void CGame::CollisionJudge()
 
 	D3DXVECTOR3 camrot = CCamera::GetInstance()->GetRot();
 	ImGui::Text("%f,%f,%f", camrot.x, camrot.y, camrot.z);
-	ImGui::End();
-
-	//-----------------------------------------------------
-	// 当たり判定のウィンドウ.
-	//-----------------------------------------------------
-	ImGui::Begin("ColWindow");
-
-	//if(hit) { ImGui::Text("true");	}
-	//else	{ ImGui::Text("false");	}
-	//ImGui::Text("%f,%f,%f",hitpos.x,hitpos.y,hitpos.z );
-	//ImGui::Text("%f",length );
-
-	if(pointsec.Col) { ImGui::Text("true");	}
-	else			 { ImGui::Text("false");}
-	ImGui::Text("%f,%f,%f", pointsec.Normal.x, pointsec.Normal.y, pointsec.Normal.z);
-	ImGui::Text("%f", pointsec.Depth);
-
 	ImGui::End();
 #endif
 }

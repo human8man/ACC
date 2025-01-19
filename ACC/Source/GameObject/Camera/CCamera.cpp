@@ -14,6 +14,7 @@ CCamera::CCamera()
 	, m_MouseMoveDis	( ZEROVEC2 )
 	, m_CameraRot		( ZEROVEC3 )
 	, m_DirectionPos	( ZEROVEC3 )
+	, m_RayHitPoint		( ZEROVEC3 )
 
 	, m_Fov				( 60.0f )
 	, m_DefaultFov		( 60.0f )

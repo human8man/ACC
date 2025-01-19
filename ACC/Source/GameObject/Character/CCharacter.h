@@ -4,6 +4,7 @@
 #include "Collision/Ray/CRay.h"
 #include "Object/Bullet/CBullet.h"
 #include "Object/Gun/CGun.h"
+#include "Collision/GJK/CGJK.h"
 
 //============================================================================
 //		キャラクタークラス.
@@ -50,6 +51,10 @@ public:
 	void AddGravity()	{ m_Gravity		+= m_GravityValue; } // 重力を加算していく.
 	void UseGravity()	{ m_vPosition.y -= m_Gravity;	   } // 加算した重力をキャラのY値に減算.
 
+	void DecreHP()		{ m_CharaInfo.HP--; }	 // HPを減らす.
+	void DubleDecreHP()	{ m_CharaInfo.HP -= 2; } // HPを二倍減らす.
+
+
 	// Y軸方向へ伸ばしたレイを取得.
 	RAY GetRayY() const { return *m_pRayY; }
 	// 十字レイを取得.
@@ -74,6 +79,8 @@ protected:
 	float m_JumpPower;		// ジャンプ力.
 	float m_JumpPowerMax;	// 最大ジャンプ力.
 	bool m_CanJump;			// ジャンプが可能か.
+
+	float m_EggAirRoomY;	// 気室の高さ判定用.
 
 	CharaInfo m_CharaInfo;	// キャラの情報.
 };

@@ -2,6 +2,7 @@
 
 CEnemy::CEnemy()
 {
+	m_CharaInfo.HP = 8;
 }
 
 CEnemy::~CEnemy()

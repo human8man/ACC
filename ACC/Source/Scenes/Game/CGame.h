@@ -43,17 +43,18 @@ private:
 	D3DXMATRIX	m_mView;	// ビュー(カメラ)行列.
 	D3DXMATRIX	m_mProj;	// 射影（プロジェクション）行列.
 
-	CStaticMesh*	m_pEgg;		// たまご.
-	CStaticMesh*	m_pFloor;	// 地面.
-	CStaticMesh*	m_pCylinder;// 柱.
+	std::unique_ptr<CStaticMesh> m_pEgg;		// たまご.
+	std::unique_ptr<CStaticMesh> m_pFloor;		// 地面.
+	std::unique_ptr<CStaticMesh> m_pCylinder;	// 柱.
 		
-	CPlayer*	m_pPlayer;
-	CGround*	m_pGround;
+	std::unique_ptr<CPlayer>	m_pPlayer;
+	std::unique_ptr<CEnemy>		m_pEnemy;
+	std::unique_ptr<CGround>	m_pGround;
 
 	// GJKクラス.
 	std::unique_ptr<CGJK> m_pGJK;
 
-	CRay* m_pCamRay;
+	std::unique_ptr<CRay> m_pCamRay;
 
 	float m_Angle;
 };

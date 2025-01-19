@@ -1,6 +1,8 @@
 #pragma once
 #include "Character/CCharacter.h"
 
+class CEnemy;
+
 //============================================================================
 //		プレイヤークラス.
 //============================================================================
@@ -21,14 +23,20 @@ public:
 	void AddVec(D3DXVECTOR3 vec) { m_vPosition += vec; }
 	void JumpPowerDec() { if (m_JumpPower > 0) { m_JumpPower -= m_Gravity; } }
 
+	// 当たり判定処理(的卵、床、柱).
+	void Collision(std::unique_ptr<CEnemy>& egg, MeshCollider floor, MeshCollider cylinder);
+
 private:
 	// キー入力処理.
 	void KeyInput();
 
 private:
+	// GJKクラス.
+	std::unique_ptr<CGJK> m_pGJK;
+
 	float m_TurnSpeed;	 // 回転速度.
 	float m_MoveSpeed;	 // 移動速度.
 	float m_CamRevision; // カメラ座標の補正値.
 
-	D3DXVECTOR3 m_SumVec; // 合計のベクトル量.
+	D3DXVECTOR3 m_SumVec;		// 合計のベクトル量.
 };

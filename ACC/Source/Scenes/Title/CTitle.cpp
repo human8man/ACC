@@ -116,20 +116,28 @@ void CTitle::Update()
 	POINT MousePos;
 	GetCursorPos(&MousePos);
 
-	// ウィンドウ位置を取得(ウィンドウタブを含む).
+
+	// ウィンドウ全体の位置とサイズを取得(ウィンドウタブや枠を含む).
 	RECT WindowRect;
 	GetWindowRect(m_hWnd, &WindowRect);
+
+	// クライアント領域の位置とサイズを取得 (ウィンドウ内の描画範囲).
 	RECT clientRect;
 	GetClientRect(m_hWnd, &clientRect);
 
-	POINT topLeft = { clientRect.left, clientRect.top };
+	// クライアント領域の左上と右下の座標を初期化.
+	POINT topLeft	  = { clientRect.left, clientRect.top };
 	POINT bottomRight = { clientRect.right, clientRect.bottom };
+
+	// クライアント領域の座標をスクリーン座標系に変換.
 	ClientToScreen(m_hWnd, &topLeft);
 	ClientToScreen(m_hWnd, &bottomRight);
 
-	int borderLeft = topLeft.x - WindowRect.left;
-	int borderTop = topLeft.y - WindowRect.top;
+	// ウィンドウ全体の左上座標とクライアント領域の左上座標の差分を計算.
+	int borderLeft	= topLeft.x - WindowRect.left;
+	int borderTop	= topLeft.y - WindowRect.top;
 
+	// フレーム幅を含んだウィンドウの位置を算出.
 	D3DXVECTOR2 windowrect = D3DXVECTOR2(
 		static_cast<float>(borderLeft + WindowRect.left),
 		static_cast<float>(borderTop + WindowRect.top));

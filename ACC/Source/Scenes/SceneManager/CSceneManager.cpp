@@ -81,6 +81,7 @@ void CSceneManager::Update()
 		m_pScene.release();
 		m_pScene = CreateScene(m_NextSceneNo);
 		m_pScene->Create();
+		m_pScene->Init();
 		m_pScene->LoadData();
 	}
 

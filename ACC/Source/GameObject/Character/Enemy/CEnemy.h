@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../GameObject/Character/CCharacter.h"
+#include "Character/CCharacter.h"
 
 /**************************************************
 *	エネミークラス.
