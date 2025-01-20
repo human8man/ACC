@@ -4,8 +4,9 @@
 #include "Scenes/SceneManager/CSceneManager.h"
 #include "Common/DirectInput/CDirectInput.h"
 #include "DirectSound/CSoundManager.h"
-#include "../GameObject/Camera/CCamera.h"
-#include "Effect/CEffect.h"	//Effekseerを使うためのクラス.
+#include "Camera/CCamera.h"
+#include "Effect/CEffect.h"
+#include "Common/Time/CTime.h"
 
 // ImGuiはデバッグ時のみ使用する.
 #ifdef _DEBUG
@@ -16,7 +17,7 @@
 #include <thread>
 #include <chrono>
 #include <cmath>
-#include <dwmapi.h>	//ダークモード？.
+#include <dwmapi.h>	//ダークモード用.
 #pragma comment(lib, "dwmapi.lib")
 
 const TCHAR WND_TITLE[] = _T( "ACC" );
@@ -76,6 +77,9 @@ HRESULT CMain::Create() const
 //=================================================
 void CMain::Update()
 {
+	// タイムクラスの更新(一度のみ通す).
+	CTime::GetInstance()->Update();
+
 	// CDInputの更新処理.
 	CDInput::GetInstance()->InputUpdate();
 

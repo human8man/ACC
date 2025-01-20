@@ -10,6 +10,7 @@
 #include "Object/Ground/CGround.h"
 #include "Character/Player/CPlayer.h"
 #include "Character/Enemy/CEnemy.h"
+#include "Sprite/2D/UI/CGameUI/CGameUI.h"
 
 #if _DEBUG
 	#include "ImGui/CImGui.h"
@@ -60,6 +61,8 @@ void CGame::Create()
 	m_pEnemy	= std::make_unique<CEnemy>();
 	m_pGround	= std::make_unique<CGround>();
 	m_pCamRay	= std::make_unique<CRay>();
+	m_pGameUI	= std::make_unique<CGameUI>();
+	m_pGameUI	->Create();
 }
 
 
@@ -98,7 +101,8 @@ HRESULT CGame::LoadData()
 //============================================================================
 void CGame::Release()
 {
-	m_pCamRay.reset();
+	m_pGameUI.reset();
+	m_pCamRay.reset();                               
 	m_pGround.reset();
 	m_pEnemy.reset();
 	m_pPlayer.reset();
@@ -127,6 +131,8 @@ void CGame::Update()
 {
 	CKey* Key = CDInput::GetInstance()->CDKeyboard();
 
+	// その他とカメラレイの判定(弾の到着地点に使用する).
+	RaytoObjeCol();
 
 	m_pPlayer->Update(); // プレイヤーの更新.
 	m_pEnemy->Update();	 // エネミーの更新.
@@ -146,6 +152,7 @@ void CGame::Update()
 
 	CollisionJudge();
 
+	m_pGameUI->Update();
 
 #if _DEBUG
 	//-----------------------------------------------------
@@ -196,6 +203,7 @@ void CGame::Draw()
 	m_pPlayer->Draw( m_mView, m_mProj, m_Light );
 	m_pEnemy->Draw( m_mView, m_mProj, m_Light );
 	m_pCylinder->Render( m_mView, m_mProj, m_Light );
+	m_pGameUI->Draw();
 
 	// エフェクトの描画.
 	CEffect::GetInstance()->Draw( m_mView, m_mProj, m_Light );
@@ -242,9 +250,9 @@ void CGame::CollisionJudge()
 	CollisionPoints pointspef = m_pGJK->GJK(PlayerEgg, Floor);
 	// プレイヤーと円柱の判定を返す.
 	CollisionPoints pointspec = m_pGJK->GJK(Cylinder, PlayerEgg);
-	// プレイヤーと床の判定を返す.
+	// 敵と床の判定を返す.
 	CollisionPoints pointseef = m_pGJK->GJK(EnemyEgg, Floor);
-	// プレイヤーと円柱の判定を返す.
+	// 敵と円柱の判定を返す.
 	CollisionPoints pointseec = m_pGJK->GJK(Cylinder, EnemyEgg);
 
 
@@ -267,9 +275,6 @@ void CGame::CollisionJudge()
 	// エネミーと柱の判定処理.
 	EnemytoCylinderCol(pointseec);
 
-
-	// その他とカメラレイの判定(弾の到着地点に使用する).
-	RaytoObjeCol();
 
 	// プレイヤーの当たり判定処理をする.
 	m_pPlayer->Collision(m_pEnemy, Floor, Cylinder);
@@ -418,17 +423,23 @@ void CGame::RaytoObjeCol()
 {
 	// レイ情報用の変数.
 	RayInfo SendCamera, GroundRay, CylinderRay;
-	
-	// カメラレイと各オブジェごとの判定情報を取得.
-	GroundRay = m_pGround->IsHitForRay(CCamera::GetInstance()->GetRay());
-	CylinderRay = m_pCylinder->IsHitForRay(CCamera::GetInstance()->GetRay());
+	D3DXVECTOR3 camlookpos = CCamera::GetInstance()->GetPos() + CCamera::GetInstance()->GetCamDir() * 100.f;
+	SendCamera = { false, camlookpos, 5000.f };
 
-	// グラウンドで初期化.
-	SendCamera = GroundRay;
+	// カメラレイと各オブジェごとの判定情報を取得.
+	GroundRay	= m_pGround->IsHitForRay(CCamera::GetInstance()->GetRay());
+	CylinderRay	= m_pCylinder->IsHitForRay(CCamera::GetInstance()->GetRay());
 
 	// どのオブジェが最も近いかを探す.
-	if(SendCamera.Length < CylinderRay.Length) {
-		SendCamera = CylinderRay;
+	if (GroundRay.Hit) {
+		if (SendCamera.Length > GroundRay.Length) {
+			SendCamera = GroundRay;
+		}
+	}
+	if (CylinderRay.Hit) {
+		if (SendCamera.Length > CylinderRay.Length) {
+			SendCamera = CylinderRay;
+		}
 	}
 
 	// 最終的に最短距離にある物のあたった座標を渡す.

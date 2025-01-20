@@ -4,6 +4,10 @@
 #include "Camera/CCamera.h"
 #include "Character/Enemy/CEnemy.h"
 
+#if _DEBUG
+#include "ImGui/CImGui.h"
+#endif
+
 //============================================================================
 //		プレイヤークラス.
 //============================================================================
@@ -33,6 +37,10 @@ void CPlayer::Update()
 	// カメラに向きを合わせる.
 	m_vRotation.y = CCamera::GetInstance()->GetRot().y;
 	
+	// ダッシュ関連で0以上のものがある場合カウントをする.
+	if ( m_DashCoolTime >= 0.f ) { m_DashCoolTime -= CTime::GetInstance()->GetDeltaTime(); }
+	if ( m_DashTime >= 0.f ){ m_DashTime -= CTime::GetInstance()->GetDeltaTime(); }
+
 	// 入力処理.
 	KeyInput();
 
@@ -101,6 +109,7 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, MeshCollider floor, MeshCo
 			SAFE_DELETE(m_pBullets[i]);
 			m_pBullets.erase(m_pBullets.begin() + i);
 			--i;
+			continue;
 		}
 
 		// エネミーと弾が当たった場合.
@@ -113,6 +122,7 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, MeshCollider floor, MeshCo
 			SAFE_DELETE(m_pBullets[i]);
 			m_pBullets.erase(m_pBullets.begin() + i);
 			--i;
+			continue;
 		}
 	}
 }
@@ -130,27 +140,61 @@ void CPlayer::KeyInput()
 	//----------------------------------------------------------------------
 	//		WASDで移動.
 	//----------------------------------------------------------------------
-	// カメラの向きベクトルを取得.
-	D3DXVECTOR3 camDir = CCamera::GetInstance()->GetCamDir();
-	camDir.y = 0.f;	// Y情報があると飛び始めるのでYの要素を抜く.
-	D3DXVec3Normalize(&camDir, &camDir); // 正規化.
-		
-	// 移動する方向ベクトル.
-	D3DXVECTOR3 forward(ZEROVEC3);
-	D3DXVECTOR3 left(ZEROVEC3);
-	D3DXVECTOR3 upvec(0, 1, 0);
+	// ダッシュ中は操作できないようにする.
+	if ( m_DashTime <= 0.f ) {
+		// 操作が可能な間は初期化する.
+		DashVec = ZEROVEC3;
 
-	// 左ベクトルを求める.
-	D3DXVec3Cross(&left, &camDir, &upvec);
-	D3DXVec3Normalize(&left, &left);
+		// カメラの向きベクトルを取得.
+		D3DXVECTOR3 camDir = CCamera::GetInstance()->GetCamDir();
+		camDir.y = 0.f;	// Y情報があると飛び始めるのでYの要素を抜く.
+		D3DXVec3Normalize(&camDir, &camDir); // 正規化.
 
-	if (Key->IsKeyDown( DIK_W )) { forward += camDir ; }
-	if (Key->IsKeyDown( DIK_S )) { forward -= camDir ; }
-	if (Key->IsKeyDown( DIK_A )) { forward += left ; }
-	if (Key->IsKeyDown( DIK_D )) { forward -= left ; }
+		// 移動する方向ベクトル.
+		D3DXVECTOR3 forward(ZEROVEC3);
+		D3DXVECTOR3 left(ZEROVEC3);
+		D3DXVECTOR3 upvec(0, 1, 0);
 
-	// 最終的なベクトル量を速度にかけ合計ベクトルに渡す.
-	m_SumVec += forward * m_MoveSpeed;
+		// 左ベクトルを求める.
+		D3DXVec3Cross(&left, &camDir, &upvec);
+		D3DXVec3Normalize(&left, &left);
+
+		if (Key->IsKeyDown(DIK_W)) { forward += camDir; }
+		if (Key->IsKeyDown(DIK_S)) { forward -= camDir; }
+		if (Key->IsKeyDown(DIK_A)) { forward += left; }
+		if (Key->IsKeyDown(DIK_D)) { forward -= left; }
+
+		// 最終的なベクトル量を速度にかけ合計ベクトルに渡す.
+		m_SumVec += forward * m_MoveSpeed;
+	}
+
+	//----------------------------------------------------------------------
+	//		SHIFTでダッシュ.
+	//----------------------------------------------------------------------
+	// クールタイムが終了していたらダッシュ可能に.
+	if ( m_DashCoolTime <= 0.f ) { m_CanDash = true; }
+
+	// SHIFTでダッシュ.
+	if ( Key->IsKeyAction(DIK_LSHIFT) && m_CanDash) {
+		// ダッシュ時間の設定.
+		m_DashTime = m_DashTimeMax;
+		// ダッシュクールタイムの設定.
+		m_DashCoolTime = m_DashCoolTimeMax;
+
+		// 合計ベクトルに情報がない場合.
+		if (m_SumVec == ZEROVEC3) {
+			// カメラの向きベクトルを取得.
+			D3DXVECTOR3 camDir = CCamera::GetInstance()->GetCamDir();
+			camDir.y = 0.f;	// Y情報があると飛び始めるのでYの要素を抜く.
+			D3DXVec3Normalize(&camDir, &camDir); // 正規化.
+			DashVec = camDir * m_MoveSpeed * m_DashSpeed;
+			m_CanDash = false;
+		}
+		else {
+			DashVec = m_SumVec * m_DashSpeed;
+			m_CanDash = false;
+		}
+	}
 
 	//----------------------------------------------------------------------
 	//		ジャンプ処理.
@@ -163,6 +207,10 @@ void CPlayer::KeyInput()
 	m_vPosition.y += m_JumpPower;
 
 
+	// カメラのレイHit座標から発射地点のベクトルを計算.
+	D3DXVECTOR3 shootdir = CCamera::GetInstance()->GetRayHit() - m_pGun->GetShootPos();
+	D3DXVec3Normalize(&shootdir, &shootdir);	// 正規化.
+
 	//----------------------------------------------------------------------
 	//		左クリックで射撃.
 	//----------------------------------------------------------------------
@@ -171,16 +219,26 @@ void CPlayer::KeyInput()
 
 		m_pBullets.back()->AttachMesh(*m_pMeshBullet);	// メッシュを設定.
 		m_pBullets.back()->SetPos(0.f, -1000.f, 0.f);	// nullにならないように見えない座標に初期設定.
-		m_pBullets.back()->SetScale(10.f, 10.f, 10.f);	// サイズを設定.
+		m_pBullets.back()->SetScale(5.f, 5.f, 5.f);	// サイズを設定.
 
 
 		// 弾の初期位置,移動方向の単位ベクトル,速度を設定.
 		m_pBullets.back()->Init(
 			m_pGun->GetShootPos(),
-			CCamera::GetInstance()->GetCamDir(),
-			1.f );
+			shootdir,
+			0.8f );
 	}
 
 	// 合計のベクトル量分位置を更新.
-	m_vPosition += m_SumVec;
+	m_vPosition += m_SumVec + DashVec;
+
+#if _DEBUG
+	ImGui::Begin("DashWindow");
+	ImGui::Text("DashCoolTime%f", m_DashCoolTime);
+	ImGui::Text("DashTime%f", m_DashTime);
+	ImGui::Text("DeltaTime%f", CTime::GetInstance()->GetDeltaTime() );
+	ImGui::Text("%f,%f,%f", DashVec.x, DashVec.y, DashVec.z);
+	ImGui::End();
+
+#endif
 }

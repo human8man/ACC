@@ -14,6 +14,7 @@ class CGround;
 class CEnemy;
 class CPlayer;
 class CCharacter;
+class CGameUI;
 
 
 //============================================================================
@@ -71,6 +72,9 @@ private:
 	// GJKクラス.
 	std::unique_ptr<CGJK> m_pGJK;
 	std::unique_ptr<CRay> m_pCamRay;
+
+	// UIクラス.
+	std::unique_ptr<CGameUI> m_pGameUI;	
 
 	float m_Angle;
 };

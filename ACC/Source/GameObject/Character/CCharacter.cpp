@@ -24,6 +24,14 @@ CCharacter::CCharacter()
 	, m_JumpPowerMax	( 0.784f )
 	, m_CanJump			( false )
 
+	,m_DashCoolTime		( 0.f )
+	,m_DashCoolTimeMax	( CTime::GetInstance()->GetDeltaTime() * 180.f )
+	,m_DashTime			( 0.f )
+	,m_DashTimeMax		( CTime::GetInstance()->GetDeltaTime() * 30.f )
+	,m_DashSpeed		( 1.8f )
+	,m_CanDash			( true )
+	,DashVec			( ZEROVEC3 )
+
 	, m_EggAirRoomY		( 0.5f )
 
 	, m_CharaInfo		()

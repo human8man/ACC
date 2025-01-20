@@ -5,6 +5,7 @@
 #include "Object/Bullet/CBullet.h"
 #include "Object/Gun/CGun.h"
 #include "Collision/GJK/CGJK.h"
+#include "Common/Time/CTime.h"
 
 //============================================================================
 //		キャラクタークラス.
@@ -28,6 +29,7 @@ public:
 	struct CharaInfo
 	{
 		int HP;
+		int MaxHP;
 		int Ammo;
 		int MaxAmmo;
 		CharaState Status;
@@ -79,6 +81,14 @@ protected:
 	float m_JumpPower;		// ジャンプ力.
 	float m_JumpPowerMax;	// 最大ジャンプ力.
 	bool m_CanJump;			// ジャンプが可能か.
+
+	float m_DashCoolTime;	// ダッシュのクールタイム.
+	float m_DashCoolTimeMax;// ダッシュの最大クールタイム.
+	float m_DashTime;		// ダッシュの反映時間.
+	float m_DashTimeMax;	// ダッシュの最大反映時間.
+	float m_DashSpeed;		// ダッシュ倍率.
+	bool m_CanDash;			// ダッシュが可能か.
+	D3DXVECTOR3	DashVec;	// ダッシュのベクトル保存用.
 
 	float m_EggAirRoomY;	// 気室の高さ判定用.
 

@@ -1,16 +1,15 @@
-#include "CUIFade.h"
-#include "DirectX/CDirectX11.h"	// Depthで使用.
+#include "CGameUI.h"
+#include "DirectX/CDirectX11.h"
 #include "DirectSound/CSoundManager.h"
 
-
 namespace {
-	constexpr char FadeImagePath[] = "Data\\Texture\\other";
+	constexpr char FadeImagePath[] = "Data\\Texture\\Game";
 }
 
 //======================================================================================================================
-//		フェードクラス.
+//		ゲームUIクラス.
 //======================================================================================================================
-CUIFade::CUIFade()
+CGameUI::CGameUI()
 	: m_FadeStart	( false )
 	, m_Fading		( false )
 	, m_FadePeak	( false )
@@ -24,7 +23,7 @@ CUIFade::CUIFade()
 {
 }
 
-CUIFade::~CUIFade()
+CGameUI::~CGameUI()
 {
 	Release();
 }
@@ -32,7 +31,7 @@ CUIFade::~CUIFade()
 //======================================================================================================================
 //		構築関数.
 //======================================================================================================================
-void CUIFade::Create()
+void CGameUI::Create()
 {
 	int index = 0;
 
@@ -60,72 +59,10 @@ void CUIFade::Create()
 //======================================================================================================================
 //		更新.
 //======================================================================================================================
-void CUIFade::Update()
+void CGameUI::Update()
 {
-	// いつか追加されるかもしれない画像用にfor.
 	for ( size_t i = 0; i < m_pUIs.size(); ++i ) 
 	{
-		//------------------------------------------
-		//		黒画像の場合.
-		//------------------------------------------
-		if ( i == FadeSprite::Black )
-		{
-			// フェード開始.
-			if ( m_FadeStart ) {
-				m_FadeStart = false;
-				m_Fading	= true;
-				m_FadePeak	= false;
-				m_FadeEnd	= false;
-				m_Peaking = false;
-
-				m_AddAlpha	= m_AAVMAXVAL;
-			}
-
-			// フェード中.
-			if( m_Fading ) {
-				CSoundManager::Stop(CSoundManager::SE_Move);
-
-				// ピーク時間中.
-				if ( m_Peaking ) {
-					m_FadeAlpha = 1.f;	// アルファを1で固定.
-					m_PeakCnt--;
-
-					if (m_PeakCnt <= 0) {
-						m_AddAlpha = -m_AAVMAXVAL;
-						m_Peaking  = false;
-					}
-				}
-				else {
-					m_FadeAlpha += m_AddAlpha;
-				}
-
-				// フェードの上限についていない場合.
-				if ( !m_FadePeak ) {
-					// アルファの最大値を超えた場合.
-					if ( 1.f < m_FadeAlpha )
-					{
-						m_FadePeak = true;
-						m_Peaking  = true;
-					}
-				}
-				else {
-					m_FadePeak = false;
-				}
-
-				// フェード終了.
-				if ( m_FadeAlpha <= 0 ) {
-					m_FadeAlpha = 0.f;
-					m_Fading	= false;
-					m_FadeEnd	= true;
-				}
-			}
-		}
-
-		// スプライトの方のアルファにセット.
-		m_pUIs[i]->SetAlpha( m_FadeAlpha );
-
-		// 更新.
-		m_pUIs[i]->Update();
 	}
 }
 
@@ -133,12 +70,10 @@ void CUIFade::Update()
 //======================================================================================================================
 //		描画.
 //======================================================================================================================
-void CUIFade::Draw()
+void CGameUI::Draw()
 {
 	for ( size_t i = 0; i < m_pUIs.size(); ++i )
 	{
-		// 黒画像以外の描画をしない
-		if (i != FadeSprite::Black) { continue; }
 		m_pUIs[i]->Draw();
 	}
 }
@@ -147,7 +82,7 @@ void CUIFade::Draw()
 //======================================================================================================================
 //		開放.
 //======================================================================================================================
-void CUIFade::Release()
+void CGameUI::Release()
 {
 	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) {
 		SAFE_DELETE(m_pUIs[i]);

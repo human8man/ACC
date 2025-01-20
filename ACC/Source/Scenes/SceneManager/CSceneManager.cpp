@@ -4,8 +4,8 @@
 #include "Scenes/Game/CGame.h"
 #include "Scenes/Title/CTitle.h"
 
-#include "../GameObject/Camera/CCamera.h"
-#include "../GameObject/Sprite/2D/UI/CUIFade/CUIFade.h"
+#include "Camera/CCamera.h"
+#include "Sprite/2D/UI/CUIFade/CUIFade.h"
 #include "DirectSound/CSoundManager.h"
 
 #ifdef _DEBUG
@@ -62,6 +62,7 @@ HRESULT CSceneManager::Create(HWND hWnd)
 //======================================================================================================================
 void CSceneManager::Update()
 {
+
 #ifdef _DEBUG
 	// ‚±‚±‚Å‚Ì‚ÝImGui‚ÌUpdate‚ð‰ñ‚·.
 	CImGui::GetInstance()->Update();

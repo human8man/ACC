@@ -28,18 +28,7 @@ void CEnemy::Update()
 {
 	// 毎フレームリセットする.
 	m_SumVec = ZEROVEC3;
-
-	// カメラに向きを合わせる.
-	m_vRotation.y = CCamera::GetInstance()->GetRot().y;
-	
-	// 入力処理後にカメラ座標をセット.
-	if ( !CCamera::GetInstance()->GetMoveCamera() ) {
-		// プレイヤー位置 + プレイヤーの高さを含んだ座標を渡す.
-		D3DXVECTOR3 campos = m_vPosition;
-		campos.y += m_CamRevision;
-		 CCamera::GetInstance()->SetPosition(campos);
-	}
-
+	m_vRotation.y += 1.f;
 	CCharacter::Update();
 }
 
@@ -97,6 +86,7 @@ void CEnemy::Collision(std::unique_ptr<CPlayer>& egg, MeshCollider floor, MeshCo
 			SAFE_DELETE(m_pBullets[i]);
 			m_pBullets.erase(m_pBullets.begin() + i);
 			--i;
+			continue;
 		}
 
 		// プレイヤーと弾が当たった場合.
@@ -109,6 +99,7 @@ void CEnemy::Collision(std::unique_ptr<CPlayer>& egg, MeshCollider floor, MeshCo
 			SAFE_DELETE(m_pBullets[i]);
 			m_pBullets.erase(m_pBullets.begin() + i);
 			--i;
+			continue;
 		}
 	}
 }

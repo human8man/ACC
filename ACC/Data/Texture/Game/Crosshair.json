@@ -1,0 +1,20 @@
+{
+  "Base": {
+    "h": 4.0,
+    "w": 4.0
+  },
+  "Disp": {
+    "h": 4.0,
+    "w": 4.0
+  },
+  "FilePath": "Data\\Texture\\Game\\Crosshair.json",
+  "Pos": {
+    "x": 638.0,
+    "y": 358.0,
+    "z": 0.0
+  },
+  "Stride": {
+    "h": 4.0,
+    "w": 4.0
+  }
+}
