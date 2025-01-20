@@ -130,6 +130,9 @@
     <Filter Include="Source\GameObject\Object\Gun">
       <UniqueIdentifier>{08624e15-233a-442b-95e9-b0e1a757c827}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Common\Time">
+      <UniqueIdentifier>{f35d224a-e0f4-4524-84da-8cff2967acb0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Data\Shader\Sprite3D.hlsl">
@@ -302,6 +305,8 @@
     <ClCompile Include="Source\GameObject\Object\Bullet\CBullet.cpp">
       <Filter>Source\GameObject\Object\Shot</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Common\Time\CTime.cpp" />
+    <ClCompile Include="Source\Common\Random\CRandom.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Collision\BoundingSphere\CBoundingSphere.h">
@@ -457,6 +462,8 @@
     <ClInclude Include="Source\GameObject\Object\Bullet\CBullet.h">
       <Filter>Source\GameObject\Object\Shot</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Common\Time\CTime.h" />
+    <ClInclude Include="Source\Common\Random\CRandom.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Common\Easing\Easing.inl">

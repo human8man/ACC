@@ -70,25 +70,31 @@ void CPlayer::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, MeshCollider floor, MeshCollider cylinder)
 {
 	MeshCollider Bullet,enemyegg;
+	
+	// 敵データを取得.
+	enemyegg.SetVertex(
+		egg->GetPos(),
+		egg->GetRot(),
+		egg->GetScale(),
+		egg->GetMesh()->GetVertices());
 
 	// 弾の判定.
 	for (size_t i = 0; i < m_pBullets.size(); ++i) {
 
+		// 弾データを取得.
 		Bullet.SetVertex(
 			m_pBullets[i]->GetPos(),
 			m_pBullets[i]->GetRot(),
 			m_pBullets[i]->GetScale(),
 			m_pMeshBullet->GetVertices());
 
-		enemyegg.SetVertex(
-			egg->GetPos(),
-			egg->GetRot(),
-			egg->GetScale(),
-			egg->GetMesh()->GetVertices());
 
-		CollisionPoints pointsbc = m_pGJK->GJK(Bullet, cylinder);
-		CollisionPoints pointsbf = m_pGJK->GJK(Bullet, floor);
-		CollisionPoints pointsbe = m_pGJK->GJK(Bullet, enemyegg);
+		// 当たり判定情報用の変数を宣言.
+		CollisionPoints pointsbc, pointsbf, pointsbe;
+		pointsbc = m_pGJK->GJK(Bullet, cylinder);
+		pointsbf = m_pGJK->GJK(Bullet, floor);
+		pointsbe = m_pGJK->GJK(Bullet, enemyegg);
+
 
 		// 柱や床にあたった場合削除.
 		if (pointsbc.Col || pointsbf.Col) {
@@ -97,12 +103,13 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, MeshCollider floor, MeshCo
 			--i;
 		}
 
+		// エネミーと弾が当たった場合.
 		if ( pointsbe.Col ) {
 			// ヘッドショット判定(気室判定).
 			if (m_pBullets[i]->GetPos().y < egg->GetPos().y + m_EggAirRoomY) { egg->DubleDecreHP(); }
 			else  { egg->DecreHP(); }
 
-			// あたったあとは削除.
+			// 当たったあとは削除.
 			SAFE_DELETE(m_pBullets[i]);
 			m_pBullets.erase(m_pBullets.begin() + i);
 			--i;
@@ -165,8 +172,6 @@ void CPlayer::KeyInput()
 		m_pBullets.back()->AttachMesh(*m_pMeshBullet);	// メッシュを設定.
 		m_pBullets.back()->SetPos(0.f, -1000.f, 0.f);	// nullにならないように見えない座標に初期設定.
 		m_pBullets.back()->SetScale(10.f, 10.f, 10.f);	// サイズを設定.
-
-
 
 
 		// 弾の初期位置,移動方向の単位ベクトル,速度を設定.

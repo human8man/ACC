@@ -42,7 +42,7 @@ public:
 	void CalculatePositionFromWall( CROSSRAY* pCrossRay );
 
 	// レイとメッシュの当たり判定(Hit判定、交差点、長さを返す).
-	std::tuple<bool, D3DXVECTOR3, FLOAT> IsHitForRay( const RAY& pRay  );
+	RayInfo IsHitForRay( const RAY& pRay  );
 	
 private:
 	// 交差位置のポリゴンの頂点を見つける.

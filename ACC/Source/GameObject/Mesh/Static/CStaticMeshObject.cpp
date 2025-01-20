@@ -51,7 +51,7 @@ void CStaticMeshObject::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 //============================================================================
 //		レイとメッシュの当たり判定.
 //============================================================================
-std::tuple<bool, D3DXVECTOR3, FLOAT> CStaticMeshObject::IsHitForRay(const RAY& pRay )
+RayInfo CStaticMeshObject::IsHitForRay(const RAY& pRay )
 {
 	FLOAT vDistance;
 	D3DXVECTOR3 vAxis, StartPoint, EndPoint, vIntersect;
@@ -66,7 +66,6 @@ std::tuple<bool, D3DXVECTOR3, FLOAT> CStaticMeshObject::IsHitForRay(const RAY& p
 	D3DXMatrixTranslation( &mTran, m_vPosition.x, m_vPosition.y, m_vPosition.z);
 
 	// 回転処理.
-	//	※この行列計算は「CStaicMesh::Render()関数」と同じにする必要あり.
 	D3DXMatrixRotationY(&mYaw, m_vRotation.y);	// Y軸回転行列作成.
 	D3DXMatrixRotationX(&mPitch, m_vRotation.x);// X軸回転行列作成.
 	D3DXMatrixRotationZ(&mRoll, m_vRotation.z);	// Z軸回転行列作成.
@@ -121,7 +120,7 @@ std::tuple<bool, D3DXVECTOR3, FLOAT> CStaticMeshObject::IsHitForRay(const RAY& p
 		return { true, vIntersect ,vDistance }; 
 	}
 
-	return { false, ZEROVEC3, 0.f };
+	return { false, ZEROVEC3, 9999.f };
 }
 
 

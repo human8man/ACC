@@ -23,7 +23,7 @@ public:
 	void AddVec(D3DXVECTOR3 vec) { m_vPosition += vec; }
 	void JumpPowerDec() { if (m_JumpPower > 0) { m_JumpPower -= m_Gravity; } }
 
-	// 当たり判定処理(的卵、床、柱).
+	// 当たり判定処理(エネミー、床、柱).
 	void Collision(std::unique_ptr<CEnemy>& egg, MeshCollider floor, MeshCollider cylinder);
 
 private:
