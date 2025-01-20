@@ -11,6 +11,7 @@
 //---------------------------------------.
 #include "Effect/Effekseer/include/Effekseer.h"
 #include "Effect/Effekseer/include/EffekseerRendererDX11.h"
+#include "Common/Singleton/CSingleton.h"
 
 #ifdef _DEBUG
 	#pragma comment( lib, "Effekseerd.lib" )
@@ -35,12 +36,15 @@ namespace {
 	using EsRenderer	= ::EffekseerRendererDX11::Renderer;
 };
 
-/**************************************************
-*	フリーソフト Effekseerのデータを使うためのクラス.
-*	singleton(シングルトン：デザインパターンの１つ）で作成.
-**/
+//=============================================================================
+//		フリーソフト Effekseerのデータを使うためのクラス.
+//=============================================================================
 class CEffect
+	: public CSingleton<CEffect>
 {
+public:
+	friend class CSingleton<CEffect>; // シングルトンクラスをフレンド宣言.
+
 public:
 	//エフェクト種類列挙型.
 	enum enList
@@ -51,14 +55,8 @@ public:
 		Max,			//最大数.
 	};
 
-	//インスタンス取得(唯一のアクセス経路).
-	static CEffect* GetInstance()
-	{
-		//唯一のインスタンスを作成する.
-		//※staticで作成されたので2回目以降は下の1行が無視される.
-		static CEffect s_Instance;	//s_:staticの意味.
-		return &s_Instance;
-	}
+public:
+	CEffect();
 	~CEffect();
 
 	//構築.
@@ -97,11 +95,6 @@ public:
 	}
 
 private:
-	//生成やコピーを禁止する.
-	CEffect();
-	CEffect( const CEffect& rhs ) = delete;
-	CEffect& operator = (const CEffect& rhs) = delete;
-
 	//データ解放.
 	HRESULT ReleaseData();
 

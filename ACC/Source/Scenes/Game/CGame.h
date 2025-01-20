@@ -15,6 +15,7 @@ class CEnemy;
 class CPlayer;
 class CCharacter;
 
+
 //============================================================================
 //		ゲームクラス.
 //============================================================================
@@ -36,12 +37,28 @@ public:
 private:
 	// 当たり判定関数.
 	void CollisionJudge();
-private:
-	HWND	m_hWnd;	// ウィンドウハンドル.
-	LIGHT	m_Light;// ライト情報.
+	
+	// プレイヤーと床の当たり判定をまとめる関数.
+	void PlayertoFloorCol	(CollisionPoints points);
+	
+	// プレイヤーと柱の当たり判定をまとめる関数.
+	void PlayertoCylinderCol(CollisionPoints points);
+	
+	// 敵と床の当たり判定をまとめる関数.
+	void EnemytoFloorCol	(CollisionPoints points);
 
-	D3DXMATRIX	m_mView;	// ビュー(カメラ)行列.
-	D3DXMATRIX	m_mProj;	// 射影（プロジェクション）行列.
+	// 敵と柱の当たり判定をまとめる関数.
+	void EnemytoCylinderCol	(CollisionPoints points);
+
+	// レイの当たり判定をまとめる関数.
+	void RaytoObjeCol();
+
+private:
+	HWND	m_hWnd;	 // ウィンドウハンドル.
+	LIGHT	m_Light; // ライト情報.
+
+	D3DXMATRIX	m_mView; // ビュー(カメラ)行列.
+	D3DXMATRIX	m_mProj; // 射影（プロジェクション）行列.
 
 	std::unique_ptr<CStaticMesh> m_pEgg;		// たまご.
 	std::unique_ptr<CStaticMesh> m_pFloor;		// 地面.
@@ -53,7 +70,6 @@ private:
 
 	// GJKクラス.
 	std::unique_ptr<CGJK> m_pGJK;
-
 	std::unique_ptr<CRay> m_pCamRay;
 
 	float m_Angle;
