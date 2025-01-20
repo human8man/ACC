@@ -4,9 +4,6 @@
 #include "Camera/CCamera.h"
 #include "Character/Enemy/CEnemy.h"
 
-#if _DEBUG
-#include "ImGui/CImGui.h"
-#endif
 
 //============================================================================
 //		プレイヤークラス.
@@ -231,14 +228,4 @@ void CPlayer::KeyInput()
 
 	// 合計のベクトル量分位置を更新.
 	m_vPosition += m_SumVec + DashVec;
-
-#if _DEBUG
-	ImGui::Begin("DashWindow");
-	ImGui::Text("DashCoolTime%f", m_DashCoolTime);
-	ImGui::Text("DashTime%f", m_DashTime);
-	ImGui::Text("DeltaTime%f", CTime::GetInstance()->GetDeltaTime() );
-	ImGui::Text("%f,%f,%f", DashVec.x, DashVec.y, DashVec.z);
-	ImGui::End();
-
-#endif
 }

@@ -63,7 +63,7 @@ private:
 
 	std::unique_ptr<CStaticMesh> m_pEgg;		// ‚½‚Ü‚².
 	std::unique_ptr<CStaticMesh> m_pFloor;		// ’n–Ê.
-	std::unique_ptr<CStaticMesh> m_pCylinder;	// ’Œ.
+	std::vector<std::unique_ptr<CStaticMesh>> m_pCylinders;
 		
 	std::unique_ptr<CPlayer>	m_pPlayer;
 	std::unique_ptr<CEnemy>		m_pEnemy;
@@ -77,4 +77,5 @@ private:
 	std::unique_ptr<CGameUI> m_pGameUI;	
 
 	float m_Angle;
+	int m_CylinderMax;
 };

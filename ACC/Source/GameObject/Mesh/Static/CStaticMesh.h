@@ -129,7 +129,7 @@ public:
 
 	// Šgkî•ñ‚ğİ’è.
 	void SetScale( const D3DXVECTOR3& scale ) {	m_Scale = scale;	}
-	void SetScale(float scale) { m_Scale = D3DXVECTOR3( scale, scale, scale); }
+	void SetScale(float x, float y, float z) { m_Scale = D3DXVECTOR3(x, y, z); }
 
 	
 	D3DXVECTOR3 GetScale()	const { return m_Scale; }		// ƒTƒCƒY‚ğæ“¾.

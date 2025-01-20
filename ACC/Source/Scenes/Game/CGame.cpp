@@ -27,7 +27,7 @@ CGame::CGame(HWND hWnd)
 
 	, m_pEgg		( nullptr )
 	, m_pFloor		( nullptr )
-	, m_pCylinder	( nullptr )
+	, m_pCylinders	()
 	
 	, m_pPlayer		( nullptr )
 	, m_pEnemy		( nullptr )
@@ -37,6 +37,7 @@ CGame::CGame(HWND hWnd)
 	, m_pCamRay		( nullptr )
 
 	, m_Angle		(0.f)
+	, m_CylinderMax	(9)
 {
 	// ライト情報.
 	m_Light.vDirection	= D3DXVECTOR3( 1.5f, 1.f, -1.f );
@@ -55,8 +56,12 @@ void CGame::Create()
 {
 	// インスタンス生成.
 	m_pEgg		= std::make_unique<CStaticMesh>();
-	m_pFloor	= std::make_unique<CStaticMesh>();
-	m_pCylinder = std::make_unique<CStaticMesh>();
+	m_pFloor	= std::make_unique<CStaticMesh>(); 
+	for (int i = 0; i < m_CylinderMax; ++i) {
+		auto cylinder = std::make_unique<CStaticMesh>();
+		cylinder->Init(_T("Data\\Mesh\\Static\\Stage\\Rectangular.x"));
+		m_pCylinders.push_back(std::move(cylinder));
+	}
 	m_pPlayer	= std::make_unique<CPlayer>();
 	m_pEnemy	= std::make_unique<CEnemy>();
 	m_pGround	= std::make_unique<CGround>();
@@ -72,9 +77,8 @@ void CGame::Create()
 HRESULT CGame::LoadData()
 {
 	// スタティックメッシュの読み込み.
-	m_pEgg		->Init( _T("Data\\Mesh\\Static\\Player\\egg.x"			));
-	m_pFloor	->Init( _T("Data\\Mesh\\Static\\Stage\\Floor.x"			));
-	m_pCylinder	->Init( _T("Data\\Mesh\\Static\\Stage\\Rectangular.x"	));
+	m_pEgg		->Init( _T("Data\\Mesh\\Static\\Player\\egg.x"	));
+	m_pFloor	->Init( _T("Data\\Mesh\\Static\\Stage\\Floor.x"	));
 
 	// メッシュをアタッチする.
 	m_pPlayer	->AttachMesh( *m_pEgg );
@@ -82,9 +86,54 @@ HRESULT CGame::LoadData()
 	m_pGround	->AttachMesh( *m_pFloor );
 
 	// キャラクターの初期座標を設定.
-	m_pPlayer	->SetPos( 0.f, 1.f, 6.f );
-	m_pEnemy	->SetPos( 10.f, 1.f, 6.f );
-	m_pCylinder	->SetPos( 10.f, -0.3f, 10.f );
+	m_pPlayer	->SetPos( 60.f, 50.f, 60.f );
+	m_pEnemy	->SetPos( 10.f, 1.f, 6.f ); 
+
+	// 柱の配置(後でどうにかする仮設置方法).
+	for (int i = 0; i < m_pCylinders.size(); ++i)
+	{
+		// ↓外壁.
+		if (i == 0) {
+			m_pCylinders[i]->SetPos(0.f, -10.f, 103.f);
+			m_pCylinders[i]->SetScale(50.f, 0.5f, 1.f);
+		}
+		if (i == 1) {
+			m_pCylinders[i]->SetPos(0.f, -10.f, -103.f);
+			m_pCylinders[i]->SetScale(50.f, 0.5f, 1.f);
+		}
+		if (i == 2) {
+			m_pCylinders[i]->SetPos(103.f, -10.f, 0.f);
+			m_pCylinders[i]->SetScale(1.f, 0.5f, 50.f);
+		}
+		if (i == 3) {
+			m_pCylinders[i]->SetPos(-103.f, -10.f, 0.f);
+			m_pCylinders[i]->SetScale(1.f, 0.5f, 50.f);
+		}
+		// ↑外壁.
+
+		// ↓柱.
+		if (i == 4) {
+			m_pCylinders[i]->SetPos(0.f, -0.3f, 0.f);
+			m_pCylinders[i]->SetScale(5.f, 0.5f, 5.f);
+		}
+		if (i == 5) {
+			m_pCylinders[i]->SetPos(51.5f, -0.3f, 0.f);
+			m_pCylinders[i]->SetScale(5.f, 0.5f, 5.f);
+		}
+		if (i == 6) {
+			m_pCylinders[i]->SetPos(-51.5f, -0.3f, 0.f);
+			m_pCylinders[i]->SetScale(5.f, 0.5f, 5.f);
+		}
+		if (i == 7) {
+			m_pCylinders[i]->SetPos(0.f, -0.3f, 51.5f);
+			m_pCylinders[i]->SetScale(5.f, 0.5f, 5.f);
+		}
+		if (i == 8) {
+			m_pCylinders[i]->SetPos(0.f, -0.3f, -51.5f);
+			m_pCylinders[i]->SetScale(5.f, 0.5f, 5.f);
+		}
+		// ↑柱.
+	}
 
 	// カメラの初期化.
 	CCamera::GetInstance()->Init();
@@ -102,11 +151,13 @@ HRESULT CGame::LoadData()
 void CGame::Release()
 {
 	m_pGameUI.reset();
-	m_pCamRay.reset();                               
+	m_pCamRay.reset();
 	m_pGround.reset();
 	m_pEnemy.reset();
 	m_pPlayer.reset();
-	m_pCylinder.reset();
+	for (auto& cylinder : m_pCylinders) {
+		cylinder.reset();
+	}
 	m_pEgg.reset();
 	m_pFloor.reset();
 
@@ -141,12 +192,12 @@ void CGame::Update()
 
 	// 下二つには絶対に演出を入れる（勝利,敗北演出).
 	// プレイヤーのHPが０になったとき.
-	if( m_pPlayer->GetCharaInfo().HP == 0 ) {
+	if( m_pPlayer->GetCharaInfo().HP < 0 ) {
 		CSceneManager::GetInstance()->LoadScene(SceneList::Title);
 	}
 
 	// 敵のHPが０になったとき.
-	if( m_pEnemy->GetCharaInfo().HP == 0 ) {
+	if( m_pEnemy->GetCharaInfo().HP < 0 ) {
 		CSceneManager::GetInstance()->LoadScene(SceneList::Title);
 	}
 
@@ -202,7 +253,10 @@ void CGame::Draw()
 	m_pGround->Draw( m_mView, m_mProj, m_Light );
 	m_pPlayer->Draw( m_mView, m_mProj, m_Light );
 	m_pEnemy->Draw( m_mView, m_mProj, m_Light );
-	m_pCylinder->Render( m_mView, m_mProj, m_Light );
+
+	for (auto& cylinder : m_pCylinders) {
+		cylinder->Render(m_mView, m_mProj, m_Light);
+	}
 	m_pGameUI->Draw();
 
 	// エフェクトの描画.
@@ -215,14 +269,20 @@ void CGame::Draw()
 //-----------------------------------------------------------------------------
 void CGame::CollisionJudge()
 {
-	MeshCollider PlayerEgg, EnemyEgg, Floor, Cylinder;
+	MeshCollider PlayerEgg, EnemyEgg, Floor;
+	std::vector<MeshCollider> Cylinders;
 
 	// 柱データ取得.
-	Cylinder.SetVertex(
-		m_pCylinder->GetPos(),
-		m_pCylinder->GetRot(),
-		m_pCylinder->GetScale(),
-		m_pCylinder->GetVertices());
+	for (int i = 0; i < m_CylinderMax; ++i) {
+		MeshCollider cylinder;
+		cylinder.SetVertex(
+			m_pCylinders[i]->GetPos(),
+			m_pCylinders[i]->GetRot(),
+			m_pCylinders[i]->GetScale(),
+			m_pCylinders[i]->GetVertices()
+		);
+		Cylinders.push_back(cylinder);
+	}
 
 	// 地面データ取得.
 	Floor.SetVertex(
@@ -249,11 +309,22 @@ void CGame::CollisionJudge()
 	// プレイヤーと床の判定を返す.
 	CollisionPoints pointspef = m_pGJK->GJK(PlayerEgg, Floor);
 	// プレイヤーと円柱の判定を返す.
-	CollisionPoints pointspec = m_pGJK->GJK(Cylinder, PlayerEgg);
+	std::vector<CollisionPoints> pointspecs;
+	for (int i = 0; i < m_CylinderMax; ++i) {
+		CollisionPoints pointspec;
+		pointspec = m_pGJK->GJK(Cylinders[i], PlayerEgg);
+		pointspecs.push_back(pointspec);
+	}
+
 	// 敵と床の判定を返す.
 	CollisionPoints pointseef = m_pGJK->GJK(EnemyEgg, Floor);
 	// 敵と円柱の判定を返す.
-	CollisionPoints pointseec = m_pGJK->GJK(Cylinder, EnemyEgg);
+	std::vector<CollisionPoints> pointseecs;
+	for (int i = 0; i < m_CylinderMax; ++i) {
+		CollisionPoints pointseec;
+		pointseec = m_pGJK->GJK(Cylinders[i], EnemyEgg);
+		pointseecs.push_back(pointseec);
+	}
 
 
 	// プレイヤーと床の判定処理.
@@ -263,8 +334,9 @@ void CGame::CollisionJudge()
 	m_pPlayer->UseGravity();
 
 	// プレイヤーと柱の判定処理.
-	PlayertoCylinderCol(pointspec);
-
+	for (int i = 0; i < m_CylinderMax; ++i) {
+		PlayertoCylinderCol(pointspecs[i]);
+	}
 
 	// エネミーと床の判定処理.
 	EnemytoFloorCol(pointseef);
@@ -273,12 +345,15 @@ void CGame::CollisionJudge()
 	m_pEnemy->UseGravity();
 
 	// エネミーと柱の判定処理.
-	EnemytoCylinderCol(pointseec);
+	for (int i = 0; i < m_CylinderMax; ++i) {
+		EnemytoCylinderCol(pointseecs[i]);
+	}
 
-
-	// プレイヤーの当たり判定処理をする.
-	m_pPlayer->Collision(m_pEnemy, Floor, Cylinder);
-	m_pEnemy->Collision(m_pPlayer, Floor, Cylinder);
+	// プレイヤーと敵の当たり判定処理をする.
+	for (int i = 0; i < m_CylinderMax; ++i) {
+		m_pPlayer->Collision(m_pEnemy, Floor, Cylinders[i]);
+		m_pEnemy->Collision(m_pPlayer, Floor, Cylinders[i]);
+	}
 }
 
 
@@ -422,13 +497,19 @@ void CGame::EnemytoCylinderCol(CollisionPoints points)
 void CGame::RaytoObjeCol()
 {
 	// レイ情報用の変数.
-	RayInfo SendCamera, GroundRay, CylinderRay;
+	RayInfo SendCamera, GroundRay;
+	std::vector<RayInfo> CylinderRays;
+
 	D3DXVECTOR3 camlookpos = CCamera::GetInstance()->GetPos() + CCamera::GetInstance()->GetCamDir() * 100.f;
 	SendCamera = { false, camlookpos, 5000.f };
 
 	// カメラレイと各オブジェごとの判定情報を取得.
 	GroundRay	= m_pGround->IsHitForRay(CCamera::GetInstance()->GetRay());
-	CylinderRay	= m_pCylinder->IsHitForRay(CCamera::GetInstance()->GetRay());
+	for (int i = 0; i < m_CylinderMax; ++i) {
+		RayInfo CylinderRay;
+		CylinderRay = m_pCylinders[i]->IsHitForRay(CCamera::GetInstance()->GetRay());
+		CylinderRays.push_back(CylinderRay);
+	}
 
 	// どのオブジェが最も近いかを探す.
 	if (GroundRay.Hit) {
@@ -436,9 +517,11 @@ void CGame::RaytoObjeCol()
 			SendCamera = GroundRay;
 		}
 	}
-	if (CylinderRay.Hit) {
-		if (SendCamera.Length > CylinderRay.Length) {
-			SendCamera = CylinderRay;
+	for (int i = 0; i < m_CylinderMax; ++i) {
+		if (CylinderRays[i].Hit) {
+			if (SendCamera.Length > CylinderRays[i].Length) {
+				SendCamera = CylinderRays[i];
+			}
 		}
 	}
 

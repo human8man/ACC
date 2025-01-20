@@ -79,8 +79,6 @@ void CCharacter::Update()
 		m_GunRadius,
 		D3DXToRadian(m_vRotation.y + m_GunPosRevision));
 
-	D3DXVECTOR3 camrot = CCamera::GetInstance()->GetRot();
-
 	// 銃の角度をプレイヤーの向き + 補正値に設定.
 	m_pGun->SetRot( 0.f, -D3DXToRadian(m_vRotation.y) + m_GunRotRevision, 0.f);
 
