@@ -1,0 +1,5 @@
+Pierre02
+　　cosmicmistのshockwaveからシールドエフェクト
+
+AndrewFM01
+　　hit_effのBigのやつからボディエフェクト
