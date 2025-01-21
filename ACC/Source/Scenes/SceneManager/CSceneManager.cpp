@@ -6,6 +6,7 @@
 
 #include "Camera/CCamera.h"
 #include "Sprite/2D/UI/CUIFade/CUIFade.h"
+#include "Sprite/2D/UI/CEndUI/CEndUI.h"
 #include "DirectSound/CSoundManager.h"
 
 #ifdef _DEBUG
@@ -16,9 +17,10 @@
 //		シーンマネージャークラス.
 //=================================================================================================
 CSceneManager::CSceneManager()
-	: m_hWnd		()
-	, m_pScene		()
-	, m_NextSceneNo ()
+	: m_hWnd			()
+	, m_pScene			()
+	, m_NextSceneNo		()
+	, m_EndDeleteFlag	( false )
 {
 }
 
@@ -62,6 +64,33 @@ HRESULT CSceneManager::Create(HWND hWnd)
 //=================================================================================================
 void CSceneManager::Update()
 {
+	CKey* Key = CDInput::GetInstance()->CDKeyboard();
+
+	// ESCが押された場合.
+	if (Key->IsKeyAction(DIK_ESCAPE)) {
+		// ENDUIが存在しない場合出現.
+		if (m_pEndUI == nullptr) {
+			m_pEndUI = std::make_unique<CEndUI>();
+			m_pEndUI->Create(m_hWnd);
+			m_EndDeleteFlag = false;
+		}
+		// ENDUIが存在する場合削除.
+		else if (m_pEndUI != nullptr) {
+			m_EndDeleteFlag = true;
+		}
+	}
+
+	// EndUI削除フラグがあった場合.
+	if (m_EndDeleteFlag) {
+		m_pEndUI.reset();
+		m_EndDeleteFlag = false;
+	}
+
+	// 存在する場合EndUI更新処理.
+	if (m_pEndUI != nullptr) { 
+		m_pEndUI->Update(); 
+		m_EndDeleteFlag = m_pEndUI->GetDeleteFlag();
+	}
 
 #ifdef _DEBUG
 	// ここでのみImGuiのUpdateを回す.
@@ -77,23 +106,36 @@ void CSceneManager::Update()
 	ImGui::End();
 #endif
 
-	 // フェードのピーク時にシーンを切り替える.
-	if (m_pFade->GetFadePeak()) {
-		m_pScene.release();
-		m_pScene = CreateScene(m_NextSceneNo);
-		m_pScene->Create();
-		m_pScene->Init();
-		m_pScene->LoadData();
+	if (m_pEndUI == nullptr) {
+		// フェードのピーク時にシーンを切り替える.
+		if (m_pFade->GetFadePeak()) {
+			m_pScene.release();
+			m_pScene = CreateScene(m_NextSceneNo);
+			m_pScene->Create();
+			m_pScene->Init();
+			m_pScene->LoadData();
+		}
+
+		// フェード中でない間、Update()を回す.
+		//	フェードのピーク時に一度だけ通し、フェード明け用の背景を作成する.
+		if (!m_pFade->GetFading() || m_pFade->GetFadePeak())
+		{
+			GetInstance()->m_pScene->Update();
+		}
+
+		m_pFade->Update();
 	}
 
-	// フェード中でない間、Update()を回す.
-	//	フェードのピーク時に一度だけ通し、フェード明け用の背景を作成する.
-	if (!m_pFade->GetFading() || m_pFade->GetFadePeak()) 
-	{
-		GetInstance()->m_pScene->Update();
+#if _DEBUG
+
+	ImGui::Begin("MousePos");
+	POINT pos;
+	if (GetCursorPos(&pos)) {
+		ImGui::Text("%d,%d", pos.x, pos.y);
 	}
-	
-	m_pFade->Update();
+	ImGui::End();
+
+#endif
 }
 
 
@@ -104,6 +146,9 @@ void CSceneManager::Draw()
 {
 	m_pScene->Draw();
 	m_pFade->Draw();
+
+	// 存在する場合描画処理.
+	if (m_pEndUI != nullptr) { m_pEndUI->Draw(); }
 
 #ifdef _DEBUG
 	// ここでのみImGuiのDrawを回す.

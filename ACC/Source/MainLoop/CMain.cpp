@@ -77,7 +77,7 @@ HRESULT CMain::Create() const
 //=================================================
 void CMain::Update()
 {
-	// タイムクラスの更新(一度のみ通す).
+	// タイムクラスの更新.
 	CTime::GetInstance()->Update();
 
 	// CDInputの更新処理.
@@ -85,10 +85,10 @@ void CMain::Update()
 
 	// 更新処理.
 	CSceneManager::GetInstance()->Update();
-
+	
 	// バックバッファをクリアにする.
 	CDirectX11::GetInstance()->ClearBackBuffer();
-	
+
 	// 描画処理.
 	CSceneManager::GetInstance()->Draw();
 
@@ -286,24 +286,6 @@ LRESULT CALLBACK CMain::MsgProc(
 	case WM_DESTROY:
 		// アプリケーションの終了をWindowsに通知する.
 		PostQuitMessage( 0 );
-		break;
-
-	//---------------------------------------------------------------
-	//		キーボードが押されたとき.
-	//---------------------------------------------------------------
-	case WM_KEYDOWN:
-		// キー別の処理.
-		switch( static_cast<char>( wParam ) ) {
-		case VK_ESCAPE:	// ESCｷｰ.
-			if( MessageBox( nullptr,
-				_T( "ゲームを終了しますか？" ),
-				_T( "警告" ), MB_YESNO ) == IDYES )
-			{
-				// ウィンドウを破棄する.
-				DestroyWindow( hWnd );
-			}
-			break;
-		}
 		break;
 	//---------------------------------------------------------------
 	//		ウィンドウが起動中の場合.

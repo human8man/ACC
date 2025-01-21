@@ -4,6 +4,7 @@
 
 // 前方宣言.
 class CUIFade;
+class CEndUI;
 class CSceneBase;
 
 // シーンリスト列挙型.
@@ -41,5 +42,8 @@ private:
 	SceneList m_SceneNo;
 	SceneList m_NextSceneNo;
 	std::unique_ptr<CUIFade>	m_pFade;	// フェードクラス.
+	std::unique_ptr<CEndUI>		m_pEndUI;	// エンドクラス.
 	std::unique_ptr<CSceneBase>	m_pScene;	// シーンクラスのポインタ.
+
+	bool m_EndDeleteFlag;
 };

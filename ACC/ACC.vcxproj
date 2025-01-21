@@ -289,6 +289,7 @@
     <ClCompile Include="Source\GameObject\Object\Gun\CGun.cpp" />
     <ClCompile Include="Source\GameObject\Object\Bullet\CBullet.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\2D\CSprite2D.cpp" />
+    <ClCompile Include="Source\GameObject\Sprite\2D\UI\CEndUI\CEndUI.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\2D\UI\CGameUI\CGameUI.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\2D\UI\CLoseUI\CLoseUI.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\2D\UI\COptionUI\COptionUI.cpp" />
@@ -349,6 +350,7 @@
     <ClInclude Include="Source\GameObject\Object\Gun\CGun.h" />
     <ClInclude Include="Source\GameObject\Object\Bullet\CBullet.h" />
     <ClInclude Include="Source\GameObject\Sprite\2D\CSprite2D.h" />
+    <ClInclude Include="Source\GameObject\Sprite\2D\UI\CEndUI\CEndUI.h" />
     <ClInclude Include="Source\GameObject\Sprite\2D\UI\CGameUI\CGameUI.h" />
     <ClInclude Include="Source\GameObject\Sprite\2D\UI\CLoseUI\CLoseUI.h" />
     <ClInclude Include="Source\GameObject\Sprite\2D\UI\COptionUI\COptionUI.h" />
