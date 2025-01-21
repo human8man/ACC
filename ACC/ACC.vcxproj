@@ -290,8 +290,11 @@
     <ClCompile Include="Source\GameObject\Object\Bullet\CBullet.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\2D\CSprite2D.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\2D\UI\CGameUI\CGameUI.cpp" />
+    <ClCompile Include="Source\GameObject\Sprite\2D\UI\CLoseUI\CLoseUI.cpp" />
+    <ClCompile Include="Source\GameObject\Sprite\2D\UI\COptionUI\COptionUI.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\2D\UI\CUIFade\CUIFade.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\2D\UI\CUIObject.cpp" />
+    <ClCompile Include="Source\GameObject\Sprite\2D\UI\CWinUI\CWinUI.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\3D\CSprite3D.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\3D\Explosion\CExplosion.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\CSpriteObject.cpp" />
@@ -347,8 +350,11 @@
     <ClInclude Include="Source\GameObject\Object\Bullet\CBullet.h" />
     <ClInclude Include="Source\GameObject\Sprite\2D\CSprite2D.h" />
     <ClInclude Include="Source\GameObject\Sprite\2D\UI\CGameUI\CGameUI.h" />
+    <ClInclude Include="Source\GameObject\Sprite\2D\UI\CLoseUI\CLoseUI.h" />
+    <ClInclude Include="Source\GameObject\Sprite\2D\UI\COptionUI\COptionUI.h" />
     <ClInclude Include="Source\GameObject\Sprite\2D\UI\CUIFade\CUIFade.h" />
     <ClInclude Include="Source\GameObject\Sprite\2D\UI\CUIObject.h" />
+    <ClInclude Include="Source\GameObject\Sprite\2D\UI\CWinUI\CWinUI.h" />
     <ClInclude Include="Source\GameObject\Sprite\3D\CSprite3D.h" />
     <ClInclude Include="Source\GameObject\Sprite\3D\Explosion\CExplosion.h" />
     <ClInclude Include="Source\GameObject\Sprite\CSpriteObject.h" />
