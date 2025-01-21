@@ -72,16 +72,27 @@ protected:
 	std::vector<CBullet*>	m_pBullets;		// 弾配列.
 	CGun*					m_pGun;			// 銃.
 
+	// 銃関連.
 	float m_GunRadius;		// 銃の半径.
 	float m_GunRotRevision;	// 銃の向き補正値.
 	float m_GunPosRevision;	// 銃の回転座標補正値(度).
 	float m_Gravity;		// 実際に掛かる重力.
 	float m_GravityValue;	// 重力（定数）.
 
+	// 弾関連.
+	float m_ReloadTime;			// リロードタイム.
+	float m_ReloadTimeMax;		// リロード最大タイム.
+	float m_BulletCoolTime;		// 銃の発射クールタイム.
+	float m_BulletCoolTimeMax;	// 銃の発射最大クールタイム.
+	float m_BulletSpeed;		// 弾速度.
+	bool  m_CanShot;			// 発射可能か.
+
+	// ジャンプ関連.
 	float m_JumpPower;		// ジャンプ力.
 	float m_JumpPowerMax;	// 最大ジャンプ力.
 	bool m_CanJump;			// ジャンプが可能か.
 
+	// ダッシュ関連.
 	float m_DashCoolTime;	// ダッシュのクールタイム.
 	float m_DashCoolTimeMax;// ダッシュの最大クールタイム.
 	float m_DashTime;		// ダッシュの反映時間.
@@ -89,6 +100,9 @@ protected:
 	float m_DashSpeed;		// ダッシュ倍率.
 	bool m_CanDash;			// ダッシュが可能か.
 	D3DXVECTOR3	DashVec;	// ダッシュのベクトル保存用.
+
+
+
 
 	float m_EggAirRoomY;	// 気室の高さ判定用.
 

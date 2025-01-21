@@ -49,10 +49,11 @@ public:
 	//エフェクト種類列挙型.
 	enum enList
 	{
-		Test0	= 0,	//仮で設定.
-		Test1,			//仮で設定.
-		Test2,			//仮で設定.
-		Max,			//最大数.
+		BodyHit	= 0,	// 仮で設定.
+		BodyHitCrit,	// 仮で設定.
+		ShieldHit,		// 仮で設定.
+		ShieldHitCrit,	// 最大数.
+		Max,
 	};
 
 public:

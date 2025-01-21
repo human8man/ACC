@@ -6,35 +6,43 @@
 //		キャラクタークラス.
 //============================================================================
 CCharacter::CCharacter()
-	: m_pRayY			( nullptr )
-	, m_pCrossRay		( nullptr )
+	: m_pRayY				( nullptr )
+	, m_pCrossRay			( nullptr )
 
-	, m_pBullets		()
-	, m_pGun			( nullptr )
-	, m_pMeshBullet		( nullptr )
-	, m_pMeshGun		( nullptr )
+	, m_pBullets			()
+	, m_pGun				( nullptr )
+	, m_pMeshBullet			( nullptr )
+	, m_pMeshGun			( nullptr )
 
-	, m_GunRadius		( 1.f )
-	, m_GunRotRevision	( -1.5f )
-	, m_GunPosRevision	( -30.f )
-	, m_Gravity			( 0.0098f )
-	, m_GravityValue	( 0.0098f )
+	, m_GunRadius			( 1.f )
+	, m_GunRotRevision		( -1.5f )
+	, m_GunPosRevision		( -30.f )
+	, m_Gravity				( 0.0098f )
+	, m_GravityValue		( 0.0098f )
 
-	, m_JumpPower		( 0.f )
-	, m_JumpPowerMax	( 0.784f )
-	, m_CanJump			( false )
+	
+	, m_ReloadTime			( 0.f )
+	, m_ReloadTimeMax		( CTime::GetInstance()->GetDeltaTime() * 180.f )
+	, m_BulletCoolTime		( 0.f )
+	, m_BulletCoolTimeMax	( CTime::GetInstance()->GetDeltaTime() * 60.f )
+	, m_BulletSpeed			( 2.9f )
+	, m_CanShot				( true )
 
-	,m_DashCoolTime		( 0.f )
-	,m_DashCoolTimeMax	( CTime::GetInstance()->GetDeltaTime() * 180.f )
-	,m_DashTime			( 0.f )
-	,m_DashTimeMax		( CTime::GetInstance()->GetDeltaTime() * 30.f )
-	,m_DashSpeed		( 1.8f )
-	,m_CanDash			( true )
-	,DashVec			( ZEROVEC3 )
+	, m_JumpPower			( 0.f )
+	, m_JumpPowerMax		( 0.784f )
+	, m_CanJump				( false )
 
-	, m_EggAirRoomY		( 0.5f )
+	, m_DashCoolTime		( 0.f )
+	, m_DashCoolTimeMax		( CTime::GetInstance()->GetDeltaTime() * 180.f )
+	, m_DashTime			( 0.f )
+	, m_DashTimeMax			( CTime::GetInstance()->GetDeltaTime() * 30.f )
+	, m_DashSpeed			( 2.6f )
+	, m_CanDash				( true )
+	, DashVec				( ZEROVEC3 )
 
-	, m_CharaInfo		()
+	, m_EggAirRoomY			( 0.5f )
+
+	, m_CharaInfo			()
 {
 	// レイの設定.
 	m_pRayY			= new RAY();
@@ -50,6 +58,9 @@ CCharacter::CCharacter()
 
 	m_pGun	= new CGun();
 	m_pGun	->AttachMesh( *m_pMeshGun );
+
+	m_CharaInfo.MaxHP = 20;
+	m_CharaInfo.MaxAmmo = 6;
 
 }
 

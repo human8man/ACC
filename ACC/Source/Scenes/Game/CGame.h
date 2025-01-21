@@ -15,6 +15,7 @@ class CEnemy;
 class CPlayer;
 class CCharacter;
 class CGameUI;
+class CRandom;
 
 
 //============================================================================
@@ -36,6 +37,9 @@ public:
 
 
 private:
+	// 敵とプレイヤーの初期化.
+	void InitEPPos(CRandom& random, std::unique_ptr<CPlayer>& player, std::unique_ptr<CEnemy>& enemy);
+
 	// 当たり判定関数.
 	void CollisionJudge();
 	
@@ -75,6 +79,7 @@ private:
 
 	// UIクラス.
 	std::unique_ptr<CGameUI> m_pGameUI;	
+	std::vector<D3DXVECTOR3> m_SpawnPoints;
 
 	float m_Angle;
 	int m_CylinderMax;

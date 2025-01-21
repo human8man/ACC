@@ -3,6 +3,7 @@
 #include "Common/DirectInput/CDirectInput.h"
 #include "Camera/CCamera.h"
 #include "Character/Enemy/CEnemy.h"
+#include "Effect/CEffect.h"
 
 
 //============================================================================
@@ -15,7 +16,8 @@ CPlayer::CPlayer()
 	, m_CamRevision	( 2.f )
 	, m_SumVec		( ZEROVEC3 )
 {
-	m_CharaInfo.HP = 8;
+	m_CharaInfo.HP = m_CharaInfo.MaxHP;
+	m_CharaInfo.Ammo = m_CharaInfo.MaxAmmo;
 }
 
 CPlayer::~CPlayer()
@@ -34,9 +36,11 @@ void CPlayer::Update()
 	// カメラに向きを合わせる.
 	m_vRotation.y = CCamera::GetInstance()->GetRot().y;
 	
-	// ダッシュ関連で0以上のものがある場合カウントをする.
-	if ( m_DashCoolTime >= 0.f ) { m_DashCoolTime -= CTime::GetInstance()->GetDeltaTime(); }
-	if ( m_DashTime >= 0.f ){ m_DashTime -= CTime::GetInstance()->GetDeltaTime(); }
+	// 0以上のものがある場合カウントをする.
+	if ( m_DashTime >= 0.f )		{ m_DashTime		-= CTime::GetInstance()->GetDeltaTime(); }
+	if ( m_ReloadTime >= 0.f )		{ m_ReloadTime		-= CTime::GetInstance()->GetDeltaTime(); }
+	if ( m_DashCoolTime >= 0.f )	{ m_DashCoolTime	-= CTime::GetInstance()->GetDeltaTime(); }
+	if ( m_BulletCoolTime >= 0.f )	{ m_BulletCoolTime	-= CTime::GetInstance()->GetDeltaTime(); }
 
 	// 入力処理.
 	KeyInput();
@@ -48,6 +52,8 @@ void CPlayer::Update()
 		campos.y += m_CamRevision;
 		 CCamera::GetInstance()->SetPosition(campos);
 	}
+
+
 
 	CCharacter::Update();
 }
@@ -75,7 +81,10 @@ void CPlayer::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, MeshCollider floor, MeshCollider cylinder)
 {
 	MeshCollider Bullet,enemyegg;
-	
+
+	/// エフェクト事に必要なハンドルを用意.
+	static ::EsHandle hEffect = -1;
+
 	// 敵データを取得.
 	enemyegg.SetVertex(
 		egg->GetPos(),
@@ -112,8 +121,15 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, MeshCollider floor, MeshCo
 		// エネミーと弾が当たった場合.
 		if ( pointsbe.Col ) {
 			// ヘッドショット判定(気室判定).
-			if (m_pBullets[i]->GetPos().y < egg->GetPos().y + m_EggAirRoomY) { egg->DubleDecreHP(); }
-			else  { egg->DecreHP(); }
+			if (m_pBullets[i]->GetPos().y < egg->GetPos().y + m_EggAirRoomY) 
+			{ 
+				egg->DubleDecreHP();
+				hEffect = CEffect::Play(CEffect::BodyHit, egg->GetPos());
+			}
+			else  {
+				egg->DecreHP();
+				hEffect = CEffect::Play(CEffect::ShieldHit, egg->GetPos());
+			}
 
 			// 当たったあとは削除.
 			SAFE_DELETE(m_pBullets[i]);
@@ -213,19 +229,35 @@ void CPlayer::KeyInput()
 	//----------------------------------------------------------------------
 	//		左クリックで射撃.
 	//----------------------------------------------------------------------
-	if (Mouse->IsLAction()) {
+
+	// クールタイムが終了していたら射撃可能.
+	if (m_BulletCoolTime <= 0.f) { m_CanShot = true; }
+
+	if (Mouse->IsLAction() && m_CanShot && m_CharaInfo.Ammo != 0 && m_ReloadTime <= 0) {
+		m_CanShot = false;
+		m_CharaInfo.Ammo--;
+		m_BulletCoolTime = m_BulletCoolTimeMax;
+
 		m_pBullets.push_back(new CBullet());
 
 		m_pBullets.back()->AttachMesh(*m_pMeshBullet);	// メッシュを設定.
 		m_pBullets.back()->SetPos(0.f, -1000.f, 0.f);	// nullにならないように見えない座標に初期設定.
 		m_pBullets.back()->SetScale(5.f, 5.f, 5.f);		// サイズを設定.
 
-
 		// 弾の初期位置,移動方向の単位ベクトル,速度を設定.
 		m_pBullets.back()->Init(
 			m_pGun->GetShootPos(),
 			shootdir,
-			0.8f );
+			m_BulletSpeed );
+
+	}
+
+	//----------------------------------------------------------------------
+	//		Rでリロード.
+	//----------------------------------------------------------------------
+	if (Key->IsKeyAction(DIK_R)) {
+		m_CharaInfo.Ammo = m_CharaInfo.MaxAmmo;
+		m_ReloadTime = m_ReloadTimeMax;
 	}
 
 	// 合計のベクトル量分位置を更新.

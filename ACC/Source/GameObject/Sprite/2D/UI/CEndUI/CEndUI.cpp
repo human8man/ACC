@@ -88,6 +88,7 @@ void CEndUI::Init()
 void CEndUI::Update()
 {
 	CMouse* Mouse = CDInput::GetInstance()->CDMouse();
+	CKey* Key = CDInput::GetInstance()->CDKeyboard();
 
 	// マウス位置を取得.
 	POINT MousePos;
@@ -143,17 +144,35 @@ void CEndUI::Update()
 			m_pUIs[i]->SetPatternNo(0, 0);
 		}
 
+		bool yesflag = false,noflag = false;
 
-		// Yesにカーソルが重なっている時終了する.
+		// Yesにカーソルが重なっている時.
 		if (i == EndSprite::SelectYes && m_pUIs[i]->GetPatternNo().x) {
 			if (Mouse->IsLAction()) {
-				DestroyWindow(m_hWnd);
+				yesflag = true;
 			}
 		}
+		if (Key->IsKeyAction(DIK_Y)) {
+			yesflag = true;
+		}
+
+		// Noにカーソルが重なっている時.
 		if (i == EndSprite::SelectNo && m_pUIs[i]->GetPatternNo().x) {
 			if (Mouse->IsLAction()) {
-				m_EndDeleteFlag = true;
+				noflag = true;
 			}
+		}
+		if (Key->IsKeyAction(DIK_N)) {
+			noflag = true;
+		}
+		
+
+		// フラグの結果に合わせて処理をする.
+		if (yesflag) {
+			DestroyWindow(m_hWnd);
+		}
+		if (noflag) {
+			m_EndDeleteFlag = true;
 		}
 	}
 }

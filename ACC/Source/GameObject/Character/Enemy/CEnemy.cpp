@@ -7,13 +7,14 @@
 //		エネミークラス.
 //============================================================================
 CEnemy::CEnemy()
-	: m_pGJK		( nullptr )
-	, m_TurnSpeed	( 0.1f )
-	, m_MoveSpeed	( 0.2f )
-	, m_CamRevision	( 2.f )
-	, m_SumVec		( ZEROVEC3 )
+	: m_pGJK(nullptr)
+	, m_TurnSpeed(0.1f)
+	, m_MoveSpeed(0.2f)
+	, m_CamRevision(2.f)
+	, m_SumVec(ZEROVEC3)
 {
-	m_CharaInfo.HP = 8;
+	m_CharaInfo.HP = m_CharaInfo.MaxHP;
+	m_CharaInfo.Ammo = m_CharaInfo.MaxAmmo;
 }
 
 CEnemy::~CEnemy()

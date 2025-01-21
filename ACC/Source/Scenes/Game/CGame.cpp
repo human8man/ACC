@@ -12,6 +12,8 @@
 #include "Character/Enemy/CEnemy.h"
 #include "Sprite/2D/UI/CGameUI/CGameUI.h"
 
+#include "Common/Random/CRandom.h"
+
 #if _DEBUG
 	#include "ImGui/CImGui.h"
 #endif
@@ -68,6 +70,14 @@ void CGame::Create()
 	m_pCamRay	= std::make_unique<CRay>();
 	m_pGameUI	= std::make_unique<CGameUI>();
 	m_pGameUI	->Create();
+
+	// スポーン地点の設定.
+	m_SpawnPoints = {
+		{  50.f, 5.f,  50.f },
+		{ -50.f, 5.f,  50.f },
+		{  50.f, 5.f, -50.f },
+		{ -50.f, 5.f, -50.f }
+	};
 }
 
 
@@ -87,7 +97,10 @@ HRESULT CGame::LoadData()
 
 	// キャラクターの初期座標を設定.
 	m_pPlayer	->SetPos( 60.f, 50.f, 60.f );
-	m_pEnemy	->SetPos( 10.f, 1.f, 6.f ); 
+	m_pEnemy	->SetPos( 10.f, 1.f, 6.f );
+
+	CRandom random;
+	InitEPPos(random, m_pPlayer, m_pEnemy);
 
 	// 柱の配置(後でどうにかする仮設置方法).
 	for (int i = 0; i < m_pCylinders.size(); ++i)
@@ -191,13 +204,15 @@ void CGame::Update()
 
 
 	// 下二つには絶対に演出を入れる（勝利,敗北演出).
-	// プレイヤーのHPが０になったとき.
-	if( m_pPlayer->GetCharaInfo().HP < 0 ) {
+	// プレイヤーのHPが０になったとき(バグった時).
+	if( m_pPlayer->GetCharaInfo().HP <= 0 
+	||  m_pPlayer->GetPos().y < -100.f) {
 		CSceneManager::GetInstance()->LoadScene(SceneList::Title);
 	}
 
-	// 敵のHPが０になったとき.
-	if( m_pEnemy->GetCharaInfo().HP < 0 ) {
+	// 敵のHPが０になったとき(バグった時).
+	if( m_pEnemy->GetCharaInfo().HP <= 0
+	||  m_pEnemy->GetPos().y < -100.f) {
 		CSceneManager::GetInstance()->LoadScene(SceneList::Title);
 	}
 
@@ -358,6 +373,25 @@ void CGame::CollisionJudge()
 
 
 //-----------------------------------------------------------------------------
+//	ランダムでスポーン
+//-----------------------------------------------------------------------------
+void CGame::InitEPPos(CRandom& random, std::unique_ptr<CPlayer>& player, std::unique_ptr<CEnemy>& enemy) {
+	// スポーンポイントのインデックスをランダムに取得.
+	int PIndex = random.GetRandomInt(0, m_SpawnPoints.size() - 1);
+
+	// 敵のスポーンポイントをプレイヤーと異なる場所にする.
+	int EIndex;
+	do {
+		EIndex = random.GetRandomInt(0, m_SpawnPoints.size() - 1);
+	} while (EIndex == PIndex);
+
+	// プレイヤーと敵の位置を設定.
+	player->SetPos(m_SpawnPoints[PIndex]);
+	enemy->SetPos(m_SpawnPoints[EIndex]);
+}
+
+
+//-----------------------------------------------------------------------------
 //		プレイヤーと床の当たり判定をまとめる関数.
 //-----------------------------------------------------------------------------
 void CGame::PlayertoFloorCol(CollisionPoints points)
@@ -497,7 +531,7 @@ void CGame::EnemytoCylinderCol(CollisionPoints points)
 void CGame::RaytoObjeCol()
 {
 	// レイ情報用の変数.
-	RayInfo SendCamera, GroundRay;
+	RayInfo SendCamera, GroundRay, EnemyRay;
 	std::vector<RayInfo> CylinderRays;
 
 	D3DXVECTOR3 camlookpos = CCamera::GetInstance()->GetPos() + CCamera::GetInstance()->GetCamDir() * 100.f;
@@ -510,11 +544,18 @@ void CGame::RaytoObjeCol()
 		CylinderRay = m_pCylinders[i]->IsHitForRay(CCamera::GetInstance()->GetRay());
 		CylinderRays.push_back(CylinderRay);
 	}
+	EnemyRay = m_pEnemy->IsHitForRay(CCamera::GetInstance()->GetRay());
+
 
 	// どのオブジェが最も近いかを探す.
 	if (GroundRay.Hit) {
 		if (SendCamera.Length > GroundRay.Length) {
 			SendCamera = GroundRay;
+		}
+	}
+	if (EnemyRay.Hit) {
+		if (SendCamera.Length > EnemyRay.Length) {
+			SendCamera = EnemyRay;
 		}
 	}
 	for (int i = 0; i < m_CylinderMax; ++i) {
