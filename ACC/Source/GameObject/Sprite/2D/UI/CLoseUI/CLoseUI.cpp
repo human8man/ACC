@@ -1,27 +1,21 @@
-#include "CTitle.h"
+#include "CLoseUI.h"
 
 #include "Scenes/SceneManager/CSceneManager.h"
 #include "GameObject/Sprite/2D/UI/CUIObject.h"
 #include "Common/DirectInput/CDirectInput.h"
 #include "DirectSound/CSoundManager.h"
-#include "GameObject/Mesh/Static/CStaticMesh.h"
-#include "../GameObject/Camera/CCamera.h"
-
-#if _DEBUG
-	#include "ImGui/CImGui.h"
-#endif
 
 
 namespace {
-	// タイトル画面UIのパス.
-	constexpr char TitleImagePath[] = "Data\\Texture\\Title";
+	// LoseUIのパス.
+	constexpr char OptionImagePath[] = "Data\\Texture\\Lose";
 }
 
 
 //=================================================================================================
-//		タイトルクラス.
+//		LoseUIクラス.
 //=================================================================================================
-CTitle::CTitle(HWND hWnd)
+CLoseUI::CLoseUI(HWND hWnd)
 	: m_Light			()
 	, m_mView			()
 	, m_mProj			()
@@ -29,13 +23,12 @@ CTitle::CTitle(HWND hWnd)
 	, m_SpritePosList	()
 	, m_pUIs			()
 	, m_pSprite2Ds		()
-	, m_pEgg			()
 {
 	m_hWnd = hWnd;
-	m_Light.vDirection = D3DXVECTOR3(1.f, 5.f, 0.f);	//ライト方向.
+	m_Light.vDirection = D3DXVECTOR3(1.f, 5.f, 0.f);
 }
 
-CTitle::~CTitle()
+CLoseUI::~CLoseUI()
 {
 	Release();
 }
@@ -44,12 +37,12 @@ CTitle::~CTitle()
 //=================================================================================================
 //		構築関数.
 //=================================================================================================
-void CTitle::Create()
+void CLoseUI::Create()
 {
 	int index = 0;
 
 	// 指定したディレクトリ内を走査.
-	for (const auto& entry : std::filesystem::directory_iterator(TitleImagePath)) {
+	for (const auto& entry : std::filesystem::directory_iterator(OptionImagePath)) {
 		// 文末がjsonの場合やり直す.
 		std::string Extension = entry.path().string();
 		Extension.erase(0, entry.path().string().rfind("."));
@@ -66,19 +59,14 @@ void CTitle::Create()
 		m_SpritePosList.push_back(m_pUIs[index]->GetPos());
 		index++;
 	}
-	m_pEgg = new CStaticMesh();
-
 }
 
 
 //=================================================================================================
 //		読み込み.
 //=================================================================================================
-HRESULT CTitle::LoadData()
+HRESULT CLoseUI::LoadData()
 {
-	m_pEgg->Init(_T("Data\\Mesh\\Static\\Player\\egg.x"));
-	m_pEgg->SetPos(D3DXVECTOR3(5.f, 1.f, 2.5f));
-
 	return S_OK;
 }
 
@@ -86,27 +74,26 @@ HRESULT CTitle::LoadData()
 //=================================================================================================
 //		開放.
 //=================================================================================================
-void CTitle::Release()
+void CLoseUI::Release()
 {
 	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pUIs[i]); }
 	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pSprite2Ds[i]); }
-	SAFE_DELETE(m_pEgg);
 }
 
 
 //=================================================================================================
 //		初期化.
 //=================================================================================================
-void CTitle::Init()
+void CLoseUI::Init()
 {
-	CCamera::GetInstance()->Init();	// カメラの初期化.
+
 }
 
 
 //=================================================================================================
 //		更新.
 //=================================================================================================
-void CTitle::Update()
+void CLoseUI::Update()
 {
 	CMouse* Mouse = CDInput::GetInstance()->CDMouse();
 
@@ -137,14 +124,14 @@ void CTitle::Update()
 	// フレーム幅を含んだウィンドウの位置を算出.
 	D3DXVECTOR2 windowrect = D3DXVECTOR2(
 		static_cast<float>(borderLeft + WindowRect.left),
-		static_cast<float>(borderTop + WindowRect.top));
+		static_cast<float>(borderTop  + WindowRect.top));
 
 	//----------------------------------------------------------------------------
 	//		それぞれのUIの更新.
 	//----------------------------------------------------------------------------
 	for (size_t i = 0; i < m_pUIs.size(); ++i) {
 		// 背景の処理はいらないので早期に切る.
-		if (i == TitleSprite::FullScreen) { continue; }
+		if (i == LoseSprite::FullScreen) { continue; }
 
 		// UIのサイズと座標を変換する.
 		D3DXVECTOR2 SquarePos	= D3DXVECTOR2( m_pUIs[i]->GetPos().x, m_pUIs[i]->GetPos().y );
@@ -166,42 +153,24 @@ void CTitle::Update()
 
 
 		// スタートボタンにカーソルが重なっている時.
-		if (i == TitleSprite::StartButton && m_pUIs[i]->GetPatternNo().x) {
+		if (i == LoseSprite::StartButton && m_pUIs[i]->GetPatternNo().x) {
 			if (Mouse->IsLAction()) {
 				// ゲームを開始する.
 				CSceneManager::GetInstance()->LoadScene(SceneList::Game);
 			}
 		}
 	}
-	
-
-#if _DEBUG
-	ImGui::Begin("MousePos");
-	POINT pos;
-	if (GetCursorPos(&pos)) 
-	{
-		ImGui::Text("%d,%d", pos.x, pos.y);
-	}
-	ImGui::End();
-#endif
 }
 
 
 //=================================================================================================
 //		描画.
 //=================================================================================================
-void CTitle::Draw()
-{
-	CCamera::GetInstance()->Camera(m_mView);
-	CSceneBase::Projection(m_mProj);
-	
+void CLoseUI::Draw()
+{	
 	// UIそれぞれの描画処理.
 	for (size_t i = 0; i < m_pUIs.size(); ++i) {
 		m_pUIs[i]->Draw();
-		if (i == TitleSprite::FullScreen)
-		{
-			m_pEgg->Render(m_mView, m_mProj, m_Light);
-		}
 	}
 }
 
@@ -209,7 +178,7 @@ void CTitle::Draw()
 //------------------------------------------------------------------------------------------------
 //		初期化.
 //------------------------------------------------------------------------------------------------
-bool CTitle::PointInSquare( POINT ppos, D3DXVECTOR2 spos, D3DXVECTOR2 sposs)
+bool CLoseUI::PointInSquare( POINT ppos, D3DXVECTOR2 spos, D3DXVECTOR2 sposs)
 {
 	if (spos.x < ppos.x
 	&&  spos.y < ppos.y
