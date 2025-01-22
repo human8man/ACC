@@ -1,16 +1,15 @@
 #pragma once
 
 #include "Scenes/CSceneBase.h"
-#include "Sprite/2D/CSprite2D.h"
+#include "Sprite/2D/UI/CUIObject.h"
 #include "DirectInput/CDirectInput.h"
 
-//前方宣言
-class CUIObject;
 
 //=============================================================================
 //		EndUIクラス.
 //=============================================================================
 class CEndUI
+	:public CUIObject
 {
 public:
 	// Endで使用するスプライト名を追加していく(名前順).
@@ -33,9 +32,6 @@ public:
 	void Draw();
 
 	bool GetDeleteFlag() const { return m_EndDeleteFlag; }
-private:
-	// 矩形と点の判定.
-	bool PointInSquare(POINT ppos, D3DXVECTOR2 spos, D3DXVECTOR2 sposs);
 
 private:
 	HWND		m_hWnd;

@@ -16,7 +16,8 @@ class CPlayer;
 class CCharacter;
 class CGameUI;
 class CRandom;
-
+class CWinUI;
+class CLoseUI;
 
 //============================================================================
 //		ゲームクラス.
@@ -78,7 +79,10 @@ private:
 	std::unique_ptr<CRay> m_pCamRay;
 
 	// UIクラス.
-	std::unique_ptr<CGameUI> m_pGameUI;	
+	std::unique_ptr<CGameUI> m_pGameUI;
+	std::unique_ptr<CWinUI>	 m_pWinUI;	// 勝利クラス.
+	std::unique_ptr<CLoseUI> m_pLoseUI;	// 敗北クラス.
+
 	std::vector<D3DXVECTOR3> m_SpawnPoints;
 
 	int	m_HitKind;

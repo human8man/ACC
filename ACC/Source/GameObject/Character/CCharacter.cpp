@@ -41,7 +41,7 @@ CCharacter::CCharacter()
 	, m_CanDash				( true )
 	, DashVec				( ZEROVEC3 )
 
-	, m_EggAirRoomY			( 0.5f )
+	, m_EggAirRoomY			( 1.f )
 
 	, m_CharaInfo			()
 {
@@ -62,7 +62,6 @@ CCharacter::CCharacter()
 
 	m_CharaInfo.MaxHP = 20;
 	m_CharaInfo.MaxAmmo = 6;
-
 }
 
 CCharacter::~CCharacter()

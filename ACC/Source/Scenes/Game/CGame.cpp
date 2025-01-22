@@ -11,6 +11,8 @@
 #include "Character/Player/CPlayer.h"
 #include "Character/Enemy/CEnemy.h"
 #include "Sprite/2D/UI/CGameUI/CGameUI.h"
+#include "Sprite/2D/UI/CLoseUI/CLoseUI.h"
+#include "Sprite/2D/UI/CWinUI/CWinUI.h"
 
 #include "Common/Random/CRandom.h"
 
@@ -37,6 +39,9 @@ CGame::CGame(HWND hWnd)
 
 	, m_pGJK		( nullptr )
 	, m_pCamRay		( nullptr )
+
+	, m_pWinUI		( nullptr )
+	, m_pLoseUI		( nullptr )
 
 	, m_HitKind		(0)
 	, m_CylinderMax	(9)
@@ -96,8 +101,8 @@ HRESULT CGame::LoadData()
 	m_pGround	->AttachMesh( *m_pFloor );
 
 	// キャラクターの初期座標を設定.
-	m_pPlayer	->SetPos( 60.f, 50.f, 60.f );
-	m_pEnemy	->SetPos( 10.f, 1.f, 6.f );
+	m_pPlayer	->SetScale( 2.f, 2.f, 2.f );
+	m_pEnemy	->SetScale( 2.f, 2.f, 2.f );
 
 	CRandom random;
 	InitEPPos(random, m_pPlayer, m_pEnemy);
@@ -195,40 +200,58 @@ void CGame::Update()
 {
 	CKey* Key = CDInput::GetInstance()->CDKeyboard();
 
-	// その他とカメラレイの判定(弾の到着地点に使用する).
-	RaytoObjeCol();
-
-	m_pPlayer->Update(); // プレイヤーの更新.
-	m_pEnemy->Update();	 // エネミーの更新.
-	CCamera::GetInstance()->Update(); // カメラの更新.
-
-
-	// 下二つには絶対に演出を入れる（勝利,敗北演出).
 	// プレイヤーのHPが０になったとき(バグった時).
-	if( m_pPlayer->GetCharaInfo().HP <= 0 
-	||  m_pPlayer->GetPos().y < -100.f) {
-		CSceneManager::GetInstance()->LoadScene(SceneList::Title);
+	if (m_pLoseUI == nullptr
+	&& (m_pPlayer->GetCharaInfo().HP <= 0
+	||  m_pPlayer->GetPos().y		< -100.f)) {
+		m_pLoseUI = std::make_unique<CLoseUI>();
+		m_pLoseUI->Create();
 	}
 
 	// 敵のHPが０になったとき(バグった時).
-	if( m_pEnemy->GetCharaInfo().HP <= 0
-	||  m_pEnemy->GetPos().y < -100.f) {
-		CSceneManager::GetInstance()->LoadScene(SceneList::Title);
+	if (m_pWinUI == nullptr
+	&& (m_pEnemy->GetCharaInfo().HP <= 0
+	||  m_pEnemy->GetPos().y		< -100.f)) {
+		m_pWinUI = std::make_unique<CWinUI>();
+		m_pWinUI->Create();
 	}
 
-	// 当たり判定処理.
-	CollisionJudge();
+	// 勝利や敗北画面の更新処理.
+	if ( m_pLoseUI != nullptr ) { m_pLoseUI->Update(); }
+	if ( m_pWinUI != nullptr ) { m_pWinUI->Update(); }
 
-	// プレイヤーの攻撃が命中していた場合.
-	if (m_pPlayer->GetHit()) {
-		m_pGameUI->SetHit(m_pPlayer->GetHitKind());
+
+	// 勝利や敗北画面が出現していない間.
+	if (m_pLoseUI == nullptr && m_pWinUI == nullptr)
+	{
+		// その他とカメラレイの判定(弾の到着地点に使用する).
+		RaytoObjeCol();
+
+		m_pPlayer->Update(); // プレイヤーの更新.
+		m_pEnemy->Update();	 // エネミーの更新.
+		CCamera::GetInstance()->Update(); // カメラの更新.
+
+		// 当たり判定処理.
+		CollisionJudge();
+
+		// プレイヤーの攻撃が命中していた場合.
+		if (m_pPlayer->GetHit()) {
+			// 命中の種類を設定.
+			m_pGameUI->SetHit(m_pPlayer->GetHitKind());
+		}
+
+		// ゲーム画面UIの設定.
+		m_pGameUI->SetHP(m_pPlayer->GetCharaInfo().HP, m_pPlayer->GetCharaInfo().MaxHP);
+		m_pGameUI->SetAmmo(m_pPlayer->GetCharaInfo().Ammo);
+		m_pGameUI->SetReloadTime(m_pPlayer->GetReloadTime());
+
+		// UIの更新処理.
+		m_pGameUI->Update();
+
 	}
-	// 銃関連UIの設定.
-	m_pGameUI->SetAmmo(m_pPlayer->GetCharaInfo().Ammo);
-	m_pGameUI->SetReloadTime(m_pPlayer->GetReloadTime());
-	// UIの更新処理.
-	m_pGameUI->Update();
 
+	// カメラ側のキー操作を無効にする.
+	if (Key->IsKeyAction(DIK_F3)) { CCamera::GetInstance()->ChangeUseMouse(); }
 #if _DEBUG
 	//-----------------------------------------------------
 	//	キャラクターウィンドウ.
@@ -249,19 +272,7 @@ void CGame::Update()
 	ImGui::Text("%f,%f,%f", playersumvec.x, playersumvec.y, playersumvec.z);
 	ImGui::End();
 
-
-	//-----------------------------------------------------
-	//	銃ウィンドウ.
-	//-----------------------------------------------------
-	ImGui::Begin("CameraWindow");
-	D3DXVECTOR3 camrot = CCamera::GetInstance()->GetRot();
-	ImGui::Text("%f,%f,%f", camrot.x, camrot.y, camrot.z);
-	ImGui::End();
-
-
-	// カメラ側のキー操作を無効にする.
 	if (Key->IsKeyAction(DIK_F2)) { CCamera::GetInstance()->ChangeCanMove(); }
-	if (Key->IsKeyAction(DIK_F3)) { CCamera::GetInstance()->ChangeUseMouse(); }
 #endif
 }
 
@@ -271,6 +282,7 @@ void CGame::Update()
 //============================================================================
 void CGame::Draw()
 {
+
 	CCamera::GetInstance()->Camera(m_mView);
 	CSceneBase::Projection(m_mProj);
 
@@ -285,6 +297,10 @@ void CGame::Draw()
 
 	// エフェクトの描画.
 	CEffect::GetInstance()->Draw( m_mView, m_mProj, m_Light );
+
+	// 勝利と敗北画面の描画.
+	if (m_pLoseUI != nullptr) { m_pLoseUI->Draw(); }
+	if (m_pWinUI != nullptr) { m_pWinUI->Draw(); }
 }
 
 

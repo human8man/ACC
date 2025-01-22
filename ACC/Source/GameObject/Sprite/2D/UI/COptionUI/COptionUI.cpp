@@ -173,20 +173,3 @@ void COptionUI::Draw()
 		m_pUIs[i]->Draw();
 	}
 }
-
-
-//------------------------------------------------------------------------------------------------
-//		èâä˙âª.
-//------------------------------------------------------------------------------------------------
-bool COptionUI::PointInSquare( POINT ppos, D3DXVECTOR2 spos, D3DXVECTOR2 sposs)
-{
-	if (spos.x < ppos.x
-	&&  spos.y < ppos.y
-	&&  ppos.x < spos.x + sposs.x
-	&&  ppos.y < spos.y + sposs.y )
-	{
-		return true;
-	}
-
-	return false;
-}

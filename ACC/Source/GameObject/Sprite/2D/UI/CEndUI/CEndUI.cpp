@@ -132,7 +132,7 @@ void CEndUI::Update()
 		D3DXVECTOR2 SquareDisp = D3DXVECTOR2(m_pUIs[i]->GetSpriteData().Disp.w, m_pUIs[i]->GetSpriteData().Disp.h);
 
 		// 点と四角の当たり判定.
-		if (PointInSquare(MousePos, SquarePos + windowrect, SquareDisp))
+		if (CUIObject::PointInSquare(MousePos, SquarePos + windowrect, SquareDisp))
 		{
 			//	前回選択されていなかった場合SEを鳴らす.
 			if (m_pUIs[i]->GetPatternNo().x == 0) {
@@ -187,21 +187,4 @@ void CEndUI::Draw()
 	for (size_t i = 0; i < m_pUIs.size(); ++i) {
 		m_pUIs[i]->Draw();
 	}
-}
-
-
-//------------------------------------------------------------------------------------------------
-//		初期化.
-//------------------------------------------------------------------------------------------------
-bool CEndUI::PointInSquare(POINT ppos, D3DXVECTOR2 spos, D3DXVECTOR2 sposs)
-{
-	if (spos.x < ppos.x
-		&& spos.y < ppos.y
-		&& ppos.x < spos.x + sposs.x
-		&& ppos.y < spos.y + sposs.y)
-	{
-		return true;
-	}
-
-	return false;
 }

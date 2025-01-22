@@ -2,7 +2,6 @@
 #include "DirectX/CDirectX11.h"
 #include "DirectSound/CSoundManager.h"
 #include "Common/Time/CTime.h"
-#include "Common/Easing/Easing.h"
 
 namespace {
 	constexpr char FadeImagePath[] = "Data\\Texture\\Game";
@@ -12,7 +11,10 @@ namespace {
 //		ゲームUIクラス.
 //=================================================================================================
 CGameUI::CGameUI()
-	: m_Ammo			( 0 )
+	: m_HP				( 0 )
+	, m_HPMax			( 0 )
+	, m_Ammo			( 0 )
+	, m_HitKind			( 0 )
 	, m_ReloadTime		( 0.f )
 	, m_ViewHitTime		( 0.f )
 	, m_ViewHitTimeMax	( CTime::GetInstance()->GetDeltaTime() * 60.f )
@@ -85,6 +87,12 @@ void CGameUI::Draw()
 			else {
 				m_pUIs[i]->SetPatternNo(0, 0);
 			}
+		}
+
+		// HPUIの描画設定.
+		if (i == GameSprite::LowHP) {
+			// HPが半分以上の場合は描画しない.
+			if (m_HP > m_HPMax / 2) { continue; }
 		}
 
 		// リロードUIの描画設定.

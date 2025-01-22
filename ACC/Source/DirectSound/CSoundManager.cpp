@@ -6,33 +6,13 @@ static CSoundManager::SoundList s_SoundList[] =
 	//10000Ç™MAXÇÃâπó .
 	//Ç±Ç±Ç≈ê›íËÇ∑ÇÈâπó ÇÃêîílÇÕMAXéûÇÃâπó ÇÃêîíl.
 	//âπÇ™ëÂÇ´Ç¢Ç‡ÇÃÇæÇØÇè¨Ç≥Ç≠Ç∑ÇÈ.
-		{ CSoundManager::enList::SE_Jump		,"Data\\Sound\\SE\\Jump.wav"		, {"SE_Jump"}		,10000 },
-		{ CSoundManager::enList::SE_JumpEnd		,"Data\\Sound\\SE\\JumpEnd.wav"		, {"SE_JumpEnd"}	,10000 },
-		{ CSoundManager::enList::SE_JumpPad		,"Data\\Sound\\SE\\JumpPad.wav"		, {"SE_JumpPad"}	,10000 },
-		{ CSoundManager::enList::SE_Wire		,"Data\\Sound\\SE\\Wire.wav"		, {"SE_Wire"}		,10000 },
-		{ CSoundManager::enList::SE_CanSliding	,"Data\\Sound\\SE\\CanSliding.wav"	, {"SE_CanSliding"}	,10000 },
-		{ CSoundManager::enList::SE_Sliding		,"Data\\Sound\\SE\\Sliding.wav"		, {"SE_Sliding"}	,10000 },
-		{ CSoundManager::enList::SE_Move		,"Data\\Sound\\SE\\Run.wav"			, {"SE_Move"}		,10000 },
-		{ CSoundManager::enList::SE_WallJump	,"Data\\Sound\\SE\\WallJump.wav"	, {"SE_WallJump"}	, 9000 },
-		{ CSoundManager::enList::SE_Pause		,"Data\\Sound\\SE\\Pause.wav"		, {"SE_Pause"}		,10000 },
-		{ CSoundManager::enList::SE_Decision	,"Data\\Sound\\SE\\Decision.wav"	, {"SE_Dection"}	,10000 },
-		{ CSoundManager::enList::SE_GameStart	,"Data\\Sound\\SE\\GameStart.wav"	, {"SE_GameStart"}	,10000 },
-		{ CSoundManager::enList::SE_SelectMove	,"Data\\Sound\\SE\\SelectMove.wav"	, {"SE_SelectMove"}	,10000 },
-		{ CSoundManager::enList::SE_GameOver	,"Data\\Sound\\SE\\GameOver.wav"	, {"SE_GameOver"}	,10000 },
-		{ CSoundManager::enList::SE_GameClear	,"Data\\Sound\\SE\\GameClear.wav"	, {"SE_GameClear"}	,10000 },
-		{ CSoundManager::enList::BGM_GameMain	,"Data\\Sound\\BGM\\MainBGM.wav"	, {"BGM_Main"}		, 8500 },
-		{ CSoundManager::enList::BGM_Title		,"Data\\Sound\\BGM\\TitleBGM.wav"	, {"BGM_Title"}		, 8500 },
-		
-#ifdef _DEBUG
-		{ CSoundManager::enList::ImGui_Add		,"Data\\Sound\\IMGUI\\Add.wav"		,{"ImGui_Add"}		,10000 },
-		{ CSoundManager::enList::ImGui_Delete	,"Data\\Sound\\IMGUI\\Delete.wav"	,{"ImGui_Delete"}	,10000 },
-		{ CSoundManager::enList::ImGui_Ground	,"Data\\Sound\\IMGUI\\Ground.wav"	,{"ImGui_Ground"}	,10000 },
-		{ CSoundManager::enList::ImGui_JumpPad	,"Data\\Sound\\IMGUI\\JumpPad.wav"	,{"ImGui_JumpPad"}	,10000 },
-		{ CSoundManager::enList::ImGui_Laser	,"Data\\Sound\\IMGUI\\Laser.wav"	,{"ImGui_Laser"}	,10000 },
-		{ CSoundManager::enList::ImGui_Save		,"Data\\Sound\\IMGUI\\Save.wav"		,{"ImGui_Save"}		,10000 },
-		{ CSoundManager::enList::ImGui_Select	,"Data\\Sound\\IMGUI\\Select.wav"	,{"ImGui_Select"}	,10000 },
-		{ CSoundManager::enList::ImGui_Wall		,"Data\\Sound\\IMGUI\\Wall.wav"		,{"ImGui_Wall"}		,10000 },
-#endif
+	{ CSoundManager::enList::SE_CritHit		,"Data\\Sound\\SE\\CritHit.wav"		, {"SE_CritHit"}	,10000 },
+	{ CSoundManager::enList::SE_Hit			,"Data\\Sound\\SE\\Hit.wav"			, {"SE_Hit"}		,10000 },
+	{ CSoundManager::enList::SE_NoAmmo		,"Data\\Sound\\SE\\NoAmmo.wav"		, {"SE_NoAmmo"}		,10000 },
+	{ CSoundManager::enList::SE_Reload		,"Data\\Sound\\SE\\Reload.wav"		, {"SE_Reload"}		,10000 },
+	{ CSoundManager::enList::SE_ReloadEnd	,"Data\\Sound\\SE\\ReloadEnd.wav"	, {"SE_ReloadEnd"}	,10000 },
+	{ CSoundManager::enList::SE_SelectMove	,"Data\\Sound\\SE\\SelectMove.wav"	, {"SE_SelectMove"}	,10000 },
+	{ CSoundManager::enList::SE_Shot		,"Data\\Sound\\SE\\Shot.wav"		, {"SE_Shot"}		,10000 },
 };
 
 CSoundManager::CSoundManager()

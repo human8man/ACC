@@ -13,7 +13,7 @@ CPlayer::CPlayer()
 	: m_pGJK		( nullptr )
 	, m_TurnSpeed	( 0.1f )
 	, m_MoveSpeed	( 0.2f )
-	, m_CamRevision	( 2.f )
+	, m_CamRevision	( 4.f )
 	, m_SumVec		( ZEROVEC3 )
 {
 	m_CharaInfo.HP = m_CharaInfo.MaxHP;
@@ -38,8 +38,14 @@ void CPlayer::Update()
 	m_vRotation.y = CCamera::GetInstance()->GetRot().y;
 	
 	// 0以上のものがある場合カウントをする.
-	if ( m_DashTime >= 0.f )		{ m_DashTime		-= CTime::GetInstance()->GetDeltaTime(); }
-	if ( m_ReloadTime >= 0.f )		{ m_ReloadTime		-= CTime::GetInstance()->GetDeltaTime(); }
+	if ( m_DashTime >= 0.f )		{ m_DashTime -= CTime::GetInstance()->GetDeltaTime(); }
+	if ( m_ReloadTime >= 0.f ) {
+		m_ReloadTime -= CTime::GetInstance()->GetDeltaTime(); 
+		if (m_ReloadTime < 0.f) {
+			// リロード終了.
+			CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_ReloadEnd);
+		}
+	}
 	if ( m_DashCoolTime >= 0.f )	{ m_DashCoolTime	-= CTime::GetInstance()->GetDeltaTime(); }
 	if ( m_BulletCoolTime >= 0.f )	{ m_BulletCoolTime	-= CTime::GetInstance()->GetDeltaTime(); }
 
@@ -126,21 +132,25 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, MeshCollider floor, MeshCo
 			if (m_pBullets[i]->GetPos().y < egg->GetPos().y + m_EggAirRoomY) 
 			{ 
 				// HPを二倍減らす.
-				egg->DubleDecreHP();
+				egg->TripleDecreHP();
 				// エフェクトの再生.
 				hEffect = CEffect::Play(CEffect::BodyHitCrit, egg->GetPos());
 				// 命中種類の設定.
 				m_HitKind = HitKind::Crit;
+				// クリティカル命中音を鳴らす.
+				CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_CritHit);
 			}
 			else  {
 				// HPを減らす.
 				egg->DecreHP();
 				// エフェクトがズレていたのでずらしてからエフェクトの再生.
 				D3DXVECTOR3 enemypos = egg->GetPos();
-				enemypos.y += 1.f;
+				enemypos.y += 2.f;
 				hEffect = CEffect::Play(CEffect::ShieldHit, enemypos);
 				// 命中種類の設定.
 				m_HitKind = HitKind::Hit;
+				// 命中音を鳴らす.
+				CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_Hit);
 			}
 
 			// 命中した.
@@ -161,16 +171,16 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, MeshCollider floor, MeshCo
 //-----------------------------------------------------------------------------
 void CPlayer::KeyInput()
 {
-	CKey*	Key		= CDInput::GetInstance()->CDKeyboard();
-	CMouse* Mouse	= CDInput::GetInstance()->CDMouse();
-	
+	CKey* Key = CDInput::GetInstance()->CDKeyboard();
+	CMouse* Mouse = CDInput::GetInstance()->CDMouse();
+
 
 	//----------------------------------------------------------------------
 	//		WASDで移動.
 	//----------------------------------------------------------------------
-	
+
 	// ダッシュ中は操作できないようにする.
-	if ( m_DashTime <= 0.f ) {
+	if (m_DashTime <= 0.f) {
 		// 操作が可能な間は初期化する.
 		DashVec = ZEROVEC3;
 
@@ -200,12 +210,12 @@ void CPlayer::KeyInput()
 	//----------------------------------------------------------------------
 	//		SHIFTでダッシュ.
 	//----------------------------------------------------------------------
-	
+
 	// クールタイムが終了していたらダッシュ可能に.
-	if ( m_DashCoolTime <= 0.f ) { m_CanDash = true; }
+	if (m_DashCoolTime <= 0.f) { m_CanDash = true; }
 
 	// SHIFTでダッシュ.
-	if ( Key->IsKeyAction(DIK_LSHIFT) && m_CanDash) {
+	if (Key->IsKeyAction(DIK_LSHIFT) && m_CanDash) {
 		// ダッシュ時間の設定.
 		m_DashTime = m_DashTimeMax;
 		// ダッシュクールタイムの設定.
@@ -229,9 +239,9 @@ void CPlayer::KeyInput()
 	//----------------------------------------------------------------------
 	//		ジャンプ処理.
 	//----------------------------------------------------------------------
-	if ( Key->IsKeyAction(DIK_SPACE) && m_CanJump ) {
-		m_JumpPower = m_JumpPowerMax; 
-		m_CanJump = false; 
+	if (Key->IsKeyAction(DIK_SPACE) && m_CanJump) {
+		m_JumpPower = m_JumpPowerMax;
+		m_CanJump = false;
 	}
 	// ジャンプ力をY値に加算.
 	m_vPosition.y += m_JumpPower;
@@ -248,23 +258,31 @@ void CPlayer::KeyInput()
 	// クールタイムが終了していたら射撃可能.
 	if (m_BulletCoolTime <= 0.f) { m_CanShot = true; }
 
-	if (Mouse->IsLAction() && m_CanShot && m_CharaInfo.Ammo != 0 && m_ReloadTime <= 0) {
-		m_CanShot = false;
-		m_CharaInfo.Ammo--;
-		m_BulletCoolTime = m_BulletCoolTimeMax;
+	if (Mouse->IsLAction()){
+		if (m_CanShot && m_CharaInfo.Ammo != 0 && m_ReloadTime <= 0) {
+			m_CanShot = false;
+			m_CharaInfo.Ammo--;
+			m_BulletCoolTime = m_BulletCoolTimeMax;
 
-		m_pBullets.push_back(new CBullet());
+			m_pBullets.push_back(new CBullet());
 
-		m_pBullets.back()->AttachMesh(*m_pMeshBullet);	// メッシュを設定.
-		m_pBullets.back()->SetPos(0.f, -1000.f, 0.f);	// nullにならないように見えない座標に初期設定.
-		m_pBullets.back()->SetScale(5.f, 5.f, 5.f);		// サイズを設定.
+			m_pBullets.back()->AttachMesh(*m_pMeshBullet);	// メッシュを設定.
+			m_pBullets.back()->SetPos(0.f, -1000.f, 0.f);	// nullにならないように見えない座標に初期設定.
+			m_pBullets.back()->SetScale(5.f, 5.f, 5.f);		// サイズを設定.
 
-		// 弾の初期位置,移動方向の単位ベクトル,速度を設定.
-		m_pBullets.back()->Init(
-			m_pGun->GetShootPos(),
-			shootdir,
-			m_BulletSpeed );
+			// 弾の初期位置,移動方向の単位ベクトル,速度を設定.
+			m_pBullets.back()->Init(
+				m_pGun->GetShootPos(),
+				shootdir,
+				m_BulletSpeed);
 
+			// 射撃音を鳴らす.
+			CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_Shot);
+		}
+		else if (m_CanShot && m_CharaInfo.Ammo == 0 && m_ReloadTime <= 0) {
+			// 空打ち音を鳴らす.
+			CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_NoAmmo);
+		}
 	}
 
 	//----------------------------------------------------------------------
@@ -273,6 +291,7 @@ void CPlayer::KeyInput()
 	if (Key->IsKeyAction(DIK_R)) {
 		m_CharaInfo.Ammo = m_CharaInfo.MaxAmmo;
 		m_ReloadTime = m_ReloadTimeMax;
+		CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_Reload);
 	}
 
 	// 合計のベクトル量分位置を更新.

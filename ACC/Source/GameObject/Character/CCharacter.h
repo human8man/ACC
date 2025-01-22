@@ -54,7 +54,7 @@ public:
 	void UseGravity()	{ m_vPosition.y -= m_Gravity;	   } // ‰ÁZ‚µ‚½d—Í‚ğƒLƒƒƒ‰‚ÌY’l‚ÉŒ¸Z.
 
 	void DecreHP()		{ m_CharaInfo.HP--; }	 // HP‚ğŒ¸‚ç‚·.
-	void DubleDecreHP()	{ m_CharaInfo.HP -= 2; } // HP‚ğ“ñ”{Œ¸‚ç‚·.
+	void TripleDecreHP()	{ m_CharaInfo.HP -= 3; } // HP‚ğ3”{Œ¸‚ç‚·.
 
 
 	// Y²•ûŒü‚ÖL‚Î‚µ‚½ƒŒƒC‚ğæ“¾.

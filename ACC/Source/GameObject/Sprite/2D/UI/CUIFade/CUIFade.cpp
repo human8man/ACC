@@ -83,8 +83,6 @@ void CUIFade::Update()
 
 			// フェード中.
 			if( m_Fading ) {
-				CSoundManager::Stop(CSoundManager::SE_Move);
-
 				// ピーク時間中.
 				if ( m_Peaking ) {
 					m_FadeAlpha = 1.f;	// アルファを1で固定.

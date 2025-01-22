@@ -46,6 +46,7 @@ void CGun::UpdateGunPos(const D3DXVECTOR3& center, float radius, float playerYaw
 	// 初期位置を回転して最終的な位置を計算.
 	D3DXVECTOR3 rotatedPosition;
 	D3DXVec3TransformCoord(&rotatedPosition, &initialPosition, &rotationMatrix);
+	rotatedPosition.y += 2.f;
 
 	// プレイヤーの位置を基準に最終位置を計算.
 	m_vPosition = center + rotatedPosition;

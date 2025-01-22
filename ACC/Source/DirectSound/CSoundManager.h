@@ -15,31 +15,13 @@ public:
 	// サウンドリスト列挙型.
 	enum enList
 	{
-		SE_Jump,		// ジャンプ.
-		SE_JumpEnd,		// ジャンプ終了.
-		SE_JumpPad,		// ジャンプパッド.
-		SE_Wire,		// ワイヤー.
-		SE_CanSliding,	// スライディング可能.
-		SE_Sliding,		// スライディング.
-		SE_Move,		// 移動用.
-		SE_WallJump,	// 壁ジャンプ.
-		SE_Pause,		// 一時停止時
-		SE_Decision,	// 決定
-		SE_GameStart,	// ゲーム開始
-		SE_SelectMove,	// 選択肢移動
-		SE_GameOver,	// ゲームオーバー
-		SE_GameClear,	// ゲームクリア.
-		BGM_GameMain,	// ゲームメイン.
-		BGM_Title,		// タイトル.
-
-		ImGui_Add,		// 追加.
-		ImGui_Delete,	// 削除.
-		ImGui_Ground,	// 床.
-		ImGui_JumpPad,	// ジャンプパッド.
-		ImGui_Laser,	// レーザー.
-		ImGui_Save,		// 保存.
-		ImGui_Select,	// 選択.
-		ImGui_Wall,		// 壁.
+		SE_CritHit,		// 気室ショット.
+		SE_Hit,			// 命中.
+		SE_NoAmmo,		// 残弾数なしのときに撃つとなる音.
+		SE_Reload,		// リロード.
+		SE_ReloadEnd,	// リロード終了.
+		SE_SelectMove,	// 選択肢移動.
+		SE_Shot,		// 射撃.
 
 		// 音が増えたら「ここ」に追加してください.
 		max, // 最大数.

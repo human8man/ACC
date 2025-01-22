@@ -93,7 +93,7 @@ void CEnemy::Collision(std::unique_ptr<CPlayer>& egg, MeshCollider floor, MeshCo
 		// プレイヤーと弾が当たった場合.
 		if ( pointsbp.Col ) {
 			// ヘッドショット判定(気室判定).
-			if (m_pBullets[i]->GetPos().y < egg->GetPos().y + m_EggAirRoomY) { egg->DubleDecreHP(); }
+			if (m_pBullets[i]->GetPos().y < egg->GetPos().y + m_EggAirRoomY) { egg->TripleDecreHP(); }
 			else  { egg->DecreHP(); }
 
 			// 当たったあとは削除.

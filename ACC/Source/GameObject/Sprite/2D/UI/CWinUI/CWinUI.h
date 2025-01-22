@@ -1,32 +1,25 @@
 #pragma once
 
 #include "Scenes/CSceneBase.h"
-#include "Sprite/2D/CSprite2D.h"
+#include "Sprite/2D/UI/CUIObject.h"
 #include "DirectInput/CDirectInput.h"
 
-//前方宣言
-class CUIObject;
 
 //=============================================================================
 //		WinUIクラス.
 //=============================================================================
 class CWinUI
+	:public CUIObject
 {
 public:
 	// Titleで使用するスプライト名を追加していく(名前順).
 	enum WinSprite {
-		FullScreen,
-		Select1,
-		Select2,
-		Select3,
-		Select4,
-		Select5,
-		StartButton,
-		Training,
+		Black,
+		Victory
 	};
 
 public:
-	CWinUI(HWND hWnd);
+	CWinUI();
 	~CWinUI();
 
 	void Create();
@@ -36,10 +29,6 @@ public:
 
 	void Update();
 	void Draw();
-
-private:
-	// 矩形と点の判定.
-	bool PointInSquare(POINT ppos, D3DXVECTOR2 spos, D3DXVECTOR2 sposs);
 
 private:
 	HWND		m_hWnd;
@@ -53,4 +42,7 @@ private:
 
 	std::vector<CUIObject*> m_pUIs;			// UIクラス.
 	std::vector<CSprite2D*> m_pSprite2Ds;	// Sprite2Dクラス.
+
+	float m_SpawnTimeMax;	// スポーン最大時間.
+	float m_SpawnTime;		// スポーン時間.
 };

@@ -42,6 +42,19 @@ void CUIObject::Draw()
 	CDirectX11::GetInstance()->SetDepth(true);
 }
 
+bool CUIObject::PointInSquare(POINT ppos, D3DXVECTOR2 spos, D3DXVECTOR2 sposs)
+{
+	if (spos.x < ppos.x
+		&& spos.y < ppos.y
+		&& ppos.x < spos.x + sposs.x
+		&& ppos.y < spos.y + sposs.y)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 void CUIObject::Draw(
 	D3DXMATRIX& View, D3DXMATRIX& Proj,
 	LIGHT& Light )

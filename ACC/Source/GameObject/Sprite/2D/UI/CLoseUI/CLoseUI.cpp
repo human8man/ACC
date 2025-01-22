@@ -5,6 +5,8 @@
 #include "Common/DirectInput/CDirectInput.h"
 #include "DirectSound/CSoundManager.h"
 
+#include "Common/Time/CTime.h"
+#include "Common/Easing/Easing.h"
 
 namespace {
 	// LoseUIのパス.
@@ -15,7 +17,7 @@ namespace {
 //=================================================================================================
 //		LoseUIクラス.
 //=================================================================================================
-CLoseUI::CLoseUI(HWND hWnd)
+CLoseUI::CLoseUI()
 	: m_Light			()
 	, m_mView			()
 	, m_mProj			()
@@ -23,8 +25,10 @@ CLoseUI::CLoseUI(HWND hWnd)
 	, m_SpritePosList	()
 	, m_pUIs			()
 	, m_pSprite2Ds		()
+
+	, m_SpawnTimeMax	( CTime::GetInstance()->GetDeltaTime() * 300.f )
+	, m_SpawnTime		( m_SpawnTimeMax )
 {
-	m_hWnd = hWnd;
 	m_Light.vDirection = D3DXVECTOR3(1.f, 5.f, 0.f);
 }
 
@@ -95,69 +99,20 @@ void CLoseUI::Init()
 //=================================================================================================
 void CLoseUI::Update()
 {
-	CMouse* Mouse = CDInput::GetInstance()->CDMouse();
-
-	// マウス位置を取得.
-	POINT MousePos;
-	GetCursorPos(&MousePos);
-
-	// ウィンドウ全体の位置とサイズを取得（ウィンドウタブや枠を含む）.
-	RECT WindowRect;
-	GetWindowRect(m_hWnd, &WindowRect);
-
-	// クライアント領域の位置とサイズを取得（ウィンドウ内の描画範囲）.
-	RECT clientRect;
-	GetClientRect(m_hWnd, &clientRect);
-
-	// クライアント領域の左上と右下の座標を初期化.
-	POINT topLeft	  = { clientRect.left, clientRect.top };
-	POINT bottomRight = { clientRect.right, clientRect.bottom };
-
-	// クライアント領域の座標をスクリーン座標系に変換.
-	ClientToScreen(m_hWnd, &topLeft);
-	ClientToScreen(m_hWnd, &bottomRight);
-
-	// ウィンドウ全体の左上座標とクライアント領域の左上座標の差分を計算.
-	int borderLeft	= topLeft.x - WindowRect.left;
-	int borderTop	= topLeft.y - WindowRect.top;
-
-	// フレーム幅を含んだウィンドウの位置を算出.
-	D3DXVECTOR2 windowrect = D3DXVECTOR2(
-		static_cast<float>(borderLeft + WindowRect.left),
-		static_cast<float>(borderTop  + WindowRect.top));
+	m_SpawnTime -= CTime::GetInstance()->GetDeltaTime();
 
 	//----------------------------------------------------------------------------
 	//		それぞれのUIの更新.
 	//----------------------------------------------------------------------------
 	for (size_t i = 0; i < m_pUIs.size(); ++i) {
-		// 背景の処理はいらないので早期に切る.
-		if (i == LoseSprite::FullScreen) { continue; }
-
-		// UIのサイズと座標を変換する.
-		D3DXVECTOR2 SquarePos	= D3DXVECTOR2( m_pUIs[i]->GetPos().x, m_pUIs[i]->GetPos().y );
-		D3DXVECTOR2 SquareDisp	= D3DXVECTOR2( m_pUIs[i]->GetSpriteData().Disp.w, m_pUIs[i]->GetSpriteData().Disp.h );
-
-
-		// 点と四角の当たり判定.
-		if (PointInSquare(MousePos, SquarePos + windowrect, SquareDisp)) 
-		{
-			//	前回選択されていなかった場合SEを鳴らす.
-			if ( m_pUIs[i]->GetPatternNo().x == 0 ) {
-				CSoundManager::GetInstance()->PlaySE(CSoundManager::SE_SelectMove);
-			}
-			m_pUIs[i]->SetPatternNo(1, 0);
-		}
-		else {
-			m_pUIs[i]->SetPatternNo(0, 0);
+		// 背景を透過させる.
+		if (i == LoseSprite::Black) {
+			m_pUIs[i]->SetAlpha(0.4f);
 		}
 
-
-		// スタートボタンにカーソルが重なっている時.
-		if (i == LoseSprite::StartButton && m_pUIs[i]->GetPatternNo().x) {
-			if (Mouse->IsLAction()) {
-				// ゲームを開始する.
-				CSceneManager::GetInstance()->LoadScene(SceneList::Game);
-			}
+		if (m_SpawnTime < 0.f) {
+			// ゲームを開始する.
+			CSceneManager::GetInstance()->LoadScene(SceneList::Title);
 		}
 	}
 }
@@ -172,21 +127,4 @@ void CLoseUI::Draw()
 	for (size_t i = 0; i < m_pUIs.size(); ++i) {
 		m_pUIs[i]->Draw();
 	}
-}
-
-
-//------------------------------------------------------------------------------------------------
-//		初期化.
-//------------------------------------------------------------------------------------------------
-bool CLoseUI::PointInSquare( POINT ppos, D3DXVECTOR2 spos, D3DXVECTOR2 sposs)
-{
-	if (spos.x < ppos.x
-	&&  spos.y < ppos.y
-	&&  ppos.x < spos.x + sposs.x
-	&&  ppos.y < spos.y + sposs.y )
-	{
-		return true;
-	}
-
-	return false;
 }

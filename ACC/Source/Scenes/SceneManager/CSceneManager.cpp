@@ -174,10 +174,6 @@ void CSceneManager::LoadScene(SceneList Scene)
 {
 	m_pFade->DoFade(120);
 	m_NextSceneNo = Scene;
-
-	CSoundManager::Stop(CSoundManager::BGM_Title);
-	CSoundManager::Stop(CSoundManager::BGM_GameMain);
-	CSoundManager::Stop(CSoundManager::SE_Move);
 }
 
 

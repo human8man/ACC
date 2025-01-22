@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../GameObject/CGameObject.h"
+#include "CGameObject.h"
 
 #include "../CSprite2D.h"
 
@@ -36,6 +36,7 @@ public:
 
 	POINTS GetPatternNo() const { return m_PatternNo; }
 	CSprite2D::SPRITE_STATE GetSpriteData() const { return m_pSprite->GetSpriteData(); }
+	bool PointInSquare(POINT ppos, D3DXVECTOR2 spos, D3DXVECTOR2 sposs);
 
 protected:
 	//CGameObjectÇ©ÇÁoverrideÇµÇΩä÷êî.
