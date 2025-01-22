@@ -269,7 +269,6 @@
     </ClCompile>
     <ClCompile Include="Source\Common\Time\CTime.cpp" />
     <ClCompile Include="Source\Common\XInput\CXInput.cpp" />
-    <ClCompile Include="Source\DebugText\CDebugText.cpp" />
     <ClCompile Include="Source\DirectSound\CSound.cpp" />
     <ClCompile Include="Source\DirectSound\CSoundManager.cpp" />
     <ClCompile Include="Source\DirectX\CDirectX11.cpp" />
@@ -330,7 +329,6 @@
     <ClInclude Include="Source\Common\stdafx.h" />
     <ClInclude Include="Source\Common\Time\CTime.h" />
     <ClInclude Include="Source\Common\XInput\CXInput.h" />
-    <ClInclude Include="Source\DebugText\CDebugText.h" />
     <ClInclude Include="Source\DirectSound\CSound.h" />
     <ClInclude Include="Source\DirectSound\CSoundManager.h" />
     <ClInclude Include="Source\DirectX\CDirectX11.h" />

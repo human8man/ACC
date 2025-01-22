@@ -3,7 +3,6 @@
 #include "DirectX/CDirectX9.h"
 #include "DirectX/CDirectX11.h"
 
-#include "DebugText/CDebugText.h"
 #include "Collision/GJK/CGJK.h"
 
 
