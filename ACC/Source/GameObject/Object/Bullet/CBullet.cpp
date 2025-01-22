@@ -6,7 +6,7 @@
 CBullet::CBullet()
 	: m_MoveDirection	()
 	, m_MoveSpeed		()
-	, m_DeleteTime		(FPS * 10)
+	, m_DeleteTime		()
 {
 }
 
@@ -45,4 +45,5 @@ void CBullet::Init(
 	m_vPosition		= pos;
 	m_MoveDirection = vector;
 	m_MoveSpeed		= speed;
+	m_DeleteTime	= FPS * 10;
 }

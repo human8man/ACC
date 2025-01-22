@@ -87,7 +87,6 @@ void CCamera::Update()
 
 	// ベクトル計算をし、注視点に代入.
 	MouseMove(m_MouseMoveDis);
-	ShowCursor(m_CanMoveMouse);
 
 	// レイに値を入れる.
 	m_pRay.Position = m_Camera.Pos;

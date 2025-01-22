@@ -10,11 +10,8 @@ public:
 	enum GameSprite {
 		Bullets,
 		Crosshair,
-		HP,
 		LowHP,
-		Reload,
-		AutoAim,
-		Homing
+		Reload
 	};
 
 public:
@@ -38,9 +35,6 @@ public:
 	// リロード時間の設定.
 	void SetReloadTime( float time ){ m_ReloadTime = time; }
 
-
-	void SetAutoAim(bool flg) { m_AutoAim = flg; }
-	void SetHoming(bool flg) { m_Homing = flg; }
 private:
 	std::vector<std::string> m_SpriteDataList;	//スプライト情報をまとめる配列.
 	std::vector<D3DXVECTOR3> m_SpritePosList;	//スプライト座標をまとめる配列.
@@ -55,7 +49,4 @@ private:
 	float	m_ReloadTime;		// リロード時間.
 	float	m_ViewHitTime;		// ヒット表示時間.
 	float	m_ViewHitTimeMax;	// ヒット最大表示時間.
-
-	bool	m_AutoAim;	//オートエイム.
-	bool	m_Homing;	// ホーミング.
 };

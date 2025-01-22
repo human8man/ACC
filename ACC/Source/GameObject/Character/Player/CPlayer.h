@@ -19,15 +19,13 @@ public:
 	CPlayer();
 	virtual ~CPlayer() override;
 
-	void Update(std::unique_ptr<CEnemy>& chara);
+	virtual void Update() override;
 	virtual void Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light ) override;
 
 
 	// 命中フラグを渡す.
 	const bool& GetHit() { return m_Hit; }
 	const int& GetHitKind() { return m_HitKind; }
-	const bool& GetAutoAim() { return m_AutoAim; }
-	const bool& GetHoming() { return m_Homing; }
 	// 移動量の取得.
 	const D3DXVECTOR3& GetMoveVec() { return m_SumVec; }
 
@@ -52,9 +50,6 @@ private:
 
 	bool m_Hit;		// 命中したか.
 	int	 m_HitKind;	// 命中の種類.
-
-	bool m_AutoAim;	// オートエイム.
-	bool m_Homing;	// ホーミング.
 
 	D3DXVECTOR3 m_SumVec;	// 合計のベクトル量.
 };

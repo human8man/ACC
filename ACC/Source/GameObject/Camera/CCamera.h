@@ -53,7 +53,6 @@ public:
 	static void SetSens		 (const float& Sens)	  { GetInstance()->m_MouseSens = Sens;	}
 	static void SetPosition	 (const D3DXVECTOR3& Pos) { GetInstance()->m_Camera.Pos = Pos;	}
 	static void SetRayHit	 (const D3DXVECTOR3& Pos) { GetInstance()->m_RayHitPoint = Pos;	}
-	static void SetLook		 (const D3DXVECTOR3& Pos) { GetInstance()->m_Camera.Look = Pos;	}
 private:
 	void KeyInput();					// キー入力.
 	void CameraMove(int vec);			// カメラの移動.

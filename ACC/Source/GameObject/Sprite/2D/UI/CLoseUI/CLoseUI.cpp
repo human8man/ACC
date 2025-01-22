@@ -113,7 +113,6 @@ void CLoseUI::Update()
 		if (m_SpawnTime < 0.f) {
 			// ƒQ[ƒ€‚ðŠJŽn‚·‚é.
 			CSceneManager::GetInstance()->LoadScene(SceneList::Title);
-			CSoundManager::GetInstance()->Stop(CSoundManager::enList::BGM_Game);
 		}
 	}
 }

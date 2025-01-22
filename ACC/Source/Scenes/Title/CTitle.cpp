@@ -104,10 +104,6 @@ void CTitle::Init()
 //=================================================================================================
 void CTitle::Update()
 {
-	ShowCursor(true);
-	// BGMÄ¶.
-	CSoundManager::GetInstance()->PlayLoop(CSoundManager::enList::BGM_Title);
-
 	CMouse* Mouse = CDInput::GetInstance()->CDMouse();
 	m_pEgg->SetRotY(m_pEgg->GetRot().y + 0.01f);
 
@@ -171,7 +167,6 @@ void CTitle::Update()
 			if (Mouse->IsLAction()) {
 				// ƒQ[ƒ€‚ðŠJŽn‚·‚é.
 				CSceneManager::GetInstance()->LoadScene(SceneList::Game);
-				CSoundManager::GetInstance()->Stop(CSoundManager::enList::BGM_Title);
 			}
 		}
 	}

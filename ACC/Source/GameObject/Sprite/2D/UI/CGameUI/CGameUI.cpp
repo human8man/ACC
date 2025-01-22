@@ -18,8 +18,6 @@ CGameUI::CGameUI()
 	, m_ReloadTime		( 0.f )
 	, m_ViewHitTime		( 0.f )
 	, m_ViewHitTimeMax	( CTime::GetInstance()->GetDeltaTime() * 60.f )
-	, m_AutoAim			(false)
-	, m_Homing			(false)
 {
 }
 
@@ -92,12 +90,6 @@ void CGameUI::Draw()
 		}
 
 		// HPUIÇÃï`âÊê›íË.
-		if (i == GameSprite::HP) {
-			if (m_HP < 0) { m_HP = 0; }
-			m_pUIs[i]->SetPatternNo(m_HP, 0);
-		}
-
-		// LOWHPUIÇÃï`âÊê›íË.
 		if (i == GameSprite::LowHP) {
 			// HPÇ™îºï™à»è„ÇÃèÍçáÇÕï`âÊÇµÇ»Ç¢.
 			if (m_HP > m_HPMax / 2) { continue; }
@@ -109,9 +101,6 @@ void CGameUI::Draw()
 			if (m_ReloadTime <= 0.f) { continue; }
 		}
 
-		// É`Å[ÉgånÇÃUIï`âÊê›íË.
-		if (i == GameSprite::AutoAim) {m_pUIs[i]->SetPatternNo(m_AutoAim, 0);}
-		if (i == GameSprite::Homing)  {m_pUIs[i]->SetPatternNo(m_Homing, 0);}
 
 		m_pUIs[i]->Draw();
 	}

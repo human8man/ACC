@@ -14,6 +14,17 @@ class CCharacter
 	: public CStaticMeshObject
 {
 public:
+	// キャラ状態列挙体.
+	enum CharaState
+	{
+		// ここに状態とか書いていく.
+	};
+	// チート状態列挙.
+	enum CheatState
+	{
+		// ここに使うチートとか書いていく.
+	};
+
 	// キャラ情報構造体.
 	struct CharaInfo
 	{
@@ -21,6 +32,11 @@ public:
 		int MaxHP;
 		int Ammo;
 		int MaxAmmo;
+		CharaState Status;
+		CheatState UsingCheat1;
+		CheatState UsingCheat2;
+		CheatState UsingCheat3;
+		CheatState UsingCheat4;
 	};
 public:
 	CCharacter();

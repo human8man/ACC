@@ -83,7 +83,6 @@ void CGame::Create()
 		{  50.f, 5.f, -50.f },
 		{ -50.f, 5.f, -50.f }
 	};
-
 }
 
 
@@ -199,9 +198,6 @@ void CGame::Init()
 //============================================================================
 void CGame::Update()
 {
-	// BGMを再生.
-	CSoundManager::GetInstance()->PlayLoop(CSoundManager::enList::BGM_Game);
-
 	CKey* Key = CDInput::GetInstance()->CDKeyboard();
 
 	// プレイヤーのHPが０になったとき(バグった時).
@@ -233,12 +229,7 @@ void CGame::Update()
 		// その他とカメラレイの判定(弾の到着地点に使用する).
 		RaytoObjeCol();
 
-		// プレイヤーがオートエイムを使用していた場合.
-		if (m_pPlayer->GetAutoAim()) {
-			CCamera::GetInstance()->SetLook(m_pEnemy->GetPos());
-		}
-
-		m_pPlayer->Update(m_pEnemy);		// プレイヤーの更新.
+		m_pPlayer->Update();				// プレイヤーの更新.
 		m_pEnemy->Update(m_pPlayer);		// エネミーの更新.
 		CCamera::GetInstance()->Update();	// カメラの更新.
 
@@ -255,11 +246,10 @@ void CGame::Update()
 		m_pGameUI->SetHP(m_pPlayer->GetCharaInfo().HP, m_pPlayer->GetCharaInfo().MaxHP);
 		m_pGameUI->SetAmmo(m_pPlayer->GetCharaInfo().Ammo);
 		m_pGameUI->SetReloadTime(m_pPlayer->GetReloadTime());
-		m_pGameUI->SetAutoAim(m_pPlayer->GetAutoAim());
-		m_pGameUI->SetHoming(m_pPlayer->GetHoming());
 
 		// UIの更新処理.
 		m_pGameUI->Update();
+
 	}
 
 	// カメラ側のキー操作を無効にする.
