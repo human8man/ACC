@@ -155,11 +155,17 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Collision\BoundingSphere\CBoundingSphere.cpp">
+      <Filter>Source\Collision\BoundingSphere</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Collision\Ray\CRay.cpp">
       <Filter>Source\Collision\Ray</Filter>
     </ClCompile>
     <ClCompile Include="Source\Common\stdafx.cpp">
       <Filter>Source\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\DebugText\CDebugText.cpp">
+      <Filter>Source\DebugText</Filter>
     </ClCompile>
     <ClCompile Include="Source\DirectSound\CSoundManager.cpp">
       <Filter>Source\DirectSound</Filter>
@@ -301,13 +307,11 @@
     </ClCompile>
     <ClCompile Include="Source\Common\Time\CTime.cpp" />
     <ClCompile Include="Source\Common\Random\CRandom.cpp" />
-    <ClCompile Include="Source\GameObject\Sprite\2D\UI\CEndUI\CEndUI.cpp" />
-    <ClCompile Include="Source\GameObject\Sprite\2D\UI\CGameUI\CGameUI.cpp" />
-    <ClCompile Include="Source\GameObject\Sprite\2D\UI\CLoseUI\CLoseUI.cpp" />
-    <ClCompile Include="Source\GameObject\Sprite\2D\UI\COptionUI\COptionUI.cpp" />
-    <ClCompile Include="Source\GameObject\Sprite\2D\UI\CWinUI\CWinUI.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Collision\BoundingSphere\CBoundingSphere.h">
+      <Filter>Source\Collision\BoundingSphere</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Collision\Ray\CRay.h">
       <Filter>Source\Collision\Ray</Filter>
     </ClInclude>
@@ -319,6 +323,9 @@
     </ClInclude>
     <ClInclude Include="Source\Common\Global.h">
       <Filter>Source\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\DebugText\CDebugText.h">
+      <Filter>Source\DebugText</Filter>
     </ClInclude>
     <ClInclude Include="Source\DirectSound\CSoundManager.h">
       <Filter>Source\DirectSound</Filter>
@@ -457,11 +464,6 @@
     </ClInclude>
     <ClInclude Include="Source\Common\Time\CTime.h" />
     <ClInclude Include="Source\Common\Random\CRandom.h" />
-    <ClInclude Include="Source\GameObject\Sprite\2D\UI\CEndUI\CEndUI.h" />
-    <ClInclude Include="Source\GameObject\Sprite\2D\UI\CGameUI\CGameUI.h" />
-    <ClInclude Include="Source\GameObject\Sprite\2D\UI\CLoseUI\CLoseUI.h" />
-    <ClInclude Include="Source\GameObject\Sprite\2D\UI\COptionUI\COptionUI.h" />
-    <ClInclude Include="Source\GameObject\Sprite\2D\UI\CWinUI\CWinUI.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Common\Easing\Easing.inl">
