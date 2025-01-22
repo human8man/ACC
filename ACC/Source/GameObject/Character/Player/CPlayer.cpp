@@ -52,7 +52,7 @@ void CPlayer::Update(std::unique_ptr<CEnemy>& chara)
 	if ( m_BulletCoolTime >= 0.f )	{ m_BulletCoolTime	-= CTime::GetInstance()->GetDeltaTime(); }
 
 	// 入力処理.
-	KeyInput();
+	KeyInput(chara);
 
 	// 入力処理後にカメラ座標をセット.
 	if (!CCamera::GetInstance()->GetMoveCamera()) {
@@ -186,7 +186,7 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, MeshCollider floor, MeshCo
 //-----------------------------------------------------------------------------
 //		キー入力処理.
 //-----------------------------------------------------------------------------
-void CPlayer::KeyInput()
+void CPlayer::KeyInput(std::unique_ptr<CEnemy>& chara)
 {
 	CKey* Key = CDInput::GetInstance()->CDKeyboard();
 	CMouse* Mouse = CDInput::GetInstance()->CDMouse();
@@ -204,7 +204,7 @@ void CPlayer::KeyInput()
 		D3DXVECTOR3 camDir;
 		// カメラの向きベクトルを取得.
 		if (m_AutoAim) {
-			camDir = CCamera::GetInstance()->GetCamDir();
+			camDir = chara->GetPos() - m_vPosition;
 			camDir.y = 0.f;	// Y情報があると飛び始めるのでYの要素を抜く.
 			D3DXVec3Normalize(&camDir, &camDir); // 正規化.
 		}

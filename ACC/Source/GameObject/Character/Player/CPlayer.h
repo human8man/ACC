@@ -40,7 +40,7 @@ public:
 
 private:
 	// キー入力処理.
-	void KeyInput();
+	void KeyInput(std::unique_ptr<CEnemy>& chara);
 
 private:
 	// GJKクラス.

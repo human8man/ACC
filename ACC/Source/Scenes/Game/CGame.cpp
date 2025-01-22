@@ -16,9 +16,6 @@
 
 #include "Common/Random/CRandom.h"
 
-#if _DEBUG
-	#include "ImGui/CImGui.h"
-#endif
 
 //============================================================================
 //		ゲームクラス.
@@ -233,14 +230,14 @@ void CGame::Update()
 		// その他とカメラレイの判定(弾の到着地点に使用する).
 		RaytoObjeCol();
 
+		m_pPlayer->Update(m_pEnemy);		// プレイヤーの更新.
+		m_pEnemy->Update(m_pPlayer);		// エネミーの更新.
+		CCamera::GetInstance()->Update();	// カメラの更新.
+
 		// プレイヤーがオートエイムを使用していた場合.
 		if (m_pPlayer->GetAutoAim()) {
 			CCamera::GetInstance()->SetLook(m_pEnemy->GetPos());
 		}
-
-		m_pPlayer->Update(m_pEnemy);		// プレイヤーの更新.
-		m_pEnemy->Update(m_pPlayer);		// エネミーの更新.
-		CCamera::GetInstance()->Update();	// カメラの更新.
 
 		// 当たり判定処理.
 		CollisionJudge();
@@ -264,28 +261,6 @@ void CGame::Update()
 
 	// カメラ側のキー操作を無効にする.
 	if (Key->IsKeyAction(DIK_F3)) { CCamera::GetInstance()->ChangeUseMouse(); }
-#if _DEBUG
-	//-----------------------------------------------------
-	//	キャラクターウィンドウ.
-	//-----------------------------------------------------
-	ImGui::Begin("CharaWindow");
-	ImGui::Text("%d", m_pPlayer->GetCharaInfo().HP);
-	ImGui::Text("%d", m_pEnemy->GetCharaInfo().HP);
-	ImGui::End();
-
-
-	//-----------------------------------------------------
-	//	プレイヤーウィンドウ.
-	//-----------------------------------------------------
-	ImGui::Begin("PlayerWindow");
-	D3DXVECTOR3 playerpos = m_pPlayer->GetPos();
-	ImGui::Text("%f,%f,%f", playerpos.x, playerpos.y, playerpos.z);
-	D3DXVECTOR3 playersumvec = m_pPlayer->GetMoveVec();
-	ImGui::Text("%f,%f,%f", playersumvec.x, playersumvec.y, playersumvec.z);
-	ImGui::End();
-
-	if (Key->IsKeyAction(DIK_F2)) { CCamera::GetInstance()->ChangeCanMove(); }
-#endif
 }
 
 
