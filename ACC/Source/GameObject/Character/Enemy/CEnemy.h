@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Character/CCharacter.h"
+#include "Character/Player/CPlayer.h"
 
-class CPlayer;
 
 //==================================================
 //		エネミークラス.
@@ -10,11 +10,23 @@ class CPlayer;
 class CEnemy
 	: public CCharacter
 {
+public :
+	// 移動の種類.
+	enum MoveKind {
+		Straight,
+		Left,
+		Right,
+		Back,
+		Wait,
+
+		max,
+	};
+
 public:
 	CEnemy();
 	virtual ~CEnemy();
 
-	virtual void Update() override;
+	void Update(std::unique_ptr<CPlayer>& chara);
 	virtual void Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light ) override;
 
 
@@ -28,6 +40,12 @@ public:
 	void Collision(std::unique_ptr<CPlayer>& egg, MeshCollider floor, MeshCollider cylinder);
 
 private:
+	// 行動をまとめる.
+	void Act(std::unique_ptr<CPlayer>& chara);
+
+private:
+	// プレイヤー情報を取得用.
+	CPlayer*  m_pPlayer;
 	// GJKクラス.
 	std::unique_ptr<CGJK> m_pGJK;
 
@@ -35,5 +53,12 @@ private:
 	float m_MoveSpeed;	 // 移動速度.
 	float m_CamRevision; // カメラ座標の補正値.
 
-	D3DXVECTOR3 m_SumVec;// 合計のベクトル量.
+	bool m_Hit;		// 命中したか.
+	int	 m_HitKind;	// 命中の種類.
+
+	float m_SelectMoveTime;		// 次の行動決定までの時間.
+	float m_SelectMoveTimeMax;	// 次の行動決定までの最大時間.
+
+	int			m_MoveKind;	// 行動種類.
+	D3DXVECTOR3 m_SumVec;	// 合計のベクトル量.
 };

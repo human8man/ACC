@@ -13,6 +13,12 @@ static CSoundManager::SoundList s_SoundList[] =
 	{ CSoundManager::enList::SE_ReloadEnd	,"Data\\Sound\\SE\\ReloadEnd.wav"	, {"SE_ReloadEnd"}	,10000 },
 	{ CSoundManager::enList::SE_SelectMove	,"Data\\Sound\\SE\\SelectMove.wav"	, {"SE_SelectMove"}	,10000 },
 	{ CSoundManager::enList::SE_Shot		,"Data\\Sound\\SE\\Shot.wav"		, {"SE_Shot"}		,10000 },
+	{ CSoundManager::enList::SE_Dash		,"Data\\Sound\\SE\\Dash.wav"		, {"SE_Dash"}		,10000 },
+	{ CSoundManager::enList::SE_Jump		,"Data\\Sound\\SE\\Jump.wav"		, {"SE_Jump"}		,10000 },
+	{ CSoundManager::enList::SE_Damage		,"Data\\Sound\\SE\\Damage.wav"		, {"SE_Damage"}		,10000 },
+	{ CSoundManager::enList::SE_DamageCrit	,"Data\\Sound\\SE\\DamageCrit.wav"	, {"SE_DamageCrit"}	,10000 },
+	{ CSoundManager::enList::SE_Lose		,"Data\\Sound\\SE\\Lose.wav"		, {"SE_Lose"}		,10000 },
+	{ CSoundManager::enList::SE_Win			,"Data\\Sound\\SE\\Win.wav"			, {"SE_Win"}		,10000 },
 };
 
 CSoundManager::CSoundManager()

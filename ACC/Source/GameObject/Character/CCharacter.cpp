@@ -34,7 +34,7 @@ CCharacter::CCharacter()
 	, m_CanJump				( false )
 
 	, m_DashCoolTime		( 0.f )
-	, m_DashCoolTimeMax		( CTime::GetInstance()->GetDeltaTime() * 180.f )
+	, m_DashCoolTimeMax		( CTime::GetInstance()->GetDeltaTime() * 60.f )
 	, m_DashTime			( 0.f )
 	, m_DashTimeMax			( CTime::GetInstance()->GetDeltaTime() * 30.f )
 	, m_DashSpeed			( 2.6f )

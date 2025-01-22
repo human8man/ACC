@@ -206,6 +206,7 @@ void CGame::Update()
 	||  m_pPlayer->GetPos().y		< -100.f)) {
 		m_pLoseUI = std::make_unique<CLoseUI>();
 		m_pLoseUI->Create();
+		CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_Lose);
 	}
 
 	// 敵のHPが０になったとき(バグった時).
@@ -214,6 +215,7 @@ void CGame::Update()
 	||  m_pEnemy->GetPos().y		< -100.f)) {
 		m_pWinUI = std::make_unique<CWinUI>();
 		m_pWinUI->Create();
+		CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_Win);
 	}
 
 	// 勝利や敗北画面の更新処理.
@@ -227,9 +229,9 @@ void CGame::Update()
 		// その他とカメラレイの判定(弾の到着地点に使用する).
 		RaytoObjeCol();
 
-		m_pPlayer->Update(); // プレイヤーの更新.
-		m_pEnemy->Update();	 // エネミーの更新.
-		CCamera::GetInstance()->Update(); // カメラの更新.
+		m_pPlayer->Update();				// プレイヤーの更新.
+		m_pEnemy->Update(m_pPlayer);		// エネミーの更新.
+		CCamera::GetInstance()->Update();	// カメラの更新.
 
 		// 当たり判定処理.
 		CollisionJudge();
@@ -541,7 +543,7 @@ void CGame::EnemytoCylinderCol(CollisionPoints points)
 
 		// 修正した移動ベクトルをプレイヤーに適用.
 		m_pEnemy->AddVec(PlayerMove);
-		m_pEnemy->SetPos(m_pPlayer->GetPos() + points.Normal * points.Depth);
+		m_pEnemy->SetPos(m_pEnemy->GetPos() + points.Normal * points.Depth);
 
 		if (points.Depth < 0.05f) {
 			m_pEnemy->AddVec(-m_pEnemy->GetMoveVec());

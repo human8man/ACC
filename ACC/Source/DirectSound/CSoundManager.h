@@ -22,6 +22,12 @@ public:
 		SE_ReloadEnd,	// リロード終了.
 		SE_SelectMove,	// 選択肢移動.
 		SE_Shot,		// 射撃.
+		SE_Dash,		// ダッシュ.
+		SE_Jump,		// ジャンプ.
+		SE_Damage,		// ダメージ.
+		SE_DamageCrit,	// クリティカルダメージ.
+		SE_Lose,		// まけ.
+		SE_Win,			// かち.
 
 		// 音が増えたら「ここ」に追加してください.
 		max, // 最大数.

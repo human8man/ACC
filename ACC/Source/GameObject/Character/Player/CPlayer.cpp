@@ -131,7 +131,7 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, MeshCollider floor, MeshCo
 			// ヘッドショット判定(気室判定).
 			if (m_pBullets[i]->GetPos().y < egg->GetPos().y + m_EggAirRoomY) 
 			{ 
-				// HPを二倍減らす.
+				// HPを3倍減らす.
 				egg->TripleDecreHP();
 				// エフェクトの再生.
 				hEffect = CEffect::Play(CEffect::BodyHitCrit, egg->GetPos());
@@ -234,6 +234,7 @@ void CPlayer::KeyInput()
 			DashVec = m_SumVec * m_DashSpeed;
 			m_CanDash = false;
 		}
+		CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_Dash);
 	}
 
 	//----------------------------------------------------------------------
@@ -242,6 +243,7 @@ void CPlayer::KeyInput()
 	if (Key->IsKeyAction(DIK_SPACE) && m_CanJump) {
 		m_JumpPower = m_JumpPowerMax;
 		m_CanJump = false;
+		CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_Jump);
 	}
 	// ジャンプ力をY値に加算.
 	m_vPosition.y += m_JumpPower;
