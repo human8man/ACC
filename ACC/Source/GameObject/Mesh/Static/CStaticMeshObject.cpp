@@ -6,14 +6,11 @@
 //============================================================================
 CStaticMeshObject::CStaticMeshObject()
 	: m_pMesh		( nullptr )
-	, m_pBSphere	( nullptr )
 {
-	m_pBSphere = new CBoundingSphere();
 }
 
 CStaticMeshObject::~CStaticMeshObject()
 {
-	SAFE_DELETE( m_pBSphere );
 	DetachMesh();
 }
 

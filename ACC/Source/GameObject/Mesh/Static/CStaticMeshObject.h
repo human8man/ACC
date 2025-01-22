@@ -2,7 +2,6 @@
 
 #include "CStaticMesh.h"
 #include "CGameObject.h"
-#include "Collision/BoundingSphere/CBoundingSphere.h"
 #include "Collision/Ray/CRay.h"
 #include <tuple>
 
@@ -25,18 +24,9 @@ public:
 	//メッシュを解放.
 	void DetachMesh(){ m_pMesh = nullptr; }
 	
-	// バウンディングスフィアをオブジェクト位置に合わせる.
-	void UpdateBSpherePos() { m_pBSphere->SetPosition( m_vPosition ); }
-
-	// バウンディングスフィア取得.
-	CBoundingSphere* GetBSphere() const { return m_pBSphere; }
 	// メッシュの取得.
 	CStaticMesh*	 GetMesh()	  const { return m_pMesh;	 }
 
-	// モデルに合わせたバウンディングスフィア作成のラッパー関数.
-	HRESULT CreateBSphereForMesh( const CStaticMesh& pMesh ){
-		return m_pBSphere->CreateSphereForMesh( pMesh );
-	}
 	
 	// 壁からの位置を計算する.
 	void CalculatePositionFromWall( CROSSRAY* pCrossRay );
@@ -56,5 +46,4 @@ private:
 
 protected:
 	CStaticMesh*		m_pMesh;
-	CBoundingSphere*	m_pBSphere;
 };

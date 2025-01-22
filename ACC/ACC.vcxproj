@@ -238,7 +238,6 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Collision\BoundingSphere\CBoundingSphere.cpp" />
     <ClCompile Include="Source\Collision\GJK\CGJK.cpp" />
     <ClCompile Include="Source\Collision\Ray\CRay.cpp" />
     <ClCompile Include="Source\Common\DirectInput\CDirectInput.cpp">
@@ -306,7 +305,6 @@
     <ClCompile Include="Source\Scenes\Title\CTitle.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\Collision\BoundingSphere\CBoundingSphere.h" />
     <ClInclude Include="Source\Collision\GJK\CGJK.h" />
     <ClInclude Include="Source\Collision\Ray\CRay.h" />
     <ClInclude Include="Source\Common\DirectInput\CDirectInput.h" />

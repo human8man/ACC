@@ -3,15 +3,12 @@
 
 CSkinMeshObject::CSkinMeshObject()
 	: m_pMesh		( nullptr )
-	, m_pBSphere	( nullptr )
 	, m_pAnimCtrl	( nullptr )
 {
-	m_pBSphere = new CBoundingSphere();
 }
 
 CSkinMeshObject::~CSkinMeshObject()
 {
-	SAFE_DELETE(m_pBSphere);
 	DetachMesh();
 }
 
