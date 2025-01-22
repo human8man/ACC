@@ -29,6 +29,9 @@ public:
 		SE_Lose,		// ‚Ü‚¯.
 		SE_Win,			// ‚©‚¿.
 
+		BGM_Game,
+		BGM_Title,
+
 		// ‰¹‚ª‘‚¦‚½‚çu‚±‚±v‚É’Ç‰Á‚µ‚Ä‚­‚¾‚³‚¢.
 		max, // Å‘å”.
 	};
