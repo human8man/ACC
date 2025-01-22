@@ -38,7 +38,7 @@ CGame::CGame(HWND hWnd)
 	, m_pGJK		( nullptr )
 	, m_pCamRay		( nullptr )
 
-	, m_Angle		(0.f)
+	, m_HitKind		(0)
 	, m_CylinderMax	(9)
 {
 	// ライト情報.
@@ -216,8 +216,17 @@ void CGame::Update()
 		CSceneManager::GetInstance()->LoadScene(SceneList::Title);
 	}
 
+	// 当たり判定処理.
 	CollisionJudge();
 
+	// プレイヤーの攻撃が命中していた場合.
+	if (m_pPlayer->GetHit()) {
+		m_pGameUI->SetHit(m_pPlayer->GetHitKind());
+	}
+	// 銃関連UIの設定.
+	m_pGameUI->SetAmmo(m_pPlayer->GetCharaInfo().Ammo);
+	m_pGameUI->SetReloadTime(m_pPlayer->GetReloadTime());
+	// UIの更新処理.
 	m_pGameUI->Update();
 
 #if _DEBUG

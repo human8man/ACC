@@ -1,5 +1,6 @@
 #include "CCharacter.h"
 #include "Camera/CCamera.h"
+#include "Common/Time/CTime.h"
 
 
 //============================================================================
@@ -25,7 +26,7 @@ CCharacter::CCharacter()
 	, m_ReloadTimeMax		( CTime::GetInstance()->GetDeltaTime() * 180.f )
 	, m_BulletCoolTime		( 0.f )
 	, m_BulletCoolTimeMax	( CTime::GetInstance()->GetDeltaTime() * 60.f )
-	, m_BulletSpeed			( 2.9f )
+	, m_BulletSpeed			( 2.3f )
 	, m_CanShot				( true )
 
 	, m_JumpPower			( 0.f )

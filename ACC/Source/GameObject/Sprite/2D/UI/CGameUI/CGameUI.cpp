@@ -1,6 +1,8 @@
 #include "CGameUI.h"
 #include "DirectX/CDirectX11.h"
 #include "DirectSound/CSoundManager.h"
+#include "Common/Time/CTime.h"
+#include "Common/Easing/Easing.h"
 
 namespace {
 	constexpr char FadeImagePath[] = "Data\\Texture\\Game";
@@ -10,16 +12,10 @@ namespace {
 //		ゲームUIクラス.
 //=================================================================================================
 CGameUI::CGameUI()
-	: m_FadeStart	( false )
-	, m_Fading		( false )
-	, m_FadePeak	( false )
-	, m_FadeEnd		( false )
-	, m_Peaking		( false )
-
-	, m_FadeAlpha	( 0.f )
-	, m_AddAlpha	( 0.f )
-	, m_AAVMAXVAL	( 0.02f )
-	, m_PeakCnt		( 0 )
+	: m_Ammo			( 0 )
+	, m_ReloadTime		( 0.f )
+	, m_ViewHitTime		( 0.f )
+	, m_ViewHitTimeMax	( CTime::GetInstance()->GetDeltaTime() * 60.f )
 {
 }
 
@@ -34,7 +30,7 @@ CGameUI::~CGameUI()
 void CGameUI::Create()
 {
 	int index = 0;
-
+	
 	// 指定したディレクトリ内を走査.
 	for (const auto& entry : std::filesystem::directory_iterator(FadeImagePath)) {
 		// 文末がjsonの場合やり直す.
@@ -61,9 +57,9 @@ void CGameUI::Create()
 //=================================================================================================
 void CGameUI::Update()
 {
-	for ( size_t i = 0; i < m_pUIs.size(); ++i ) 
-	{
-	}
+	// カウントを回す.
+	if (m_ViewHitTime >= 0.f) { m_ViewHitTime -= CTime::GetInstance()->GetDeltaTime(); }
+
 }
 
 
@@ -72,8 +68,32 @@ void CGameUI::Update()
 //=================================================================================================
 void CGameUI::Draw()
 {
-	for ( size_t i = 0; i < m_pUIs.size(); ++i )
-	{
+	for ( size_t i = 0; i < m_pUIs.size(); ++i ) {
+
+		// 弾UIの描画設定.
+		if(i == GameSprite::Bullets) {
+			// リロードしていた場合は描画しない.
+			if (m_ReloadTime >= 0.f) { continue; }
+			m_pUIs[i]->SetPatternNo(m_Ammo, 0);
+		}
+
+		// クロスヘアの描画設定.
+		if (i == GameSprite::Crosshair) {
+			if (m_ViewHitTime > 0.f) {
+				m_pUIs[i]->SetPatternNo(m_HitKind, 0);
+			}
+			else {
+				m_pUIs[i]->SetPatternNo(0, 0);
+			}
+		}
+
+		// リロードUIの描画設定.
+		if (i == GameSprite::Reload) {
+			// リロードしていない場合は描画しない.
+			if (m_ReloadTime <= 0.f) { continue; }
+		}
+
+
 		m_pUIs[i]->Draw();
 	}
 }
@@ -90,4 +110,14 @@ void CGameUI::Release()
 	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) {
 		SAFE_DELETE(m_pSprite2Ds[i]);
 	}
+}
+
+
+//=================================================================================================
+//		Hit情報の設定.
+//=================================================================================================
+void CGameUI::SetHit(int hit)
+{
+	m_HitKind = hit; 
+	m_ViewHitTime = m_ViewHitTimeMax;
 }

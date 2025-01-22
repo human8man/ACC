@@ -63,6 +63,9 @@ public:
 	CROSSRAY GetCrossRay() const { return *m_pCrossRay; }
 	// キャラの情報を取得.
 	CharaInfo GetCharaInfo() const { return m_CharaInfo; }
+	// リロード時間を返す.
+	float GetReloadTime() const { return m_ReloadTime; }
+
 protected:
 	RAY*		m_pRayY;		// Y方向へ伸ばしたレイ.
 	CROSSRAY*	m_pCrossRay;	// 十字（前後左右に伸ばした）レイ

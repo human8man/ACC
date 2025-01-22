@@ -81,6 +81,6 @@ private:
 	std::unique_ptr<CGameUI> m_pGameUI;	
 	std::vector<D3DXVECTOR3> m_SpawnPoints;
 
-	float m_Angle;
-	int m_CylinderMax;
+	int	m_HitKind;
+	int	m_CylinderMax;
 };

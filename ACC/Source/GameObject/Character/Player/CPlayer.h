@@ -3,6 +3,12 @@
 
 class CEnemy;
 
+// Hit情報.
+enum HitKind {
+	Hit = 1,
+	Crit
+};
+
 //============================================================================
 //		プレイヤークラス.
 //============================================================================
@@ -17,8 +23,12 @@ public:
 	virtual void Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light ) override;
 
 
+	// 命中フラグを渡す.
+	const bool& GetHit() { return m_Hit; }
+	const int& GetHitKind() { return m_HitKind; }
 	// 移動量の取得.
 	const D3DXVECTOR3& GetMoveVec() { return m_SumVec; }
+
 	// 移動量の追加.
 	void AddVec(D3DXVECTOR3 vec) { m_vPosition += vec; }
 	void JumpPowerDec() { if (m_JumpPower > 0) { m_JumpPower -= m_Gravity; } }
@@ -38,5 +48,8 @@ private:
 	float m_MoveSpeed;	 // 移動速度.
 	float m_CamRevision; // カメラ座標の補正値.
 
-	D3DXVECTOR3 m_SumVec;		// 合計のベクトル量.
+	bool m_Hit;		// 命中したか.
+	int	 m_HitKind;	// 命中の種類.
+
+	D3DXVECTOR3 m_SumVec;	// 合計のベクトル量.
 };

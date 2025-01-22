@@ -32,6 +32,7 @@ void CPlayer::Update()
 {
 	// 毎フレームリセットする.
 	m_SumVec = ZEROVEC3;
+	m_Hit = false;
 
 	// カメラに向きを合わせる.
 	m_vRotation.y = CCamera::GetInstance()->GetRot().y;
@@ -50,7 +51,7 @@ void CPlayer::Update()
 		// プレイヤー位置 + プレイヤーの高さを含んだ座標を渡す.
 		D3DXVECTOR3 campos = m_vPosition;
 		campos.y += m_CamRevision;
-		 CCamera::GetInstance()->SetPosition(campos);
+		CCamera::GetInstance()->SetPosition(campos);
 	}
 
 
@@ -118,18 +119,32 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, MeshCollider floor, MeshCo
 			continue;
 		}
 
+
 		// エネミーと弾が当たった場合.
 		if ( pointsbe.Col ) {
 			// ヘッドショット判定(気室判定).
 			if (m_pBullets[i]->GetPos().y < egg->GetPos().y + m_EggAirRoomY) 
 			{ 
+				// HPを二倍減らす.
 				egg->DubleDecreHP();
-				hEffect = CEffect::Play(CEffect::BodyHit, egg->GetPos());
+				// エフェクトの再生.
+				hEffect = CEffect::Play(CEffect::BodyHitCrit, egg->GetPos());
+				// 命中種類の設定.
+				m_HitKind = HitKind::Crit;
 			}
 			else  {
+				// HPを減らす.
 				egg->DecreHP();
-				hEffect = CEffect::Play(CEffect::ShieldHit, egg->GetPos());
+				// エフェクトがズレていたのでずらしてからエフェクトの再生.
+				D3DXVECTOR3 enemypos = egg->GetPos();
+				enemypos.y += 1.f;
+				hEffect = CEffect::Play(CEffect::ShieldHit, enemypos);
+				// 命中種類の設定.
+				m_HitKind = HitKind::Hit;
 			}
+
+			// 命中した.
+			m_Hit = true;
 
 			// 当たったあとは削除.
 			SAFE_DELETE(m_pBullets[i]);
