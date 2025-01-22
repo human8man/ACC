@@ -15,6 +15,8 @@ CPlayer::CPlayer()
 	, m_MoveSpeed	( 0.2f )
 	, m_CamRevision	( 4.f )
 	, m_SumVec		( ZEROVEC3 )
+	, m_AutoAim		(false)
+	, m_Homing		(false)
 {
 	m_CharaInfo.HP = m_CharaInfo.MaxHP;
 	m_CharaInfo.Ammo = m_CharaInfo.MaxAmmo;
@@ -28,7 +30,7 @@ CPlayer::~CPlayer()
 //============================================================================
 //		更新処理.
 //============================================================================
-void CPlayer::Update()
+void CPlayer::Update(std::unique_ptr<CEnemy>& chara)
 {
 	// 毎フレームリセットする.
 	m_SumVec = ZEROVEC3;
@@ -38,8 +40,8 @@ void CPlayer::Update()
 	m_vRotation.y = CCamera::GetInstance()->GetRot().y;
 	
 	// 0以上のものがある場合カウントをする.
-	if ( m_DashTime >= 0.f )		{ m_DashTime -= CTime::GetInstance()->GetDeltaTime(); }
-	if ( m_ReloadTime >= 0.f ) {
+	if ( m_DashTime >= 0.f )	{ m_DashTime -= CTime::GetInstance()->GetDeltaTime(); }
+	if ( m_ReloadTime >= 0.f )	{
 		m_ReloadTime -= CTime::GetInstance()->GetDeltaTime(); 
 		if (m_ReloadTime < 0.f) {
 			// リロード終了.
@@ -60,7 +62,22 @@ void CPlayer::Update()
 		CCamera::GetInstance()->SetPosition(campos);
 	}
 
+	// ホーミングのチートが有効な場合.
+	if (m_Homing) {
+		for (size_t i = 0; i < m_pBullets.size(); ++i) {
+			D3DXVECTOR3 shootdir, EnemyPos;
+			EnemyPos = chara->GetPos();
+			EnemyPos.y += 0.5f;
+			shootdir = EnemyPos - m_pBullets[i]->GetPos();
+			D3DXVec3Normalize(&shootdir, &shootdir);	// 正規化.
 
+			// 弾の初期位置,移動方向の単位ベクトル,速度を設定.
+			m_pBullets[i]->Init(
+				m_pBullets[i]->GetPos(),
+				shootdir,
+				m_BulletSpeed);
+		}
+	}
 
 	CCharacter::Update();
 }
@@ -184,10 +201,18 @@ void CPlayer::KeyInput()
 		// 操作が可能な間は初期化する.
 		DashVec = ZEROVEC3;
 
+		D3DXVECTOR3 camDir;
 		// カメラの向きベクトルを取得.
-		D3DXVECTOR3 camDir = CCamera::GetInstance()->GetCamDir();
-		camDir.y = 0.f;	// Y情報があると飛び始めるのでYの要素を抜く.
-		D3DXVec3Normalize(&camDir, &camDir); // 正規化.
+		if (m_AutoAim) {
+			camDir = CCamera::GetInstance()->GetCamDir();
+			camDir.y = 0.f;	// Y情報があると飛び始めるのでYの要素を抜く.
+			D3DXVec3Normalize(&camDir, &camDir); // 正規化.
+		}
+		else {
+			camDir = CCamera::GetInstance()->GetCamDir();
+			camDir.y = 0.f;	// Y情報があると飛び始めるのでYの要素を抜く.
+			D3DXVec3Normalize(&camDir, &camDir); // 正規化.
+		}
 
 		// 移動する方向ベクトル.
 		D3DXVECTOR3 forward(ZEROVEC3);
@@ -295,6 +320,13 @@ void CPlayer::KeyInput()
 		m_ReloadTime = m_ReloadTimeMax;
 		CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_Reload);
 	}
+
+	//----------------------------------------------------------------------
+	//		チート関連.
+	//----------------------------------------------------------------------
+	if (Key->IsKeyAction(DIK_1)) { m_AutoAim = !m_AutoAim; }
+	if (Key->IsKeyAction(DIK_2)) { m_Homing = !m_Homing; }
+
 
 	// 合計のベクトル量分位置を更新.
 	m_vPosition += m_SumVec + DashVec;

@@ -17,7 +17,7 @@ CEnemy::CEnemy()
 	, m_SumVec		(ZEROVEC3)
 	
 	, m_SelectMoveTime		( 0.f )
-	, m_SelectMoveTimeMax	( CTime::GetInstance()->GetDeltaTime() * 2.f )
+	, m_SelectMoveTimeMax	( CTime::GetInstance()->GetDeltaTime() * 60.f )
 {
 	m_CharaInfo.HP = m_CharaInfo.MaxHP;
 	m_CharaInfo.Ammo = m_CharaInfo.MaxAmmo;
@@ -35,7 +35,7 @@ void CEnemy::Update(std::unique_ptr<CPlayer>& chara)
 {
 	// 毎フレームリセットする.
 	m_SumVec = ZEROVEC3;
-
+	m_vRotation.y += 2.f;
 	
 	// 0以上のものがある場合カウントをする.
 	if (m_DashTime >= 0.f) { m_DashTime -= CTime::GetInstance()->GetDeltaTime(); }
@@ -191,7 +191,7 @@ void CEnemy::Act(std::unique_ptr<CPlayer>& chara)
 	if (m_DashCoolTime <= 0.f) { m_CanDash = true; }
 
 	bool dash = false;
-	if (random.GetRandomInt(0, 50) == 0) {
+	if (random.GetRandomInt(0, 120) == 0) {
 		dash = true;
 	}
 
@@ -227,7 +227,7 @@ void CEnemy::Act(std::unique_ptr<CPlayer>& chara)
 	//----------------------------------------------------------------------
 
 	bool jump = false;
-	if (random.GetRandomInt(0, 50) == 0) {
+	if (random.GetRandomInt(0, 120) == 0) {
 		jump = true;
 	}
 
