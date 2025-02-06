@@ -1,5 +1,6 @@
 #include "CBullet.h"
 
+
 //============================================================================
 //		íeÉNÉâÉX.
 //============================================================================
@@ -12,6 +13,20 @@ CBullet::CBullet()
 
 CBullet::~CBullet()
 {
+}
+
+
+//============================================================================
+//		èâä˙âªèàóù.
+//============================================================================
+void CBullet::Init(
+	const D3DXVECTOR3& pos,
+	const D3DXVECTOR3& vector,
+	const float& speed)
+{
+	m_vPosition		= pos;
+	m_MoveDirection = vector;
+	m_MoveSpeed		= speed;
 }
 
 
@@ -31,18 +46,4 @@ void CBullet::Update()
 void CBullet::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 {
 	CStaticMeshObject::Draw( View, Proj, Light );
-}
-
-
-//============================================================================
-//		èâä˙âª.
-//============================================================================
-void CBullet::Init(
-	const D3DXVECTOR3& pos,
-	const D3DXVECTOR3& vector,
-	const float& speed)
-{
-	m_vPosition		= pos;
-	m_MoveDirection = vector;
-	m_MoveSpeed		= speed;
 }

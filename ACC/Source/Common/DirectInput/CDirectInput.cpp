@@ -1,5 +1,9 @@
 #include "CDirectInput.h"
 
+
+//==============================================================================
+//		ダイレクトインプットクラス.
+//==============================================================================
 CDInput::CDInput()
 {
 	m_pDCInput = NULL;
@@ -12,11 +16,15 @@ CDInput::~CDInput()
 	Release();
 }
 
+
+//==============================================================================
+//		作成処理.
+//==============================================================================
 HRESULT CDInput::Create(HWND hWnd, int useDevice)
 {
-	m_hWnd = hWnd;	// ウィンドウハンドルを保存
+	m_hWnd = hWnd;	// ウィンドウハンドルを保存.
 
-	// すでに存在する場合は開放し初期化.
+	// すでに存在する場合は解放.
 	if (m_pDCInput) { Release(); }
 
 	//DirectInputオブジェクトの生成.
@@ -46,20 +54,9 @@ HRESULT CDInput::Create(HWND hWnd, int useDevice)
 }
 
 
-void CDInput::InputUpdate()
-{
-	if (!GamePadConnect())
-	{
-		m_Key.Update();
-		m_Mouse.Update();
-	}
-	else
-	{
-		m_GamePad.Update();
-	}
-}
-
-
+//==============================================================================
+//		作成処理.
+//==============================================================================
 bool CDInput::GamePadConnect()
 {
 	// ゲームパッドが作成されていないとき.
@@ -70,7 +67,7 @@ bool CDInput::GamePadConnect()
 
 	HRESULT hr = m_GamePad.GetDeviceState();
 
-	// 失敗した場合、
+	// 失敗した場合.
 	if (FAILED(hr) || hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED)
 	{
 		return false;
@@ -79,6 +76,10 @@ bool CDInput::GamePadConnect()
 	return true;
 }
 
+
+//==============================================================================
+//		解放処理.
+//==============================================================================
 void CDInput::Release()
 {
 	// DirectInputオブジェクトの解放.
@@ -94,4 +95,21 @@ void CDInput::Release()
 
 	m_hWnd = NULL;
 	m_UseDevice = 0;
+}
+
+
+//-----------------------------------------------------------------------------
+//		入力状態の更新.
+//-----------------------------------------------------------------------------
+void CDInput::InputUpdate()
+{
+	if (!GamePadConnect())
+	{
+		m_Key.Update();
+		m_Mouse.Update();
+	}
+	else
+	{
+		m_GamePad.Update();
+	}
 }

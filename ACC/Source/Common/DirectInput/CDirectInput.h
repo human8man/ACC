@@ -7,6 +7,7 @@
 
 #include "Common/Singleton/CSingleton.h"
 
+
 //==============================================================================
 //		キーボードクラス.
 //==============================================================================
@@ -23,9 +24,12 @@ public:
 	bool Init(CKey& Key, IDirectInput8* pDInput, HWND hWnd);
 private:
 	CKey();
-
-	bool Create(IDirectInput8* pDCInput, HWND hWnd);
+	
+	// 作成処理.
+	bool Create(IDirectInput8* pDInput, HWND hWnd);
+	// 更新処理.
 	void Update();
+	// 解放処理.
 	void Release();
 
 private:
@@ -34,6 +38,7 @@ private:
 	bool m_KeyAction[Button_MAX];
 };
 
+
 //==============================================================================
 //		マウスクラス.
 //==============================================================================
@@ -41,35 +46,39 @@ class CMouse
 {
 private:
 	friend class CDInput;
-public:
-	// 入力時の判定.
-	bool IsLAction() const { return m_LAction; }
-	bool IsRAction() const { return m_RAction; }
-	bool IsMAction() const { return m_MAction; }
 
-	// 入力中の判定.
-	bool IsLDown() const { return m_LDown; }
-	bool IsRDown() const { return m_RDown; }
-	bool IsMDown() const { return m_MDown; }
+public:
+	bool IsLAction() const { return m_LAction; }	// 左クリック時.
+	bool IsRAction() const { return m_RAction; }	// 右クリック時.
+	bool IsMAction() const { return m_MAction; }	// ミドルクリック時.
+
+	bool IsLDown() const { return m_LDown; }	// 左クリック中.
+	bool IsRDown() const { return m_RDown; }	// 右クリック中.
+	bool IsMDown() const { return m_MDown; }	// ミドルクリック中.
+
 private:
 	CMouse();
 
+	// 作成処理.
 	bool Create(IDirectInput8* pDInput, HWND hWnd);
+	// 更新処理.
 	void Update();
+	// 解放処理.
 	void Release();
+
 private:
 	HWND m_hWnd;
 	IDirectInputDevice8* m_pDIMouse;
 
 	// 入力時の判定.
-	bool m_LAction;
-	bool m_RAction;
-	bool m_MAction;
+	bool m_LAction;	// 左クリック.
+	bool m_RAction;	// 右クリック.
+	bool m_MAction;	// ミドルクリック.
 
 	// 入力中の判定.
-	bool m_LDown;
-	bool m_RDown;
-	bool m_MDown;
+	bool m_LDown;	// 左クリック.
+	bool m_RDown;	// 右クリック.
+	bool m_MDown;	// ミドルクリック.
 };
 
 
@@ -85,8 +94,11 @@ private:
 public:
 	DIJOYSTATE GetPadpos() const { return m_Pad; }
 	
-	bool IsValid() const;			// ジョイスティックが作成されているか.
-	HRESULT GetDeviceState() const;	// ゲームパッドが接続中か.
+	// ジョイスティックが作成されているか.
+	bool IsValid() const;
+
+	// ゲームパッドが接続中か.
+	HRESULT GetDeviceState() const;	
 	
 	bool GetPadButtonAction	(int buttonIndex)	const;	// ボタン入力時判定を取得.
 	bool GetPadButtonDown	(int buttonIndex)	const;	// ボタン入力中判定を取得.
@@ -129,9 +141,13 @@ public:
 	CDInput();
 	~CDInput();
 
+	// 作成処理.
 	HRESULT Create(HWND hWnd, int useDevice = UseInputDevice_ALL);
-	bool GamePadConnect();	// コントローラー接続確認.
+	// コントローラー接続確認.
+	bool GamePadConnect();
+	// 解放処理.
 	void Release();
+
 public:
 	// 入力状態の更新.
 	void InputUpdate();

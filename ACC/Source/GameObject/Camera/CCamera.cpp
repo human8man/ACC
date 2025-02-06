@@ -7,22 +7,18 @@
 //===================================================================
 CCamera::CCamera()
 	: m_Camera			()
-	
 	, m_NowCurorPos		( RESETPOS )
 	, m_BeforCursorPos	( RESETPOS )
-
 	, m_MouseMoveDis	( ZEROVEC2 )
 	, m_CameraRot		( ZEROVEC3 )
 	, m_DirectionPos	( ZEROVEC3 )
 	, m_RayHitPoint		( ZEROVEC3 )
-
 	, m_Fov				( 60.0f )
 	, m_DefaultFov		( 60.0f )
 	, m_MoveValue		(  0.1f )
 	, m_CameraYaw		(  0.0f )
 	, m_CameraPitch		(  0.0f )
 	, m_MouseSens		( 0.03f )
-
 	, m_CanMoveMouse	( false )
 	, m_CanMoveCamera	( false )
 {
@@ -35,7 +31,7 @@ CCamera::~CCamera()
 
 
 //===================================================================
-//		初期化.
+//		初期化処理.
 //===================================================================
 void CCamera::Init()
 {
@@ -45,8 +41,7 @@ void CCamera::Init()
 	m_Camera.UpVec	= D3DXVECTOR3(0.f, 1.f, 0.f);
 	m_Camera.Pos	= D3DXVECTOR3(0.f, 3.f, 0.f);
 
-	 m_Fov = m_DefaultFov;
-
+	m_Fov = m_DefaultFov;	// 視野角を初期化.
 	MouseMove(ZEROVEC2);	// カメラの回転の初期化.
 }
 
@@ -59,10 +54,8 @@ void CCamera::Update()
 	// マウス移動量の初期化.
 	m_MouseMoveDis = ZEROVEC2;
 
-
 	// カメラの操作が可能な場合、キー入力処理を通る.
 	if( m_CanMoveCamera ) { KeyInput(); }
-
 
 	// マウスが操作可能か.
 	if ( !m_CanMoveMouse )
@@ -89,13 +82,14 @@ void CCamera::Update()
 	MouseMove(m_MouseMoveDis);
 	ShowCursor(m_CanMoveMouse);
 
-	// レイに値を入れる.
-	m_pRay.Position = m_Camera.Pos;
-	m_CamDirection = m_Camera.Look - m_Camera.Pos;
-	D3DXVec3Normalize(&m_CamDirection, &m_CamDirection);
-	m_pRay.Axis = m_CamDirection;
-	m_pRay.Length = 1.f;
+	// レイに関する処理.
+	m_pRay.Position	= m_Camera.Pos;						// レイ座標をカメラ座標にする.
+	m_CamDirection	= m_Camera.Look - m_Camera.Pos;		// カメラの正面ベクトルの計算.
+	D3DXVec3Normalize(&m_CamDirection, &m_CamDirection);// 正面ベクトルの正規化.
+	m_pRay.Axis = m_CamDirection;						// レイにベクトルを適応.
+	m_pRay.Length = 1.f;								// レイ長さの設定.
 }
+
 
 //===================================================================
 //		カメラ関数(ビュー行列計算).
@@ -112,60 +106,33 @@ void CCamera::Camera( D3DXMATRIX& View ) const
 
 
 //-------------------------------------------------------------------
-//		キー入力.
+//		キー入力処理をまとめる関数.
 //-------------------------------------------------------------------
 void CCamera::KeyInput()
 {
 	CKey* Key = CDInput::GetInstance()->CDKeyboard();
 
-	// マウスの操作ができない場合(マウスが画面中央に固定されている場合).
+	// マウスが画面中央に固定されている場合.
 	if (!m_CanMoveMouse)
 	{
+		// WASDの処理(移動).
 		if ( Key->IsKeyDown(DIK_W) ){ CameraMove(Straight);	}
 		if ( Key->IsKeyDown(DIK_S) ){ CameraMove(Back);		}
 		if ( Key->IsKeyDown(DIK_A) ){ CameraMove(Left);		}
 		if ( Key->IsKeyDown(DIK_D) ){ CameraMove(Right);	}
 
+		// SPACE,SHIFTの処理(昇降).
 		float Yvalue = 0.f;
 		if ( Key->IsKeyDown(DIK_SPACE) )  { Yvalue =  m_MoveValue; }
 		if ( Key->IsKeyDown(DIK_LSHIFT) ) { Yvalue = -m_MoveValue; }
 
+		// 座標と注視点どちらにも足す,
 		m_Camera.Pos.y  += Yvalue;
 		m_Camera.Look.y += Yvalue;
 	}
 
 	// マウスカーソルの表示.
 	ShowCursor(m_CanMoveMouse);
-}
-
-
-//-------------------------------------------------------------------
-//		マウスの移動量に応じてカメラの方向を変更する.
-//-------------------------------------------------------------------
-void CCamera::MouseMove(D3DXVECTOR2 value)
-{
-	D3DXVECTOR3	LookDirection = ZEROVEC3; // カメラ注視点の移動量.
-
-	// マウスの移動量にマウス感度をかけてYawとPitchを出す.
-	m_CameraRot.y -= value.x * m_MouseSens;
-	m_CameraRot.x -= value.y * m_MouseSens;
-
-	// カメラピッチ角を制限.
-	if ( m_CameraRot.x >=  89.f  ) { m_CameraRot.x =  89.f; }
-	if ( m_CameraRot.x <= -89.f  ) { m_CameraRot.x = -89.f; }
-	if ( m_CameraRot.y >=  360.f ) { m_CameraRot.y =   0.f; }
-	if ( m_CameraRot.y <= -360.f ) { m_CameraRot.y =   0.f; }
-
-	// 方向ベクトルを更新.
-	LookDirection.x = cos(D3DXToRadian(m_CameraRot.y)) * cos(D3DXToRadian(m_CameraRot.x));
-	LookDirection.y = sin(D3DXToRadian(m_CameraRot.x));
-	LookDirection.z = sin(D3DXToRadian(m_CameraRot.y)) * cos(D3DXToRadian(m_CameraRot.x));
-
-	// 正規化.
-	D3DXVec3Normalize(&LookDirection, &LookDirection);
-
-	// カメラの位置を更新.
-	m_Camera.Look = m_Camera.Pos + LookDirection;
 }
 
 
@@ -215,4 +182,34 @@ void CCamera::CameraMove(int vec)
 		break;
 	default: break;
 	}
+}
+
+
+//-------------------------------------------------------------------
+//		マウスの移動量に応じてカメラの方向を変更する.
+//-------------------------------------------------------------------
+void CCamera::MouseMove(D3DXVECTOR2 value)
+{
+	D3DXVECTOR3	LookDirection = ZEROVEC3; // カメラ注視点の移動量.
+
+	// マウスの移動量にマウス感度をかけてYawとPitchを出す.
+	m_CameraRot.y -= value.x * m_MouseSens;
+	m_CameraRot.x -= value.y * m_MouseSens;
+
+	// カメラピッチ角を制限.
+	if ( m_CameraRot.x >=  89.f  ) { m_CameraRot.x =  89.f; }
+	if ( m_CameraRot.x <= -89.f  ) { m_CameraRot.x = -89.f; }
+	if ( m_CameraRot.y >=  360.f ) { m_CameraRot.y =   0.f; }
+	if ( m_CameraRot.y <= -360.f ) { m_CameraRot.y =   0.f; }
+
+	// 方向ベクトルを更新.
+	LookDirection.x = cos(D3DXToRadian(m_CameraRot.y)) * cos(D3DXToRadian(m_CameraRot.x));
+	LookDirection.y = sin(D3DXToRadian(m_CameraRot.x));
+	LookDirection.z = sin(D3DXToRadian(m_CameraRot.y)) * cos(D3DXToRadian(m_CameraRot.x));
+
+	// 正規化.
+	D3DXVec3Normalize(&LookDirection, &LookDirection);
+
+	// カメラの位置を更新.
+	m_Camera.Look = m_Camera.Pos + LookDirection;
 }
