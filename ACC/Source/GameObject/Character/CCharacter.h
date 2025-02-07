@@ -7,6 +7,7 @@
 #include "Collision/GJK/CGJK.h"
 #include "Common/Time/CTime.h"
 
+
 //============================================================================
 //		キャラクタークラス.
 //============================================================================
@@ -26,38 +27,33 @@ public:
 	CCharacter();
 	virtual ~CCharacter();
 
+	// 更新処理.
 	virtual void Update() override;
+	// 描画処理.
 	virtual void Draw(D3DXMATRIX& View, D3DXMATRIX& Proj,LIGHT& Light) override;
 
-	// ジャンプ関連.
-	void CanJump() { m_CanJump = true; } // ジャンプを可能にする.
 
-	// 重力関連.
-	void ResetGravity()	{ m_Gravity		 = m_GravityValue; } // 重力をリセットする.
-	void AddGravity()	{ m_Gravity		+= m_GravityValue; } // 重力を加算していく.
-	void UseGravity()	{ m_vPosition.y -= m_Gravity;	   } // 加算した重力をキャラのY値に減算.
+	void CanJump()		 { m_CanJump = true;			}	// ジャンプを可能にする.
+	void ResetGravity()	 { m_Gravity = m_GravityValue;	}	// 重力をリセットする.
+	void AddGravity()	 { m_Gravity += m_GravityValue;	}	// 重力を加算していく.
+	void UseGravity()	 { m_vPosition.y -= m_Gravity;	}	// 加算した重力をキャラのY値に減算.
+	void DecreHP()		 { m_CharaInfo.HP--;			}	// HPを減らす.
+	void TripleDecreHP() { m_CharaInfo.HP -= 3;			}	// HPを3倍減らす.
 
-	void DecreHP()		{ m_CharaInfo.HP--; }	 // HPを減らす.
-	void TripleDecreHP()	{ m_CharaInfo.HP -= 3; } // HPを3倍減らす.
-
-
-	// Y軸方向へ伸ばしたレイを取得.
-	RAY GetRayY() const { return *m_pRayY; }
-	// 十字レイを取得.
-	CROSSRAY GetCrossRay() const { return *m_pCrossRay; }
-	// キャラの情報を取得.
-	CharaInfo GetCharaInfo() const { return m_CharaInfo; }
-	// リロード時間を返す.
-	float GetReloadTime() const { return m_ReloadTime; }
+	
+	RAY GetRayY()			const { return *m_pRayY; }		// Y軸方向へ伸ばしたレイを取得.
+	float GetReloadTime()	const { return m_ReloadTime; }	// リロード時間を返す.
+	CROSSRAY GetCrossRay()	const { return *m_pCrossRay; }	// 十字レイを取得.
+	CharaInfo GetCharaInfo()const { return m_CharaInfo; }	// キャラの情報を取得.
 
 protected:
-	RAY*		m_pRayY;		// Y方向へ伸ばしたレイ.
-	CROSSRAY*	m_pCrossRay;	// 十字（前後左右に伸ばした）レイ
+	std::unique_ptr<RAY>		m_pRayY;		// Y方向へ伸ばしたレイ.
+	std::unique_ptr<CROSSRAY>	m_pCrossRay;	// 十字（前後左右に伸ばした）レイ
 	
-	CStaticMesh*			m_pMeshBullet;	// 弾メッシュ.
-	CStaticMesh*			m_pMeshGun;		// 銃メッシュ.
-	std::vector<CBullet*>	m_pBullets;		// 弾配列.
-	CGun*					m_pGun;			// 銃.
+	std::unique_ptr<CStaticMesh>			m_pMeshGun;		// 銃メッシュ.
+	std::unique_ptr<CStaticMesh>			m_pMeshBullet;	// 弾メッシュ.
+	std::unique_ptr<CGun>					m_pGun;			// 銃クラス.
+	std::vector<std::unique_ptr<CBullet>>	m_pBullets;		// 弾クラス配列.
 
 	// 銃関連.
 	float m_GunRadius;		// 銃の半径.
@@ -88,10 +84,9 @@ protected:
 	bool m_CanDash;			// ダッシュが可能か.
 	D3DXVECTOR3	DashVec;	// ダッシュのベクトル保存用.
 
+	// 気室(ヘッドショット)の判定用.
+	float m_EggAirRoomY;
 
-
-
-	float m_EggAirRoomY;	// 気室の高さ判定用.
-
-	CharaInfo m_CharaInfo;	// キャラの情報.
+	// キャラ情報.
+	CharaInfo m_CharaInfo;
 };

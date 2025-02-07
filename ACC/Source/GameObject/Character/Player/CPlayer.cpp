@@ -136,7 +136,7 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, MeshCollider floor, MeshCo
 
 		// íåÇ‚è∞Ç…Ç†ÇΩÇ¡ÇΩèÍçáçÌèú.
 		if (pointsbc.Col || pointsbf.Col) {
-			SAFE_DELETE(m_pBullets[i]);
+			m_pBullets[i].reset();
 			m_pBullets.erase(m_pBullets.begin() + i);
 			--i;
 			continue;
@@ -174,7 +174,7 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, MeshCollider floor, MeshCo
 			m_Hit = true;
 
 			// ìñÇΩÇ¡ÇΩÇ†Ç∆ÇÕçÌèú.
-			SAFE_DELETE(m_pBullets[i]);
+			m_pBullets[i].reset();
 			m_pBullets.erase(m_pBullets.begin() + i);
 			--i;
 			continue;
@@ -291,7 +291,7 @@ void CPlayer::KeyInput(std::unique_ptr<CEnemy>& chara)
 			m_CharaInfo.Ammo--;
 			m_BulletCoolTime = m_BulletCoolTimeMax;
 
-			m_pBullets.push_back(new CBullet());
+			m_pBullets.push_back(std::make_unique<CBullet>());
 
 			m_pBullets.back()->AttachMesh(*m_pMeshBullet);	// ÉÅÉbÉVÉÖÇê›íË.
 			m_pBullets.back()->SetPos(0.f, -1000.f, 0.f);	// nullÇ…Ç»ÇÁÇ»Ç¢ÇÊÇ§Ç…å©Ç¶Ç»Ç¢ç¿ïWÇ…èâä˙ê›íË.
