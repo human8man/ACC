@@ -1132,12 +1132,12 @@ HRESULT CSkinMesh::DestroyAppMeshFromD3DXMesh( LPD3DXFRAME p )
 			delete[] pFrame->pPartsMesh->ppIndexBuffer;
 		}
 
-		//頂点バッファ開放.
+		//頂点バッファ解放.
 		pFrame->pPartsMesh->pVertexBuffer->Release();
 		pFrame->pPartsMesh->pVertexBuffer = nullptr;
 	}
 
-	//パーツマテリアル開放.
+	//パーツマテリアル解放.
 	delete[] pFrame->pPartsMesh;
 	pFrame->pPartsMesh = nullptr;
 

@@ -2,9 +2,9 @@
 #include "DirectX/CDirectX11.h"
 
 
-//================================================================
+//============================================================================
 //		CDirectX11クラス
-//================================================================
+//============================================================================
 CDirectX11::CDirectX11()
 	: m_pDevice11				( nullptr )
 	, m_pContext11				( nullptr )
@@ -26,14 +26,14 @@ CDirectX11::~CDirectX11()
 	Release();
 }
 
-//================================================================
-//		DirectX11構築関数.
-//================================================================
+
+//============================================================================
+//		作成処理.
+//============================================================================
 HRESULT CDirectX11::Create(HWND hWnd)
 {
 	// デバイスとスワップチェインを作成.
-	if( FAILED(
-		CreateDeviceAndSwapChain(
+	if( FAILED( CreateDeviceAndSwapChain(
 			hWnd,
 			static_cast<UINT>(FPS),
 			static_cast<UINT>(WND_W),
@@ -44,34 +44,19 @@ HRESULT CDirectX11::Create(HWND hWnd)
 
 	// 各種テクスチャとそれに付帯する各種ビュー（画面）を作成.
 	//	バックバッファ準備：カラーバッファレンダーターゲットビュー.
-	if( FAILED(
-		CreateColorBackBufferRTV() ) )
-	{
-		return E_FAIL;
-	}
+	if( FAILED(CreateColorBackBufferRTV() ) ) { return E_FAIL; }
 	
 	// バックバッファ準備：デプス（深度）ステンシルレンダーターゲットビュー.
-	if( FAILED(
-		CreateDepthStencilBackBufferRTV() ) )
-	{
-		return E_FAIL;
-	}
+	if( FAILED( CreateDepthStencilBackBufferRTV() ) ) { return E_FAIL; }
 
 	// レンダーターゲットビューとデプスステンシルビューをパイプラインにセット.
-	m_pContext11->OMSetRenderTargets(
-		1,
-		&m_pBackBuffer_TexRTV,
-		m_pBackBuffer_DSTexDSV );
+	m_pContext11->OMSetRenderTargets( 1, &m_pBackBuffer_TexRTV, m_pBackBuffer_DSTexDSV );
 	
 	// デプスステンシル設定の作成.
-	if( FAILED( CreateDepthStencilState() ) ){
-		return E_FAIL;
-	}
+	if( FAILED( CreateDepthStencilState() ) ){ return E_FAIL; }
 
 	// アルファブレンドステートの作成.
-	if( FAILED( CreateAlphaBlendState() ) ){
-		return E_FAIL;
-	}
+	if( FAILED( CreateAlphaBlendState() ) ){ return E_FAIL; }
 
 	//------------------------------------------------
 	//	ビューポート設定.
@@ -79,25 +64,24 @@ HRESULT CDirectX11::Create(HWND hWnd)
 	D3D11_VIEWPORT vp;
 	vp.Width	= WND_W;	// 幅.
 	vp.Height	= WND_H;	// 高さ.
-	vp.MinDepth = 0.0f;		// 最小深度（手前）.
-	vp.MaxDepth = 1.0f;		// 最大深度（奥）.
-	vp.TopLeftX = 0.0f;		// 左上位置x.
-	vp.TopLeftY = 0.0f;		// 左上位置y.
+	vp.MinDepth = 0.f;		// 最小深度（手前）.
+	vp.MaxDepth = 1.f;		// 最大深度（奥）.
+	vp.TopLeftX = 0.f;		// 左上位置x.
+	vp.TopLeftY = 0.f;		// 左上位置y.
 
+	// ラスタライザーステージにビューポートを設定する.
 	m_pContext11->RSSetViewports( 1, &vp );
 
-
 	// ラスタライズ（面の塗りつぶし方）の設定.
-	if( FAILED( CreateRasterizer() ) ){
-		return E_FAIL;
-	}
+	if( FAILED( CreateRasterizer() ) ){ return E_FAIL; }
 
 	return S_OK;
 }
 
-//================================================================
+
+//============================================================================
 //		解放処理.
-//================================================================
+//============================================================================
 void CDirectX11::Release()
 {
 	SAFE_RELEASE( m_pAlphaBlendOff );
@@ -116,83 +100,59 @@ void CDirectX11::Release()
 }
 
 
-//--------------------------------------------------
+//----------------------------------------------------------------------------
 //		デバイスとスワップチェーンの作成.
-//--------------------------------------------------
-HRESULT CDirectX11::CreateDeviceAndSwapChain(
-	HWND hWnd, UINT uFPS, UINT uWidth, UINT uHeight )
+//----------------------------------------------------------------------------
+HRESULT CDirectX11::CreateDeviceAndSwapChain( HWND hWnd, UINT uFPS, UINT uWidth, UINT uHeight )
 {
 	// スワップチェーン構造体.
 	DXGI_SWAP_CHAIN_DESC sd;
-	ZeroMemory( &sd, sizeof( sd ) );	// 0で初期化.
-	sd.BufferCount			= 1;		// バックバッファの数.
-	sd.BufferDesc.Width		= uWidth;	// バックバッファの幅.
-	sd.BufferDesc.Height	= uHeight;	// バックバッファの高さ.
+	ZeroMemory( &sd, sizeof( sd ) );							// 0で初期化.
+	sd.BufferCount			= 1;								// バックバッファの数.
+	sd.BufferDesc.Width		= uWidth;							// バックバッファの幅.
+	sd.BufferDesc.Height	= uHeight;							// バックバッファの高さ.
 	sd.BufferDesc.Format	= DXGI_FORMAT_R8G8B8A8_UNORM;		// フォーマット（32ビットカラー）.
 	sd.BufferDesc.RefreshRate.Numerator		= uFPS;				// リフレッシュレート（分母） ※FPS:60.
 	sd.BufferDesc.RefreshRate.Denominator	= 1;				// リフレッシュレート（分子）.
 	sd.BufferUsage			= DXGI_USAGE_RENDER_TARGET_OUTPUT;	// 使い方（表示先）.
-	sd.OutputWindow			= hWnd;		// ウィンドウハンドル.
-	sd.SampleDesc.Count		= 1;		// マルチサンプルの数.
-	sd.SampleDesc.Quality	= 0;		// マルチサンプルのクオリティ.
-	sd.Windowed				= TRUE;		// ウィンドウモード（フルスクリーン時はFALSE）.
+	sd.OutputWindow			= hWnd;								// ウィンドウハンドル.
+	sd.SampleDesc.Count		= 1;								// マルチサンプルの数.
+	sd.SampleDesc.Quality	= 0;								// マルチサンプルのクオリティ.
+	sd.Windowed				= TRUE;								// ウィンドウモード（フルスクリーン時はFALSE）.
+
 
 	// 作成を試みる機能レベルの優先を指定.
-	//  (GPUがサポートする機能セットの定義).
-	//  D3D_FEATURE_LEVEL列挙型の配列.
-	//  D3D_FEATURE_LEVEL_11_0:Direct3D 11.0 の GPUレベル.
+	//	(GPUがサポートする機能セットの定義).
+	//	D3D_FEATURE_LEVEL列挙型の配列.
+	//	D3D_FEATURE_LEVEL_11_0:Direct3D 11.0 の GPUレベル.
 	D3D_FEATURE_LEVEL pFeatureLevels = D3D_FEATURE_LEVEL_11_0;
 	D3D_FEATURE_LEVEL* pFeatureLevel = nullptr;// 配列の要素数.
 
 	// デバイスとスワップチェーンの作成.
-	// ハードウェア（GPU）デバイスでの作成.
-	if( FAILED(
-		D3D11CreateDeviceAndSwapChain(
-			nullptr,					// ビデオアダプタへのポインタ.
-			D3D_DRIVER_TYPE_HARDWARE,	// 作成するデバイスの種類.
-			nullptr,					// ソフトウェア ラスタライザを実装するDLLのハンドル.
-			0,							// 有効にするランタイムレイヤー.
-			&pFeatureLevels,			// 作成を試みる機能レベルの順序を指定する配列へのポインタ.
-			1,							// ↑の要素数.
-			D3D11_SDK_VERSION,			// SDKのバージョン.
-			&sd,						// スワップチェーンの初期化パラメータのポインタ.
-			&m_pSwapChain,				// (out)レンダリングに使用するスワップチェーン.
-			&m_pDevice11,				// (out)作成されたデバイス.
-			pFeatureLevel,				// 機能レベルの配列にある最初の要素を表すポインタ.
-			&m_pContext11 ) ) )			// (out)デバイス　コンテキスト.
+	// デバイス作成処理を関数化.
+	auto TryCreateDevice = [&](D3D_DRIVER_TYPE driverType) -> bool {
+		return SUCCEEDED(D3D11CreateDeviceAndSwapChain(
+			nullptr, driverType, nullptr, 0,
+			&pFeatureLevels, 1, D3D11_SDK_VERSION,
+			&sd, &m_pSwapChain, &m_pDevice11, nullptr, &m_pContext11));
+	};
+
+	// ハードウェア → WARP（ソフトウェア）→ リファレンスの順で作成を試みる.
+	if (!(TryCreateDevice(D3D_DRIVER_TYPE_HARDWARE)	||
+		  TryCreateDevice(D3D_DRIVER_TYPE_WARP)		||
+		  TryCreateDevice(D3D_DRIVER_TYPE_REFERENCE)))
 	{
-		// WARPデバイスの作成.
-		//  D3D_FEATURE_LEVEL_9_1～D3D_FEATURE_LEVEL_10_1.
-		if( FAILED(
-			D3D11CreateDeviceAndSwapChain(
-				nullptr, D3D_DRIVER_TYPE_WARP, nullptr,
-				0, &pFeatureLevels, 1, D3D11_SDK_VERSION,
-				&sd, &m_pSwapChain, &m_pDevice11,
-				pFeatureLevel, &m_pContext11 ) ) )
-		{
-			// リファレンスデバイスの作成.
-			//  DirectX SDKがインストールされていないと使えない.
-			if( FAILED(
-				D3D11CreateDeviceAndSwapChain(
-					nullptr, D3D_DRIVER_TYPE_REFERENCE, nullptr,
-					0, &pFeatureLevels, 1, D3D11_SDK_VERSION,
-					&sd, &m_pSwapChain, &m_pDevice11,
-					pFeatureLevel, &m_pContext11 ) ) )
-			{
-				MessageBox( nullptr,
-					_T( "デバイスとスワップチェーン作成失敗" ),
-					_T( "Error" ), MB_OK );
-				return E_FAIL;
-			}
-		}
+		MessageBox(nullptr, _T("デバイスとスワップチェーン作成失敗"), _T("Error"), MB_OK);
+		return E_FAIL;
 	}
 
 	return S_OK;
 }
 
-//-------------------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
 //		ラスタライザ作成.
-//-------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 HRESULT CDirectX11::CreateRasterizer()
 {
 	D3D11_RASTERIZER_DESC rdc;
@@ -200,9 +160,9 @@ HRESULT CDirectX11::CreateRasterizer()
 	rdc.FillMode = D3D11_FILL_SOLID;// 塗りつぶし（ソリッド）.
 
 	// カリングの設定.
-	// D3D11_CULL_BACK	:背面を描画しない.
-	// D3D11_CULL_FRONT	:正面を描画しない.
-	// D3D11_CULL_NONE	:カリングを切る（正背面を描画する）.
+	//	D3D11_CULL_BACK		:背面を描画しない.
+	//	D3D11_CULL_FRONT	:正面を描画しない.
+	//	D3D11_CULL_NONE		:カリングを切る（正背面を描画する）.
 	rdc.CullMode = D3D11_CULL_NONE;
 
 	// ポリゴンの表裏を決定するフラグ.
@@ -221,9 +181,10 @@ HRESULT CDirectX11::CreateRasterizer()
 	return S_OK;
 }
 
-//-------------------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
 //		デプスステンシル設定.
-//-------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 HRESULT CDirectX11::CreateDepthStencilState()
 {
 	// 深度テスト（Ｚテスト）の設定.
@@ -238,9 +199,7 @@ HRESULT CDirectX11::CreateDepthStencilState()
 	// 深度テスト（Ｚテスト）を有効にする.
 	dsDesc.DepthEnable = TRUE; // 有効.
 	// 深度設定作成.
-	if( FAILED(
-		m_pDevice11->CreateDepthStencilState(
-			&dsDesc, &m_pDepthStencilStateOn ) ) )
+	if( FAILED( m_pDevice11->CreateDepthStencilState( &dsDesc, &m_pDepthStencilStateOn ) ) )
 	{
 		_ASSERT_EXPR( false, _T("深度ON設定作成失敗") );
 		return E_FAIL;
@@ -249,9 +208,7 @@ HRESULT CDirectX11::CreateDepthStencilState()
 	// 深度テスト（Ｚ）テストを無効にする.
 	dsDesc.DepthEnable = FALSE;// 無効.
 	// 深度設定作成.
-	if( FAILED(
-		m_pDevice11->CreateDepthStencilState(
-			&dsDesc, &m_pDepthStencilStateOff ) ) )
+	if( FAILED( m_pDevice11->CreateDepthStencilState( &dsDesc, &m_pDepthStencilStateOff ) ) )
 	{
 		_ASSERT_EXPR( false, _T( "深度OFF設定作成失敗" ) );
 		return E_FAIL;
@@ -261,9 +218,9 @@ HRESULT CDirectX11::CreateDepthStencilState()
 }
 
 
-//-------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 //		ブレンドステート作成.
-//-------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 HRESULT CDirectX11::CreateAlphaBlendState()
 {
 	// アルファブレンド用ブレンドステート構造体.
@@ -304,9 +261,10 @@ HRESULT CDirectX11::CreateAlphaBlendState()
 	return S_OK;
 }
 
-//================================================================
+
+//============================================================================
 //		透過設定の切り替え.
-//================================================================
+//============================================================================
 void CDirectX11::SetAlphaBlend( bool flag )
 {
 	UINT mask = 0xffffffff;	// マスク値.
@@ -317,9 +275,9 @@ void CDirectX11::SetAlphaBlend( bool flag )
 }
 
 
-//================================================================
+//============================================================================
 //		深度（Ｚ）テストON/OFF切り替え.
-//================================================================
+//============================================================================
 void CDirectX11::SetDepth(bool flag)
 {
 	ID3D11DepthStencilState* pTmp
@@ -330,9 +288,9 @@ void CDirectX11::SetDepth(bool flag)
 }
 
 
-//================================================================
+//============================================================================
 //		バックバッファクリア関数.
-//================================================================
+//============================================================================
 void CDirectX11::ClearBackBuffer()
 {
 	// 画面のクリア.
@@ -353,18 +311,18 @@ void CDirectX11::ClearBackBuffer()
 }
 
 
-//================================================================
-//		表示.
-//================================================================
+//============================================================================
+//		表示処理.
+//============================================================================
 void CDirectX11::Present()
 {
 	m_pSwapChain->Present( 0, 0 );
 }
 
 
-//--------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 //		バックバッファ作成:カラー用レンダーターゲットビュー作成.
-//--------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 HRESULT CDirectX11::CreateColorBackBufferRTV()
 {
 	// バックバッファテクスチャを取得（既にあるので作成ではない）.
@@ -397,12 +355,11 @@ HRESULT CDirectX11::CreateColorBackBufferRTV()
 }
 
 
-//-------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 //		バックバッファ作成:デプスステンシル用レンダーターゲットビュー作成.
-//-------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 HRESULT CDirectX11::CreateDepthStencilBackBufferRTV()
 {
-
 	// デプス（深さor深度）ステンシルビュー用のテクスチャを作成.
 	D3D11_TEXTURE2D_DESC	descDepth;
 	descDepth.Width		= WND_W;	// 幅.

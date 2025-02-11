@@ -1,13 +1,14 @@
 ﻿#include "CDirectInput.h"
 
-//ヘッダーで定義すると.objで定義されると出るため、ここで定義.
+
+// ヘッダーで定義すると.objで定義されると出るため、ここで定義.
 LPDIRECTINPUT8 lpDI8;
 LPDIRECTINPUTDEVICE8 lpJoystick;
 
 
-//==============================================================================
+//--------------------------------------------------------------------------------
 //		ゲームパッドクラス.
-//==============================================================================
+//--------------------------------------------------------------------------------
 CGamePad::CGamePad()
 	: m_ButtonPressed			()
 	, m_PreviousButtonPressed	()
@@ -63,9 +64,36 @@ BOOL EnumJoyDeviceProc(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
 }
 
 
-//==============================================================================
-//		更新.
-//==============================================================================
+//--------------------------------------------------------------------------------
+//		作成処理.
+//--------------------------------------------------------------------------------
+int CGamePad::Create()
+{
+	// IDirectInput8の作成.
+	HRESULT ret = DirectInput8Create(GetModuleHandle(NULL), DIRECTINPUT_VERSION, IID_IDirectInput8, (LPVOID*)&lpDI8, NULL);
+	if (FAILED(ret)) { return -1; }
+
+	// 接続されているゲームコントローラー（ジョイスティック）を列挙.
+	ret = lpDI8->EnumDevices(
+		DI8DEVCLASS_GAMECTRL,	// ジョイスティックの列挙.
+		EnumJoyDeviceProc,		// 上記のコールバック関数のポインタを指定.
+		NULL,					// コールバックの第二引数にそのまま値が渡される.
+		DIEDFL_ATTACHEDONLY);	// 現在接続済みのデバイスのみを列挙する.
+
+	// 列挙に失敗した場合、もしくはジョイスティックが存在しない場合.
+	if (FAILED(ret) || !lpJoystick)
+	{
+		lpDI8->Release();
+		return -1;
+	}
+
+	return 0;
+}
+
+
+//--------------------------------------------------------------------------------
+//		更新処理.
+//--------------------------------------------------------------------------------
 void CGamePad::Update()
 {
 	// ジョイスティックがある状態なら.
@@ -115,36 +143,9 @@ void CGamePad::Update()
 }
 
 
-//==============================================================================
-//		作成.
-//==============================================================================
-int CGamePad::Create()
-{
-	// IDirectInput8の作成.
-	HRESULT ret = DirectInput8Create(GetModuleHandle(NULL), DIRECTINPUT_VERSION, IID_IDirectInput8, (LPVOID*)&lpDI8, NULL);
-	if (FAILED(ret)) { return -1; }
-
-	// 接続されているゲームコントローラー（ジョイスティック）を列挙.
-	ret = lpDI8->EnumDevices(
-		DI8DEVCLASS_GAMECTRL,	// ジョイスティックの列挙.
-		EnumJoyDeviceProc,		// 上記のコールバック関数のポインタを指定.
-		NULL,					// コールバックの第二引数にそのまま値が渡される.
-		DIEDFL_ATTACHEDONLY);	// 現在接続済みのデバイスのみを列挙する.
-
-	// 列挙に失敗した場合、もしくはジョイスティックが存在しない場合.
-	if (FAILED(ret) || !lpJoystick)
-	{
-		lpDI8->Release();
-		return -1;
-	}
-
-	return 0;
-}
-
-
-//==============================================================================
-//		開放.
-//==============================================================================
+//--------------------------------------------------------------------------------
+//		解放処理.
+//--------------------------------------------------------------------------------
 void CGamePad::Release()
 {
 	if (lpJoystick != NULL) {
@@ -181,8 +182,7 @@ bool CGamePad::GetPovAction(int Direction)
 	bool WasPressed = m_BPOVButtonPressed[Direction];
 
 	// 状態変化時.
-	if (!WasPressed && IsPressed)
-	{
+	if (!WasPressed && IsPressed) {
 		// 状態が変わったので、現在入力中として記録.
 		m_BPOVButtonPressed[Direction] = true;
 		return true; // 入力時のみ反応.
@@ -232,6 +232,7 @@ bool CGamePad::GetPovDown(int Direction)
 	}
 	return false;
 }
+
 
 //==============================================================================
 //		値を返すだけの処理達.
