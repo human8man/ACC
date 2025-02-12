@@ -91,35 +91,31 @@ private:
 	friend class CDInput;
 
 	static constexpr int ButtonMAX = 32;
-public:
-	DIJOYSTATE GetPadpos() const { return m_Pad; }
-	
-	// ジョイスティックが作成されているか.
-	bool IsValid() const;
 
-	// ゲームパッドが接続中か.
-	HRESULT GetDeviceState() const;	
-	
+public:
+	bool GetPovAction(int Direction);	// 十字キー入力時判定.
+	bool GetPovDown(int Direction);		// 十字キー入力中判定.
+
+	bool IsValid() const;								// ジョイスティックが作成されているかを取得.
+	HRESULT GetDeviceState() const;						// ゲームパッドが接続中かを取得.
 	bool GetPadButtonAction	(int buttonIndex)	const;	// ボタン入力時判定を取得.
 	bool GetPadButtonDown	(int buttonIndex)	const;	// ボタン入力中判定を取得.
-	bool GetPovAction		(int Direction);	// 十字キー入力時判定.
-	bool GetPovDown			(int Direction);	// 十字キー入力中判定.
+
 private:
 	CGamePad();
 
-	int  Create();
-	void Update();
-	void Release();
+	int  Create();	// 作成処理.
+	void Update();	// 更新処理.
+	void Release();	// 解放処理.
 
 private:
-	bool m_ButtonPressed[ButtonMAX];	// ボタン配列.
-	bool m_PreviousButtonPressed[32];	// 前フレームのボタン状態.
-	bool m_BPOVButtonPressed[4];
+	bool m_ButtonPressed[ButtonMAX];			// ボタン配列.
+	bool m_PreviousButtonPressed[ButtonMAX];	// 前フレームのボタン状態.
+	bool m_BPOVButtonPressed[4];				// 十字キーの押下状態の保存用.
 	DIJOYSTATE m_Pad;
 	DIJOYSTATE m_PrevPad;
 
 	bool m_IsConect;
-
 };
 
 

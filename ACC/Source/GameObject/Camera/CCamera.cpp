@@ -126,7 +126,7 @@ void CCamera::KeyInput()
 		if ( Key->IsKeyDown(DIK_SPACE) )  { Yvalue =  m_MoveValue; }
 		if ( Key->IsKeyDown(DIK_LSHIFT) ) { Yvalue = -m_MoveValue; }
 
-		// 座標と注視点どちらにも足す,
+		// 座標と注視点どちらにもY値を足す.
 		m_Camera.Pos.y  += Yvalue;
 		m_Camera.Look.y += Yvalue;
 	}

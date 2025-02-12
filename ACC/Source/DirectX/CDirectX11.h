@@ -19,32 +19,33 @@ public:
 	CDirectX11();
 	~CDirectX11();
 
-	// DirectX11構築.
+	// 作成処理.
 	HRESULT Create(HWND hWnd);
-	// DirectX11解放.
+	// 解放処理.
 	void Release();
 
 	// 深度（Ｚ）テストON/OFF切り替え.
 	void SetDepth( bool flag );
+
 	// アルファブレンドON/OFF切り替え.
 	void SetAlphaBlend( bool flag );
 
 	// バックバッファクリア関数.
 	void ClearBackBuffer();
-	// 表示.
+
+	// 表示処理.
 	void Present();
 
 	// デバイスを取得.
-	ID3D11Device* GetDevice() const { return m_pDevice11; }
+	ID3D11Device* GetDevice()			const { return m_pDevice11; }
 	// デバイスコンテキストを取得.
-	ID3D11DeviceContext* GetContext() const { return m_pContext11; }
+	ID3D11DeviceContext* GetContext()	const { return m_pContext11; }
 	// レンダーターゲットビューを取得.
-	ID3D11RenderTargetView* GetTexRTV()const { return m_pBackBuffer_TexRTV; }
+	ID3D11RenderTargetView* GetTexRTV()	const { return m_pBackBuffer_TexRTV; }
 
 private:
 	// デバイスとスワップチェイン作成.
-	HRESULT CreateDeviceAndSwapChain(
-		HWND hWnd, UINT uFPS, UINT uWidth, UINT uHeight );
+	HRESULT CreateDeviceAndSwapChain( HWND hWnd, UINT uFPS, UINT uWidth, UINT uHeight );
 
 	// バックバッファ作成:カラー用レンダーターゲットビュー作成.
 	HRESULT CreateColorBackBufferRTV();
@@ -76,7 +77,4 @@ private:
 	// アルファブレンド.
 	ID3D11BlendState*		m_pAlphaBlendOn;	// 有効設定.
 	ID3D11BlendState*		m_pAlphaBlendOff;	// 無効設定.
-
-	// ラスタライザ設定保存したいため
-	D3D11_RASTERIZER_DESC m_RasterizerDc;
 };

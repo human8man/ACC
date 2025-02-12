@@ -83,5 +83,5 @@ HRESULT CDirectX9::Create( HWND hWnd )
 //===================================================================
 void CDirectX9::Release()
 {
-
+	SAFE_RELEASE(m_pDevice9);
 }

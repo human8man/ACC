@@ -59,17 +59,13 @@ HRESULT CDInput::Create(HWND hWnd, int useDevice)
 //==============================================================================
 bool CDInput::GamePadConnect()
 {
-	// ゲームパッドが作成されていないとき.
-	if (!m_GamePad.IsValid())
-	{
-		return false;
-	}
+	// ゲームパッドが作成されていない場合中断.
+	if (!m_GamePad.IsValid()){ return false; }
 
 	HRESULT hr = m_GamePad.GetDeviceState();
 
 	// 失敗した場合.
-	if (FAILED(hr) || hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED)
-	{
+	if (FAILED(hr) || hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED) {
 		return false;
 	}
 
@@ -83,8 +79,7 @@ bool CDInput::GamePadConnect()
 void CDInput::Release()
 {
 	// DirectInputオブジェクトの解放.
-	if (m_pDCInput != NULL)
-	{
+	if (m_pDCInput != NULL) {
 		m_pDCInput->Release();
 		m_pDCInput = NULL;
 	}
@@ -103,13 +98,12 @@ void CDInput::Release()
 //-----------------------------------------------------------------------------
 void CDInput::InputUpdate()
 {
-	if (!GamePadConnect())
-	{
+	// コントローラーが接続されている場合.
+	if (!GamePadConnect()) {
 		m_Key.Update();
 		m_Mouse.Update();
 	}
-	else
-	{
+	else {
 		m_GamePad.Update();
 	}
 }
