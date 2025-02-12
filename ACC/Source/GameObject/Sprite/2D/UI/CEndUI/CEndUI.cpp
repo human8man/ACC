@@ -7,25 +7,23 @@
 
 
 namespace {
-	// EndUI‚ÌƒpƒX.
+	// EndUIã®ãƒ‘ã‚¹.
 	constexpr char OptionImagePath[] = "Data\\Texture\\End";
 }
 
 
-//=================================================================================================
-//		EndUIƒNƒ‰ƒX.
-//=================================================================================================
+//=============================================================================
+//		EndUIã‚¯ãƒ©ã‚¹.
+//=============================================================================
 CEndUI::CEndUI()
-	: m_Light			()
-	, m_mView			()
-	, m_mProj			()
+	: m_hWnd			()
 	, m_SpriteDataList	()
 	, m_SpritePosList	()
 	, m_pUIs			()
 	, m_pSprite2Ds		()
+	, m_WindowRect		( ZEROVEC2 )
 	, m_EndDeleteFlag	( false )
 {
-	m_Light.vDirection = D3DXVECTOR3(1.f, 5.f, 0.f);
 }
 
 CEndUI::~CEndUI()
@@ -34,26 +32,26 @@ CEndUI::~CEndUI()
 }
 
 
-//=================================================================================================
-//		\’zŠÖ”.
-//=================================================================================================
+//=============================================================================
+//		ä½œæˆå‡¦ç†.
+//=============================================================================
 void CEndUI::Create(HWND hWnd)
 {
 	m_hWnd = hWnd;
 	int index = 0;
 
-	// w’è‚µ‚½ƒfƒBƒŒƒNƒgƒŠ“à‚ğ‘–¸.
+	// æŒ‡å®šã—ãŸãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªå†…ã‚’èµ°æŸ».
 	for (const auto& entry : std::filesystem::directory_iterator(OptionImagePath)) {
-		// •¶––‚ªjson‚Ìê‡‚â‚è’¼‚·.
+		// æ–‡æœ«ãŒjsonã®å ´åˆã‚„ã‚Šç›´ã™.
 		std::string Extension = entry.path().string();
 		Extension.erase(0, entry.path().string().rfind("."));
 		if (Extension == ".json") continue;
 
-		// ƒCƒ“ƒXƒ^ƒ“ƒX¶¬.
+		// ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ç”Ÿæˆ.
 		m_pSprite2Ds.push_back(new CSprite2D());
 		m_pUIs.push_back(new CUIObject());
 
-		// ‰æ‘œƒf[ƒ^‚Ì“Ç‚İ‚İ.
+		// ç”»åƒãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿.
 		m_pSprite2Ds[index]->Init(entry.path().string());
 		m_pUIs[index]->AttachSprite(*m_pSprite2Ds[index]);
 		m_pUIs[index]->SetPos(m_pSprite2Ds[index]->GetSpriteData().Pos);
@@ -62,79 +60,48 @@ void CEndUI::Create(HWND hWnd)
 	}
 }
 
-
-//=================================================================================================
-//		‰ğ•úˆ—.
-//=================================================================================================
-void CEndUI::Release()
-{
-	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pUIs[i]); }
-	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pSprite2Ds[i]); }
-}
-
-
-//=================================================================================================
-//		‰Šú‰».
-//=================================================================================================
+//=============================================================================
+//		åˆæœŸåŒ–å‡¦ç†.
+//=============================================================================
 void CEndUI::Init()
 {
-
+	m_WindowRect = ZEROVEC2;
+	m_EndDeleteFlag = false;
 }
 
 
-//=================================================================================================
-//		XV.
-//=================================================================================================
+//=============================================================================
+//		æ›´æ–°å‡¦ç†.
+//=============================================================================
 void CEndUI::Update()
 {
+	// DInputã®å‘¼ã³å‡ºã—.
 	CMouse* Mouse = CDInput::GetInstance()->CDMouse();
 	CKey* Key = CDInput::GetInstance()->CDKeyboard();
-
-	// ƒ}ƒEƒXˆÊ’u‚ğæ“¾.
+	
+	// ãƒã‚¦ã‚¹ä½ç½®ã‚’å–å¾—.
 	POINT MousePos;
 	GetCursorPos(&MousePos);
 
-	// ƒEƒBƒ“ƒhƒE‘S‘Ì‚ÌˆÊ’u‚ÆƒTƒCƒY‚ğæ“¾iƒEƒBƒ“ƒhƒEƒ^ƒu‚â˜g‚ğŠÜ‚Şj.
-	RECT WindowRect;
-	GetWindowRect(m_hWnd, &WindowRect);
-
-	// ƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæ‚ÌˆÊ’u‚ÆƒTƒCƒY‚ğæ“¾iƒEƒBƒ“ƒhƒE“à‚Ì•`‰æ”ÍˆÍj.
-	RECT clientRect;
-	GetClientRect(m_hWnd, &clientRect);
-
-	// ƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæ‚Ì¶ã‚Æ‰E‰º‚ÌÀ•W‚ğ‰Šú‰».
-	POINT topLeft = { clientRect.left, clientRect.top };
-	POINT bottomRight = { clientRect.right, clientRect.bottom };
-
-	// ƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæ‚ÌÀ•W‚ğƒXƒNƒŠ[ƒ“À•WŒn‚É•ÏŠ·.
-	ClientToScreen(m_hWnd, &topLeft);
-	ClientToScreen(m_hWnd, &bottomRight);
-
-	// ƒEƒBƒ“ƒhƒE‘S‘Ì‚Ì¶ãÀ•W‚ÆƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæ‚Ì¶ãÀ•W‚Ì·•ª‚ğŒvZ.
-	int borderLeft = topLeft.x - WindowRect.left;
-	int borderTop = topLeft.y - WindowRect.top;
-
-	// ƒtƒŒ[ƒ€•‚ğŠÜ‚ñ‚¾ƒEƒBƒ“ƒhƒE‚ÌˆÊ’u‚ğZo.
-	D3DXVECTOR2 windowrect = D3DXVECTOR2(
-		static_cast<float>(borderLeft + WindowRect.left),
-		static_cast<float>(borderTop + WindowRect.top));
+	// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ä½ç½®ã‚’è¨ˆç®—.
+	m_WindowRect = WindowRectMath();
 
 	//----------------------------------------------------------------------------
-	//		‚»‚ê‚¼‚ê‚ÌUI‚ÌXV.
+	//		ãã‚Œãã‚Œã®UIã®æ›´æ–°.
 	//----------------------------------------------------------------------------
 	for (size_t i = 0; i < m_pUIs.size(); ++i) {
-		// ˆ—‚ª•K—v‚Ì‚È‚¢‚à‚Ì‚Í‘Šú‚É•Ô‚·.
+		// å‡¦ç†ãŒå¿…è¦ã®ãªã„ã‚‚ã®ã¯æ—©æœŸã«è¿”ã™.
 		if (i == EndSprite::Back) { continue; }
 		if (i == EndSprite::Frame) { continue; }
 
-		// UI‚ÌƒTƒCƒY‚ÆÀ•W‚ğ•ÏŠ·‚·‚é.
+		// UIã®ã‚µã‚¤ã‚ºã¨åº§æ¨™ã‚’å¤‰æ›ã™ã‚‹.
 		D3DXVECTOR2 SquarePos = D3DXVECTOR2(m_pUIs[i]->GetPos().x, m_pUIs[i]->GetPos().y);
 		D3DXVECTOR2 SquareDisp = D3DXVECTOR2(m_pUIs[i]->GetSpriteData().Disp.w, m_pUIs[i]->GetSpriteData().Disp.h);
 
-		// “_‚ÆlŠp‚Ì“–‚½‚è”»’è.
-		if (CUIObject::PointInSquare(MousePos, SquarePos + windowrect, SquareDisp))
+		// ç‚¹ã¨å››è§’ã®å½“ãŸã‚Šåˆ¤å®š.
+		if (CUIObject::PointInSquare(MousePos, SquarePos + m_WindowRect, SquareDisp))
 		{
-			//	‘O‰ñ‘I‘ğ‚³‚ê‚Ä‚¢‚È‚©‚Á‚½ê‡SE‚ğ–Â‚ç‚·.
+			//	å‰å›é¸æŠã•ã‚Œã¦ã„ãªã‹ã£ãŸå ´åˆSEã‚’é³´ã‚‰ã™.
 			if (m_pUIs[i]->GetPatternNo().x == 0) {
 				CSoundManager::GetInstance()->PlaySE(CSoundManager::SE_SelectMove);
 			}
@@ -144,9 +111,9 @@ void CEndUI::Update()
 			m_pUIs[i]->SetPatternNo(0, 0);
 		}
 
-		bool yesflag = false,noflag = false;
+		bool yesflag = false, noflag = false;
 
-		// Yes‚ÉƒJ[ƒ\ƒ‹‚ªd‚È‚Á‚Ä‚¢‚é.
+		// Yesã«ã‚«ãƒ¼ã‚½ãƒ«ãŒé‡ãªã£ã¦ã„ã‚‹æ™‚.
 		if (i == EndSprite::SelectYes && m_pUIs[i]->GetPatternNo().x) {
 			if (Mouse->IsLAction()) {
 				yesflag = true;
@@ -156,7 +123,7 @@ void CEndUI::Update()
 			yesflag = true;
 		}
 
-		// No‚ÉƒJ[ƒ\ƒ‹‚ªd‚È‚Á‚Ä‚¢‚é.
+		// Noã«ã‚«ãƒ¼ã‚½ãƒ«ãŒé‡ãªã£ã¦ã„ã‚‹æ™‚.
 		if (i == EndSprite::SelectNo && m_pUIs[i]->GetPatternNo().x) {
 			if (Mouse->IsLAction()) {
 				noflag = true;
@@ -167,7 +134,7 @@ void CEndUI::Update()
 		}
 		
 
-		// ƒtƒ‰ƒO‚ÌŒ‹‰Ê‚É‡‚í‚¹‚Äˆ—‚ğ‚·‚é.
+		// ãƒ•ãƒ©ã‚°ã®çµæœã«åˆã‚ã›ã¦å‡¦ç†ã‚’ã™ã‚‹.
 		if (yesflag) {
 			DestroyWindow(m_hWnd);
 		}
@@ -178,13 +145,55 @@ void CEndUI::Update()
 }
 
 
-//=================================================================================================
-//		•`‰æ.
-//=================================================================================================
+//=============================================================================
+//		æç”»å‡¦ç†.
+//=============================================================================
 void CEndUI::Draw()
 {
-	// UI‚»‚ê‚¼‚ê‚Ì•`‰æˆ—.
+	// UIãã‚Œãã‚Œã®æç”»å‡¦ç†.
 	for (size_t i = 0; i < m_pUIs.size(); ++i) {
 		m_pUIs[i]->Draw();
 	}
+}
+
+
+//=============================================================================
+//		è§£æ”¾å‡¦ç†.
+//=============================================================================
+void CEndUI::Release()
+{
+	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pUIs[i]); }
+	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pSprite2Ds[i]); }
+}
+
+
+//-----------------------------------------------------------------------------
+//		ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ä½ç½®ã®è¨ˆç®—ã‚’ã¾ã¨ã‚ãŸé–¢æ•°.
+//-----------------------------------------------------------------------------
+D3DXVECTOR2 CEndUI::WindowRectMath()
+{
+	// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å…¨ä½“ã®ä½ç½®ã¨ã‚µã‚¤ã‚ºã‚’å–å¾—ï¼ˆã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¿ãƒ–ã‚„æ ã‚’å«ã‚€ï¼‰.
+	RECT WindowRect;
+	GetWindowRect(m_hWnd, &WindowRect);
+
+	// ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆé ˜åŸŸã®ä½ç½®ã¨ã‚µã‚¤ã‚ºã‚’å–å¾—ï¼ˆã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å†…ã®æç”»ç¯„å›²ï¼‰.
+	RECT clientRect;
+	GetClientRect(m_hWnd, &clientRect);
+
+	// ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆé ˜åŸŸã®å·¦ä¸Šã¨å³ä¸‹ã®åº§æ¨™ã‚’åˆæœŸåŒ–.
+	POINT topLeft = { clientRect.left, clientRect.top };
+	POINT bottomRight = { clientRect.right, clientRect.bottom };
+
+	// ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆé ˜åŸŸã®åº§æ¨™ã‚’ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åº§æ¨™ç³»ã«å¤‰æ›.
+	ClientToScreen(m_hWnd, &topLeft);
+	ClientToScreen(m_hWnd, &bottomRight);
+
+	// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å…¨ä½“ã®å·¦ä¸Šåº§æ¨™ã¨ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆé ˜åŸŸã®å·¦ä¸Šåº§æ¨™ã®å·®åˆ†ã‚’è¨ˆç®—.
+	int borderLeft = topLeft.x - WindowRect.left;
+	int borderTop = topLeft.y - WindowRect.top;
+
+	// ãƒ•ãƒ¬ãƒ¼ãƒ å¹…ã‚’å«ã‚“ã ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä½ç½®ã‚’è¿”ã™.
+	return D3DXVECTOR2(
+		static_cast<float>(borderLeft + WindowRect.left),
+		static_cast<float>(borderTop + WindowRect.top));
 }

@@ -1,5 +1,9 @@
 #include "CExplosion.h"
 
+
+//=============================================================================
+//		3dSprite爆発クラス.
+//=============================================================================
 CExplosion::CExplosion()
 	: m_PatternNo	()
 	, m_AnimCount	()
@@ -10,6 +14,10 @@ CExplosion::~CExplosion()
 {
 }
 
+
+//=============================================================================
+//		更新処理.
+//=============================================================================
 void CExplosion::Update()
 {
 	const POINTS PatternMax = m_pSprite->GetPatternMax();
@@ -40,8 +48,11 @@ void CExplosion::Update()
 #endif
 }
 
-void CExplosion::Draw(
-	D3DXMATRIX& View, D3DXMATRIX& Proj )
+
+//=============================================================================
+//		描画処理.
+//=============================================================================
+void CExplosion::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj )
 {
 	m_pSprite->SetPatternNo( m_PatternNo.x, m_PatternNo.y );
 
