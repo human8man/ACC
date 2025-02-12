@@ -12,20 +12,18 @@ namespace {
 }
 
 
-//=================================================================================================
+//=============================================================================
 //		EndUIクラス.
-//=================================================================================================
+//=============================================================================
 CEndUI::CEndUI()
-	: m_Light			()
-	, m_mView			()
-	, m_mProj			()
+	: m_hWnd			()
 	, m_SpriteDataList	()
 	, m_SpritePosList	()
 	, m_pUIs			()
 	, m_pSprite2Ds		()
+	, m_WindowRect		( ZEROVEC2 )
 	, m_EndDeleteFlag	( false )
 {
-	m_Light.vDirection = D3DXVECTOR3(1.f, 5.f, 0.f);
 }
 
 CEndUI::~CEndUI()
@@ -34,9 +32,9 @@ CEndUI::~CEndUI()
 }
 
 
-//=================================================================================================
-//		構築関数.
-//=================================================================================================
+//=============================================================================
+//		作成処理.
+//=============================================================================
 void CEndUI::Create(HWND hWnd)
 {
 	m_hWnd = hWnd;
@@ -63,61 +61,31 @@ void CEndUI::Create(HWND hWnd)
 }
 
 
-//=================================================================================================
-//		開放.
-//=================================================================================================
-void CEndUI::Release()
-{
-	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pUIs[i]); }
-	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pSprite2Ds[i]); }
-}
-
-
-//=================================================================================================
-//		初期化.
-//=================================================================================================
+//=============================================================================
+//		初期化処理.
+//=============================================================================
 void CEndUI::Init()
 {
-
+	m_WindowRect = ZEROVEC2;
+	m_EndDeleteFlag = false;
 }
 
 
-//=================================================================================================
-//		更新.
-//=================================================================================================
+//=============================================================================
+//		更新処理.
+//=============================================================================
 void CEndUI::Update()
 {
+	// DInputの呼び出し.
 	CMouse* Mouse = CDInput::GetInstance()->CDMouse();
 	CKey* Key = CDInput::GetInstance()->CDKeyboard();
-
+	
 	// マウス位置を取得.
 	POINT MousePos;
 	GetCursorPos(&MousePos);
 
-	// ウィンドウ全体の位置とサイズを取得（ウィンドウタブや枠を含む）.
-	RECT WindowRect;
-	GetWindowRect(m_hWnd, &WindowRect);
-
-	// クライアント領域の位置とサイズを取得（ウィンドウ内の描画範囲）.
-	RECT clientRect;
-	GetClientRect(m_hWnd, &clientRect);
-
-	// クライアント領域の左上と右下の座標を初期化.
-	POINT topLeft = { clientRect.left, clientRect.top };
-	POINT bottomRight = { clientRect.right, clientRect.bottom };
-
-	// クライアント領域の座標をスクリーン座標系に変換.
-	ClientToScreen(m_hWnd, &topLeft);
-	ClientToScreen(m_hWnd, &bottomRight);
-
-	// ウィンドウ全体の左上座標とクライアント領域の左上座標の差分を計算.
-	int borderLeft = topLeft.x - WindowRect.left;
-	int borderTop = topLeft.y - WindowRect.top;
-
-	// フレーム幅を含んだウィンドウの位置を算出.
-	D3DXVECTOR2 windowrect = D3DXVECTOR2(
-		static_cast<float>(borderLeft + WindowRect.left),
-		static_cast<float>(borderTop + WindowRect.top));
+	// ウィンドウ位置を計算.
+	m_WindowRect = WindowRectMath();
 
 	//----------------------------------------------------------------------------
 	//		それぞれのUIの更新.
@@ -132,7 +100,7 @@ void CEndUI::Update()
 		D3DXVECTOR2 SquareDisp = D3DXVECTOR2(m_pUIs[i]->GetSpriteData().Disp.w, m_pUIs[i]->GetSpriteData().Disp.h);
 
 		// 点と四角の当たり判定.
-		if (CUIObject::PointInSquare(MousePos, SquarePos + windowrect, SquareDisp))
+		if (CUIObject::PointInSquare(MousePos, SquarePos + m_WindowRect, SquareDisp))
 		{
 			//	前回選択されていなかった場合SEを鳴らす.
 			if (m_pUIs[i]->GetPatternNo().x == 0) {
@@ -144,7 +112,7 @@ void CEndUI::Update()
 			m_pUIs[i]->SetPatternNo(0, 0);
 		}
 
-		bool yesflag = false,noflag = false;
+		bool yesflag = false, noflag = false;
 
 		// Yesにカーソルが重なっている時.
 		if (i == EndSprite::SelectYes && m_pUIs[i]->GetPatternNo().x) {
@@ -178,13 +146,55 @@ void CEndUI::Update()
 }
 
 
-//=================================================================================================
-//		描画.
-//=================================================================================================
+//=============================================================================
+//		描画処理.
+//=============================================================================
 void CEndUI::Draw()
 {
 	// UIそれぞれの描画処理.
 	for (size_t i = 0; i < m_pUIs.size(); ++i) {
 		m_pUIs[i]->Draw();
 	}
+}
+
+
+//=============================================================================
+//		解放処理.
+//=============================================================================
+void CEndUI::Release()
+{
+	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pUIs[i]); }
+	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pSprite2Ds[i]); }
+}
+
+
+//-----------------------------------------------------------------------------
+//		ウィンドウ位置の計算をまとめた関数.
+//-----------------------------------------------------------------------------
+D3DXVECTOR2 CEndUI::WindowRectMath()
+{
+	// ウィンドウ全体の位置とサイズを取得（ウィンドウタブや枠を含む）.
+	RECT WindowRect;
+	GetWindowRect(m_hWnd, &WindowRect);
+
+	// クライアント領域の位置とサイズを取得（ウィンドウ内の描画範囲）.
+	RECT clientRect;
+	GetClientRect(m_hWnd, &clientRect);
+
+	// クライアント領域の左上と右下の座標を初期化.
+	POINT topLeft = { clientRect.left, clientRect.top };
+	POINT bottomRight = { clientRect.right, clientRect.bottom };
+
+	// クライアント領域の座標をスクリーン座標系に変換.
+	ClientToScreen(m_hWnd, &topLeft);
+	ClientToScreen(m_hWnd, &bottomRight);
+
+	// ウィンドウ全体の左上座標とクライアント領域の左上座標の差分を計算.
+	int borderLeft = topLeft.x - WindowRect.left;
+	int borderTop = topLeft.y - WindowRect.top;
+
+	// フレーム幅を含んだウィンドウの位置を返す.
+	return D3DXVECTOR2(
+		static_cast<float>(borderLeft + WindowRect.left),
+		static_cast<float>(borderTop + WindowRect.top));
 }

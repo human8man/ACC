@@ -20,7 +20,7 @@ public:
 	virtual ~CPlayer() override;
 
 	void Update(std::unique_ptr<CEnemy>& chara);
-	virtual void Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light ) override;
+	void Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light );
 
 
 	// –½’†ƒtƒ‰ƒO‚ð“n‚·.
