@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Sprite/2D/UI/CUIObject.h"
+#include "Character/Player/CPlayer.h"
 
 class CGameUI
 	:public CUIObject
@@ -21,29 +22,18 @@ public:
 	CGameUI();
 	~CGameUI();
 
+	// 作成処理.
 	void Create();
-	void Update();
-	void Draw();
-	void Release();
+	// 更新処理.
+	void Update(std::unique_ptr<CPlayer>& chara);
+	// 描画処理.
+	void Draw(); 
+	// 解放処理.
+	void Release(); 
 
-	// Hit情報の設定.
-	void SetHit(int hit);
-
-	// 残弾数の設定.
-	void SetAmmo( int val )	{ m_Ammo = val; }
-	
-	// HPの設定.
-	void SetHP( int val, int max)	{ m_HP = val; m_HPMax = max;}
-
-	// リロード時間の設定.
-	void SetReloadTime( float time ){ m_ReloadTime = time; }
-
-
-	void SetAutoAim(bool flg) { m_AutoAim = flg; }
-	void SetHoming(bool flg) { m_Homing = flg; }
 private:
-	std::vector<std::string> m_SpriteDataList;	//スプライト情報をまとめる配列.
-	std::vector<D3DXVECTOR3> m_SpritePosList;	//スプライト座標をまとめる配列.
+	std::vector<std::string> m_SpriteDataList;	// スプライト情報をまとめる配列.
+	std::vector<D3DXVECTOR3> m_SpritePosList;	// スプライト座標をまとめる配列.
 
 	std::vector<CUIObject*> m_pUIs;			// UIクラス.
 	std::vector<CSprite2D*> m_pSprite2Ds;	// Sprite2Dクラス.
@@ -56,6 +46,6 @@ private:
 	float	m_ViewHitTime;		// ヒット表示時間.
 	float	m_ViewHitTimeMax;	// ヒット最大表示時間.
 
-	bool	m_AutoAim;	//オートエイム.
+	bool	m_AutoAim;	// オートエイム.
 	bool	m_Homing;	// ホーミング.
 };

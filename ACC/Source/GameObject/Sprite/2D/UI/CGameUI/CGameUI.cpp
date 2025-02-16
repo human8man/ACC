@@ -3,9 +3,11 @@
 #include "DirectSound/CSoundManager.h"
 #include "Common/Time/CTime.h"
 
+
 namespace {
 	constexpr char FadeImagePath[] = "Data\\Texture\\Game";
 }
+
 
 //=================================================================================================
 //		ゲームUIクラス.
@@ -18,8 +20,8 @@ CGameUI::CGameUI()
 	, m_ReloadTime		( 0.f )
 	, m_ViewHitTime		( 0.f )
 	, m_ViewHitTimeMax	( CTime::GetInstance()->GetDeltaTime() * 60.f )
-	, m_AutoAim			(false)
-	, m_Homing			(false)
+	, m_AutoAim			( false )
+	, m_Homing			( false )
 {
 }
 
@@ -27,6 +29,7 @@ CGameUI::~CGameUI()
 {
 	Release();
 }
+
 
 //=================================================================================================
 //		構築関数.
@@ -59,11 +62,25 @@ void CGameUI::Create()
 //=================================================================================================
 //		更新.
 //=================================================================================================
-void CGameUI::Update()
+void CGameUI::Update(std::unique_ptr<CPlayer>& chara)
 {
 	// カウントを回す.
 	if (m_ViewHitTime >= 0.f) { m_ViewHitTime -= CTime::GetInstance()->GetDeltaTime(); }
 
+	// プレイヤーの攻撃が命中していた場合.
+	if (chara->GetHit()) {
+		// 命中の種類を設定.
+		m_HitKind = chara->GetHitKind();
+		m_ViewHitTime = m_ViewHitTimeMax;
+	}
+
+	// ゲーム画面UIに必要な情報の設定.
+	m_Homing		= chara->GetHoming();
+	m_AutoAim		= chara->GetAutoAim();
+	m_ReloadTime	= chara->GetReloadTime();
+	m_HP			= chara->GetCharaInfo().HP;
+	m_Ammo			= chara->GetCharaInfo().Ammo;
+	m_HPMax			= chara->GetCharaInfo().MaxHP;
 }
 
 
@@ -129,14 +146,4 @@ void CGameUI::Release()
 	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) {
 		SAFE_DELETE(m_pSprite2Ds[i]);
 	}
-}
-
-
-//=================================================================================================
-//		Hit情報の設定.
-//=================================================================================================
-void CGameUI::SetHit(int hit)
-{
-	m_HitKind = hit; 
-	m_ViewHitTime = m_ViewHitTimeMax;
 }

@@ -1,4 +1,6 @@
 #pragma once
+
+
 #include "Scenes/CSceneBase.h"
 #include "DirectX/CDirectX9.h"
 #include "DirectX/CDirectX11.h"
@@ -28,35 +30,34 @@ public:
 	CGame( HWND hWnd );
 	~CGame();
 
-	void Create()	override;
-	HRESULT LoadData()override;
-	void Release()	override;
-	void Init()		override;
-	void Update()	override;
-	void Draw()		override;
+	void Create()	override;	// 作成処理.
+	HRESULT LoadData()override;	// データ読込.
+	void Release()	override;	// 解放処理.
+	void Init()		override;	// 初期化処理.
+	void Update()	override;	// 更新処理.
+	void Draw()		override;	// 描画処理.
 
 
 private:
-	// 敵とプレイヤーの初期化.
+	// 敵とプレイヤーをンダムでスポーン.
 	void InitEPPos(CRandom& random, std::unique_ptr<CPlayer>& player, std::unique_ptr<CEnemy>& enemy);
 
 	// 当たり判定関数.
 	void CollisionJudge();
 	
-	// プレイヤーと床の当たり判定をまとめる関数.
+	// プレイヤーの床と柱の当たり判定をまとめる関数.
 	void PlayertoFloorCol	(CollisionPoints points);
-	
-	// プレイヤーと柱の当たり判定をまとめる関数.
 	void PlayertoCylinderCol(CollisionPoints points);
 	
-	// 敵と床の当たり判定をまとめる関数.
+	// 敵の床と柱の当たり判定をまとめる関数.
 	void EnemytoFloorCol	(CollisionPoints points);
-
-	// 敵と柱の当たり判定をまとめる関数.
 	void EnemytoCylinderCol	(CollisionPoints points);
 
 	// レイの当たり判定をまとめる関数.
 	void RaytoObjeCol();
+
+	// UI処理をまとめる関数.
+	void UIUpdate();
 
 private:
 	HWND	m_hWnd;	 // ウィンドウハンドル.
@@ -65,25 +66,25 @@ private:
 	D3DXMATRIX	m_mView; // ビュー(カメラ)行列.
 	D3DXMATRIX	m_mProj; // 射影（プロジェクション）行列.
 
-	std::unique_ptr<CStaticMesh> m_pEgg;		// たまご.
-	std::unique_ptr<CStaticMesh> m_pFloor;		// 地面.
-	std::vector<std::unique_ptr<CStaticMesh>> m_pCylinders;
+	std::unique_ptr<CStaticMesh> m_pEgg;					// たまご.
+	std::unique_ptr<CStaticMesh> m_pFloor;					// 地面.
+	std::vector<std::unique_ptr<CStaticMesh>> m_pCylinders;	// 柱配列.
 		
-	std::unique_ptr<CPlayer>	m_pPlayer;
-	std::unique_ptr<CEnemy>		m_pEnemy;
-	std::unique_ptr<CGround>	m_pGround;
+	std::unique_ptr<CPlayer>	m_pPlayer;	// プレイヤークラス.
+	std::unique_ptr<CEnemy>		m_pEnemy;	// 敵クラス.
+	std::unique_ptr<CGround>	m_pGround;	// 地面クラス.
 
-	// GJKクラス.
-	std::unique_ptr<CGJK> m_pGJK;
-	std::unique_ptr<CRay> m_pCamRay;
+	// 当たり判定.
+	std::unique_ptr<CGJK> m_pGJK;		// GJKクラス.
+	std::unique_ptr<CRay> m_pCamRay;	// レイクラス.
 
-	// UIクラス.
-	std::unique_ptr<CGameUI> m_pGameUI;
+	// UI.
+	std::unique_ptr<CGameUI> m_pGameUI;	// UIクラス.
 	std::unique_ptr<CWinUI>	 m_pWinUI;	// 勝利クラス.
 	std::unique_ptr<CLoseUI> m_pLoseUI;	// 敗北クラス.
 
-	std::vector<D3DXVECTOR3> m_SpawnPoints;
+	std::vector<D3DXVECTOR3> m_SpawnPoints;	// スポーン地点配列.
 
-	int	m_HitKind;
-	int	m_CylinderMax;
+	int	m_HitKind;		// Hitの種類.
+	int	m_CylinderMax;	// 柱の最大数.
 };
