@@ -85,7 +85,7 @@ void CGame::Create()
 
 
 //============================================================================
-//		ロードデータ関数.
+//		データ読込.
 //============================================================================
 HRESULT CGame::LoadData()
 {
@@ -102,6 +102,7 @@ HRESULT CGame::LoadData()
 	m_pPlayer	->SetScale( 2.f, 2.f, 2.f );
 	m_pEnemy	->SetScale( 2.f, 2.f, 2.f );
 
+	// プレイヤーと敵のスポーン位置をランダムに決める.
 	CRandom random;
 	InitEPPos(random, m_pPlayer, m_pEnemy);
 
@@ -201,28 +202,8 @@ void CGame::Update()
 
 	CKey* Key = CDInput::GetInstance()->CDKeyboard();
 
-	// プレイヤーのHPが０になったとき(バグった時).
-	if (m_pLoseUI == nullptr
-	&& (m_pPlayer->GetCharaInfo().HP <= 0
-	||  m_pPlayer->GetPos().y		< -100.f)) {
-		m_pLoseUI = std::make_unique<CLoseUI>();
-		m_pLoseUI->Create();
-		CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_Lose);
-	}
-
-	// 敵のHPが０になったとき(バグった時).
-	if (m_pWinUI == nullptr
-	&& (m_pEnemy->GetCharaInfo().HP <= 0
-	||  m_pEnemy->GetPos().y		< -100.f)) {
-		m_pWinUI = std::make_unique<CWinUI>();
-		m_pWinUI->Create();
-		CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_Win);
-	}
-
-	// 勝利や敗北画面の更新処理.
-	if ( m_pLoseUI != nullptr ) { m_pLoseUI->Update(); }
-	if ( m_pWinUI != nullptr ) { m_pWinUI->Update(); }
-
+	// UIの更新処理.
+	UIUpdate();
 
 	// 勝利や敗北画面が出現していない間.
 	if (m_pLoseUI == nullptr && m_pWinUI == nullptr)
@@ -242,21 +223,8 @@ void CGame::Update()
 		// 当たり判定処理.
 		CollisionJudge();
 
-		// プレイヤーの攻撃が命中していた場合.
-		if (m_pPlayer->GetHit()) {
-			// 命中の種類を設定.
-			m_pGameUI->SetHit(m_pPlayer->GetHitKind());
-		}
-
-		// ゲーム画面UIの設定.
-		m_pGameUI->SetHP(m_pPlayer->GetCharaInfo().HP, m_pPlayer->GetCharaInfo().MaxHP);
-		m_pGameUI->SetAmmo(m_pPlayer->GetCharaInfo().Ammo);
-		m_pGameUI->SetReloadTime(m_pPlayer->GetReloadTime());
-		m_pGameUI->SetAutoAim(m_pPlayer->GetAutoAim());
-		m_pGameUI->SetHoming(m_pPlayer->GetHoming());
-
 		// UIの更新処理.
-		m_pGameUI->Update();
+		m_pGameUI->Update(m_pPlayer);
 	}
 
 	// カメラ側のキー操作を無効にする.
@@ -269,21 +237,24 @@ void CGame::Update()
 //============================================================================
 void CGame::Draw()
 {
-
 	CCamera::GetInstance()->Camera(m_mView);
 	CSceneBase::Projection(m_mProj);
 
-	m_pGround->Draw( m_mView, m_mProj, m_Light );
-	m_pPlayer->Draw( m_mView, m_mProj, m_Light );
-	m_pEnemy->Draw( m_mView, m_mProj, m_Light );
+	m_pGround->Draw( m_mView, m_mProj, m_Light );	// 地面の描画.
+	m_pPlayer->Draw( m_mView, m_mProj, m_Light );	// プレイヤーの描画.
+	m_pEnemy->Draw( m_mView, m_mProj, m_Light );	// 敵の描画.
 
+	// 柱の描画.
 	for (auto& cylinder : m_pCylinders) {
 		cylinder->Render(m_mView, m_mProj, m_Light);
 	}
-	m_pGameUI->Draw();
 
 	// エフェクトの描画.
-	CEffect::GetInstance()->Draw( m_mView, m_mProj, m_Light );
+	CEffect::GetInstance()->Draw(m_mView, m_mProj, m_Light);
+
+
+	// UIの描画.
+	m_pGameUI->Draw();
 
 	// 勝利と敗北画面の描画.
 	if (m_pLoseUI != nullptr) { m_pLoseUI->Draw(); }
@@ -296,19 +267,18 @@ void CGame::Draw()
 //-----------------------------------------------------------------------------
 void CGame::CollisionJudge()
 {
-	MeshCollider PlayerEgg, EnemyEgg, Floor;
-	std::vector<MeshCollider> Cylinders;
+	Collider PlayerEgg, EnemyEgg, Floor, Cylinder;
+	std::vector<Collider> Cylinders;
 
 	// 柱データ取得.
 	for (int i = 0; i < m_CylinderMax; ++i) {
-		MeshCollider cylinder;
-		cylinder.SetVertex(
+		Cylinder.SetVertex(
 			m_pCylinders[i]->GetPos(),
 			m_pCylinders[i]->GetRot(),
 			m_pCylinders[i]->GetScale(),
 			m_pCylinders[i]->GetVertices()
 		);
-		Cylinders.push_back(cylinder);
+		Cylinders.push_back(Cylinder);
 	}
 
 	// 地面データ取得.
@@ -333,48 +303,37 @@ void CGame::CollisionJudge()
 		m_pEgg->GetVertices());
 
 
-	// プレイヤーと床の判定を返す.
-	CollisionPoints pointspef = m_pGJK->GJK(PlayerEgg, Floor);
+	// プレイヤーと敵の柱判定を取得用の変数を用意.
+	CollisionPoints pointsPC, pointsEC;
+
 	// プレイヤーと円柱の判定を返す.
 	std::vector<CollisionPoints> pointspecs;
 	for (int i = 0; i < m_CylinderMax; ++i) {
-		CollisionPoints pointspec;
-		pointspec = m_pGJK->GJK(Cylinders[i], PlayerEgg);
-		pointspecs.push_back(pointspec);
+		pointsPC = m_pGJK->GJK(Cylinders[i], PlayerEgg);
+		pointspecs.push_back(pointsPC);
 	}
 
-	// 敵と床の判定を返す.
-	CollisionPoints pointseef = m_pGJK->GJK(EnemyEgg, Floor);
 	// 敵と円柱の判定を返す.
 	std::vector<CollisionPoints> pointseecs;
 	for (int i = 0; i < m_CylinderMax; ++i) {
-		CollisionPoints pointseec;
-		pointseec = m_pGJK->GJK(Cylinders[i], EnemyEgg);
-		pointseecs.push_back(pointseec);
+		pointsEC = m_pGJK->GJK(Cylinders[i], EnemyEgg);
+		pointseecs.push_back(pointsEC);
 	}
 
+	// プレイヤーと敵の床の判定を取得.
+	CollisionPoints pointsPF = m_pGJK->GJK(PlayerEgg, Floor), pointsEF = m_pGJK->GJK(EnemyEgg, Floor);
 
-	// プレイヤーと床の判定処理.
-	PlayertoFloorCol(pointspef);
+	// プレイヤーと敵の床の衝突判定処理.
+	PlayertoFloorCol(pointsPF);
+	EnemytoFloorCol(pointsEF);
 
-	// プレイヤーに重力を加える.
+	// プレイヤーと敵に重力を加える.
 	m_pPlayer->UseGravity();
-
-	// プレイヤーと柱の判定処理.
-	for (int i = 0; i < m_CylinderMax; ++i) {
-		PlayertoCylinderCol(pointspecs[i]);
-	}
-
-	// エネミーと床の判定処理.
-	EnemytoFloorCol(pointseef);
-
-	// エネミーに重力を加える.
 	m_pEnemy->UseGravity();
 
-	// エネミーと柱の判定処理.
-	for (int i = 0; i < m_CylinderMax; ++i) {
-		EnemytoCylinderCol(pointseecs[i]);
-	}
+	// プレイヤーと敵の柱の衝突判定処理.
+	for (int i = 0; i < m_CylinderMax; ++i) { PlayertoCylinderCol(pointspecs[i]); }
+	for (int i = 0; i < m_CylinderMax; ++i) { EnemytoCylinderCol(pointseecs[i]); }
 
 	// プレイヤーと敵の当たり判定処理をする.
 	for (int i = 0; i < m_CylinderMax; ++i) {
@@ -385,9 +344,10 @@ void CGame::CollisionJudge()
 
 
 //-----------------------------------------------------------------------------
-//	ランダムでスポーン
+//		敵とプレイヤーをンダムでスポーン.
 //-----------------------------------------------------------------------------
-void CGame::InitEPPos(CRandom& random, std::unique_ptr<CPlayer>& player, std::unique_ptr<CEnemy>& enemy) {
+void CGame::InitEPPos(CRandom& random, std::unique_ptr<CPlayer>& player, std::unique_ptr<CEnemy>& enemy)
+{
 	// スポーンポイントのインデックスをランダムに取得.
 	int PIndex = random.GetRandomInt(0, m_SpawnPoints.size() - 1);
 
@@ -451,11 +411,12 @@ void CGame::PlayertoFloorCol(CollisionPoints points)
 void CGame::PlayertoCylinderCol(CollisionPoints points)
 {
 	if (points.Col) {
-		D3DXVec3Normalize(&points.Normal, &points.Normal); // 法線を正規化.
-		D3DXVECTOR3 PlayerMove = m_pPlayer->GetMoveVec();  // プレイヤーの移動ベクトルを取得.
+		D3DXVec3Normalize(&points.Normal, &points.Normal);	// 法線を正規化.
+		D3DXVECTOR3 PlayerMove = m_pPlayer->GetMoveVec();	// プレイヤーの移動ベクトルを取得.
 
 		// プレイヤーの移動ベクトルと法線ベクトルの内積を計算.
 		float Dot = D3DXVec3Dot(&PlayerMove, &points.Normal);
+
 		// 法線方向の移動成分を除去して、壁に沿った移動成分のみにする.
 		PlayerMove = PlayerMove - Dot * points.Normal;
 
@@ -463,6 +424,7 @@ void CGame::PlayertoCylinderCol(CollisionPoints points)
 		m_pPlayer->AddVec(PlayerMove);
 		m_pPlayer->SetPos(m_pPlayer->GetPos() + points.Normal * points.Depth);
 
+		// 深度が設定値以下の場合.
 		if (points.Depth < 0.05f) {
 			m_pPlayer->AddVec(-m_pPlayer->GetMoveVec());
 		}
@@ -478,35 +440,35 @@ void CGame::EnemytoFloorCol(CollisionPoints points)
 	// 当たっていた場合.
 	if (points.Col)
 	{
-		m_pEnemy->ResetGravity();	// プレイヤーにかかる重力のリセット.
+		m_pEnemy->ResetGravity();	// 敵にかかる重力のリセット.
 		m_pEnemy->CanJump();		// ジャンプを可能に.
 
 		// 地面に衝突している場合.
 		if (points.Normal.y < 0.f)
 		{
-			// プレイヤーを押し戻したときの座標を算出.
+			// 敵を押し戻したときの座標を算出.
 			D3DXVECTOR3 SetPos = m_pEnemy->GetPos() - points.Normal * points.Depth;
 
-			// プレイヤーの位置の更新.
+			// 敵の位置の更新.
 			m_pEnemy->SetPos(SetPos);
 		}
 		// 壁や斜面に衝突している場合.
 		else {
-			D3DXVec3Normalize(&points.Normal, &points.Normal); // 正規化.
-			D3DXVECTOR3 PlayerMove = m_pEnemy->GetMoveVec();   // プレイヤーの移動ベクトルを取得.
+			D3DXVec3Normalize(&points.Normal, &points.Normal);	// 正規化.
+			D3DXVECTOR3 EnemyMove = m_pEnemy->GetMoveVec();		// 敵の移動ベクトルを取得.
 			
-			// プレイヤーの移動ベクトルと法線ベクトルの内積を計算.
-			float Dot = D3DXVec3Dot(&PlayerMove, &points.Normal);
+			// 敵の移動ベクトルと法線ベクトルの内積を計算.
+			float Dot = D3DXVec3Dot(&EnemyMove, &points.Normal);
 
 			// 法線方向の移動成分を除去して、壁に沿った移動成分のみにする.
-			PlayerMove = PlayerMove - Dot * points.Normal;
+			EnemyMove = EnemyMove - Dot * points.Normal;
 
-			// 修正した移動ベクトルをプレイヤーに加算.
-			m_pEnemy->AddVec(PlayerMove);
+			// 修正した移動ベクトルを敵に加算.
+			m_pEnemy->AddVec(EnemyMove);
 		}
 	}
 	else {
-		m_pEnemy->AddGravity();	 // プレイヤーにかかる重力を増やす.
+		m_pEnemy->AddGravity();	 // 敵にかかる重力を増やす.
 		m_pEnemy->JumpPowerDec();// ジャンプで加算される値を減らす.
 	}
 }
@@ -517,19 +479,22 @@ void CGame::EnemytoFloorCol(CollisionPoints points)
 //-----------------------------------------------------------------------------
 void CGame::EnemytoCylinderCol(CollisionPoints points)
 {
+	// 当たっている場合.
 	if (points.Col) {
-		D3DXVec3Normalize(&points.Normal, &points.Normal); // 法線を正規化.
-		D3DXVECTOR3 PlayerMove = m_pEnemy->GetMoveVec();  // プレイヤーの移動ベクトルを取得.
+		D3DXVec3Normalize(&points.Normal, &points.Normal);	// 法線を正規化.
+		D3DXVECTOR3 EnemyMove = m_pEnemy->GetMoveVec();		// プレイヤーの移動ベクトルを取得.
 
 		// プレイヤーの移動ベクトルと法線ベクトルの内積を計算.
-		float Dot = D3DXVec3Dot(&PlayerMove, &points.Normal);
-		// 法線方向の移動成分を除去して、壁に沿った移動成分のみにする.
-		PlayerMove = PlayerMove - Dot * points.Normal;
+		float Dot = D3DXVec3Dot(&EnemyMove, &points.Normal);
 
-		// 修正した移動ベクトルをプレイヤーに適用.
-		m_pEnemy->AddVec(PlayerMove);
+		// 法線方向の移動成分を除去して、壁に沿った移動成分のみにする.
+		EnemyMove = EnemyMove - Dot * points.Normal;
+
+		// 修正した移動ベクトルを敵に適用.
+		m_pEnemy->AddVec(EnemyMove);
 		m_pEnemy->SetPos(m_pEnemy->GetPos() + points.Normal * points.Depth);
 
+		// 深度が設定値以下の場合.
 		if (points.Depth < 0.05f) {
 			m_pEnemy->AddVec(-m_pEnemy->GetMoveVec());
 		}
@@ -542,42 +507,90 @@ void CGame::EnemytoCylinderCol(CollisionPoints points)
 //-----------------------------------------------------------------------------
 void CGame::RaytoObjeCol()
 {
-	// レイ情報用の変数.
-	RayInfo SendCamera, GroundRay, EnemyRay;
-	std::vector<RayInfo> CylinderRays;
-
+	// カメラベクトル.
 	D3DXVECTOR3 camlookpos = CCamera::GetInstance()->GetPos() + CCamera::GetInstance()->GetCamDir() * 100.f;
-	SendCamera = { false, camlookpos, 5000.f };
+	
+	// レイ情報用の変数.
+	RayInfo SendCamera = { false, camlookpos, 5000.f }, GroundRay, EnemyRay, CylinderRay;
+	std::vector<RayInfo> CylinderRays;	// 柱用のレイ配列.
 
-	// カメラレイと各オブジェごとの判定情報を取得.
-	GroundRay	= m_pGround->IsHitForRay(CCamera::GetInstance()->GetRay());
+	//-------------------------------------------------------------------------
+	//	カメラレイと各オブジェごとの判定情報を取得.
+	//-------------------------------------------------------------------------
+	
+	// 地面とカメラレイの判定を取得.
+	GroundRay = m_pGround->IsHitForRay(CCamera::GetInstance()->GetRay());
+	
+	// 柱とカメラレイの判定を取得.
 	for (int i = 0; i < m_CylinderMax; ++i) {
-		RayInfo CylinderRay;
 		CylinderRay = m_pCylinders[i]->IsHitForRay(CCamera::GetInstance()->GetRay());
 		CylinderRays.push_back(CylinderRay);
 	}
+	
+	// 敵とカメラレイの判定を取得.
 	EnemyRay = m_pEnemy->IsHitForRay(CCamera::GetInstance()->GetRay());
 
 
-	// どのオブジェが最も近いかを探す.
+	//-------------------------------------------------------------------------
+	//		どのオブジェクトが最もカメラから近いかを探す.
+	//-------------------------------------------------------------------------
+	
+	// レイが地面にあたっている場合.
 	if (GroundRay.Hit) {
-		if (SendCamera.Length > GroundRay.Length) {
-			SendCamera = GroundRay;
-		}
+		// 地面からカメラまでのレイ長さを比較、trueの場合値を上書きする.
+		if (SendCamera.Length > GroundRay.Length) { SendCamera = GroundRay; }
 	}
+	
+	// レイが敵にあたっている場合.
 	if (EnemyRay.Hit) {
-		if (SendCamera.Length > EnemyRay.Length) {
-			SendCamera = EnemyRay;
-		}
+		// 敵からカメラまでのレイ長さを比較し、trueの場合値を上書きする.
+		if (SendCamera.Length > EnemyRay.Length) { SendCamera = EnemyRay; }
 	}
+
+	// 柱の数分forループを回す.
 	for (int i = 0; i < m_CylinderMax; ++i) {
+		// レイが柱にあたっている場合.
 		if (CylinderRays[i].Hit) {
-			if (SendCamera.Length > CylinderRays[i].Length) {
-				SendCamera = CylinderRays[i];
-			}
+			// 柱からカメラまでのレイ長さを比較、trueの場合値を上書きする.
+			if (SendCamera.Length > CylinderRays[i].Length) { SendCamera = CylinderRays[i]; }
 		}
 	}
 
-	// 最終的に最短距離にある物のあたった座標を渡す.
+	// 最終的に最短距離にあるオブジェクトのHit座標を渡す.
 	CCamera::GetInstance()->SetRayHit(SendCamera.HitPos);
+}
+
+
+//-----------------------------------------------------------------------------
+//		UI処理をまとめる関数.
+//-----------------------------------------------------------------------------
+void CGame::UIUpdate()
+{
+	// プレイヤーのHPが０になったとき(バグった時)敗北UIを作成.
+	if (m_pLoseUI == nullptr
+	&& (m_pPlayer->GetCharaInfo().HP <= 0|| m_pPlayer->GetPos().y < -100.f)) 
+	{
+		// 敗北UIの作成
+		m_pLoseUI = std::make_unique<CLoseUI>();
+		m_pLoseUI->Create();
+
+		// 敗北時の効果音を鳴らす.
+		CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_Lose);
+	}
+
+	// 敵のHPが０になったとき(バグった時)勝利UIを作成.
+	if (m_pWinUI == nullptr 
+	&& (m_pEnemy->GetCharaInfo().HP <= 0|| m_pEnemy->GetPos().y < -100.f)) 
+	{
+		// 勝利UIの作成
+		m_pWinUI = std::make_unique<CWinUI>();
+		m_pWinUI->Create();
+
+		// 勝利時の効果音を鳴らす.
+		CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_Win);
+	}
+	
+	// 勝利や敗北画面の更新処理.
+	if ( m_pLoseUI != nullptr )	{ m_pLoseUI->Update();	}
+	if ( m_pWinUI  != nullptr )	{ m_pWinUI->Update();	}
 }

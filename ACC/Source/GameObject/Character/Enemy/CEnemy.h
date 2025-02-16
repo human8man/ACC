@@ -32,7 +32,7 @@ public:
 	void Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light );
 	
 	// 当たり判定処理(プレイヤー、床、柱).
-	void Collision(std::unique_ptr<CPlayer>& egg, MeshCollider floor, MeshCollider cylinder);
+	void Collision(std::unique_ptr<CPlayer>& egg, Collider floor, Collider cylinder);
 
 
 	// 移動量の取得.

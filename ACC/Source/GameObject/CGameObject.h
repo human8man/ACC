@@ -13,6 +13,7 @@ public:
 	virtual void Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light ) = 0;
 
 	// ç¿ïWê›íËä÷êî.
+	void SetPos(const D3DXVECTOR3& pos) { m_vPosition = pos; }
 	void SetPos( float x, float y, float z ){
 		m_vPosition.x = x;
 		m_vPosition.y = y;
@@ -20,31 +21,31 @@ public:
 	};
 
 	// âÒì]ê›íËä÷êî.
+	void SetRot(const D3DXVECTOR3& rot) { m_vRotation = rot; }
 	void SetRot( float x, float y, float z ){
 		m_vRotation.x = x;
 		m_vRotation.y = y;
 		m_vRotation.z = z;
 	};
 
-	//ägèkê›íËä÷êî.
+	// ägèkê›íËä÷êî.
+	void SetScale( float xyz ) { m_vScale = D3DXVECTOR3( xyz, xyz, xyz ); }
 	void SetScale( float x, float y, float z ){
 		m_vScale.x = x;
 		m_vScale.y = y;
 		m_vScale.z = z;
 	}
 
-	void SetAlpha	( float alpha )			  { m_Alpha = alpha; }
-	void SetPos		( const D3DXVECTOR3& pos ){ m_vPosition = pos;}
-	void SetRot		( const D3DXVECTOR3& rot ){ m_vRotation = rot; }
-	void SetScale	( float xyz )			  { m_vScale = D3DXVECTOR3( xyz, xyz, xyz ); }
+	// ìßâﬂìxê›íËä÷êî.
+	void SetAlpha( float alpha ) { m_Alpha = alpha; }
 
 	const D3DXVECTOR3& GetScale()	 const { return m_vScale;	 }
 	const D3DXVECTOR3& GetPos()		 const { return m_vPosition; }
 	const D3DXVECTOR3& GetRot()		 const { return m_vRotation; }
 
 protected:
-	D3DXVECTOR3	m_vPosition;
-	D3DXVECTOR3	m_vRotation;
-	D3DXVECTOR3	m_vScale;
-	float		m_Alpha;
+	D3DXVECTOR3	m_vPosition;	// ç¿ïWèÓïÒ.
+	D3DXVECTOR3	m_vRotation;	// âÒì]èÓïÒ.
+	D3DXVECTOR3	m_vScale;		// ÉTÉCÉY.
+	float		m_Alpha;		// ìßâﬂìx.
 };

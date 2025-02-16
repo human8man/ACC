@@ -21,8 +21,8 @@ CExplosion::~CExplosion()
 void CExplosion::Update()
 {
 	const POINTS PatternMax = m_pSprite->GetPatternMax();
-
-#if 1
+	
+	// アニメーションを再生する.
 	m_AnimCount++;
 	if (m_AnimCount % 10 == 0) {
 		m_PatternNo.x = ( m_AnimCount / 10 ) % PatternMax.x;
@@ -32,20 +32,6 @@ void CExplosion::Update()
 	{
 		m_AnimCount = 0;
 	}
-#else
-	m_AnimCount++;
-	if (m_AnimCount == 10) {
-		m_PatternNo.x++;
-		m_AnimCount = 0;
-		if (m_PatternNo.x >= PatternMax.x) {
-			m_PatternNo.y++;
-			m_PatternNo.x = 0;
-			if (m_PatternNo.y >= PatternMax.y) {
-				m_PatternNo.y = 0;
-			}
-		}
-	}
-#endif
 }
 
 
@@ -54,11 +40,15 @@ void CExplosion::Update()
 //=============================================================================
 void CExplosion::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj )
 {
+	// 画像のパターン設定.
 	m_pSprite->SetPatternNo( m_PatternNo.x, m_PatternNo.y );
 
+	// ビルボード設定.
 	m_pSprite->SetBillboard( true );
 
+	// 描画.
 	CSpriteObject::Draw( View, Proj );
 
+	// ビルボード設定.
 	m_pSprite->SetBillboard( false );
 }

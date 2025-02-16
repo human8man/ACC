@@ -13,7 +13,6 @@ public:
 	CExplosion();
 	virtual ~CExplosion() override;
 
-
 	// XVˆ—.
 	virtual void Update() override;
 	// •`‰æˆ—.

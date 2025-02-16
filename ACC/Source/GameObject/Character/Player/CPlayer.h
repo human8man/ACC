@@ -36,7 +36,7 @@ public:
 	void JumpPowerDec() { if (m_JumpPower > 0) { m_JumpPower -= m_Gravity; } }
 
 	// 当たり判定処理(エネミー、床、柱).
-	void Collision(std::unique_ptr<CEnemy>& egg, MeshCollider floor, MeshCollider cylinder);
+	void Collision(std::unique_ptr<CEnemy>& egg, Collider floor, Collider cylinder);
 
 private:
 	// キー入力処理.

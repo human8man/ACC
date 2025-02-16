@@ -71,9 +71,9 @@ void CEnemy::Draw(D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light)
 //=============================================================================
 //		当たり判定処理.
 //=============================================================================
-void CEnemy::Collision(std::unique_ptr<CPlayer>& egg, MeshCollider floor, MeshCollider cylinder)
+void CEnemy::Collision(std::unique_ptr<CPlayer>& egg, Collider floor, Collider cylinder)
 {
-	MeshCollider Bullet, enemyegg;
+	Collider Bullet, enemyegg;
 
 	// エフェクトに必要なハンドルを用意.
 	static ::EsHandle hEffect = -1;

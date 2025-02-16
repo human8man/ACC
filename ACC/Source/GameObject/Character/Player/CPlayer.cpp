@@ -102,9 +102,9 @@ void CPlayer::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 //============================================================================
 //		当たり判定処理.
 //============================================================================
-void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, MeshCollider floor, MeshCollider cylinder)
+void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, Collider floor, Collider cylinder)
 {
-	MeshCollider Bullet,enemyegg;
+	Collider Bullet,enemyegg;
 
 	/// エフェクト事に必要なハンドルを用意.
 	static ::EsHandle hEffect = -1;
