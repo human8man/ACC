@@ -79,21 +79,13 @@ void CEnemy::Collision(std::unique_ptr<CPlayer>& egg, Collider floor, Collider c
 	static ::EsHandle hEffect = -1;
 
 	// プレイヤーデータを取得.
-	enemyegg.SetVertex(
-		egg->GetPos(),
-		egg->GetRot(),
-		egg->GetScale(),
-		egg->GetMesh()->GetVertices());
+	enemyegg.SetVertex( egg->GetObjeInfo(), egg->GetMesh()->GetVertices());
 
 	// 弾の判定.
 	for (size_t i = 0; i < m_pBullets.size(); ++i) 
 	{
 		// 弾データを取得.
-		Bullet.SetVertex(
-			m_pBullets[i]->GetPos(),
-			m_pBullets[i]->GetRot(),
-			m_pBullets[i]->GetScale(),
-			m_pMeshBullet->GetVertices());
+		Bullet.SetVertex( m_pBullets[i]->GetObjeInfo(), m_pMeshBullet->GetVertices());
 
 
 		// 当たり判定情報用の変数を宣言.
@@ -130,7 +122,7 @@ void CEnemy::Collision(std::unique_ptr<CPlayer>& egg, Collider floor, Collider c
 			// 命中した.
 			m_Hit = true;
 
-			// 当たったあとは削除.
+			// 命中後に削除.
 			m_pBullets[i].reset();
 			m_pBullets.erase(m_pBullets.begin() + i);
 			--i;

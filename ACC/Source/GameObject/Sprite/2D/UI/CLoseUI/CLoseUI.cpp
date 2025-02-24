@@ -1,12 +1,13 @@
 #include "CLoseUI.h"
 
 #include "Scenes/SceneManager/CSceneManager.h"
-#include "GameObject/Sprite/2D/UI/CUIObject.h"
+#include "Sprite/2D/UI/CUIObject.h"
 #include "Common/DirectInput/CDirectInput.h"
 #include "DirectSound/CSoundManager.h"
 
 #include "Common/Time/CTime.h"
 #include "Common/Easing/Easing.h"
+
 
 namespace {
 	// LoseUIのパス.
@@ -29,6 +30,7 @@ CLoseUI::CLoseUI()
 	, m_SpawnTimeMax	( CTime::GetInstance()->GetDeltaTime() * 300.f )
 	, m_SpawnTime		( m_SpawnTimeMax )
 {
+	m_hWnd = nullptr;
 	m_Light.vDirection = D3DXVECTOR3(1.f, 5.f, 0.f);
 }
 
@@ -39,7 +41,7 @@ CLoseUI::~CLoseUI()
 
 
 //=================================================================================================
-//		構築関数.
+//		作成処理.
 //=================================================================================================
 void CLoseUI::Create()
 {
@@ -67,7 +69,7 @@ void CLoseUI::Create()
 
 
 //=================================================================================================
-//		読み込み.
+//		読込処理.
 //=================================================================================================
 HRESULT CLoseUI::LoadData()
 {
@@ -76,17 +78,7 @@ HRESULT CLoseUI::LoadData()
 
 
 //=================================================================================================
-//		解放処理.
-//=================================================================================================
-void CLoseUI::Release()
-{
-	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pUIs[i]); }
-	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pSprite2Ds[i]); }
-}
-
-
-//=================================================================================================
-//		初期化.
+//		初期化処理.
 //=================================================================================================
 void CLoseUI::Init()
 {
@@ -95,20 +87,19 @@ void CLoseUI::Init()
 
 
 //=================================================================================================
-//		更新.
+//		更新処理.
 //=================================================================================================
 void CLoseUI::Update()
 {
-	m_SpawnTime -= CTime::GetInstance()->GetDeltaTime();
+	if (m_SpawnTime <= 0) { m_SpawnTime -= CTime::GetInstance()->GetDeltaTime(); }
 
 	//----------------------------------------------------------------------------
 	//		それぞれのUIの更新.
 	//----------------------------------------------------------------------------
-	for (size_t i = 0; i < m_pUIs.size(); ++i) {
+	for (size_t i = 0; i < m_pUIs.size(); ++i) 
+	{
 		// 背景を透過させる.
-		if (i == LoseSprite::Black) {
-			m_pUIs[i]->SetAlpha(0.4f);
-		}
+		if (i == LoseSprite::Black) { m_pUIs[i]->SetAlpha(0.4f); }
 
 		if (m_SpawnTime < 0.f) {
 			// ゲームを開始する.
@@ -120,12 +111,20 @@ void CLoseUI::Update()
 
 
 //=================================================================================================
-//		描画.
+//		描画処理.
 //=================================================================================================
 void CLoseUI::Draw()
 {	
 	// UIそれぞれの描画処理.
-	for (size_t i = 0; i < m_pUIs.size(); ++i) {
-		m_pUIs[i]->Draw();
-	}
+	for (size_t i = 0; i < m_pUIs.size(); ++i) { m_pUIs[i]->Draw(); }
+}
+
+
+//=================================================================================================
+//		解放処理.
+//=================================================================================================
+void CLoseUI::Release()
+{
+	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pUIs[i]); }
+	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pSprite2Ds[i]); }
 }

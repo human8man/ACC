@@ -246,7 +246,6 @@
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">stdcpp20</LanguageStandard>
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|x64'">stdcpp20</LanguageStandard>
     </ClCompile>
-    <ClCompile Include="Source\Common\DirectInput\CGamePad.cpp" />
     <ClCompile Include="Source\Common\DirectInput\CKey.cpp" />
     <ClCompile Include="Source\Common\DirectInput\CMouse.cpp" />
     <ClCompile Include="Source\Common\FileManager\FileManager.cpp" />
@@ -283,7 +282,6 @@
     <ClCompile Include="Source\GameObject\Mesh\Skin\CSkinMeshParser.cpp" />
     <ClCompile Include="Source\GameObject\Mesh\Static\CStaticMesh.cpp" />
     <ClCompile Include="Source\GameObject\Mesh\Static\CStaticMeshObject.cpp" />
-    <ClCompile Include="Source\GameObject\Object\Ground\CGround.cpp" />
     <ClCompile Include="Source\GameObject\Object\Gun\CGun.cpp" />
     <ClCompile Include="Source\GameObject\Object\Bullet\CBullet.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\2D\CSprite2D.cpp" />
@@ -342,7 +340,6 @@
     <ClInclude Include="Source\GameObject\Mesh\Skin\CSkinMeshParser.h" />
     <ClInclude Include="Source\GameObject\Mesh\Static\CStaticMesh.h" />
     <ClInclude Include="Source\GameObject\Mesh\Static\CStaticMeshObject.h" />
-    <ClInclude Include="Source\GameObject\Object\Ground\CGround.h" />
     <ClInclude Include="Source\GameObject\Object\Gun\CGun.h" />
     <ClInclude Include="Source\GameObject\Object\Bullet\CBullet.h" />
     <ClInclude Include="Source\GameObject\Sprite\2D\CSprite2D.h" />

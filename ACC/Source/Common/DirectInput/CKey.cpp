@@ -19,10 +19,7 @@ CKey::CKey()
 bool CKey::Init(CKey& Key, IDirectInput8* pDInput, HWND hWnd)
 {
 	//　キーボードデバイスの作成.
-	if (!Key.Create(pDInput, hWnd))
-	{
-		return false;
-	}
+	if (!Key.Create(pDInput, hWnd)){ return false; }
 	return true;
 }
 
@@ -32,19 +29,20 @@ bool CKey::Init(CKey& Key, IDirectInput8* pDInput, HWND hWnd)
 //------------------------------------------------------------------------------
 bool CKey::Create(IDirectInput8* pDInput, HWND hWnd)
 {
+	// 引数チェック（DirectInput が nullptr の場合は失敗）.
+	if (!pDInput) { return false; }
+
 	HRESULT hr;
 
-	if ( !pDInput ){ return false; }
-
-	//キーボードデバイスを作成.
+	// キーボードデバイスを作成.
 	hr = pDInput->CreateDevice( GUID_SysKeyboard, &m_pDIDevKB, NULL );
 	if ( FAILED(hr) ){ return false; }
 	
-	//データフォーマットの設定.
+	// データフォーマットの設定.
 	hr = m_pDIDevKB->SetDataFormat( &c_dfDIKeyboard );
 	if ( FAILED(hr) ){ return false; }
 
-	//バッファサイズの設定.
+	// バッファサイズの設定.
 	DIPROPDWORD diprop = {};
 	diprop.diph.dwSize = sizeof( diprop );
 	diprop.diph.dwHeaderSize = sizeof(diprop.diph);
@@ -55,12 +53,13 @@ bool CKey::Create(IDirectInput8* pDInput, HWND hWnd)
 	hr = m_pDIDevKB->SetProperty( DIPROP_BUFFERSIZE, &diprop.diph );
 	if ( FAILED(hr) ){ return false; }
 
-	//協調モードの設定.
+	// 協調モードの設定.
 	hr = m_pDIDevKB->SetCooperativeLevel( hWnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND );
 	if ( FAILED(hr) ){ return false; }
 
-	//入力を許可する.
+	// 入力を許可する.
 	m_pDIDevKB->Acquire();
+
 	return true;
 }
 
@@ -70,7 +69,7 @@ bool CKey::Create(IDirectInput8* pDInput, HWND hWnd)
 //------------------------------------------------------------------------------
 void CKey::Update()
 {
-	// m_KeyActionをリセット.
+	// キー入力状態のリセット.
 	ZeroMemory(m_KeyAction, sizeof(m_KeyAction));
 
 	DIDEVICEOBJECTDATA od;

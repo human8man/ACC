@@ -110,7 +110,7 @@ void CCamera::Camera( D3DXMATRIX& View ) const
 //-------------------------------------------------------------------
 void CCamera::KeyInput()
 {
-	CKey* Key = CDInput::GetInstance()->CDKeyboard();
+	CKey* Key = CInput::GetInstance()->CDKeyboard();
 
 	// マウスが画面中央に固定されている場合.
 	if (!m_CanMoveMouse)

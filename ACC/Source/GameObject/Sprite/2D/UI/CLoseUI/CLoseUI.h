@@ -22,13 +22,12 @@ public:
 	CLoseUI();
 	~CLoseUI();
 
-	void Create();
-	HRESULT LoadData();
-	void Release();
-	void Init();
-
-	void Update();
-	void Draw();
+	void Create();		// ì¬ˆ—.
+	HRESULT LoadData();	// “Çˆ—.
+	void Init();		// ‰Šú‰»ˆ—.
+	void Update();		// XVˆ—.
+	void Draw();		// •`‰æˆ—.
+	void Release();		// ‰ğ•úˆ—.
 
 private:
 	HWND		m_hWnd;

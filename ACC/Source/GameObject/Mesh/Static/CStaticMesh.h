@@ -135,10 +135,13 @@ public:
 	D3DXVECTOR3 GetScale()	const { return m_Scale; }		// サイズを取得.
 	D3DXVECTOR3 GetPos()	const { return m_Position; }	// メッシュ位置を取得.
 	D3DXVECTOR3 GetRot()	const { return m_Rotation; }	// メッシュ角度を取得.
+	// オブジェクト情報(座標情報,回転情報,サイズ)を取得.
+	ObjectInfo GetObjeInfo() const { return ObjectInfo{ m_Position, m_Rotation, m_Scale }; }
+
 	LPD3DXMESH GetMesh()	const { return m_Model.pMesh; }	// メッシュを取得.
 	LPD3DXMESH GetMeshForRay()	const { return m_ModelForRay.pMesh; }		// レイとの当たり判定用のメッシュを取得.
 	std::vector<D3DXVECTOR3>GetVertices()	const { return m_Vertices; }	// メッシュの頂点情報を取得.
-	
+
 	// レイとメッシュの当たり判定(Hit判定、交差点、長さを返す).
 	RayInfo IsHitForRay( const RAY& pRay  );
 private:

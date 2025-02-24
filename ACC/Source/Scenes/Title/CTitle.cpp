@@ -1,11 +1,16 @@
 #include "CTitle.h"
 
 #include "Scenes/SceneManager/CSceneManager.h"
-#include "GameObject/Sprite/2D/UI/CUIObject.h"
+#include "Sprite/2D/UI/CUIObject.h"
 #include "Common/DirectInput/CDirectInput.h"
 #include "DirectSound/CSoundManager.h"
-#include "GameObject/Mesh/Static/CStaticMesh.h"
-#include "../GameObject/Camera/CCamera.h"
+#include "Mesh/Static/CStaticMesh.h"
+#include "Camera/CCamera.h"
+
+
+#if _DEBUG
+#include "Common/ImGui/CImGui.h"
+#endif
 
 
 namespace {
@@ -108,7 +113,8 @@ void CTitle::Update()
 	// BGM再生.
 	CSoundManager::GetInstance()->PlayLoop(CSoundManager::enList::BGM_Title);
 
-	CMouse* Mouse = CDInput::GetInstance()->CDMouse();
+	CMouse* Mouse = CInput::GetInstance()->CDMouse();
+	CXInput* XInput = CInput::GetInstance()->CDXInput();
 	m_pEgg->SetRotY(m_pEgg->GetRot().y + 0.01f);
 
 	// マウス位置を取得.
@@ -174,9 +180,23 @@ void CTitle::Update()
 				CSoundManager::GetInstance()->Stop(CSoundManager::enList::BGM_Title);
 			}
 		}
+		else if (XInput->IsUp(XInput->A))
+		{
+			// ゲームを開始する.
+			CSceneManager::GetInstance()->LoadScene(SceneList::Game);
+			CSoundManager::GetInstance()->Stop(CSoundManager::enList::BGM_Title);
+		}
 	}
 	
 
+#if _DEBUG
+	ImGui::Begin("cWindow");
+
+	ImGui::Text("%d", XInput->GetPadID());
+	ImGui::Text("%d", XInput->IsConnect());
+
+	ImGui::End();
+#endif
 }
 
 

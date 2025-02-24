@@ -11,7 +11,6 @@
 class CStaticMesh;
 class CGJK;
 class CRay;
-class CGround;
 class CEnemy;
 class CPlayer;
 class CCharacter;
@@ -72,7 +71,6 @@ private:
 		
 	std::unique_ptr<CPlayer>	m_pPlayer;	// プレイヤークラス.
 	std::unique_ptr<CEnemy>		m_pEnemy;	// 敵クラス.
-	std::unique_ptr<CGround>	m_pGround;	// 地面クラス.
 
 	// 当たり判定.
 	std::unique_ptr<CGJK> m_pGJK;		// GJKクラス.
