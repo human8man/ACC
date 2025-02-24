@@ -8,10 +8,12 @@
 #include "Effect/CEffect.h"
 #include "Common/Time/CTime.h"
 
+
 // ImGuiはデバッグ時のみ使用する.
 #ifdef _DEBUG
 #include "Common/ImGui/CImGui.h"
 #endif
+
 
 #include <iostream>
 #include <thread>
@@ -20,8 +22,10 @@
 #include <dwmapi.h>	//ダークモード用.
 #pragma comment(lib, "dwmapi.lib")
 
+
 const TCHAR WND_TITLE[] = _T( "ACC" );
 const TCHAR APP_NAME[]	= _T( "ACC" );
+
 
 //=================================================
 //		メインループクラス.
@@ -50,7 +54,7 @@ HRESULT CMain::Create() const
 	// シーンマネージャー構築.
 	if (FAILED(CSceneManager::GetInstance()	->Create(m_hWnd))) { return E_FAIL; }
 	// DirectInput構築.
-	if (FAILED(CDInput::GetInstance()		->Create(m_hWnd))) { return E_FAIL; }
+	if (FAILED(CInput::GetInstance()		->Create(m_hWnd))) { return E_FAIL; }
 
 	// EffectManagerの構築.
 	if (FAILED(CEffect::GetInstance()->Create(
@@ -80,8 +84,8 @@ void CMain::Update()
 	// タイムクラスの更新.
 	CTime::GetInstance()->Update();
 
-	// CDInputの更新処理.
-	CDInput::GetInstance()->InputUpdate();
+	// CInputの更新処理.
+	CInput::GetInstance()->InputUpdate();
 
 	// 更新処理.
 	CSceneManager::GetInstance()->Update();
@@ -103,7 +107,7 @@ void CMain::Release()
 {
 	CSoundManager::GetInstance()->Release();
 	CSceneManager::GetInstance()->Release();
-	CDInput::GetInstance()->Release();
+	CInput::GetInstance()->Release();
 }
 
 
@@ -337,6 +341,10 @@ LRESULT CALLBACK CMain::MsgProc(
 	return DefWindowProc( hWnd, uMsg, wParam, lParam );
 }
 
+
+//------------------------------------------------------------------------------
+//		ウィンドウをダークモードにする関数.
+//------------------------------------------------------------------------------
 bool CMain::setUseImmersiveDarkMode(HWND hwnd, bool dark_mode)
 {
 	// ダークモードにする.
@@ -356,22 +364,26 @@ bool CMain::setUseImmersiveDarkMode(HWND hwnd, bool dark_mode)
 	return false;
 }
 
+
+//------------------------------------------------------------------------------
+//		ウィンドウの枠を虹色に変色させる関数.
+//------------------------------------------------------------------------------
 void CMain::SetRainbowBorder(HWND hwnd)
 {
-	// sin関数を使用して、赤、緑、青の色成分を計算
+	// sin関数を使用して、赤、緑、青の色成分を計算.
 	COLORREF color = RGB(
-		static_cast<BYTE>((sin(m_ColorStep * 0.3) * 127) + 128),  // 赤
-		static_cast<BYTE>((sin(m_ColorStep * 0.3 + 2) * 127) + 128),  // 緑
-		static_cast<BYTE>((sin(m_ColorStep * 0.3 + 4) * 127) + 128)   // 青
+		static_cast<BYTE>((sin(m_ColorStep * 0.3) * 127) + 128),		// 赤.
+		static_cast<BYTE>((sin(m_ColorStep * 0.3 + 2) * 127) + 128),	// 緑.
+		static_cast<BYTE>((sin(m_ColorStep * 0.3 + 4) * 127) + 128)		// 青.
 	);
 
-	// ウィンドウの枠線の色を変更
+	// ウィンドウの枠線の色を変更.
 	DwmSetWindowAttribute(hwnd, DWMWA_BORDER_COLOR, &color, sizeof(color));
 	
-	// ステップを進めることで色が変化
+	// ステップを進めることで色が変化.
 	m_ColorStep++;
 
-	// 一定数のステップでリセットして色を最初に戻す
+	// 一定数のステップでリセットして色を最初に戻す.
 	if (m_ColorStep > 1000) {
 		m_ColorStep = 0;
 	}

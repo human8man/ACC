@@ -11,10 +11,6 @@
 class CCamera
 	: public CSingleton<CCamera>
 {
-private:
-	// シングルトンクラスをフレンド宣言.
-	friend class CSingleton<CCamera>;
-
 public:
 	// 移動方向の分岐.
 	enum Move {
@@ -30,6 +26,7 @@ public:
 	static constexpr POINT RESETPOS = { WND_WM, WND_HM };
 
 public:
+	friend class CSingleton<CCamera>;// シングルトンクラスをフレンド宣言.
 	CCamera();
 	~CCamera();
 	

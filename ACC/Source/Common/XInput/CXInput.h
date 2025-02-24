@@ -19,7 +19,7 @@ public:
 	static constexpr WORD	VIBRATION_MIN	= 0;
 	static constexpr WORD	VIBRATION_MAX	= 65535;
 
-	//キー列挙体.
+	// キー列挙体.
 	enum KEY
 	{
 		UP,		// 方向パッド:上.
@@ -46,37 +46,29 @@ public:
 	CXInput( DWORD padId );
 	~CXInput();
 
+	// 更新処理.
 	bool Update();
 	// 終了処理.
 	void EndProc();
-
 	
 	bool IsDown( KEY key, bool Just = false );	// 押した.
 	bool IsRepeat( KEY key );					// 押し続けている.
 	bool IsUp( KEY key );						// 離した.
-
-	// 左トリガー取得.
-	BYTE GetLTrigger() const { return m_state.Gamepad.bLeftTrigger;  }
-	// 右トリガー取得.
-	BYTE GetRTrigger() const { return m_state.Gamepad.bRightTrigger; }
-
-	// 左スティックX軸取得.
-	SHORT GetLThumbX() const { return m_state.Gamepad.sThumbLX; }
-	// 左スティックY軸取得.
-	SHORT GetLThumbY() const { return m_state.Gamepad.sThumbLY; }
-
-	// 右スティックX軸取得.
-	SHORT GetRThumbX() const { return m_state.Gamepad.sThumbRX; }
-	// 右スティックY軸取得.
-	SHORT GetRThumbY() const { return m_state.Gamepad.sThumbRY; }
-
+	
 	// 振動設定.
 	bool SetVibration( WORD LMotorSpd, WORD RMotorSpd );
 
 	// 接続チェック.
-	bool IsConnect() const { return m_connect; }
+	bool IsConnect() const { return m_Connect; }
 	// パッド番号取得.
-	DWORD GetPadID() const { return m_padId; }
+	DWORD GetPadID() const { return m_PadId; }
+
+	BYTE GetLTrigger() const { return m_State.Gamepad.bLeftTrigger;  } // 左トリガー取得.
+	BYTE GetRTrigger() const { return m_State.Gamepad.bRightTrigger; } // 右トリガー取得.
+	SHORT GetLThumbX() const { return m_State.Gamepad.sThumbLX; } // 左スティックX軸取得.
+	SHORT GetLThumbY() const { return m_State.Gamepad.sThumbLY; } // 左スティックY軸取得.
+	SHORT GetRThumbX() const { return m_State.Gamepad.sThumbRX; } // 右スティックX軸取得.
+	SHORT GetRThumbY() const { return m_State.Gamepad.sThumbRY; } // 右スティックY軸取得.
 
 private:
 	// キー入力の更新.
@@ -87,9 +79,9 @@ private:
 	WORD GenerateGamePadValue( KEY key );
 
 private:
-	DWORD			 m_padId;		// パッド番号(0~3).
-	XINPUT_STATE	 m_state;		// キー入力情報.
-	XINPUT_STATE	 m_stateOld;	// キー入力情報(キーストローク判定用).
-	XINPUT_VIBRATION m_vibration;	// 振動.
-	bool			 m_connect;		// 接続判定.
+	DWORD			 m_PadId;		// パッド番号(0~3).
+	XINPUT_STATE	 m_State;		// キー入力情報.
+	XINPUT_STATE	 m_StateOld;	// キー入力情報(キーストローク判定用).
+	XINPUT_VIBRATION m_Vibration;	// 振動.
+	bool			 m_Connect;		// 接続判定.
 };

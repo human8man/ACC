@@ -1,5 +1,5 @@
 #include "CBullet.h"
-
+#include "Common/Time/CTime.h"
 
 //============================================================================
 //		弾クラス.
@@ -7,7 +7,7 @@
 CBullet::CBullet()
 	: m_MoveDirection	()
 	, m_MoveSpeed		()
-	, m_DeleteTime		(FPS * 10)
+	, m_DeleteTime		( CTime::GetInstance()->GetDeltaTime() * 600.f )
 {
 }
 
@@ -17,25 +17,11 @@ CBullet::~CBullet()
 
 
 //============================================================================
-//		初期化処理.
-//============================================================================
-void CBullet::Init(
-	const D3DXVECTOR3& pos,
-	const D3DXVECTOR3& vector,
-	const float& speed)
-{
-	m_vPosition		= pos;
-	m_MoveDirection = vector;
-	m_MoveSpeed		= speed;
-}
-
-
-//============================================================================
 //		更新処理.
 //============================================================================
 void CBullet::Update()
 {
-	m_DeleteTime--;
+	m_DeleteTime -= CTime::GetInstance()->GetDeltaTime();
 	m_vPosition += m_MoveDirection * m_MoveSpeed;
 }
 

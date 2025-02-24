@@ -4,26 +4,29 @@
 #include "Common/ImGui/library/imgui_impl_win32.h"
 #include "Common/ImGui/library/imgui_impl_dx11.h"
 
-//staticで更新後のサイズ変数を宣言.
+// staticで更新後のサイズ変数を宣言.
 static UINT g_ResizeWidth, g_ResizeHeight;
 
+
+//=============================================================================
+//		ImGuiクラス.
+//=============================================================================
 class CImGui
 	: public CSingleton<CImGui>
 {
 private:
-	friend class CSingleton<CImGui>; //シングルトンクラスをフレンド宣言
+	friend class CSingleton<CImGui>; //シングルトンクラスをフレンド宣言.
 	CImGui();
 	~CImGui();
 
 public:
-	//作成処理.
+	// 作成処理.
 	void Create(HWND hwnd);
 	
-	//更新処理.
+	// 更新処理.
 	void Update();
 
-	//描画処理
-	void Render();
+	// 描画処理
 	void Draw();
 
 	//ウィンドウハンドルをImGuiに渡す.

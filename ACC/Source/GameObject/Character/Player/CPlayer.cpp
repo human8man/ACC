@@ -111,9 +111,7 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, Collider floor, Collider c
 
 	// “Gƒf[ƒ^‚ðŽæ“¾.
 	enemyegg.SetVertex(
-		egg->GetPos(),
-		egg->GetRot(),
-		egg->GetScale(),
+		egg->GetObjeInfo(),
 		egg->GetMesh()->GetVertices());
 
 	// ’e‚Ì”»’è.
@@ -121,9 +119,7 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, Collider floor, Collider c
 
 		// ’eƒf[ƒ^‚ðŽæ“¾.
 		Bullet.SetVertex(
-			m_pBullets[i]->GetPos(),
-			m_pBullets[i]->GetRot(),
-			m_pBullets[i]->GetScale(),
+			m_pBullets[i]->GetObjeInfo(),
 			m_pMeshBullet->GetVertices());
 
 
@@ -188,8 +184,8 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, Collider floor, Collider c
 //-----------------------------------------------------------------------------
 void CPlayer::KeyInput(std::unique_ptr<CEnemy>& chara)
 {
-	CKey* Key = CDInput::GetInstance()->CDKeyboard();
-	CMouse* Mouse = CDInput::GetInstance()->CDMouse();
+	CKey* Key = CInput::GetInstance()->CDKeyboard();
+	CMouse* Mouse = CInput::GetInstance()->CDMouse();
 
 
 	//----------------------------------------------------------------------

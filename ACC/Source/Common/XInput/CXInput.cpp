@@ -1,12 +1,14 @@
 #include "CXInput.h"
 #include <crtdbg.h>
 
+
 // 値を範囲内に収める関数.
 template<typename T>
 T Clamp( T val, T min, T max )
 {
 	return ( val < min ) ? min : ( max < val ) ? max : val;
 }
+
 
 // KEY列挙体に対応したXINPUT_GAMEPADのテーブル.
 const WORD KEY_TABLE[CXInput::MAX] =
@@ -32,11 +34,11 @@ const WORD KEY_TABLE[CXInput::MAX] =
 //		XInputクラス.
 //=================================================================================================
 CXInput::CXInput( DWORD padId )
-	: m_padId		( padId )
-	, m_state		()
-	, m_stateOld	()
-	, m_vibration	()
-	, m_connect		( false )
+	: m_PadId		( padId )
+	, m_State		()
+	, m_StateOld	()
+	, m_Vibration	()
+	, m_Connect		( false )
 {
 }
 
@@ -52,10 +54,8 @@ CXInput::~CXInput()
 bool CXInput::Update()
 {
 	// キー情報を更新する前に退避.
-	m_stateOld = m_state;
-	if( UpdateStatus() == false ){
-		return false;
-	}
+	m_StateOld = m_State;
+	if( UpdateStatus() == false ){ return false; }
 	return true;
 }
 
@@ -76,13 +76,10 @@ bool CXInput::IsDown( KEY key, bool Just )
 {
 	WORD GamePad = GenerateGamePadValue( key );
 
-	if( IsKeyCore( GamePad, m_state ) == true )
-	{
-		if( Just == true ){
-			// 今回入力で前回未入力→押した瞬間.
-			if( IsKeyCore( GamePad, m_stateOld ) == false ){
-				return true;
-			}
+	if( IsKeyCore( GamePad, m_State ) ) {
+		if( Just ) {
+			// 今回入力で前回未入力 → 押した瞬間.
+			if( !IsKeyCore( GamePad, m_StateOld ) ) { return true; }
 		}
 		return true;
 	}
@@ -98,8 +95,7 @@ bool CXInput::IsUp( KEY key )
 	WORD GamePad = GenerateGamePadValue( key );
 
 	// 前回入力で今回未入力→離した瞬間.
-	if( IsKeyCore( GamePad, m_stateOld ) == true &&
-		IsKeyCore( GamePad, m_state ) == false )
+	if( IsKeyCore( GamePad, m_StateOld ) && !IsKeyCore( GamePad, m_State ) )
 	{
 		return true;
 	}
@@ -115,8 +111,8 @@ bool CXInput::IsRepeat( KEY key )
 	WORD GamePad = GenerateGamePadValue( key );
 
 	//前回入力で今回入力→押し続けている.
-	if( IsKeyCore( GamePad, m_stateOld ) == true &&
-		IsKeyCore( GamePad, m_state ) == true )
+	if( IsKeyCore( GamePad, m_StateOld ) == true &&
+		IsKeyCore( GamePad, m_State )	 == true )
 	{
 		return true;
 	}
@@ -129,13 +125,10 @@ bool CXInput::IsRepeat( KEY key )
 //=================================================================================================
 bool CXInput::SetVibration( WORD LMotorSpd, WORD RMotorSpd )
 {
-	m_vibration.wLeftMotorSpeed = Clamp( LMotorSpd, VIBRATION_MIN, VIBRATION_MAX );
-	m_vibration.wRightMotorSpeed = Clamp( RMotorSpd, VIBRATION_MIN, VIBRATION_MAX );
+	m_Vibration.wLeftMotorSpeed  = Clamp( LMotorSpd, VIBRATION_MIN, VIBRATION_MAX );
+	m_Vibration.wRightMotorSpeed = Clamp( RMotorSpd, VIBRATION_MIN, VIBRATION_MAX );
 
-	if( ERROR_SUCCESS == XInputSetState(
-		m_padId, &m_vibration ) ){
-		return true;
-	}
+	if( ERROR_SUCCESS == XInputSetState( m_PadId, &m_Vibration ) ){ return true; }
 	return false;
 }
 
@@ -145,12 +138,10 @@ bool CXInput::SetVibration( WORD LMotorSpd, WORD RMotorSpd )
 //-------------------------------------------------------------------------------------------------
 bool CXInput::UpdateStatus()
 {
-	m_connect = false;
-	if( ERROR_SUCCESS == XInputGetState(
-		m_padId,
-		&m_state ) )
+	m_Connect = false;
+	if( ERROR_SUCCESS == XInputGetState( m_PadId, &m_State ) )
 	{
-		m_connect = true;
+		m_Connect = true;
 		return true;
 	}
 	return false;
@@ -162,11 +153,10 @@ bool CXInput::UpdateStatus()
 //-------------------------------------------------------------------------------------------------
 bool CXInput::IsKeyCore( WORD GamePad, const XINPUT_STATE& State )
 {
-	if( ( State.Gamepad.wButtons & GamePad ) != 0 ){
-		return true;
-	}
+	if( ( State.Gamepad.wButtons & GamePad ) != 0 ){ return true; }
 	return false;
 }
+
 
 //-------------------------------------------------------------------------------------------------
 //		KEY列挙体を対応したXINPUT_GAMEPADの値に変換.

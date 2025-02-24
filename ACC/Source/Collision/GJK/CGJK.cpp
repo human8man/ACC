@@ -29,23 +29,23 @@ D3DXVECTOR3 Collider::FindFurthestPoint(D3DXVECTOR3 Direction) const
 //==============================================================================
 //		頂点情報をワールド座標に変換してセットする.
 //==============================================================================
-void Collider::SetVertex(const D3DXVECTOR3& pos, const D3DXVECTOR3& rot, const D3DXVECTOR3& scale, const std::vector<D3DXVECTOR3>& vertex) 
+void Collider::SetVertex(const ObjectInfo& object, const std::vector<D3DXVECTOR3>& vertex)
 {
 	// ワールド変換行列.
 	D3DXMATRIX mTrans, mRot, mScale;
 
 	// 拡大縮小行列.
-	D3DXMatrixScaling(&mScale, scale.x, scale.y, scale.z);
+	D3DXMatrixScaling(&mScale, object.scale.x, object.scale.y, object.scale.z);
 
 	// 回転行列.
 	D3DXMATRIX mYaw, mPitch, mRoll;
-	D3DXMatrixRotationY(&mYaw, rot.y);
-	D3DXMatrixRotationX(&mPitch, rot.x);
-	D3DXMatrixRotationZ(&mRoll, rot.z);
+	D3DXMatrixRotationY(&mYaw,	object.rot.y);
+	D3DXMatrixRotationX(&mPitch,object.rot.x);
+	D3DXMatrixRotationZ(&mRoll,	object.rot.z);
 	mRot = mYaw * mPitch * mRoll;
 
 	// 平行移動行列.
-	D3DXMatrixTranslation(&mTrans, pos.x, pos.y, pos.z);
+	D3DXMatrixTranslation(&mTrans, object.pos.x, object.pos.y, object.pos.z);
 
 	// ワールド行列 = 拡大 * 回転 * 平行移動.
 	D3DXMATRIX mWorld = mScale * mRot * mTrans;
@@ -303,17 +303,13 @@ void CGJK::AddIfUniqueEdge(
 //======================================================================================
 //		与えられた頂点群の中で最も低いY座標の頂点の位置を返す.
 //======================================================================================
-float CGJK::SendMinVertexPosY( 
-	const D3DXVECTOR3& _Pos, 
-	const D3DXVECTOR3& _Rot, 
-	const D3DXVECTOR3& _Scale, 
-	const std::vector<D3DXVECTOR3>& vertex)
+float CGJK::SendMinVertexPosY( const ObjectInfo& obje, const std::vector<D3DXVECTOR3>& vertex)
 {
 	std::vector<D3DXVECTOR3> Vertex;	// 変換後の頂点リスト.
 	float MinPosY = FLT_MAX;			// Y座標の最小値（初期値は最大値）.
 
 	// 位置・回転・スケールの値を取得.
-	D3DXVECTOR3 Pos = _Pos, Rot = _Rot, Scale = _Scale;
+	D3DXVECTOR3 Pos = obje.pos, Rot = obje.rot, Scale = obje.scale;
 
 	// 各種変換行列.
 	D3DXMATRIX mTrans, mRot, mScale;
@@ -323,9 +319,9 @@ float CGJK::SendMinVertexPosY(
 
 	// 回転行列.
 	D3DXMATRIX mYaw, mPitch, mRoll;
-	D3DXMatrixRotationY(&mYaw, Rot.y);	// Yaw（Y軸回転）.
-	D3DXMatrixRotationX(&mPitch, Rot.x);// Pitch（X軸回転）.
-	D3DXMatrixRotationZ(&mRoll, Rot.z);	// Roll（Z軸回転）.
+	D3DXMatrixRotationY(&mYaw, Rot.y);	// Yaw.
+	D3DXMatrixRotationX(&mPitch, Rot.x);// Pitch.
+	D3DXMatrixRotationZ(&mRoll, Rot.z);	// Roll.
 
 	// 回転の適用順序: Yaw → Pitch → Roll.
 	//	※回転の順番を変えると結果も変化する.
@@ -355,9 +351,7 @@ float CGJK::SendMinVertexPosY(
 		D3DXVec3TransformCoord(&Vertex[i], &Vertex[i], &mWorld);
 
 		// 最小Y座標を更新
-		if (MinPosY > Vertex[i].y) {
-			MinPosY = Vertex[i].y;
-		}
+		if (MinPosY > Vertex[i].y) { MinPosY = Vertex[i].y; }
 	}
 
 	// 最も低いY座標を返す
@@ -378,7 +372,6 @@ bool CGJK::NextSimplex(Simplex& points, D3DXVECTOR3& Direction)
 	case 4: return Tetrahedron	( points, Direction );	// 4点の場合（四面体のケース）.
 	}
 
-	// 0点 or 1点の場合は false を返す.
 	return false;
 }
 

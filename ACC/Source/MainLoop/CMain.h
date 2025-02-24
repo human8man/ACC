@@ -11,10 +11,11 @@ public:
 	CMain();
 	~CMain();
 
-	HRESULT Create() const;
-	void Update();
-	void Release();
-	void Loop();
+	
+	HRESULT Create() const;	// 作成処理.
+	void Update();			// 更新処理.
+	void Release();			// 解放処理.
+	void Loop();			// メインループ.
 
 	// ウィンドウ初期化関数.
 	HRESULT InitWindow(
@@ -28,11 +29,13 @@ private:
 		HWND hWnd,	   UINT uMsg,
 		WPARAM wParam, LPARAM lParam );
 
+	// ウィンドウをダークモードにする関数.
 	bool setUseImmersiveDarkMode(HWND hwnd, bool dark_mode);
+	// ウィンドウの枠を虹色に変色させる関数.
 	void SetRainbowBorder(HWND hwnd);
 
 private:
-	HWND	m_hWnd;	// ウィンドウハンドル.
+	HWND	m_hWnd;			// ウィンドウハンドル.
 
-	int		m_ColorStep;
+	int		m_ColorStep;	// ウィンドウ枠を虹色にする関数用の変数.
 };

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameObject/Mesh/Static/CStaticMeshObject.h"
+#include "Mesh/Static/CStaticMeshObject.h"
 
 
 //============================================================================
@@ -12,14 +12,24 @@ class CBullet
 public:
 	CBullet();
 	virtual ~CBullet() override;
-	
-	// 初期化処理(初期位置,移動方向の単位ベクトル,速度).
+
+	// 初期化処理.
+	// @param pos 初期位置.
+	// @param vector 移動方向の単位ベクトル.
+	// @param speed 移動速度.
 	void Init(
 		const D3DXVECTOR3& pos,
 		const D3DXVECTOR3& vector,
-		const float& speed );
+		const float& speed )
+	{
+		m_vPosition = pos;
+		m_MoveDirection = vector;
+		m_MoveSpeed = speed;
+	};
+
 	// 更新処理.
 	virtual void Update() override;
+
 	// 描画処理.
 	virtual void Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light ) override;
 

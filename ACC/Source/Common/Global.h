@@ -72,3 +72,10 @@ struct LIGHT {
 	D3DXMATRIX	mRotation;	//回転行列.
 	float		Intensity;	//強度(明るさ).
 };
+
+// オブジェクトの座標、回転、サイズをまとめた構造体.
+struct ObjectInfo {
+	D3DXVECTOR3 pos;
+	D3DXVECTOR3 rot;
+	D3DXVECTOR3 scale;
+};

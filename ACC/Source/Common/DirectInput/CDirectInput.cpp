@@ -4,14 +4,15 @@
 //==============================================================================
 //		ダイレクトインプットクラス.
 //==============================================================================
-CDInput::CDInput()
-{
-	m_pDCInput = NULL;
-	m_hWnd = NULL;
-	m_UseDevice = 0;
+CInput::CInput()
+	: m_hWnd		(NULL)
+	, m_pDCInput	(NULL)
+	, m_UseDevice	(0)
+	, m_GamePad		(NULL)
+{	
 }
 
-CDInput::~CDInput()
+CInput::~CInput()
 {
 	Release();
 }
@@ -20,14 +21,14 @@ CDInput::~CDInput()
 //==============================================================================
 //		作成処理.
 //==============================================================================
-HRESULT CDInput::Create(HWND hWnd, int useDevice)
+HRESULT CInput::Create(HWND hWnd, int useDevice)
 {
 	m_hWnd = hWnd;	// ウィンドウハンドルを保存.
 
 	// すでに存在する場合は解放.
 	if (m_pDCInput) { Release(); }
 
-	//DirectInputオブジェクトの生成.
+	// DirectInputオブジェクトの生成.
 	HRESULT hr = DirectInput8Create(
 		::GetModuleHandle(NULL),	// アプリケーションのモジュールハンドル.
 		DIRECTINPUT_VERSION,		// 使用するDirectInputのバージョン.
@@ -41,42 +42,17 @@ HRESULT CDInput::Create(HWND hWnd, int useDevice)
 	// 使用するデバイスの設定を保存.
 	m_UseDevice = useDevice;
 
-	if (useDevice & UseInputDevice_KEYBOARD) {
-		m_Key.Create(m_pDCInput, hWnd);
-	}
-	if (useDevice & UseInputDevice_GAMEPAD) {
-		m_Mouse.Create(m_pDCInput, hWnd);
-	}
-
-	m_GamePad.Create();
+	if (useDevice & UseInputDevice_KEYBOARD){ m_Key.Create(m_pDCInput, hWnd);   }
+	if (useDevice & UseInputDevice_GAMEPAD) { m_Mouse.Create(m_pDCInput, hWnd); }
 
 	return S_OK;
 }
 
 
 //==============================================================================
-//		作成処理.
-//==============================================================================
-bool CDInput::GamePadConnect()
-{
-	// ゲームパッドが作成されていない場合中断.
-	if (!m_GamePad.IsValid()){ return false; }
-
-	HRESULT hr = m_GamePad.GetDeviceState();
-
-	// 失敗した場合.
-	if (FAILED(hr) || hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED) {
-		return false;
-	}
-
-	return true;
-}
-
-
-//==============================================================================
 //		解放処理.
 //==============================================================================
-void CDInput::Release()
+void CInput::Release()
 {
 	// DirectInputオブジェクトの解放.
 	if (m_pDCInput != NULL) {
@@ -86,7 +62,7 @@ void CDInput::Release()
 
 	m_Key.Release();
 	m_Mouse.Release();
-	m_GamePad.Release();
+	SAFE_DELETE(m_GamePad);
 
 	m_hWnd = NULL;
 	m_UseDevice = 0;
@@ -96,14 +72,31 @@ void CDInput::Release()
 //-----------------------------------------------------------------------------
 //		入力状態の更新.
 //-----------------------------------------------------------------------------
-void CDInput::InputUpdate()
+void CInput::InputUpdate()
 {
+	XINPUT_STATE state;
+	bool isConnected = (XInputGetState(0, &state) == ERROR_SUCCESS);
+
 	// コントローラーが接続されている場合.
-	if (!GamePadConnect()) {
-		m_Key.Update();
-		m_Mouse.Update();
+	if (isConnected)
+	{
+		if (!m_GamePad) {
+			m_GamePad = new CXInput(0);
+		}
 	}
-	else {
-		m_GamePad.Update();
+	else
+	{
+		if (m_GamePad) {
+			delete m_GamePad;
+			m_GamePad = nullptr;
+		}
 	}
+	// コントローラーが接続されている場合更新.
+	if (m_GamePad) {
+		m_GamePad->Update();
+	}
+
+	// キーとマウスの更新.
+	m_Key.Update();
+	m_Mouse.Update();
 }

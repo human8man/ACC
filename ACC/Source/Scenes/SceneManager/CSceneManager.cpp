@@ -64,7 +64,7 @@ HRESULT CSceneManager::Create(HWND hWnd)
 //=================================================================================================
 void CSceneManager::Update()
 {
-	CKey* Key = CDInput::GetInstance()->CDKeyboard();
+	CKey* Key = CInput::GetInstance()->CDKeyboard();
 
 	// ESC‚ª‰Ÿ‚³‚ê‚½ê‡.
 	if (Key->IsKeyAction(DIK_ESCAPE)) {

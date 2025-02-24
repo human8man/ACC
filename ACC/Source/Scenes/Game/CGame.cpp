@@ -7,7 +7,6 @@
 #include "Effect/CEffect.h"
 
 #include "Camera/CCamera.h"
-#include "Object/Ground/CGround.h"
 #include "Character/Player/CPlayer.h"
 #include "Character/Enemy/CEnemy.h"
 #include "Sprite/2D/UI/CGameUI/CGameUI.h"
@@ -32,7 +31,6 @@ CGame::CGame(HWND hWnd)
 	
 	, m_pPlayer		( nullptr )
 	, m_pEnemy		( nullptr )
-	, m_pGround		( nullptr )
 
 	, m_pGJK		( nullptr )
 	, m_pCamRay		( nullptr )
@@ -68,7 +66,6 @@ void CGame::Create()
 	}
 	m_pPlayer	= std::make_unique<CPlayer>();
 	m_pEnemy	= std::make_unique<CEnemy>();
-	m_pGround	= std::make_unique<CGround>();
 	m_pCamRay	= std::make_unique<CRay>();
 	m_pGameUI	= std::make_unique<CGameUI>();
 	m_pGameUI	->Create();
@@ -96,7 +93,6 @@ HRESULT CGame::LoadData()
 	// メッシュをアタッチする.
 	m_pPlayer	->AttachMesh( *m_pEgg );
 	m_pEnemy	->AttachMesh( *m_pEgg );
-	m_pGround	->AttachMesh( *m_pFloor );
 
 	// キャラクターの初期座標を設定.
 	m_pPlayer	->SetScale( 2.f, 2.f, 2.f );
@@ -169,7 +165,6 @@ void CGame::Release()
 {
 	m_pGameUI.reset();
 	m_pCamRay.reset();
-	m_pGround.reset();
 	m_pEnemy.reset();
 	m_pPlayer.reset();
 	for (auto& cylinder : m_pCylinders) {
@@ -200,7 +195,7 @@ void CGame::Update()
 	// BGMを再生.
 	CSoundManager::GetInstance()->PlayLoop(CSoundManager::enList::BGM_Game);
 
-	CKey* Key = CDInput::GetInstance()->CDKeyboard();
+	CKey* Key = CInput::GetInstance()->CDKeyboard();
 
 	// UIの更新処理.
 	UIUpdate();
@@ -240,9 +235,9 @@ void CGame::Draw()
 	CCamera::GetInstance()->Camera(m_mView);
 	CSceneBase::Projection(m_mProj);
 
-	m_pGround->Draw( m_mView, m_mProj, m_Light );	// 地面の描画.
-	m_pPlayer->Draw( m_mView, m_mProj, m_Light );	// プレイヤーの描画.
-	m_pEnemy->Draw( m_mView, m_mProj, m_Light );	// 敵の描画.
+	m_pFloor	->Render( m_mView, m_mProj, m_Light );	// 地面の描画.
+	m_pPlayer	->Draw( m_mView, m_mProj, m_Light );	// プレイヤーの描画.
+	m_pEnemy	->Draw( m_mView, m_mProj, m_Light );	// 敵の描画.
 
 	// 柱の描画.
 	for (auto& cylinder : m_pCylinders) {
@@ -272,36 +267,14 @@ void CGame::CollisionJudge()
 
 	// 柱データ取得.
 	for (int i = 0; i < m_CylinderMax; ++i) {
-		Cylinder.SetVertex(
-			m_pCylinders[i]->GetPos(),
-			m_pCylinders[i]->GetRot(),
-			m_pCylinders[i]->GetScale(),
-			m_pCylinders[i]->GetVertices()
-		);
+		Cylinder.SetVertex( m_pCylinders[i]->GetObjeInfo(), m_pCylinders[i]->GetVertices());
 		Cylinders.push_back(Cylinder);
 	}
 
-	// 地面データ取得.
-	Floor.SetVertex(
-		m_pGround->GetPos(),
-		m_pGround->GetRot(),
-		m_pGround->GetScale(),
-		m_pFloor->GetVertices());
-
-	// プレイヤーデータ取得.
-	PlayerEgg.SetVertex(
-		m_pPlayer->GetPos(),
-		m_pPlayer->GetRot(),
-		m_pPlayer->GetScale(),
-		m_pEgg->GetVertices());
-	
-	// プレイヤーデータ取得.
-	EnemyEgg.SetVertex(
-		m_pEnemy->GetPos(),
-		m_pEnemy->GetRot(),
-		m_pEnemy->GetScale(),
-		m_pEgg->GetVertices());
-
+	// 地面,プレイヤー,敵のデータ取得.
+	Floor		.SetVertex( m_pFloor->GetObjeInfo(),	m_pFloor->GetVertices());
+	PlayerEgg	.SetVertex( m_pPlayer->GetObjeInfo(),	m_pEgg->GetVertices());
+	EnemyEgg	.SetVertex( m_pEnemy->GetObjeInfo(),	m_pEgg->GetVertices());
 
 	// プレイヤーと敵の柱判定を取得用の変数を用意.
 	CollisionPoints pointsPC, pointsEC;
@@ -519,7 +492,7 @@ void CGame::RaytoObjeCol()
 	//-------------------------------------------------------------------------
 	
 	// 地面とカメラレイの判定を取得.
-	GroundRay = m_pGround->IsHitForRay(CCamera::GetInstance()->GetRay());
+	GroundRay = m_pFloor->IsHitForRay(CCamera::GetInstance()->GetRay());
 	
 	// 柱とカメラレイの判定を取得.
 	for (int i = 0; i < m_CylinderMax; ++i) {

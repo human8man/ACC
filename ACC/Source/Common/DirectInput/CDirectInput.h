@@ -6,6 +6,7 @@
 #pragma comment( lib, "dinput8.lib" )
 
 #include "Common/Singleton/CSingleton.h"
+#include "Common/XInput/CXInput.h"
 
 
 //==============================================================================
@@ -14,7 +15,7 @@
 class CKey
 {
 private:
-	friend class CDInput;
+	friend class CInput;
 
 	static constexpr int Button_MAX = 256;
 public:
@@ -45,7 +46,7 @@ private:
 class CMouse
 {
 private:
-	friend class CDInput;
+	friend class CInput;
 
 public:
 	bool IsLAction() const { return m_LAction; }	// 左クリック時.
@@ -83,50 +84,13 @@ private:
 
 
 //==============================================================================
-//		ゲームパッドクラス.
-//==============================================================================
-class CGamePad
-{
-private:
-	friend class CDInput;
-
-	static constexpr int ButtonMAX = 32;
-
-public:
-	bool GetPovAction(int Direction);	// 十字キー入力時判定.
-	bool GetPovDown(int Direction);		// 十字キー入力中判定.
-
-	bool IsValid() const;								// ジョイスティックが作成されているかを取得.
-	HRESULT GetDeviceState() const;						// ゲームパッドが接続中かを取得.
-	bool GetPadButtonAction	(int buttonIndex)	const;	// ボタン入力時判定を取得.
-	bool GetPadButtonDown	(int buttonIndex)	const;	// ボタン入力中判定を取得.
-
-private:
-	CGamePad();
-
-	int  Create();	// 作成処理.
-	void Update();	// 更新処理.
-	void Release();	// 解放処理.
-
-private:
-	bool m_ButtonPressed[ButtonMAX];			// ボタン配列.
-	bool m_PreviousButtonPressed[ButtonMAX];	// 前フレームのボタン状態.
-	bool m_BPOVButtonPressed[4];				// 十字キーの押下状態の保存用.
-	DIJOYSTATE m_Pad;
-	DIJOYSTATE m_PrevPad;
-
-	bool m_IsConect;
-};
-
-
-//==============================================================================
 //		DirectInputクラス.
 //==============================================================================
-class CDInput
-	: public CSingleton<CDInput>
+class CInput
+	: public CSingleton<CInput>
 {
 private:
-	friend class CSingleton<CDInput>;
+	friend class CSingleton<CInput>;
 
 	// このクラス内でしか使わない定義.
 #define UseInputDevice_KEYBOARD 0x01
@@ -134,13 +98,11 @@ private:
 #define UseInputDevice_GAMEPAD	0x04	// 0x04にするのはデバイスの重複を避けるため.
 #define UseInputDevice_ALL		(UseInputDevice_KEYBOARD | UseInputDevice_MOUSE | UseInputDevice_GAMEPAD)
 public:
-	CDInput();
-	~CDInput();
+	CInput();
+	~CInput();
 
 	// 作成処理.
 	HRESULT Create(HWND hWnd, int useDevice = UseInputDevice_ALL);
-	// コントローラー接続確認.
-	bool GamePadConnect();
 	// 解放処理.
 	void Release();
 
@@ -149,9 +111,9 @@ public:
 	void InputUpdate();
 
 	// 各デバイスを参照.
-	CKey*		CDKeyboard() { return &m_Key;	  }
-	CMouse*		CDMouse()	 { return &m_Mouse;	  }
-	CGamePad*	CDGamePad()	 { return &m_GamePad; }
+	CKey*		CDKeyboard() { return &m_Key;	}
+	CMouse*		CDMouse()	 { return &m_Mouse;	}
+	CXInput*	CDXInput()	 { return m_GamePad;}
 
 private:
 	HWND m_hWnd;
@@ -161,5 +123,7 @@ private:
 	// 各デバイスの変数宣言.
 	CKey	 m_Key;
 	CMouse	 m_Mouse;
-	CGamePad m_GamePad;
+	// XInput 用のメンバ変数を追加.
+	CXInput* m_GamePad;
+
 };

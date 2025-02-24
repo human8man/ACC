@@ -76,8 +76,8 @@ void CEndUI::Init()
 void CEndUI::Update()
 {
 	// DInputの呼び出し.
-	CMouse* Mouse = CDInput::GetInstance()->CDMouse();
-	CKey* Key = CDInput::GetInstance()->CDKeyboard();
+	CMouse* Mouse = CInput::GetInstance()->CDMouse();
+	CKey* Key = CInput::GetInstance()->CDKeyboard();
 	
 	// マウス位置を取得.
 	POINT MousePos;

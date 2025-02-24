@@ -95,7 +95,7 @@ void COptionUI::Init()
 //=================================================================================================
 void COptionUI::Update()
 {
-	CMouse* Mouse = CDInput::GetInstance()->CDMouse();
+	CMouse* Mouse = CInput::GetInstance()->CDMouse();
 
 	// マウス位置を取得.
 	POINT MousePos;
