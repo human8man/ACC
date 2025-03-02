@@ -1,12 +1,13 @@
 ﻿#pragma once
+
 #define DIRECTINPUT_VERSION 0x0800  // DirectXのバージョン設定.
 
 #pragma warning(disable : 28251)
 #include <dinput.h>
 #pragma comment( lib, "dinput8.lib" )
 
-#include "Common/Singleton/CSingleton.h"
-#include "Common/XInput/CXInput.h"
+#include "Singleton/CSingleton.h"
+#include "XInput/CXInput.h"
 
 
 //==============================================================================
@@ -83,9 +84,9 @@ private:
 };
 
 
-//==============================================================================
+//=============================================================================
 //		DirectInputクラス.
-//==============================================================================
+//=============================================================================
 class CInput
 	: public CSingleton<CInput>
 {

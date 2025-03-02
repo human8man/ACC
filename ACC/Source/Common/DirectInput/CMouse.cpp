@@ -1,5 +1,5 @@
 #include "CDirectInput.h"
-#include "Common/Global.h"
+#include "Global.h"
 
 
 //--------------------------------------------------------------------------------

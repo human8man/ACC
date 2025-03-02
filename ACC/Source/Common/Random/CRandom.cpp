@@ -19,8 +19,8 @@ CRandom::~CRandom()
 //=============================================================================
 int CRandom::GetRandomInt(int min, int max)
 {
-	std::uniform_int_distribution<int> dist(min, max);
-	return dist(m_RandomEngine);
+	std::uniform_int_distribution<int> dist(min, max); // 整数の一様分布を定義.
+	return dist(m_RandomEngine); // 乱数を生成して返す.
 }
 
 
@@ -29,6 +29,6 @@ int CRandom::GetRandomInt(int min, int max)
 //=============================================================================
 float CRandom::GetRandomFloat(float min, float max)
 {
-	std::uniform_real_distribution<float> dist(min, max);
-	return dist(m_RandomEngine);
+	std::uniform_real_distribution<float> dist(min, max); // 浮動小数の一様分布を定義.
+	return dist(m_RandomEngine); // 乱数を生成して返す.
 }

@@ -1,5 +1,6 @@
 #include "CSceneBase.h"
-#include "../GameObject/Camera/CCamera.h"
+#include "Camera/CCamera.h"
+
 
 //===================================================
 //		シーンベースクラス.
@@ -16,6 +17,7 @@ CSceneBase::~CSceneBase()
 {
 }
 
+
 //===================================================
 //		プロジェクション関数.
 //===================================================
@@ -31,9 +33,9 @@ void CSceneBase::Projection( D3DXMATRIX& Proj )
 
 	// プロジェクション（射影）変換.
 	D3DXMatrixPerspectiveFovLH(
-	    &Proj,	    // (out)プロジェクション計算結果.
-		fov_y,		// 視野角（FOV：Field of View）.
-		aspect,		// アスペクト.
-		near_z,		// 近いビュー平面のz値.
-		far_z);	    // 遠いビュー平面のz値.
+	    &Proj,	// (out)プロジェクション計算結果.
+		fov_y,	// 視野角（FOV：Field of View）.
+		aspect,	// アスペクト.
+		near_z,	// 近いビュー平面のz値.
+		far_z);	// 遠いビュー平面のz値.
 }

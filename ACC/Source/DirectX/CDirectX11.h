@@ -3,7 +3,7 @@
 // 警告についてのコード分析を無効にする.4005:再定義.
 #pragma warning(disable:4005)
 
-#include "Common/Singleton/CSingleton.h"
+#include "Singleton/CSingleton.h"
 
 
 //==================================================

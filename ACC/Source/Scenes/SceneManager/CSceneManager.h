@@ -13,6 +13,7 @@ enum SceneList {
 	Game,
 };
 
+
 //===============================================
 //		シーンマネージャークラス.
 //===============================================
@@ -26,11 +27,11 @@ public:
 	CSceneManager();
 	~CSceneManager();
 
-	static HRESULT Create(HWND hWnd);
-	void LoadScene(SceneList Scene);
-	void Update();
-	void Draw();
-	void Release();
+	static HRESULT Create(HWND hWnd);	// 作成処理.
+	void LoadScene(SceneList Scene);	// 読込処理
+	void Update();						// 更新処理.
+	void Draw();						// 描画処理.
+	void Release();						// 解放処理.
 
 	static SceneList& GetSceneNo() { return GetInstance()->m_SceneNo; }
 private:
@@ -39,8 +40,8 @@ private:
 
 private:
 	HWND m_hWnd;
-	SceneList m_SceneNo;
-	SceneList m_NextSceneNo;
+	SceneList m_SceneNo;		// 現在のシーン番号.
+	SceneList m_NextSceneNo;	// 次のシーン番号.
 	std::unique_ptr<CUIFade>	m_pFade;	// フェードクラス.
 	std::unique_ptr<CEndUI>		m_pEndUI;	// エンドクラス.
 	std::unique_ptr<CSceneBase>	m_pScene;	// シーンクラスのポインタ.

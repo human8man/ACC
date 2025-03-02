@@ -1,13 +1,16 @@
 #pragma once
 #include "Character/CCharacter.h"
 
+
 class CEnemy;
+
 
 // Hit情報.
 enum HitKind {
 	Hit = 1,
 	Crit
 };
+
 
 //============================================================================
 //		プレイヤークラス.
@@ -19,22 +22,21 @@ public:
 	CPlayer();
 	virtual ~CPlayer() override;
 
+	// 更新処理.
 	void Update(std::unique_ptr<CEnemy>& chara);
+	// 描画処理.
 	void Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light );
-
-
-	// 命中フラグを渡す.
-	const bool& GetHit() { return m_Hit; }
-	const int& GetHitKind() { return m_HitKind; }
-	const bool& GetAutoAim() { return m_AutoAim; }
-	const bool& GetHoming() { return m_Homing; }
-	// 移動量の取得.
-	const D3DXVECTOR3& GetMoveVec() { return m_SumVec; }
+	
+	const int& GetHitKind()	{ return m_HitKind;	}	// 命中の種類を渡す.
+	const bool& GetHit()	{ return m_Hit;		}	// 命中フラグを渡す.
+	const bool& GetHoming()	{ return m_Homing;	}	// ホーミングフラグを渡す.
+	const bool& GetAutoAim(){ return m_AutoAim;	}	// オートエイムフラグを渡す.
+	const D3DXVECTOR3& GetMoveVec() { return m_SumVec; }	// 移動量を渡す.
 
 	// 移動量の追加.
 	void AddVec(D3DXVECTOR3 vec) { m_vPosition += vec; }
+	// ジャンプ力を重力分減算する関数.
 	void JumpPowerDec() { if (m_JumpPower > 0) { m_JumpPower -= m_Gravity; } }
-
 	// 当たり判定処理(エネミー、床、柱).
 	void Collision(std::unique_ptr<CEnemy>& egg, Collider floor, Collider cylinder);
 

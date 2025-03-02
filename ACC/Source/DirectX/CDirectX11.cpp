@@ -1,4 +1,4 @@
-#include "../Common/MyMacro.h"
+#include "MyMacro.h"
 #include "DirectX/CDirectX11.h"
 
 

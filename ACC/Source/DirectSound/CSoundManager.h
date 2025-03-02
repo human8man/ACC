@@ -1,6 +1,6 @@
 #pragma once
 #include "CSound.h"
-#include "Common/Singleton/CSingleton.h"
+#include "Singleton/CSingleton.h"
 
 //=============================================
 //		サウンドマネージャークラス.
