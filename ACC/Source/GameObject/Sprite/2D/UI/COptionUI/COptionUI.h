@@ -28,13 +28,13 @@ public:
 	COptionUI(HWND hWnd);
 	~COptionUI();
 
-	void Create();
-	HRESULT LoadData();
-	void Release();
-	void Init();
+	void Create();		// ì¬ˆ—.
+	HRESULT LoadData();	// “Çˆ—.
+	void Release();		// ‰ğ•úˆ—.
+	void Init();		// ‰Šú‰»ˆ—.
 
-	void Update();
-	void Draw();
+	void Update();		// XVˆ—.
+	void Draw();		// •`‰æˆ—.
 
 private:
 	HWND		m_hWnd;

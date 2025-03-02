@@ -9,7 +9,7 @@
 
 #include "Effect/Effekseer/include/Effekseer.h"
 #include "Effect/Effekseer/include/EffekseerRendererDX11.h"
-#include "Common/Singleton/CSingleton.h"
+#include "Singleton/CSingleton.h"
 
 #ifdef _DEBUG
 	#pragma comment( lib, "Effekseerd.lib" )

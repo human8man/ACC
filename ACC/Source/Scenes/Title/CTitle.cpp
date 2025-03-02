@@ -180,23 +180,22 @@ void CTitle::Update()
 				CSoundManager::GetInstance()->Stop(CSoundManager::enList::BGM_Title);
 			}
 		}
-		else if (XInput->IsUp(XInput->A))
-		{
-			// ゲームを開始する.
-			CSceneManager::GetInstance()->LoadScene(SceneList::Game);
-			CSoundManager::GetInstance()->Stop(CSoundManager::enList::BGM_Title);
-		}
+		//else if (XInput->IsUp(XInput->A))
+		//{
+		//	// ゲームを開始する.
+		//	CSceneManager::GetInstance()->LoadScene(SceneList::Game);
+		//	CSoundManager::GetInstance()->Stop(CSoundManager::enList::BGM_Title);
+		//}
 	}
 	
-
-#if _DEBUG
-	ImGui::Begin("cWindow");
-
-	ImGui::Text("%d", XInput->GetPadID());
-	ImGui::Text("%d", XInput->IsConnect());
-
-	ImGui::End();
-#endif
+//#if _DEBUG
+//	ImGui::Begin("cWindow");
+//
+//	ImGui::Text("%d", XInput->GetPadID());
+//	ImGui::Text("%d", XInput->IsConnect());
+//
+//	ImGui::End();
+//#endif
 }
 
 

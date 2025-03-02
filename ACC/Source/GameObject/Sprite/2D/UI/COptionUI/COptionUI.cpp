@@ -1,7 +1,7 @@
 #include "COptionUI.h"
 
 #include "Scenes/SceneManager/CSceneManager.h"
-#include "GameObject/Sprite/2D/UI/CUIObject.h"
+#include "Sprite/2D/UI/CUIObject.h"
 #include "Common/DirectInput/CDirectInput.h"
 #include "DirectSound/CSoundManager.h"
 
@@ -72,16 +72,6 @@ HRESULT COptionUI::LoadData()
 
 
 //=================================================================================================
-//		解放処理.
-//=================================================================================================
-void COptionUI::Release()
-{
-	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pUIs[i]); }
-	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pSprite2Ds[i]); }
-}
-
-
-//=================================================================================================
 //		初期化.
 //=================================================================================================
 void COptionUI::Init()
@@ -110,7 +100,7 @@ void COptionUI::Update()
 	GetClientRect(m_hWnd, &clientRect);
 
 	// クライアント領域の左上と右下の座標を初期化.
-	POINT topLeft	  = { clientRect.left, clientRect.top };
+	POINT topLeft = { clientRect.left, clientRect.top };
 	POINT bottomRight = { clientRect.right, clientRect.bottom };
 
 	// クライアント領域の座標をスクリーン座標系に変換.
@@ -118,8 +108,8 @@ void COptionUI::Update()
 	ClientToScreen(m_hWnd, &bottomRight);
 
 	// ウィンドウ全体の左上座標とクライアント領域の左上座標の差分を計算.
-	int borderLeft	= topLeft.x - WindowRect.left;
-	int borderTop	= topLeft.y - WindowRect.top;
+	int borderLeft = topLeft.x - WindowRect.left;
+	int borderTop = topLeft.y - WindowRect.top;
 
 	// フレーム幅を含んだウィンドウの位置を算出.
 	D3DXVECTOR2 windowrect = D3DXVECTOR2(
@@ -134,15 +124,15 @@ void COptionUI::Update()
 		if (i == OptionSprite::FullScreen) { continue; }
 
 		// UIのサイズと座標を変換する.
-		D3DXVECTOR2 SquarePos	= D3DXVECTOR2( m_pUIs[i]->GetPos().x, m_pUIs[i]->GetPos().y );
-		D3DXVECTOR2 SquareDisp	= D3DXVECTOR2( m_pUIs[i]->GetSpriteData().Disp.w, m_pUIs[i]->GetSpriteData().Disp.h );
+		D3DXVECTOR2 SquarePos = D3DXVECTOR2(m_pUIs[i]->GetPos().x, m_pUIs[i]->GetPos().y);
+		D3DXVECTOR2 SquareDisp = D3DXVECTOR2(m_pUIs[i]->GetSpriteData().Disp.w, m_pUIs[i]->GetSpriteData().Disp.h);
 
 
 		// 点と四角の当たり判定.
-		if (PointInSquare(MousePos, SquarePos + windowrect, SquareDisp)) 
+		if (PointInSquare(MousePos, SquarePos + windowrect, SquareDisp))
 		{
 			//	前回選択されていなかった場合SEを鳴らす.
-			if ( m_pUIs[i]->GetPatternNo().x == 0 ) {
+			if (m_pUIs[i]->GetPatternNo().x == 0) {
 				CSoundManager::GetInstance()->PlaySE(CSoundManager::SE_SelectMove);
 			}
 			m_pUIs[i]->SetPatternNo(1, 0);
@@ -167,9 +157,21 @@ void COptionUI::Update()
 //		描画.
 //=================================================================================================
 void COptionUI::Draw()
-{	
+{
 	// UIそれぞれの描画処理.
 	for (size_t i = 0; i < m_pUIs.size(); ++i) {
 		m_pUIs[i]->Draw();
 	}
 }
+
+
+//=================================================================================================
+//		解放処理.
+//=================================================================================================
+void COptionUI::Release()
+{
+	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pUIs[i]); }
+	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pSprite2Ds[i]); }
+}
+
+

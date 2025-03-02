@@ -1,7 +1,7 @@
 #include "CEndUI.h"
 
 #include "Scenes/SceneManager/CSceneManager.h"
-#include "GameObject/Sprite/2D/UI/CUIObject.h"
+#include "Sprite/2D/UI/CUIObject.h"
 #include "Common/DirectInput/CDirectInput.h"
 #include "DirectSound/CSoundManager.h"
 
@@ -115,32 +115,20 @@ void CEndUI::Update()
 
 		// Yesにカーソルが重なっている時.
 		if (i == EndSprite::SelectYes && m_pUIs[i]->GetPatternNo().x) {
-			if (Mouse->IsLAction()) {
-				yesflag = true;
-			}
+			if (Mouse->IsLAction()) { yesflag = true; }
 		}
-		if (Key->IsKeyAction(DIK_Y)) {
-			yesflag = true;
-		}
+		if (Key->IsKeyAction(DIK_Y)) { yesflag = true; }
 
 		// Noにカーソルが重なっている時.
 		if (i == EndSprite::SelectNo && m_pUIs[i]->GetPatternNo().x) {
-			if (Mouse->IsLAction()) {
-				noflag = true;
-			}
+			if (Mouse->IsLAction()) { noflag = true; }
 		}
-		if (Key->IsKeyAction(DIK_N)) {
-			noflag = true;
-		}
+		if (Key->IsKeyAction(DIK_N)) { noflag = true; }
 		
 
 		// フラグの結果に合わせて処理をする.
-		if (yesflag) {
-			DestroyWindow(m_hWnd);
-		}
-		if (noflag) {
-			m_EndDeleteFlag = true;
-		}
+		if (yesflag) { DestroyWindow(m_hWnd); }
+		if (noflag) { m_EndDeleteFlag = true; }
 	}
 }
 

@@ -4,7 +4,7 @@
 #pragma warning(disable:4005)
 
 #include <d3dx9.h>
-#include "Common/Singleton/CSingleton.h"
+#include "Singleton/CSingleton.h"
 
 
 //===================================================================

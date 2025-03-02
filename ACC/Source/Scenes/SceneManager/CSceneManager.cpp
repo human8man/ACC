@@ -9,17 +9,20 @@
 #include "Sprite/2D/UI/CEndUI/CEndUI.h"
 #include "DirectSound/CSoundManager.h"
 
+
 #ifdef _DEBUG
-	#include "Common/ImGui/CImGui.h"
+	#include "ImGui/CImGui.h"
 #endif
+
 
 //=================================================================================================
 //		シーンマネージャークラス.
 //=================================================================================================
 CSceneManager::CSceneManager()
 	: m_hWnd			()
-	, m_pScene			()
+	, m_SceneNo			()
 	, m_NextSceneNo		()
+	, m_pScene			()
 	, m_EndDeleteFlag	( false )
 {
 }
@@ -123,18 +126,15 @@ void CSceneManager::Update()
 			GetInstance()->m_pScene->Update();
 		}
 
+		// フェードUIの更新処理.
 		m_pFade->Update();
 	}
 
 #if _DEBUG
-
 	ImGui::Begin("MousePos");
 	POINT pos;
-	if (GetCursorPos(&pos)) {
-		ImGui::Text("%d,%d", pos.x, pos.y);
-	}
+	if (GetCursorPos(&pos)) { ImGui::Text("%d,%d", pos.x, pos.y); }
 	ImGui::End();
-
 #endif
 }
 
@@ -189,7 +189,8 @@ std::unique_ptr<CSceneBase> CSceneManager::CreateScene(SceneList No)
 		return std::make_unique<CTitle>( m_hWnd );
 	case Game:
 		return std::make_unique<CGame>( m_hWnd );
-	default:return nullptr;
+	default:
+		return nullptr;
 	}
 	return nullptr;
 }

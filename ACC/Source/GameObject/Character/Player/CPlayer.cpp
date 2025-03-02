@@ -1,6 +1,6 @@
 #include "CPlayer.h"
 #include "DirectSound/CSoundManager.h"
-#include "Common/DirectInput/CDirectInput.h"
+#include "DirectInput/CDirectInput.h"
 #include "Camera/CCamera.h"
 #include "Character/Enemy/CEnemy.h"
 #include "Effect/CEffect.h"
@@ -18,6 +18,7 @@ CPlayer::CPlayer()
 	, m_AutoAim		(false)
 	, m_Homing		(false)
 {
+	// 初期化.
 	m_CharaInfo.HP = m_CharaInfo.MaxHP;
 	m_CharaInfo.Ammo = m_CharaInfo.MaxAmmo;
 }
@@ -64,21 +65,24 @@ void CPlayer::Update(std::unique_ptr<CEnemy>& chara)
 
 	// ホーミングのチートが有効な場合.
 	if (m_Homing) {
-		for (size_t i = 0; i < m_pBullets.size(); ++i) {
+		for (size_t i = 0; i < m_pBullets.size(); ++i) 
+		{
 			D3DXVECTOR3 shootdir, EnemyPos;
+
+			// 敵座標を取得(原点だと地面に当たるため少し浮かす).
 			EnemyPos = chara->GetPos();
 			EnemyPos.y += 0.5f;
+
+			// 弾座標から敵座標のベクトルを出す.
 			shootdir = EnemyPos - m_pBullets[i]->GetPos();
 			D3DXVec3Normalize(&shootdir, &shootdir);	// 正規化.
 
 			// 弾の初期位置,移動方向の単位ベクトル,速度を設定.
-			m_pBullets[i]->Init(
-				m_pBullets[i]->GetPos(),
-				shootdir,
-				m_BulletSpeed);
+			m_pBullets[i]->Init( m_pBullets[i]->GetPos(), shootdir, m_BulletSpeed);
 		}
 	}
 
+	// キャラクターの更新処理.
 	CCharacter::Update();
 }
 
@@ -110,25 +114,19 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, Collider floor, Collider c
 	static ::EsHandle hEffect = -1;
 
 	// 敵データを取得.
-	enemyegg.SetVertex(
-		egg->GetObjeInfo(),
-		egg->GetMesh()->GetVertices());
+	enemyegg.SetVertex( egg->GetObjeInfo(), egg->GetMesh()->GetVertices());
 
 	// 弾の判定.
 	for (size_t i = 0; i < m_pBullets.size(); ++i) {
 
 		// 弾データを取得.
-		Bullet.SetVertex(
-			m_pBullets[i]->GetObjeInfo(),
-			m_pMeshBullet->GetVertices());
-
+		Bullet.SetVertex( m_pBullets[i]->GetObjeInfo(), m_pMeshBullet->GetVertices());
 
 		// 当たり判定情報用の変数を宣言.
 		CollisionPoints pointsbc, pointsbf, pointsbe;
 		pointsbc = m_pGJK->GJK(Bullet, cylinder);
 		pointsbf = m_pGJK->GJK(Bullet, floor);
 		pointsbe = m_pGJK->GJK(Bullet, enemyegg);
-
 
 		// 柱や床にあたった場合削除.
 		if (pointsbc.Col || pointsbf.Col) {
@@ -137,7 +135,6 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, Collider floor, Collider c
 			--i;
 			continue;
 		}
-
 
 		// エネミーと弾が当たった場合.
 		if ( pointsbe.Col ) {
@@ -186,7 +183,6 @@ void CPlayer::KeyInput(std::unique_ptr<CEnemy>& chara)
 {
 	CKey* Key = CInput::GetInstance()->CDKeyboard();
 	CMouse* Mouse = CInput::GetInstance()->CDMouse();
-
 
 	//----------------------------------------------------------------------
 	//		WASDで移動.
@@ -248,10 +244,13 @@ void CPlayer::KeyInput(std::unique_ptr<CEnemy>& chara)
 			D3DXVECTOR3 camDir = CCamera::GetInstance()->GetCamDir();
 			camDir.y = 0.f;	// Y情報があると飛び始めるのでYの要素を抜く.
 			D3DXVec3Normalize(&camDir, &camDir); // 正規化.
+
+			// カメラ方向 × 移動速度 × ダッシュ倍率のベクトルを出す.
 			DashVec = camDir * m_MoveSpeed * m_DashSpeed;
 			m_CanDash = false;
 		}
 		else {
+			// 合計ベクトルにダッシュ倍率を変えた値を出す.
 			DashVec = m_SumVec * m_DashSpeed;
 			m_CanDash = false;
 		}
@@ -281,12 +280,16 @@ void CPlayer::KeyInput(std::unique_ptr<CEnemy>& chara)
 	// クールタイムが終了していたら射撃可能.
 	if (m_BulletCoolTime <= 0.f) { m_CanShot = true; }
 
+	// 左クリックが押された場合.
 	if (Mouse->IsLAction()){
+		// 射撃条件が整っている場合.
 		if (m_CanShot && m_CharaInfo.Ammo != 0 && m_ReloadTime <= 0) {
+			// クールタイムや残弾数の設定.
 			m_CanShot = false;
 			m_CharaInfo.Ammo--;
 			m_BulletCoolTime = m_BulletCoolTimeMax;
-
+			
+			// 弾を作成する.
 			m_pBullets.push_back(std::make_unique<CBullet>());
 
 			m_pBullets.back()->AttachMesh(*m_pMeshBullet);	// メッシュを設定.

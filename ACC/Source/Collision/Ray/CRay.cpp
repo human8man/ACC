@@ -1,8 +1,10 @@
 #include "CRay.h"
 #include "DirectX/CDirectX11.h"
 
+
 // シェーダファイル名（ディレクトリも含む）.
 const TCHAR SHADER_NAME[] = _T( "Data\\Shader\\Ray.hlsl" );
+
 
 //============================================================================
 //		レイクラス.
@@ -32,6 +34,7 @@ CRay::~CRay()
 	m_pDx11		 = nullptr;
 }
 
+
 //============================================================================
 //		初期化.
 //============================================================================
@@ -39,8 +42,8 @@ HRESULT CRay::Init(
 	RAY& pRay )
 {
 	m_pDx11 = CDirectX11::GetInstance();
-	m_pDevice11 = m_pDx11->GetDevice();		//実態は別のところにある.他とも共有している.
-	m_pContext11 = m_pDx11->GetContext();	//実態は別のところにある.他とも共有している.
+	m_pDevice11 = m_pDx11->GetDevice();
+	m_pContext11 = m_pDx11->GetContext();
 
 	//外部から取得したレイ構造体を設定.
 	m_Ray = pRay;
@@ -52,6 +55,7 @@ HRESULT CRay::Init(
 
 	return S_OK;
 }
+
 
 //============================================================================
 //		解放.
@@ -68,6 +72,7 @@ void CRay::Release()
 	m_pDevice11 = nullptr;
 }
 
+
 //============================================================================
 //		HLSLファイルを読み込みシェーダを作成する.
 //============================================================================
@@ -77,29 +82,26 @@ HRESULT CRay::CreateShader()
 	ID3DBlob* pErrors = nullptr;
 	UINT uCompileFlag = 0;
 
-
 #ifdef _DEBUG
-	uCompileFlag =
-		D3D10_SHADER_DEBUG | D3D10_SHADER_SKIP_OPTIMIZATION;
-#endif//#ifdef _DEBUG
-
+	uCompileFlag = D3D10_SHADER_DEBUG | D3D10_SHADER_SKIP_OPTIMIZATION;
+#endif
 
 	//---------------------------------------------------------------
 	//	HLSLからバーテックスシェーダのブロブを作成.
 	//---------------------------------------------------------------
 	if (FAILED(
 		D3DX11CompileFromFile(
-			SHADER_NAME,	// シェーダファイル名（HLSLファイル）.
-			nullptr,		// マクロ定義の配列へのポインタ（未使用）.
-			nullptr,		// インクルードファイルを扱うインターフェイスへのポインタ（未使用）.
-			"VS_Main",		// シェーダエントリーポイント関数の名前.
-			"vs_5_0",		// シェーダのモデルを指定する文字列（プロファイル）.
-			uCompileFlag,	// シェーダコンパイルフラグ.
-			0,				// エフェクトコンパイルフラグ（未使用）.
-			nullptr,		// スレッド ポンプ インターフェイスへのポインタ（未使用）.
-			&pCompiledShader,// ブロブを格納するメモリへのポインタ.
-			&pErrors,		// エラーと警告一覧を格納するメモリへのポインタ.
-			nullptr)))		// 戻り値へのポインタ（未使用）.
+			SHADER_NAME,		// シェーダファイル名（HLSLファイル）.
+			nullptr,			// マクロ定義の配列へのポインタ（未使用）.
+			nullptr,			// インクルードファイルを扱うインターフェイスへのポインタ（未使用）.
+			"VS_Main",			// シェーダエントリーポイント関数の名前.
+			"vs_5_0",			// シェーダのモデルを指定する文字列（プロファイル）.
+			uCompileFlag,		// シェーダコンパイルフラグ.
+			0,					// エフェクトコンパイルフラグ（未使用）.
+			nullptr,			// スレッド ポンプ インターフェイスへのポインタ（未使用）.
+			&pCompiledShader,	// ブロブを格納するメモリへのポインタ.
+			&pErrors,			// エラーと警告一覧を格納するメモリへのポインタ.
+			nullptr)))			// 戻り値へのポインタ（未使用）.
 	{
 		_ASSERT_EXPR( false, _T( "hlsl読み込み失敗" ) );
 		return E_FAIL;
