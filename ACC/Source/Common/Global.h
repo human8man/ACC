@@ -36,13 +36,13 @@
 #define DEBUGMODE
 
 
-//=================================================
+//=============================================================================
 //		定数.
-//=================================================
-constexpr int WND_W = 1280;	 // ウィンドウの幅(int).
-constexpr int WND_H = 720;	 // ウィンドウの高さ(int).
-constexpr float FWND_W = 1280.f;	 // ウィンドウの幅(float).
-constexpr float FWND_H = 720.f;		 // ウィンドウの高さ(float).
+//=============================================================================
+constexpr int WND_W = 1280;		 // ウィンドウの幅(int).
+constexpr int WND_H = 720;		 // ウィンドウの高さ(int).
+constexpr float FWND_W = 1280.f; // ウィンドウの幅(float).
+constexpr float FWND_H = 720.f;	 // ウィンドウの高さ(float).
 
 constexpr int FPS   = 60;	 // フレームレート.
 constexpr int STIC_LOW = 60; // スティック入力のデッドゾーン.
@@ -54,10 +54,10 @@ constexpr float ZEROFLOAT2[2] = { 0.f,0.f };
 const D3DXVECTOR3 ZEROVEC3( 0.f,0.f,0.f );
 const D3DXVECTOR2 ZEROVEC2( 0.f,0.f );
 
-//=================================================
-//		構造体.
-//================================================= 
 
+//=============================================================================
+//		構造体.
+//=============================================================================
 // カメラ情報.
 struct CAMERA {
 	D3DXVECTOR3	Pos;	// 視点.
@@ -67,10 +67,10 @@ struct CAMERA {
 
 // ライト情報.
 struct LIGHT {
-	D3DXVECTOR3	Position;	//位置.
-	D3DXVECTOR3	vDirection;	//方向.
-	D3DXMATRIX	mRotation;	//回転行列.
-	float		Intensity;	//強度(明るさ).
+	D3DXVECTOR3	Position;	// 位置.
+	D3DXVECTOR3	vDirection;	// 方向.
+	D3DXMATRIX	mRotation;	// 回転行列.
+	float		Intensity;	// 強度(明るさ).
 };
 
 // オブジェクトの座標、回転、サイズをまとめた構造体.

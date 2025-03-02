@@ -1,10 +1,9 @@
 #include "FileManager.h"
 
-//----------------------------.
-// テキストファイルの読み込み.
-//	"//" : コメントアウト.
-//	"#"  : 区切り文字(',')までコメントアウト.
-//----------------------------.
+
+//============================================================================
+//		テキストファイルの読み込み.
+//============================================================================
 std::vector<std::string> FileManager::TextLoad(
 	const std::string&	FilePath,
 	const bool			IsCommentOut,
@@ -18,7 +17,8 @@ std::vector<std::string> FileManager::TextLoad(
 
 	// 一行づつ読み込む.
 	std::string Line;
-	while ( std::getline( i, Line ) ){
+	while ( std::getline( i, Line ) )
+	{
 		// コメントアウト処理.
 		if ( IsCommentOut == true ){
 			if ( Line.substr( 0, 2 ) == "//" ) continue;
@@ -33,7 +33,8 @@ std::vector<std::string> FileManager::TextLoad(
 		}
 
 		// 区切り文字(',')で区切って文字を取得.
-		while ( std::getline( stream, Buff, Delim ) ){
+		while ( std::getline( stream, Buff, Delim ) )
+		{
 			// 一部分のコメントアウト処理.
 			if ( IsCommentOut == true ){
 				if ( Buff.find( '#' ) != std::string::npos ) continue;
@@ -48,9 +49,10 @@ std::vector<std::string> FileManager::TextLoad(
 	return OutList;
 }
 
-//----------------------------.
-// テキストファイルに書き込む.
-//----------------------------.
+
+//============================================================================
+//		テキストファイルに書き込む.
+//============================================================================
 HRESULT FileManager::TextSave( const std::string& FilePath, const std::string& Data )
 {
 	// ファイルを開く.
@@ -72,9 +74,10 @@ HRESULT FileManager::TextSave( const std::string& FilePath, const std::string& D
 	return S_OK;
 }
 
-//---------------------------.
-// jsonファイルを開く.
-//---------------------------.
+
+//============================================================================
+//		jsonファイルを開く.
+//============================================================================
 Json FileManager::JsonLoad( const std::string& FilePath )
 {
 	Json Out;
@@ -91,9 +94,10 @@ Json FileManager::JsonLoad( const std::string& FilePath )
 	return Out;
 }
 
-//---------------------------.
-// jsonファイルで書き込む.
-//---------------------------.
+
+//============================================================================
+//		jsonファイルで書き込む.
+//============================================================================
 HRESULT FileManager::JsonSave( const std::string& FilePath, const Json& Data )
 {
 	// ファイルを開く.
@@ -115,9 +119,10 @@ HRESULT FileManager::JsonSave( const std::string& FilePath, const Json& Data )
 	return S_OK;
 }
 
-//---------------------------.
-// json を std::unordered_map に変換.
-//---------------------------.
+
+//============================================================================
+//		json を std::unordered_map に変換.
+//============================================================================
 std::unordered_map<std::string, std::string> FileManager::JsonToMap( const Json& Json )
 {
 	std::unordered_map<std::string, std::string> Out;
@@ -125,9 +130,10 @@ std::unordered_map<std::string, std::string> FileManager::JsonToMap( const Json&
 	return Out;
 }
 
-//---------------------------.
-// std::unordered_map を json に変換.
-//---------------------------.
+
+//============================================================================
+//		std::unordered_map を json に変換.
+//============================================================================
 Json FileManager::MapToJson( const std::unordered_map<std::string, std::string> Map )
 {
 	Json Out;
@@ -161,10 +167,12 @@ Json FileManager::MapToJson( const std::unordered_map<std::string, std::vector<s
 	return Out;
 }
 
-//---------------------------.
-// ファイルディレクトリを作成.
-//---------------------------.
-HRESULT FileManager::CreateFileDirectory( const std::string& FilePath ) {
+
+//============================================================================
+//		ファイルディレクトリを作成.
+//============================================================================
+HRESULT FileManager::CreateFileDirectory( const std::string& FilePath ) 
+{
 	size_t	FindPos = 0;
 	bool	IsEnd	= false;
 

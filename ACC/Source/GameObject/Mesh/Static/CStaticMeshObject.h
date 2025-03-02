@@ -5,6 +5,7 @@
 #include "Collision/Ray/CRay.h"
 #include <tuple>
 
+
 //============================================================================
 //		スタティックメッシュオブジェクトクラス.
 //============================================================================
@@ -15,19 +16,19 @@ public:
 	CStaticMeshObject();
 	virtual ~CStaticMeshObject() override;
 
-	// CGameObjectで純粋仮想関数の宣言がされてるのでこちらで定義を書く.
+	// 更新処理.
 	virtual void Update() override;
+	// 描画処理.
 	virtual void Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light ) override;
 
-	//メッシュを接続.
+	// メッシュを接続.
 	void AttachMesh( CStaticMesh& pMesh ){ m_pMesh = &pMesh; }
-	//メッシュを解放.
+	// メッシュを解放.
 	void DetachMesh(){ m_pMesh = nullptr; }
 	
 	// メッシュの取得.
-	CStaticMesh*	 GetMesh()	  const { return m_pMesh;	 }
+	CStaticMesh* GetMesh() const { return m_pMesh; }
 
-	
 	// 壁からの位置を計算する.
 	void CalculatePositionFromWall( CROSSRAY* pCrossRay );
 
@@ -45,5 +46,5 @@ private:
 	void ClampDirection(float* dir);
 
 protected:
-	CStaticMesh*		m_pMesh;
+	CStaticMesh* m_pMesh;
 };

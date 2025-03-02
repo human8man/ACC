@@ -1,10 +1,12 @@
 #pragma once
+
 #include "CSound.h"
 #include "Singleton/CSingleton.h"
 
-//=============================================
+
+//==============================================================================
 //		サウンドマネージャークラス.
-//=============================================
+//==============================================================================
 class CSoundManager
 	: public CSingleton<CSoundManager>
 {
@@ -48,24 +50,25 @@ public:
 	CSoundManager();
 	~CSoundManager();
 
-
+	// 作成処理.
 	HRESULT Create(CSound** ppSound, std::string filePath, HWND hWnd);
+	// データ読込処理.
 	bool Load( HWND hWnd );
+	// 解放処理.
 	void Release();
-
 	
-	//音量を適用させる.
+	// 音量を適用させる.
 	void ApplyVolumeSetting();
 	
-	//SEを再生する.
+	// SEを再生する.
 	static void PlaySE( enList list ) {
 		CSoundManager::GetInstance()->m_pSound[list]->Play();
 	}
-	//ループ再生する.
+	// ループ再生する.
 	static void PlayLoop( enList list ) {
 		CSoundManager::GetInstance()->m_pSound[list]->PlayLoop();
 	}
-	//停止する.
+	// 停止する.
 	static void Stop( enList list ) {
 		CSoundManager::GetInstance()->m_pSound[list]->Stop();
 	}
@@ -130,7 +133,7 @@ public:
 
 	// SEVolumeの取得.
 	float GetSEVol() { return m_SEVolume; }
-	//SEVolumeの設定
+	// SEVolumeの設定
 	void SetSEVol(float Vol) { m_SEVolume = Vol; }
 	
 private:
@@ -140,7 +143,7 @@ private:
 private:
 	std::vector<CSound*> m_pSound;
 
-	std::vector<SoundList> m_SoundList;	//サウンドリスト.
+	std::vector<SoundList> m_SoundList;	// サウンドリスト.
 	float m_MasterVolume;
 	float m_BGMVolume;
 	float m_SEVolume;

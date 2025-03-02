@@ -14,7 +14,7 @@ public:
 	virtual ~CBullet() override;
 
 	/****************************************************************
-	// 初期化処理.
+	// @brief 初期化処理.
 	// @param pos 初期位置.
 	// @param vector 移動方向の単位ベクトル.
 	// @param speed 移動速度.

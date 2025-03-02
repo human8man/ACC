@@ -1,14 +1,14 @@
 #include "CStaticMeshObject.h"
-#include "../GameObject/Camera/CCamera.h"
+#include "Camera/CCamera.h"
+
 
 //============================================================================
 //		StaticMeshObjectクラス.
 //============================================================================
 CStaticMeshObject::CStaticMeshObject()
-	: m_pMesh		( nullptr )
+	: m_pMesh	( nullptr )
 {
 }
-
 CStaticMeshObject::~CStaticMeshObject()
 {
 	DetachMesh();
@@ -20,9 +20,7 @@ CStaticMeshObject::~CStaticMeshObject()
 //============================================================================
 void CStaticMeshObject::Update()
 {
-	if( m_pMesh == nullptr ){
-		return;
-	}
+	if( m_pMesh == nullptr ){ return; }
 }
 
 
@@ -31,9 +29,7 @@ void CStaticMeshObject::Update()
 //============================================================================
 void CStaticMeshObject::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 {
-	if( m_pMesh == nullptr ){
-		return;
-	}
+	if( m_pMesh == nullptr ){ return; }
 
 	//描画直前で座標や回転情報などを更新.
 	m_pMesh->SetPos( m_vPosition );
@@ -95,7 +91,7 @@ RayInfo CStaticMeshObject::IsHitForRay(const RAY& pRay )
 		&StartPoint,				// レイの始点.
 		&vDirection,				// レイの向きと長さ（大きさ）.
 		&bHit,						// (out)判定結果.
-		&dwIndex,// (out)bHitがTRUE時にレイの始点に最も近くの面のインデックス値へのポインタ.					
+		&dwIndex,					// (out)bHitがTRUE時にレイの始点に最も近くの面のインデックス値へのポインタ.	
 		&U, &V,						// (out)重心ヒット座標.
 		&vDistance,					// (out)メッシュとの距離.
 		nullptr, nullptr);
@@ -136,19 +132,18 @@ void CStaticMeshObject::CalculatePositionFromWall(CROSSRAY* pCrossRay)
 		Distance[i]  = length;
 	}
 
-	float RotY;
 	// 回転情報は全てのレイで同じはずなのでXLを使用する.
-	RotY = fabsf( pCrossRay->Ray[CROSSRAY::XL].RotationY ); // fabsf関数:絶対値(float版).
+	float RotY = fabsf( pCrossRay->Ray[CROSSRAY::XL].RotationY ); // fabsf関数:絶対値(float版).
 	ClampDirection( &RotY ); // 0～2πの間に収める.
 
 	//----------------------------
 	//	定数宣言.
 	//----------------------------
 	static constexpr float WSPACE = 0.8f;	// 壁との限界距離.
-	static constexpr float DEG45  = D3DXToRadian(  45.0f );	// 0.785f.
-	static constexpr float DEG135 = D3DXToRadian( 135.0f );	// 2.355f.
-	static constexpr float DEG225 = D3DXToRadian( 225.0f );	// 3.925f.
-	static constexpr float DEG315 = D3DXToRadian( 315.0f );	// 5.496f.
+	static constexpr float DEG45  = D3DXToRadian(  45.f );	// 0.785f.
+	static constexpr float DEG135 = D3DXToRadian( 135.f );	// 2.355f.
+	static constexpr float DEG225 = D3DXToRadian( 225.f );	// 3.925f.
+	static constexpr float DEG315 = D3DXToRadian( 315.f );	// 5.496f.
 
 	float Dis = 0.0f;
 	float		TrgRotY = pCrossRay->Ray[CROSSRAY::XL].RotationY;
@@ -158,7 +153,7 @@ void CStaticMeshObject::CalculatePositionFromWall(CROSSRAY* pCrossRay)
 	Dis = Distance[CROSSRAY::ZF];
 	if (0.01f < Dis && Dis < WSPACE) {
 		// 時計回り.
-		if (TrgRotY < 0.0f)	{
+		if (TrgRotY < 0.f)	{
 			if		(DEG45  <= RotY && RotY < DEG135)	{ TrgPos.x += WSPACE - Dis; } // 右から.
 			else if (DEG135 <= RotY && RotY < DEG225)	{ TrgPos.z += WSPACE - Dis; } // 前から.
 			else if (DEG225 <= RotY && RotY < DEG315)	{ TrgPos.x -= WSPACE - Dis; } // 左から.

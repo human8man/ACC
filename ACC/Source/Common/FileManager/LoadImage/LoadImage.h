@@ -1,8 +1,13 @@
 #pragma once
+
 #include "Global.h"
 
 
-namespace LoadImageFile {
+//=============================================================================
+//		ファイルの画像読込.
+//=============================================================================
+namespace LoadImageFile 
+{
 	// 画像ファイルの幅、高さを取得する.
 	D3DXVECTOR2 GetImageSize( const std::string& FilePath );
 

@@ -34,11 +34,11 @@ CSound::~CSound()
 HRESULT CSound::CreateDevice( HWND hWnd )
 {
 	// エフェクトの使用前にCOMを初期化.
-    HRESULT hr = CoInitialize(NULL);
-    if (FAILED(hr)) {
-        _ASSERT_EXPR(0, L"COMライブラリの初期化に失敗しました");
-        return hr;
-    }
+	HRESULT hr = CoInitialize(NULL);
+	if (FAILED(hr)) {
+		_ASSERT_EXPR(0, L"COMライブラリの初期化に失敗しました");
+		return hr;
+	}
 
 	// DirectSoundオブジェクトの作成.
 	if( FAILED( DirectSoundCreate8( nullptr, &m_pDS, nullptr ) ) )
@@ -91,8 +91,7 @@ HRESULT CSound::LoadData( LPSTR szFileName )
 	hMmio = mmioOpen(
 				wstr_filename,
 				nullptr,
-				MMIO_ALLOCBUF | MMIO_READ
-				);
+				MMIO_ALLOCBUF | MMIO_READ);
 	_ASSERT_EXPR( hMmio != nullptr, L"Waveファイルの読み込み失敗" );
 
 	SAFE_DELETE(wstr_filename);
@@ -122,12 +121,13 @@ HRESULT CSound::LoadData( LPSTR szFileName )
 	//		ファイルポインタをフォーマットチャンクにセットする.
 	//--------------------------------------------------------------------------------------------------
 	ckInfo.ckid = mmioFOURCC( 'f', 'm', 't', ' ' );
-	if( MMSYSERR_NOERROR != mmioDescend(
-								hMmio,
-								&ckInfo,
-								&riffckInfo,
-								MMIO_FINDCHUNK	// 指定されたチャンクを検索.
-								) )	
+	if( MMSYSERR_NOERROR
+		!= mmioDescend(
+			hMmio,
+			&ckInfo,
+			&riffckInfo,
+			MMIO_FINDCHUNK	// 指定されたチャンクを検索.
+			) )
 	{
 		_ASSERT_EXPR( 0, L"フォーマットチャンクが見つかりません。" );
 		return E_FAIL;
@@ -176,17 +176,18 @@ HRESULT CSound::LoadData( LPSTR szFileName )
 	//		waveファイル内の音データの読み込み.
 	//--------------------------------------------------------------------------------------------------
 	ckInfo.ckid = mmioFOURCC( 'd', 'a', 't', 'a' );
-	if( MMSYSERR_NOERROR != mmioDescend(
-								hMmio,
-								&ckInfo,
-								&riffckInfo,
-								MMIO_FINDCHUNK
-								) )
+	if( MMSYSERR_NOERROR
+		!= mmioDescend(
+			hMmio,
+			&ckInfo,
+			&riffckInfo,
+			MMIO_FINDCHUNK
+			) )
 	{
 		_ASSERT_EXPR( 0, L"dataチャンクが見つかりません" );
 		return E_FAIL;
 	}
-	dwWavSize = ckInfo.cksize;	// wavデータリサイズ.
+	dwWavSize = ckInfo.cksize; // wavデータリサイズ.
 
 
 	//--------------------------------------------------------------------------------------------------
@@ -306,70 +307,18 @@ HRESULT CSound::Release()
 }
 
 
-//--------------------------------------------------------------------------------------------------
-//		再生関数.
-//--------------------------------------------------------------------------------------------------
-HRESULT CSound::PlayBase( const GUID *pGuid, DWORD preset )
+//==================================================================================================
+//		常に最初から再生する.
+//==================================================================================================
+HRESULT CSound::Play(const GUID* pGuid)
 {
-	// 現在のボリューム退避.
-	LONG lVolume;
-	m_pDSBuffer->GetVolume( &lVolume );
-	// ボリューム最少を設定.
-	m_pDSBuffer->SetVolume( DSBVOLUME_MIN );
-
-	// 音声停止.
-	m_pDSBuffer->Stop();
-
-	// エフェクトが設定されていない場合.
-	if( pGuid != nullptr )
-	{
-		// エフェクトが設定されている場合、そのエフェクトをバッファにセットする.
-		DSEFFECTDESC dsEffect;	// エフェクト構造体.
-		DWORD dwResult;			// 結果.
-		memset( &dsEffect, 0, sizeof( DSEFFECTDESC ) );
-
-		dsEffect.dwSize			= sizeof( DSEFFECTDESC );	// サイズ.
-		dsEffect.dwFlags		= 0;
-		dsEffect.guidDSFXClass	= *pGuid;	// エフェクト.
-
-		if( FAILED(
-			m_pDSBuffer->SetFX(
-					1,			// エフェクトの数.
-					&dsEffect,	// エフェクト構造体.
-					&dwResult	// (out)実行結果.
-					) ) )
-		{
-			_ASSERT_EXPR( 0, L"エフェクト作成失敗" );
-			return E_FAIL;
-		}
-		if( preset != -1 ){
-			if( FAILED(
-				SetEffectParam( m_pDSBuffer, preset )))
-			{
-				_ASSERT_EXPR( 0, L"エフェクトパラメータ設定失敗" );
-				return E_FAIL;
-			}
-		}
+	if (FAILED(m_pDSBuffer->Stop()) == S_OK) {
+		// 巻き戻し.
+		m_pDSBuffer->SetCurrentPosition(0);
 	}
-	else
-	{
-		// バッファから全てのエフェクトを取り去る.
-		if( FAILED( m_pDSBuffer->SetFX( 0, NULL, NULL ) ) )
-		{
-			_ASSERT_EXPR( 0, L"エフェクト解除失敗" );
-			return E_FAIL;
-		}
-	}
-
-
-	// ボリューム戻す.
-	m_pDSBuffer->SetVolume( lVolume );
-	
-	// 再生.
-	m_pDSBuffer->Play( NULL, 0, NULL );
-
-	return S_OK;
+	return PlayBase(pGuid);
 }
+
 
 //==================================================================================================
 //		ループ再生.
@@ -381,15 +330,18 @@ void CSound::PlayLoop( const GUID *pGuid )
 
 
 //==================================================================================================
-//		常に最初から再生する.
+//		再生中を確認する.
 //==================================================================================================
-HRESULT CSound::Play( const GUID *pGuid )
+bool CSound::IsPlaying()
 {
-	if( FAILED( m_pDSBuffer->Stop() ) == S_OK ){
-		// 巻き戻し.
-		m_pDSBuffer->SetCurrentPosition( 0 );
+	DWORD status;
+	m_pDSBuffer->GetStatus(&status);
+	if ((status & DSBSTATUS_PLAYING) == 0)
+	{
+		// まだ再生中.
+		return true;
 	}
-	return PlayBase( pGuid );
+	return false;
 }
 
 
@@ -493,106 +445,45 @@ LONG CSound::Mapvol(LONG volume)
 }
 
 
-//==================================================================================================
+//=============================================================================
 //		周波数を取得する.
-//==================================================================================================
+//=============================================================================
 DWORD CSound::GetFrequency()
 {
 	DWORD dwFreq = 0;
-	m_pDSBuffer->GetFrequency( &dwFreq );
+	m_pDSBuffer->GetFrequency(&dwFreq);
 
 	return dwFreq;
 }
 
 
-//===================================================================
+//=============================================================================
 //		パンニングを取得する.
-//===================================================================
+//=============================================================================
 LONG CSound::GetPan()
 {
 	LONG lPan = 0;
-	m_pDSBuffer->GetPan( &lPan );
+	m_pDSBuffer->GetPan(&lPan);
 
 	return lPan;
 }
 
 
-//==================================================================================================
+//=============================================================================
 //		音量を取得する.
-//==================================================================================================
+//=============================================================================
 LONG CSound::GetVolume()
 {
 	LONG lVolume = 0;
-	m_pDSBuffer->GetVolume( &lVolume );
+	m_pDSBuffer->GetVolume(&lVolume);
 
 	return lVolume;
 }
 
 
-//==================================================================================================
-//		再生中を確認する.
-//==================================================================================================
-bool CSound::IsPlaying()
-{
-	DWORD status;
-	m_pDSBuffer->GetStatus( &status );
-	if( ( status & DSBSTATUS_PLAYING ) == 0 )
-	{
-		// まだ再生中.
-		return true;
-	}
-	return false;
-}
-
-
-//--------------------------------------------------------------------------------------------------
-//		エフェクトパラメータを設定・適用する.
-//--------------------------------------------------------------------------------------------------
-HRESULT CSound::SetEffectParam(LPDIRECTSOUNDBUFFER8 pDSBuffer8,DWORD dwPreset)
-{
-	IDirectSoundFXI3DL2Reverb8* pI3DL2Reverb;
-	if( FAILED(
-		pDSBuffer8->GetObjectInPath(
-			GUID_DSFX_STANDARD_I3DL2REVERB,
-			0,
-			IID_IDirectSoundFXI3DL2Reverb8,
-			(VOID**)&pI3DL2Reverb )))
-	{
-		return E_FAIL;
-	}
-
-	// リバーブの品質を設定する.
-	if( FAILED(
-		pI3DL2Reverb->SetQuality( DSFX_I3DL2REVERB_QUALITY_MAX ) ))
-	{
-		ERR_MSG( L"最高品質にセット出来ませんでした", L"エラー" );
-		if( FAILED(
-			pI3DL2Reverb->SetQuality( DSFX_I3DL2REVERB_QUALITY_DEFAULT ) ))
-		{
-			ERR_MSG( L"標準品質にもセット出来ませんでした", L"エラー" );
-			if( FAILED(
-				pI3DL2Reverb->SetQuality( DSFX_I3DL2REVERB_QUALITY_MIN ) ))
-			{
-				ERR_MSG( L"最低品質でも失敗しました", L"エラー" );
-				return E_FAIL;
-			}
-			ERR_MSG( L"最低品質にセットしました", L"エラー" );
-		}
-	}
-	// エフェクトパラメーターをセット.
-	if( FAILED( pI3DL2Reverb->SetPreset( dwPreset ) ))
-	{
-		pI3DL2Reverb->Release();
-		return E_FAIL;
-	}
-	pI3DL2Reverb->Release();
-	return S_OK;
-}
-
-
-//==================================================================================================
+//=============================================================================
 //		エフェクトパラメータの取得.
-//==================================================================================================
+//=============================================================================
 DWORD CSound::GetPreset( I3DL2_ENV_PRESET presetNo )
 {
 	DWORD param = static_cast<DWORD>( I3DL2_ENV_PRESET::NONE );
@@ -697,27 +588,138 @@ DWORD CSound::GetPreset( I3DL2_ENV_PRESET presetNo )
 }
 
 
-//--------------------------------------------------------------------------------------------------
-//		LPSTR型をLPWSTR型にキャストする関数.
-//--------------------------------------------------------------------------------------------------
-LPWSTR CSound::ConvertLPSTRToLPWSTR(LPSTR lpstr) 
+//----------------------------------------------------------------------------
+//		再生関数.
+//----------------------------------------------------------------------------
+HRESULT CSound::PlayBase(const GUID* pGuid, DWORD preset)
 {
-    // 変換に必要なワイド文字のバッファサイズを取得
-    int size_needed = MultiByteToWideChar(CP_ACP, 0, lpstr, -1, NULL, 0);
+	// 現在のボリューム退避.
+	LONG lVolume;
+	m_pDSBuffer->GetVolume(&lVolume);
+	// ボリューム最少を設定.
+	m_pDSBuffer->SetVolume(DSBVOLUME_MIN);
 
-    // 必要なバッファを確保
-    LPWSTR lpwstr = new wchar_t[size_needed];
+	// 音声停止.
+	m_pDSBuffer->Stop();
 
-    // シングルバイト文字列をワイド文字列に変換
-    MultiByteToWideChar(CP_ACP, 0, lpstr, -1, lpwstr, size_needed);
+	// エフェクトが設定されていない場合.
+	if (pGuid != nullptr)
+	{
+		// エフェクトが設定されている場合、そのエフェクトをバッファにセットする.
+		DSEFFECTDESC dsEffect;	// エフェクト構造体.
+		DWORD dwResult;			// 結果.
+		memset(&dsEffect, 0, sizeof(DSEFFECTDESC));
 
-    return lpwstr;  // 呼び出し側でメモリを解放する必要がある
+		dsEffect.dwSize = sizeof(DSEFFECTDESC);	// サイズ.
+		dsEffect.dwFlags = 0;
+		dsEffect.guidDSFXClass = *pGuid;	// エフェクト.
+
+		if (FAILED(
+			m_pDSBuffer->SetFX(
+				1,			// エフェクトの数.
+				&dsEffect,	// エフェクト構造体.
+				&dwResult	// (out)実行結果.
+			)))
+		{
+			_ASSERT_EXPR(0, L"エフェクト作成失敗");
+			return E_FAIL;
+		}
+		if (preset != -1) {
+			if (FAILED(
+				SetEffectParam(m_pDSBuffer, preset)))
+			{
+				_ASSERT_EXPR(0, L"エフェクトパラメータ設定失敗");
+				return E_FAIL;
+			}
+		}
+	}
+	else
+	{
+		// バッファから全てのエフェクトを取り去る.
+		if (FAILED(m_pDSBuffer->SetFX(0, NULL, NULL)))
+		{
+			_ASSERT_EXPR(0, L"エフェクト解除失敗");
+			return E_FAIL;
+		}
+	}
+
+
+	// ボリューム戻す.
+	m_pDSBuffer->SetVolume(lVolume);
+
+	// 再生.
+	m_pDSBuffer->Play(NULL, 0, NULL);
+
+	return S_OK;
 }
 
 
 //--------------------------------------------------------------------------------------------------
-//		パンニングが範囲外に設定されないようにする関数.
+//		エフェクトパラメータを設定・適用する.
 //--------------------------------------------------------------------------------------------------
+HRESULT CSound::SetEffectParam(LPDIRECTSOUNDBUFFER8 pDSBuffer8, DWORD dwPreset)
+{
+	IDirectSoundFXI3DL2Reverb8* pI3DL2Reverb;
+	if (FAILED(
+		pDSBuffer8->GetObjectInPath(
+			GUID_DSFX_STANDARD_I3DL2REVERB,
+			0,
+			IID_IDirectSoundFXI3DL2Reverb8,
+			(VOID**)&pI3DL2Reverb)))
+	{
+		return E_FAIL;
+	}
+
+	// リバーブの品質を設定する.
+	if (FAILED(
+		pI3DL2Reverb->SetQuality(DSFX_I3DL2REVERB_QUALITY_MAX)))
+	{
+		ERR_MSG(L"最高品質にセット出来ませんでした", L"エラー");
+		if (FAILED(
+			pI3DL2Reverb->SetQuality(DSFX_I3DL2REVERB_QUALITY_DEFAULT)))
+		{
+			ERR_MSG(L"標準品質にもセット出来ませんでした", L"エラー");
+			if (FAILED(
+				pI3DL2Reverb->SetQuality(DSFX_I3DL2REVERB_QUALITY_MIN)))
+			{
+				ERR_MSG(L"最低品質でも失敗しました", L"エラー");
+				return E_FAIL;
+			}
+			ERR_MSG(L"最低品質にセットしました", L"エラー");
+		}
+	}
+	// エフェクトパラメーターをセット.
+	if (FAILED(pI3DL2Reverb->SetPreset(dwPreset)))
+	{
+		pI3DL2Reverb->Release();
+		return E_FAIL;
+	}
+	pI3DL2Reverb->Release();
+	return S_OK;
+}
+
+
+//-----------------------------------------------------------------------------
+//		LPSTR型をLPWSTR型にキャストする関数.
+//-----------------------------------------------------------------------------
+LPWSTR CSound::ConvertLPSTRToLPWSTR(LPSTR lpstr) 
+{
+	// 変換に必要なワイド文字のバッファサイズを取得.
+	int size_needed = MultiByteToWideChar(CP_ACP, 0, lpstr, -1, NULL, 0);
+
+	// 必要なバッファを確保.
+	LPWSTR lpwstr = new wchar_t[size_needed];
+
+	// シングルバイト文字列をワイド文字列に変換.
+	MultiByteToWideChar(CP_ACP, 0, lpstr, -1, lpwstr, size_needed);
+
+	return lpwstr;  // 呼び出し側でメモリを解放する必要がある.
+}
+
+
+//-----------------------------------------------------------------------------
+//		パンニングが範囲外に設定されないようにする関数.
+//-----------------------------------------------------------------------------
 LONG CSound::RoundingPan( LONG pan )
 {
 	if( pan != DSBPAN_CENTER )
@@ -728,9 +730,9 @@ LONG CSound::RoundingPan( LONG pan )
 }
 
 
-//--------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 //		周波数が範囲外に設定されないようにする関数.
-//--------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 DWORD CSound::RoundingFrequency( DWORD freq )
 {
 	if( freq != DSBFREQUENCY_ORIGINAL )
@@ -741,9 +743,9 @@ DWORD CSound::RoundingFrequency( DWORD freq )
 }
 
 
-//--------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 //		音量が範囲外に設定されないようにする関数.
-//--------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 LONG CSound::RoundingVolume( LONG volume )
 {
 	volume = CLAMP( volume,  (LONG)DSBVOLUME_MIN, (LONG)DSBVOLUME_MAX );

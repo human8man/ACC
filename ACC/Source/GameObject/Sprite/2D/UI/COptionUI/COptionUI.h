@@ -30,11 +30,10 @@ public:
 
 	void Create();		// ì¬ˆ—.
 	HRESULT LoadData();	// “Çˆ—.
-	void Release();		// ‰ğ•úˆ—.
 	void Init();		// ‰Šú‰»ˆ—.
-
 	void Update();		// XVˆ—.
 	void Draw();		// •`‰æˆ—.
+	void Release();		// ‰ğ•úˆ—.
 
 private:
 	HWND		m_hWnd;

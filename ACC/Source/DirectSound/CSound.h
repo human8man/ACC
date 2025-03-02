@@ -5,6 +5,7 @@
 #pragma comment ( lib, "dsound.lib" )	// DirectSound.
 #pragma comment ( lib, "dxguid.lib" )	// エフェクト用.
 
+
 enum class I3DL2_ENV_PRESET : int
 {
 	DEFAULT,		// 標準.
@@ -42,9 +43,10 @@ enum class I3DL2_ENV_PRESET : int
 	NONE = -1,		// 未設定.
 };
 
-//==========================================================
+
+//============================================================================
 //		Soundクラス.
-//==========================================================
+//============================================================================
 class CSound
 {
 public:
@@ -52,7 +54,7 @@ public:
 
 	CSound();	// コンストラクタ.
 	CSound(LONG VolumeDefault)
-		: VOLUME_DEFAULT(VolumeDefault), m_pDS(), m_pDSBuffer() {};	//コンストラクタ(初期音量設定可能版).
+		: VOLUME_DEFAULT(VolumeDefault), m_pDS(), m_pDSBuffer() {};	// コンストラクタ(初期音量設定可能版).
 	~CSound();	// デストラクタ.
 
 	// Soundデバイス作成・解放.
@@ -73,16 +75,15 @@ public:
 	// 再生中を確認する.
 	bool IsPlaying();
 
-	// 音の停止(再生位置を0にする).
-	HRESULT Stop();
-	// 音の停止(再生位置を0にしない).
-	HRESULT MiniStop();
-	
 	// 常に最初からエフェクト付きで再生する.
 	HRESULT PlayEx( I3DL2_ENV_PRESET preset );
 	// エフェクト付きでループ再生.
 	void playLoopEx( I3DL2_ENV_PRESET preset );
 
+	// 音の停止(再生位置を0にする).
+	HRESULT Stop();
+	// 音の停止(再生位置を0にしない).
+	HRESULT MiniStop();
 
 	// パンニングを設定する.
 	//	パンニング = 左右どちらかに音を偏らせる.
@@ -104,8 +105,7 @@ public:
 	// パンニングを取得する.
 	LONG GetPan();
 	// 音量を取得する.
-	LONG GetVolume(); 
-
+	LONG GetVolume();
 	// エフェクトパラメータの取得.
 	DWORD GetPreset( I3DL2_ENV_PRESET presetNo );
 
