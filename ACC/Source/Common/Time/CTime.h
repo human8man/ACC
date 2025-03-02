@@ -1,8 +1,12 @@
 #pragma once
 
-#include "Common/Singleton/CSingleton.h"
+#include "Singleton/CSingleton.h"
 #include <chrono>
 
+
+//=============================================================================
+//		タイムクラス.
+//=============================================================================
 class CTime
 	: public CSingleton<CTime>
 {

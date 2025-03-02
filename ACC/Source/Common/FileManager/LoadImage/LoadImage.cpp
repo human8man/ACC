@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 
+
 namespace {
 	constexpr int	_1BYTE_BIT_NUM		= 8;				// 1バイトのビット数.
 	constexpr int	_3BYTE_BIT_NUM		= 24;				// 2バイトのビット数.
@@ -26,9 +27,10 @@ namespace {
 	} typedef SData;
 }
 
-//---------------------------.
-// 画像ファイルの幅、高さを取得する.
-//---------------------------.
+
+//=============================================================================
+//		画像ファイルの幅、高さを取得する.
+//=============================================================================
 D3DXVECTOR2 LoadImageFile::GetImageSize( const std::string& FilePath )
 {
 	// 拡張子を見て判断して対応した関数を使用する.
@@ -42,18 +44,17 @@ D3DXVECTOR2 LoadImageFile::GetImageSize( const std::string& FilePath )
 	return ERROR_SIZE;
 }
 
-//---------------------------.
-// jpgファイルの幅、高さを取得する.
-//---------------------------.
+
+//=============================================================================
+//		jpgファイルの幅、高さを取得する.
+//=============================================================================
 D3DXVECTOR2 LoadImageFile::GetJpgImageSize( const std::string& FilePath )
 {
 	SJpgData Image;
 
 	// ファイルを開く.
 	std::ifstream file( FilePath.data(), std::ios_base::binary );
-	if ( !file.is_open() ) {
-		return ERROR_SIZE;
-	};
+	if ( !file.is_open() ) { return ERROR_SIZE; };
 
 	// 不要なセグメント分移動する.
 	int SeekPoint = SKIP_2BIT;
@@ -122,9 +123,10 @@ D3DXVECTOR2 LoadImageFile::GetJpgImageSize( const std::string& FilePath )
 	);
 }
 
-//---------------------------.
-// pngファイルの幅、高さを取得する.
-//---------------------------.
+
+//=============================================================================
+//		pngファイルの幅、高さを取得する.
+//=============================================================================
 D3DXVECTOR2 LoadImageFile::GetPngImageSize( const std::string& FilePath )
 {
 	SData Image;
@@ -163,18 +165,17 @@ D3DXVECTOR2 LoadImageFile::GetPngImageSize( const std::string& FilePath )
 	);
 }
 
-//---------------------------.
-// jpgファイルの幅、高さを取得する.
-//---------------------------.
+
+//=============================================================================
+//		jpgファイルの幅、高さを取得する.
+//=============================================================================
 D3DXVECTOR2 LoadImageFile::GetBmpImageSize( const std::string& FilePath )
 {
 	SData Image;
 
 	// ファイルを開く.
 	std::ifstream file( FilePath.data(), std::ios_base::binary );
-	if ( !file.is_open() ) {
-		return ERROR_SIZE;
-	}
+	if ( !file.is_open() ) { return ERROR_SIZE; }
 
 	// 幅、高さの前にいらない情報分移動して読み込む.
 	file.seekg( SKIP_18BIT );

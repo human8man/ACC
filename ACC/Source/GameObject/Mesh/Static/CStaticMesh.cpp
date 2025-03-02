@@ -6,7 +6,6 @@
 #include <stdlib.h>
 #include <locale.h>
 
-
 // シェーダファイル名(ディレクトリも含む).
 const TCHAR SHADER_NAME[] = _T( "Data\\Shader\\StaticMesh.hlsl" );
 
@@ -44,10 +43,9 @@ CStaticMesh::CStaticMesh()
 
 	, m_Position			()
 	, m_Rotation			()
-	, m_Scale				( 1.0f, 1.0f, 1.0f )
+	, m_Scale				( 1.f, 1.f, 1.f )
 {
 }
-
 CStaticMesh::~CStaticMesh()
 {
 	// 解放処理.
@@ -87,15 +85,11 @@ HRESULT CStaticMesh::Init(LPCTSTR lpFileName )
 //=============================================================================
 void CStaticMesh::Release()
 {
-	//インデックスバッファ解放.
 	SAFE_DELETE_ARRAY(m_ppIndexBuffer);
-	//マテリアル解放.
 	SAFE_DELETE_ARRAY(m_pMaterials);
 
-	//メッシュデータの解放.
 	SAFE_RELEASE( m_Model.pD3DXMtrlBuffer );
 	SAFE_RELEASE( m_Model.pMesh );
-	//メッシュデータ(レイとの判定用)の解放.
 	SAFE_RELEASE( m_ModelForRay.pD3DXMtrlBuffer );
 	SAFE_RELEASE( m_ModelForRay.pMesh );
 
@@ -158,13 +152,13 @@ void CStaticMesh::Render( D3DXMATRIX& mView, D3DXMATRIX& mProj, LIGHT& Light )
 		CBUFFER_PER_FRAME cb;
 
 		D3DXVECTOR3 CamPos = CCamera::GetInstance()->GetPos();
-		// カメラ位置.
-		cb.CameraPos = D3DXVECTOR4( CamPos.x, CamPos.y, CamPos.z, 0.0f );
 
-		//----- ライト情報 -----.
+		// カメラ位置.
+		cb.CameraPos = D3DXVECTOR4( CamPos.x, CamPos.y, CamPos.z, 0.f );
+
 		// ライト方向.
-		cb.vLightDir = D3DXVECTOR4(
-			Light.vDirection.x, Light.vDirection.y, Light.vDirection.z, 0.0f );
+		cb.vLightDir = D3DXVECTOR4( Light.vDirection.x, Light.vDirection.y, Light.vDirection.z, 0.f );
+
 		// ライト方向の正規化(ノーマライズ）.
 		//	※モデルからライトへ向かう方向. ディレクショナルライトで重要な要素.
 		D3DXVec4Normalize( &cb.vLightDir, &cb.vLightDir );
@@ -187,8 +181,6 @@ void CStaticMesh::Render( D3DXMATRIX& mView, D3DXMATRIX& mProj, LIGHT& Light )
 	// メッシュのレンダリング.
 	RenderMesh( mWorld, mView, mProj );
 }
-
-
 
 
 //============================================================================
@@ -267,6 +259,7 @@ RayInfo CStaticMesh::IsHitForRay(const RAY& pRay )
 	return { false, ZEROVEC3, 9999.f };
 }
 
+
 //-----------------------------------------------------------------------------
 //		モデル作成.
 //-----------------------------------------------------------------------------
@@ -294,7 +287,7 @@ HRESULT CStaticMesh::CreateShader()
 #ifdef _DEBUG
 	uCompileFlag =
 		D3D10_SHADER_DEBUG | D3D10_SHADER_SKIP_OPTIMIZATION;
-#endif//#ifdef _DEBUG
+#endif// #ifdef _DEBUG
 
 	// HLSLからバーテックスシェーダのブロブを作成.
 	if( m_EnableTexture == true ){
@@ -424,7 +417,7 @@ HRESULT CStaticMesh::CreateSampler()
 	samDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;// リニアフィルタ(線形補間).
 						// POINT:高速だが粗い.
 	samDesc.AddressU
-		= D3D11_TEXTURE_ADDRESS_WRAP;//ラッピングモード(WRAP:繰り返し).
+		= D3D11_TEXTURE_ADDRESS_WRAP;// ラッピングモード(WRAP:繰り返し).
 	samDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	samDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 	// MIRROR: 反転繰り返し.
@@ -462,8 +455,7 @@ HRESULT CStaticMesh::CreateMaterials()
 	}
 
 	// 読み込んだ情報から必要な情報を抜き出す.
-	D3DXMATERIAL* d3dxMaterials
-		= static_cast<D3DXMATERIAL*>( m_Model.pD3DXMtrlBuffer->GetBufferPointer() );
+	D3DXMATERIAL* d3dxMaterials = static_cast<D3DXMATERIAL*>( m_Model.pD3DXMtrlBuffer->GetBufferPointer() );
 	// マテリアル数分の領域を確保.
 	m_pMaterials = new MY_MATERIAL[m_Model.NumMaterials]();
 	// マテリアル数分繰り返し.
@@ -512,9 +504,9 @@ HRESULT CStaticMesh::CreateMaterials()
 				_TRUNCATE );
 
 			LPTSTR filename = TexFilename_w;
-#else//#ifdef UNICODE
+#else// #ifdef UNICODE
 			LPTSTR filename = d3dxMaterials[No].pTextureFilename;
-#endif//#ifdef UNICODE
+#endif// #ifdef UNICODE
 
 			// テクスチャありのフラグを立てる.
 			m_EnableTexture = true;
@@ -611,36 +603,34 @@ HRESULT CStaticMesh::CreateIndexBuffer()
 //-----------------------------------------------------------------------------
 HRESULT CStaticMesh::CreateVertexBuffer()
 {
-	D3D11_BUFFER_DESC	bd;	//Dx11バッファ構造体.
-	D3D11_SUBRESOURCE_DATA	InitData;//初期化データ.
+	D3D11_BUFFER_DESC	bd;	// Dx11バッファ構造体.
+	D3D11_SUBRESOURCE_DATA	InitData;// 初期化データ.
 
-	//Dx9の場合、mapではなくLockで頂点バッファからデータを取り出す.
+	// Dx9の場合、mapではなくLockで頂点バッファからデータを取り出す.
 	LPDIRECT3DVERTEXBUFFER9 pVB = nullptr;
 	m_Model.pMesh->GetVertexBuffer( &pVB );
 	DWORD dwStride = m_Model.pMesh->GetNumBytesPerVertex();
 	BYTE* pVertices = nullptr;
 	VERTEX* pVertex = nullptr;
-	if( SUCCEEDED(
-		pVB->Lock( 0, 0, (VOID**)&pVertices, 0 ) ) )
+	if( SUCCEEDED( pVB->Lock( 0, 0, (VOID**)&pVertices, 0 ) ) )
 	{
 		pVertex = (VERTEX*)pVertices;
-		//Dx9の頂点バッファからの情報で、Dx11頂点バッファを作成.
+		// Dx9の頂点バッファからの情報で、Dx11頂点バッファを作成.
 		bd.Usage = D3D11_USAGE_DEFAULT;
-		//頂点を格納するのに必要なバイト数.
+		// 頂点を格納するのに必要なバイト数.
 		bd.ByteWidth = m_Model.pMesh->GetNumBytesPerVertex()*m_Model.pMesh->GetNumVertices();
 		bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 		bd.CPUAccessFlags = 0;
 		bd.MiscFlags = 0;
 		InitData.pSysMem = pVertex;
-		if( FAILED( m_pDevice11->CreateBuffer(
-			&bd, &InitData, &m_pVertexBuffer ) ) )
+		if( FAILED( m_pDevice11->CreateBuffer( &bd, &InitData, &m_pVertexBuffer ) ) )
 		{
 			_ASSERT_EXPR( false, _T( "頂点バッファ作成失敗" ) );
 			return E_FAIL;
 		}
 		pVB->Unlock();
 	}
-	SAFE_RELEASE( pVB );	//頂点バッファ解放.
+	SAFE_RELEASE( pVB );	// 頂点バッファ解放.
 	return S_OK;
 }
 
@@ -650,50 +640,47 @@ HRESULT CStaticMesh::CreateVertexBuffer()
 //-----------------------------------------------------------------------------
 HRESULT CStaticMesh::CreateConstantBuffer()
 {
-	//コンスタントバッファ(メッシュ用).
+	// コンスタントバッファ(メッシュ用).
 	D3D11_BUFFER_DESC cb;
-	cb.BindFlags = D3D11_BIND_CONSTANT_BUFFER;	//コンスタントバッファを指定.
-	cb.ByteWidth = sizeof( CBUFFER_PER_MESH );	//コンスタントバッファのサイズ.
-	cb.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;	//書き込みでアクセス.
-	cb.MiscFlags = 0;				//その他のフラグ(未使用).
-	cb.StructureByteStride = 0;		//構造体のサイズ(未使用).
-	cb.Usage = D3D11_USAGE_DYNAMIC;	//使用方法:直接書き込み.
+	cb.BindFlags = D3D11_BIND_CONSTANT_BUFFER;	// コンスタントバッファを指定.
+	cb.ByteWidth = sizeof( CBUFFER_PER_MESH );	// コンスタントバッファのサイズ.
+	cb.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;	// 書き込みでアクセス.
+	cb.MiscFlags = 0;							// その他のフラグ(未使用).
+	cb.StructureByteStride = 0;					// 構造体のサイズ(未使用).
+	cb.Usage = D3D11_USAGE_DYNAMIC;				// 使用方法:直接書き込み.
 
-	//コンスタントバッファの作成.
-	if( FAILED(
-		m_pDevice11->CreateBuffer( &cb, nullptr, &m_pCBufferPerMesh ) ) )
+	// コンスタントバッファの作成.
+	if( FAILED( m_pDevice11->CreateBuffer( &cb, nullptr, &m_pCBufferPerMesh ) ) )
 	{
 		_ASSERT_EXPR( false, _T( "コンスタントバッファ(メッシュ)作成失敗" ) );
 		return E_FAIL;
 	}
 
-	//コンスタントバッファ(マテリアル用).
-	cb.BindFlags = D3D11_BIND_CONSTANT_BUFFER;		//コンスタントバッファを指定.
-	cb.ByteWidth = sizeof( CBUFFER_PER_MATERIAL );	//コンスタントバッファのサイズ.
-	cb.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;		//書き込みでアクセス.
-	cb.MiscFlags = 0;				//その他のフラグ(未使用).
-	cb.StructureByteStride = 0;		//構造体のサイズ(未使用).
-	cb.Usage = D3D11_USAGE_DYNAMIC;	//使用方法:直接書き込み.
+	// コンスタントバッファ(マテリアル用).
+	cb.BindFlags = D3D11_BIND_CONSTANT_BUFFER;		// コンスタントバッファを指定.
+	cb.ByteWidth = sizeof( CBUFFER_PER_MATERIAL );	// コンスタントバッファのサイズ.
+	cb.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;		// 書き込みでアクセス.
+	cb.MiscFlags = 0;								// その他のフラグ(未使用).
+	cb.StructureByteStride = 0;						// 構造体のサイズ(未使用).
+	cb.Usage = D3D11_USAGE_DYNAMIC;					// 使用方法:直接書き込み.
 
-	//コンスタントバッファの作成.
-	if( FAILED(
-		m_pDevice11->CreateBuffer( &cb, nullptr, &m_pCBufferPerMaterial ) ) )
+	// コンスタントバッファの作成.
+	if( FAILED( m_pDevice11->CreateBuffer( &cb, nullptr, &m_pCBufferPerMaterial ) ) )
 	{
 		_ASSERT_EXPR( false, _T( "コンスタントバッファ(マテリアル用)作成失敗" ) );
 		return E_FAIL;
 	}
 
-	//コンスタントバッファ(ﾌﾚｰﾑ用).
-	cb.BindFlags = D3D11_BIND_CONSTANT_BUFFER;	//コンスタントバッファを指定.
-	cb.ByteWidth = sizeof( CBUFFER_PER_FRAME );	//コンスタントバッファのサイズ.
-	cb.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;	//書き込みでアクセス.
-	cb.MiscFlags = 0;				//その他のフラグ(未使用).
-	cb.StructureByteStride = 0;		//構造体のサイズ(未使用).
-	cb.Usage = D3D11_USAGE_DYNAMIC;	//使用方法:直接書き込み.
+	// コンスタントバッファ(フレーム用).
+	cb.BindFlags = D3D11_BIND_CONSTANT_BUFFER;	// コンスタントバッファを指定.
+	cb.ByteWidth = sizeof( CBUFFER_PER_FRAME );	// コンスタントバッファのサイズ.
+	cb.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;	// 書き込みでアクセス.
+	cb.MiscFlags = 0;							// その他のフラグ(未使用).
+	cb.StructureByteStride = 0;					// 構造体のサイズ(未使用).
+	cb.Usage = D3D11_USAGE_DYNAMIC;				// 使用方法:直接書き込み.
 
-	//コンスタントバッファの作成.
-	if( FAILED(
-		m_pDevice11->CreateBuffer( &cb, nullptr, &m_pCBufferPerFrame ) ) )
+	// コンスタントバッファの作成.
+	if( FAILED( m_pDevice11->CreateBuffer( &cb, nullptr, &m_pCBufferPerFrame ) ) )
 	{
 		_ASSERT_EXPR( false, _T( "コンスタントバッファ(フレーム用)作成失敗" ) );
 		return E_FAIL;
@@ -712,19 +699,19 @@ HRESULT CStaticMesh::LoadXMesh( LPCTSTR lpFileName )
 	lstrcpy( m_Model.FileName, lpFileName );
 	lstrcpy( m_ModelForRay.FileName, lpFileName );
 
-	//マテリアルﾊﾞｯﾌｧ.
+	// マテリアルバッファ.
 	LPD3DXBUFFER pD3DXMtrlBuffer = nullptr;
 
 	//Xファイルのロード.
 	if( FAILED( D3DXLoadMeshFromX(
-		lpFileName,					//ファイル名.
-		D3DXMESH_SYSTEMMEM			//システムメモリに読み込み.
-		| D3DXMESH_32BIT,			//32bit.
+		lpFileName,					// ファイル名.
+		D3DXMESH_SYSTEMMEM			// システムメモリに読み込み.
+		| D3DXMESH_32BIT,			// 32bit.
 		m_pDevice9, nullptr,
-		&m_Model.pD3DXMtrlBuffer,	//(out)マテリアル情報.
+		&m_Model.pD3DXMtrlBuffer,	// (out)マテリアル情報.
 		nullptr,
-		&m_Model.NumMaterials,		//(out)マテリアル数.
-		&m_Model.pMesh ) ) )		//(out)メッシュオブジェクト.
+		&m_Model.NumMaterials,		// (out)マテリアル数.
+		&m_Model.pMesh ) ) )		// (out)メッシュオブジェクト.
 	{
 		_ASSERT_EXPR( false, _T( "Xファイル読込失敗" ) );
 		return E_FAIL;
@@ -733,15 +720,15 @@ HRESULT CStaticMesh::LoadXMesh( LPCTSTR lpFileName )
 	// 頂点情報の保存.
 	SaveVertices(m_Model.pMesh);
 
-	//Xファイルのロード(レイとの判定用に別設定で読み込む).
+	// Xファイルのロード(レイとの判定用に別設定で読み込む).
 	if( FAILED( D3DXLoadMeshFromX(
-		lpFileName,						//ファイル名.
-		D3DXMESH_SYSTEMMEM,				//システムメモリに読み込み.
+		lpFileName,						// ファイル名.
+		D3DXMESH_SYSTEMMEM,				// システムメモリに読み込み.
 		m_pDevice9, nullptr,
-		&m_ModelForRay.pD3DXMtrlBuffer,	//(out)マテリアル情報.
+		&m_ModelForRay.pD3DXMtrlBuffer,	// (out)マテリアル情報.
 		nullptr,
-		&m_ModelForRay.NumMaterials,	//(out)マテリアル数.
-		&m_ModelForRay.pMesh ) ) )		//(out)メッシュオブジェクト.
+		&m_ModelForRay.NumMaterials,	// (out)マテリアル数.
+		&m_ModelForRay.pMesh ) ) )		// (out)メッシュオブジェクト.
 	{
 		_ASSERT_EXPR( false, _T( "Xファイル読込失敗" ) );
 		return E_FAIL;
@@ -751,81 +738,75 @@ HRESULT CStaticMesh::LoadXMesh( LPCTSTR lpFileName )
 }
 
 
-
-
 //-----------------------------------------------------------------------------
 //		レンダリング関数(クラス内でのみ使用する).
 //-----------------------------------------------------------------------------
-void CStaticMesh::RenderMesh(
-	D3DXMATRIX& mWorld, D3DXMATRIX& mView, D3DXMATRIX& mProj)
+void CStaticMesh::RenderMesh( D3DXMATRIX& mWorld, D3DXMATRIX& mView, D3DXMATRIX& mProj)
 {
-	//シェーダのコンスタントバッファに各種データを渡す.
+	// シェーダのコンスタントバッファに各種データを渡す.
 	D3D11_MAPPED_SUBRESOURCE pData;
-	//バッファ内のデータの書き換え開始時にMap.
+	// バッファ内のデータの書き換え開始時にMap.
 	if( SUCCEEDED( m_pContext11->Map(
 		m_pCBufferPerMesh, 0,
 		D3D11_MAP_WRITE_DISCARD,
 		0, &pData )))
 	{
-		//コンスタントバッファ(メッシュ用).
+		// コンスタントバッファ(メッシュ用).
 		CBUFFER_PER_MESH cb;
 
-		//ワールド行列を渡す.
+		// ワールド行列を渡す.
 		cb.mW = mWorld;
 		D3DXMatrixTranspose( &cb.mW, &cb.mW );
 
-		//ワールド,ビュー,プロジェクション行列を渡す.
+		// ワールド,ビュー,プロジェクション行列を渡す.
 		D3DXMATRIX mWVP = mWorld * mView * mProj;
-		D3DXMatrixTranspose( &mWVP, &mWVP );	//行列を転置する.
-		//※行列の計算方法がDirectXとGPUで異なるため転置が必要.
+		D3DXMatrixTranspose( &mWVP, &mWVP );	// 行列を転置する.
+		// ※行列の計算方法がDirectXとGPUで異なるため転置が必要.
 		cb.mWVP = mWVP;
 
 		memcpy_s(
-			pData.pData,	//コピー先のバッファ.
-			pData.RowPitch,	//コピー先のバッファサイズ.
-			(void*)(&cb),	//コピー元のバッファ.
-			sizeof(cb));	//コピー元のバッファサイズ.
+			pData.pData,	// コピー先のバッファ.
+			pData.RowPitch,	// コピー先のバッファサイズ.
+			(void*)(&cb),	// コピー元のバッファ.
+			sizeof(cb));	// コピー元のバッファサイズ.
 
-		//バッファ内のデータの書き換え終了時にUnmap.
+		// バッファ内のデータの書き換え終了時にUnmap.
 		m_pContext11->Unmap( m_pCBufferPerMesh, 0 );
 	}
 
-	//このコンスタントバッファをどのシェーダで使用するか？.
-	m_pContext11->VSSetConstantBuffers( 0, 1, &m_pCBufferPerMesh );	//頂点シェーダ.
-	m_pContext11->PSSetConstantBuffers( 0, 1, &m_pCBufferPerMesh );	//ピクセルシェーダ.
+	// このコンスタントバッファをどのシェーダで使用するか？.
+	m_pContext11->VSSetConstantBuffers( 0, 1, &m_pCBufferPerMesh ); // 頂点シェーダ.
+	m_pContext11->PSSetConstantBuffers( 0, 1, &m_pCBufferPerMesh ); // ピクセルシェーダ.
 
-	//頂点インプットレイアウトをセット.
+	// 頂点インプットレイアウトをセット.
 	m_pContext11->IASetInputLayout( m_pVertexLayout );
 
-	//プリミティブ・トポロジーをセット.
-	m_pContext11->IASetPrimitiveTopology(
-		D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+	// プリミティブ・トポロジーをセット.
+	m_pContext11->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
-	//頂点バッファをセット.
+	// 頂点バッファをセット.
 	UINT stride = m_Model.pMesh->GetNumBytesPerVertex();
 	UINT offset = 0;
-	m_pContext11->IASetVertexBuffers(
-		0, 1, &m_pVertexBuffer, &stride, &offset );
+	m_pContext11->IASetVertexBuffers( 0, 1, &m_pVertexBuffer, &stride, &offset );
 
-	//属性の数だけ、それぞれの属性のインデックスバッファを描画.
+	// 属性の数だけ、それぞれの属性のインデックスバッファを描画.
 	for( DWORD No = 0; No < m_NumAttr; No++ )
 	{
-		//使用されていないマテリアル対策.
-		if( m_pMaterials[m_AttrID[No]].dwNumFace == 0 ) {
-			continue;
-		}
-		//インデックスバッファをセット.
-		m_pContext11->IASetIndexBuffer(
-			m_ppIndexBuffer[No], DXGI_FORMAT_R32_UINT, 0 );
-		//マテリアルの各要素をシェーダに渡す.
+		// 使用されていないマテリアル対策.
+		if( m_pMaterials[m_AttrID[No]].dwNumFace == 0 ) { continue; }
+		
+		// インデックスバッファをセット.
+		m_pContext11->IASetIndexBuffer( m_ppIndexBuffer[No], DXGI_FORMAT_R32_UINT, 0 );
+
+		// マテリアルの各要素をシェーダに渡す.
 		D3D11_MAPPED_SUBRESOURCE pDataMat;
 		if( SUCCEEDED(
 			m_pContext11->Map(m_pCBufferPerMaterial,
 				0, D3D11_MAP_WRITE_DISCARD, 0, &pDataMat )))
 		{
-			//コンスタントバッファ(マテリアル用).
+			// コンスタントバッファ(マテリアル用).
 			CBUFFER_PER_MATERIAL cb;
-			//ディフューズ,アンビエント,スペキュラをシェーダに渡す.
+			// ディフューズ,アンビエント,スペキュラをシェーダに渡す.
 			cb.Diffuse	= m_pMaterials[m_AttrID[No]].Diffuse;
 			cb.Ambient	= m_pMaterials[m_AttrID[No]].Ambient;
 			cb.Specular = m_pMaterials[m_AttrID[No]].Specular;
@@ -836,26 +817,25 @@ void CStaticMesh::RenderMesh(
 			m_pContext11->Unmap( m_pCBufferPerMaterial, 0 );
 		}
 
-		//このコンスタントバッファをどのシェーダで使うか？.
+		// このコンスタントバッファをどのシェーダで使うか？.
 		m_pContext11->VSSetConstantBuffers( 1, 1, &m_pCBufferPerMaterial );
 		m_pContext11->PSSetConstantBuffers( 1, 1, &m_pCBufferPerMaterial );
 
-		//テクスチャをシェーダに渡す.
+		// テクスチャをシェーダに渡す.
 		if (m_pMaterials[m_AttrID[No]].pTexture != nullptr) {
-			//テクスチャがあるとき.
+			// テクスチャがあるとき.
 			m_pContext11->PSSetSamplers( 0, 1, &m_pSampleLinear );
 			m_pContext11->PSSetShaderResources(
 				0, 1, &m_pMaterials[m_AttrID[No]].pTexture );
 		}
 		else {
-			//テクスチャがないとき.
+			// テクスチャがないとき.
 			ID3D11ShaderResourceView* pNothing[1] = { 0 };
 			m_pContext11->PSSetShaderResources( 0, 1, pNothing );
 		}
 
-		//プリミティブ(ポリゴン)をレンダリング.
-		m_pContext11->DrawIndexed(
-			m_pMaterials[m_AttrID[No]].dwNumFace * 3, 0, 0 );
+		// プリミティブ(ポリゴン)をレンダリング.
+		m_pContext11->DrawIndexed( m_pMaterials[m_AttrID[No]].dwNumFace * 3, 0, 0 );
 	}
 }
 
@@ -879,9 +859,11 @@ void CStaticMesh::SaveVertices(LPD3DXMESH pMesh)
 	m_Vertices.clear();
 
 	// 頂点バッファから全頂点を取得.
-	for (DWORD i = 0; i < numVertices; ++i) {
+	for (DWORD i = 0; i < numVertices; ++i)
+	{
 		// 現在の頂点の位置を計算.
 		BYTE* pVertex = static_cast<BYTE*>(pVertices) + i * vertexSize;
+
 		// 頂点の位置を取得.
 		D3DXVECTOR3 position = *(D3DXVECTOR3*)pVertex;
 		m_Vertices.push_back(position);
@@ -893,13 +875,10 @@ void CStaticMesh::SaveVertices(LPD3DXMESH pMesh)
 
 
 //----------------------------------------------------------------------------
-//	交差位置のポリゴンの頂点を見つける.
-//		※頂点座標はローカル座標.
+//		交差位置のポリゴンの頂点を見つける.
+//			※頂点座標はローカル座標.
 //----------------------------------------------------------------------------
-HRESULT CStaticMesh::FindVerticesOnPoly(
-	LPD3DXMESH pMesh,
-	DWORD dwPolyIndex,
-	D3DXVECTOR3* pVertices)
+HRESULT CStaticMesh::FindVerticesOnPoly( LPD3DXMESH pMesh, DWORD dwPolyIndex, D3DXVECTOR3* pVertices)
 {
 	DWORD dwStride	  = pMesh->GetNumBytesPerVertex();// 頂点ごとのバイト数を取得.
 	DWORD dwVertexAmt = pMesh->GetNumVertices();	  // 頂点数を取得.
@@ -907,9 +886,7 @@ HRESULT CStaticMesh::FindVerticesOnPoly(
 	WORD* pwPoly	  = nullptr;
 
 	// インデックスバッファをロック（読み込みモード）.
-	pMesh->LockIndexBuffer(
-		D3DLOCK_READONLY,
-		reinterpret_cast<VOID**>(&pwPoly));
+	pMesh->LockIndexBuffer( D3DLOCK_READONLY, reinterpret_cast<VOID**>(&pwPoly));
 
 	BYTE* pbVertices = nullptr;				// 頂点(バイト型).
 	FLOAT* pfVertices = nullptr;			// 頂点(float型).
@@ -922,22 +899,19 @@ HRESULT CStaticMesh::FindVerticesOnPoly(
 	if (SUCCEEDED( VB->Lock(0, 0, reinterpret_cast<VOID**>(&pbVertices), 0 ) ))
 	{
 		// ポリゴンの頂点１つ目を取得.
-		pfVertices =
-			reinterpret_cast<FLOAT*>(&pbVertices[dwStride * pwPoly[dwPolyIndex * 3]]);
+		pfVertices = reinterpret_cast<FLOAT*>(&pbVertices[dwStride * pwPoly[dwPolyIndex * 3]]);
 		pVertices[0].x = pfVertices[0];
 		pVertices[0].y = pfVertices[1];
 		pVertices[0].z = pfVertices[2];
 
 		// ポリゴンの頂点２つ目を取得.
-		pfVertices =
-			reinterpret_cast<FLOAT*>(&pbVertices[dwStride * pwPoly[dwPolyIndex * 3 + 1]]);
+		pfVertices = reinterpret_cast<FLOAT*>(&pbVertices[dwStride * pwPoly[dwPolyIndex * 3 + 1]]);
 		pVertices[1].x = pfVertices[0];
 		pVertices[1].y = pfVertices[1];
 		pVertices[1].z = pfVertices[2];
 
 		// ポリゴンの頂点３つ目を取得.
-		pfVertices =
-			reinterpret_cast<FLOAT*>(&pbVertices[dwStride * pwPoly[dwPolyIndex * 3 + 2]]);
+		pfVertices = reinterpret_cast<FLOAT*>(&pbVertices[dwStride * pwPoly[dwPolyIndex * 3 + 2]]);
 		pVertices[2].x = pfVertices[0];
 		pVertices[2].y = pfVertices[1];
 		pVertices[2].z = pfVertices[2];

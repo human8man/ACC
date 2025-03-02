@@ -1,7 +1,11 @@
 #pragma once
 
-#include "GameObject/Sprite/2D/UI/CUIObject.h"
+#include "Sprite/2D/UI/CUIObject.h"
 
+
+//=============================================================================
+//		フェードクラス.
+//=============================================================================
 class CUIFade
 {
 public:
@@ -17,10 +21,10 @@ public:
 	CUIFade();
 	 ~CUIFade();
 
-	void Create();
-	void Update();
-	void Draw();
-	void Release();
+	void Create();	// 作成処理.
+	void Update();	// 更新処理.
+	void Draw();	// 描画処理.
+	void Release();	// 解放処理.
 
 	// フェードを開始する(黒が表示されている時間).
 	void DoFade(int peaktime) { m_FadeStart = true; m_PeakCnt = peaktime; }

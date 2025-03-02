@@ -41,7 +41,6 @@ CXInput::CXInput( DWORD padId )
 	, m_Connect		( false )
 {
 }
-
 CXInput::~CXInput()
 {
 	EndProc();

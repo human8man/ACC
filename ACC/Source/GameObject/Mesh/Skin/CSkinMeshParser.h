@@ -184,14 +184,14 @@ public:
 	LPD3DXMESHCONTAINER GetMeshContainer( LPD3DXFRAME );
 
 	/****************************************************************
-	//	アニメーションセットの切り替え.
+	//	@brief アニメーションセットの切り替え.
 	//	@param Index			: アニメーション番号
 	//	@param pAC				: AnimationController
 	****************************************************************/
 	void ChangeAnimSet( int Index, LPD3DXANIMATIONCONTROLLER pAC );
 
 	/****************************************************************
-	// アニメーションセットの切り替え(開始フレーム指定可能版).
+	// @brief アニメーションセットの切り替え(開始フレーム指定可能版).
 	// @param Index			: アニメーション番号
 	// @param StartFramePos	: 開始フレーム
 	// @param pAC			: AnimationController

@@ -1,31 +1,32 @@
 #pragma once
 
-//警告についてのコード分析を無効にする.4005:再定義.
+// 警告についてのコード分析を無効にする.4005:再定義.
 #pragma warning(disable:4005)
 
-//_declspec()	:DLLから（関数、クラス、クラスのメンバ関数）エクスポートする.
-//align()		:（強制的に）16byteで使用する.
+// _declspec()	: DLLから（関数、クラス、クラスのメンバ関数）エクスポートする.
+// align()		:（強制的に）16byteで使用する.
 #define ALIGN16	_declspec( align(16) )
 
-//前方宣言.
+// 前方宣言.
 class CDirectX11;
 
-/**************************************************
-*	スプライト2Dクラス.
-**/
+
+//=============================================================================
+//		スプライト2Dクラス.
+//=============================================================================
 class CSprite2D
 {
 public:
-	//======================================
-	//	構造体.
-	//======================================
+	//------------------------------------------
+	//		構造体.
+	//------------------------------------------
 	//幅高さ構造体.
 	struct WHSIZE
 	{
 		float w;
 		float h;
 	};
-	//スプライト構造体.
+	// スプライト構造体.
 	struct SPRITE_STATE
 	{
 		WHSIZE Disp;	// 表示幅高さ.
@@ -34,31 +35,31 @@ public:
 		D3DXVECTOR3 Pos;// 画像座標.
 	};
 
-	//コンスタントバッファのアプリ側の定義.
-	//※シェーダ内のコンスタントバッファと一致している必要あり.
+	// コンスタントバッファのアプリ側の定義.
+	//	※シェーダ内のコンスタントバッファと一致している必要あり.
 	struct SHADER_CONSTANT_BUFFER
 	{
-		ALIGN16	D3DXMATRIX	mWorld;		//ワールド行列.	
-		ALIGN16	D3DXVECTOR4	vColor;		//カラー（RGBAの型に合わせる）.
-		ALIGN16	D3DXVECTOR4	vUV;		//UV座標（x,yのみ使用）.
-		ALIGN16 float fViewPortWidth;	//ビューポート幅.
-		ALIGN16 float fViewPortHeight;	//ビューポート高さ.
+		ALIGN16	D3DXMATRIX	mWorld;		// ワールド行列.
+		ALIGN16	D3DXVECTOR4	vColor;		// カラー（RGBAの型に合わせる）.
+		ALIGN16	D3DXVECTOR4	vUV;		// UV座標（x,yのみ使用）.
+		ALIGN16 float fViewPortWidth;	// ビューポート幅.
+		ALIGN16 float fViewPortHeight;	// ビューポート高さ.
 	};
-	//頂点の構造体.
+	// 頂点の構造体.
 	struct VERTEX
 	{
-		D3DXVECTOR3 Pos;	//頂点座標.
-		D3DXVECTOR2	Tex;	//テクスチャ座標.
+		D3DXVECTOR3 Pos; // 頂点座標.
+		D3DXVECTOR2	Tex; // テクスチャ座標.
 	};
 
 public:
 	CSprite2D();
 	~CSprite2D();
 
-	// 初期化.
+	// 初期化処理.
 	HRESULT Init( const std::string& lpFileName );
 
-	// 解放.
+	// 解放処理.
 	void Release();
 
 	// シェーダ作成.
@@ -97,8 +98,9 @@ public:
 		m_PatternNo.y = y;
 	}
 
-	// スプライト情報の取得.
+	// jsonファイルのスプライト情報を取得.
 	HRESULT SpriteStateDataLoad(const std::string& FilePath);
+	// スプライト情報をまとめたjsonファイルの作成.
 	HRESULT CreateSpriteState(const std::string& FilePath);
 
 	// 最大パターン数(マス目)を取得.

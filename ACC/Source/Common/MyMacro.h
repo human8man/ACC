@@ -1,8 +1,8 @@
 #pragma once
-#include <crtdbg.h>//_ASSERT_EXPR()で必要.
+#include <crtdbg.h> // _ASSERT_EXPR()で必要.
 
 //===========================================================
-//	マクロ.
+//		マクロ.
 //===========================================================
 
 #define SAFE_RELEASE(p)	{if(p!=nullptr){(p)->Release();(p)=nullptr;}}

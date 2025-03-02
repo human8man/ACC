@@ -126,5 +126,4 @@ private:
 	CMouse	 m_Mouse;
 	// XInput 用のメンバ変数を追加.
 	CXInput* m_GamePad;
-
 };

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Global.h"
 #include <iostream>
 #include "nlohmann/json.hpp"
@@ -8,9 +9,14 @@
 #include <fstream>
 #include <sstream>
 
+
 // json型を作成.
 using Json = nlohmann::json;
 
+
+//============================================================================
+//		ファイルマネージャー.
+//============================================================================
 namespace FileManager {
 	// テキストファイルの読み込み.
 	//	"//" : コメントアウト.
@@ -52,9 +58,10 @@ namespace FileManager {
 	HRESULT CreateFileDirectory( const std::string& FilePath );
 }
 
-//---------------------------.
-// バイナリデータでの読み込み.
-//---------------------------.
+
+//============================================================================
+//		バイナリデータでの読み込み.
+//============================================================================
 template<class T>
 HRESULT FileManager::BinaryLoad( const char* FilePath, T& Out, const int& SeekPoint )
 {
@@ -71,9 +78,10 @@ HRESULT FileManager::BinaryLoad( const char* FilePath, T& Out, const int& SeekPo
 	return S_OK;
 }
 
-//---------------------------.
-// バイナリデータをvectorで読み込み.
-//---------------------------.
+
+//============================================================================
+//		バイナリデータをvectorで読み込み.
+//============================================================================
 template<class T>
 HRESULT FileManager::BinaryLoad( const char* FilePath, std::vector<T>& OutList )
 {
@@ -95,9 +103,10 @@ HRESULT FileManager::BinaryLoad( const char* FilePath, std::vector<T>& OutList )
 	return S_OK;
 }
 
-//---------------------------.
-// バイナリデータでの書き込み.
-//---------------------------.
+
+//============================================================================
+//		バイナリデータでの書き込み.
+//============================================================================
 template<class T>
 HRESULT FileManager::BinarySave( const char* FilePath, const T& Data )
 {
@@ -120,9 +129,10 @@ HRESULT FileManager::BinarySave( const char* FilePath, const T& Data )
 	return S_OK;
 }
 
-//---------------------------.
-// バイナリデータをvectorで書き込み.
-//---------------------------.
+
+//============================================================================
+//		バイナリデータをvectorで書き込み.
+//============================================================================
 template<class T>
 HRESULT FileManager::BinarySave( const char* FilePath, const std::vector<T>& DataList )
 {
