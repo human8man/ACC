@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Singleton/CSingleton.h"
 #include <Xinput.h>
 #pragma comment( lib, "xinput.lib" )
 
@@ -8,7 +9,11 @@
 //		XInputクラス.
 //=============================================================================
 class CXInput
+	: public CSingleton<CXInput>
 {
+private:
+	friend class CSingleton<CXInput>; // シングルトンクラスをフレンド宣言.
+
 public:
 	// トリガー入力範囲.
 	static constexpr BYTE	TRIGGER_MIN		= 0;

@@ -8,7 +8,6 @@ CInput::CInput()
 	: m_hWnd		(NULL)
 	, m_pDCInput	(NULL)
 	, m_UseDevice	(0)
-	, m_GamePad		(NULL)
 {	
 }
 
@@ -62,7 +61,6 @@ void CInput::Release()
 
 	m_Key.Release();
 	m_Mouse.Release();
-	SAFE_DELETE(m_GamePad);
 
 	m_hWnd = NULL;
 	m_UseDevice = 0;
@@ -76,25 +74,6 @@ void CInput::InputUpdate()
 {
 	XINPUT_STATE state;
 	bool isConnected = (XInputGetState(0, &state) == ERROR_SUCCESS);
-
-	// コントローラーが接続されている場合.
-	if (isConnected)
-	{
-		if (!m_GamePad) {
-			m_GamePad = new CXInput(0);
-		}
-	}
-	else
-	{
-		if (m_GamePad) {
-			delete m_GamePad;
-			m_GamePad = nullptr;
-		}
-	}
-	// コントローラーが接続されている場合更新.
-	if (m_GamePad) {
-		m_GamePad->Update();
-	}
 
 	// キーとマウスの更新.
 	m_Key.Update();

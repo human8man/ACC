@@ -103,7 +103,6 @@ void CTitle::Update()
 	CSoundManager::GetInstance()->PlayLoop(CSoundManager::enList::BGM_Title);
 
 	CMouse* Mouse = CInput::GetInstance()->CDMouse();
-	CXInput* XInput = CInput::GetInstance()->CDXInput();
 	m_pEgg->SetRotY(m_pEgg->GetRot().y + 0.01f);
 
 	// マウス位置を取得.
@@ -141,6 +140,7 @@ void CTitle::Update()
 	for (size_t i = 0; i < m_pUIs.size(); ++i) {
 		// 背景の処理はいらないので早期に切る.
 		if (i == TitleSprite::FullScreen) { continue; }
+		if (i == TitleSprite::Title) { continue; }
 
 		// UIのサイズと座標を変換する.
 		D3DXVECTOR2 SquarePos	= D3DXVECTOR2( m_pUIs[i]->GetPos().x, m_pUIs[i]->GetPos().y );
@@ -169,22 +169,7 @@ void CTitle::Update()
 				CSoundManager::GetInstance()->Stop(CSoundManager::enList::BGM_Title);
 			}
 		}
-		//else if (XInput->IsUp(XInput->A))
-		//{
-		//	// ゲームを開始する.
-		//	CSceneManager::GetInstance()->LoadScene(SceneList::Game);
-		//	CSoundManager::GetInstance()->Stop(CSoundManager::enList::BGM_Title);
-		//}
 	}
-	
-//#if _DEBUG
-//	ImGui::Begin("cWindow");
-//
-//	ImGui::Text("%d", XInput->GetPadID());
-//	ImGui::Text("%d", XInput->IsConnect());
-//
-//	ImGui::End();
-//#endif
 }
 
 

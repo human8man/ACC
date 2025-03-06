@@ -114,8 +114,6 @@ public:
 	// 各デバイスを参照.
 	CKey*		CDKeyboard() { return &m_Key;	}
 	CMouse*		CDMouse()	 { return &m_Mouse;	}
-	CXInput*	CDXInput()	 { return m_GamePad;}
-
 private:
 	HWND m_hWnd;
 	IDirectInput8* m_pDCInput;	// DirectInputオブジェクト.
@@ -124,6 +122,4 @@ private:
 	// 各デバイスの変数宣言.
 	CKey	 m_Key;
 	CMouse	 m_Mouse;
-	// XInput 用のメンバ変数を追加.
-	CXInput* m_GamePad;
 };

@@ -19,13 +19,8 @@ public:
 	// Titleで使用するスプライト名を追加していく(名前順).
 	enum TitleSprite {
 		FullScreen,
-		Select1,
-		Select2,
-		Select3,
-		Select4,
-		Select5,
 		StartButton,
-		Training,
+		Title,
 	};
 
 public:
