@@ -11,11 +11,10 @@
 //		エネミークラス.
 //=============================================================================
 CEnemy::CEnemy()
-	: m_pGJK				(nullptr)
-	, m_TurnSpeed			(0.1f)
-	, m_MoveSpeed			(0.2f)
-	, m_CamRevision			(4.f)
-	, m_SumVec				(ZEROVEC3)
+	: m_pGJK				( nullptr )
+	, m_MoveSpeed			( 0.2f )
+	, m_CamRevision			( 4.f )
+	, m_SumVec				( ZEROVEC3 )
 	
 	, m_SelectMoveTime		( 0.f )
 	, m_SelectMoveTimeMax	( CTime::GetInstance()->GetDeltaTime() * 60.f )
@@ -112,13 +111,13 @@ void CEnemy::Collision(std::unique_ptr<CPlayer>& egg, Collider floor, Collider c
 		{
 			// ヘッドショット判定(気室判定).
 			if (m_pBullets[i]->GetPos().y < egg->GetPos().y + m_EggAirRoomY) {
-				// HPを3倍減らす.
-				egg->TripleDecreHP();
+				// HPをクリティカルダメージ分減らす.
+				egg->CritDamage();
 				CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_DamageCrit);
 			}
 			else {
-				// HPを減らす.
-				egg->DecreHP();
+				// HPを胴体ダメージ分減らす.
+				egg->BodyDamage();
 				CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_Damage);
 			}
 

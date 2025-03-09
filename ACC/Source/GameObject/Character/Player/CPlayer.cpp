@@ -4,6 +4,12 @@
 #include "Camera/CCamera.h"
 #include "Character/Enemy/CEnemy.h"
 #include "Effect/CEffect.h"
+#include "FileManager/FileManager.h"
+
+namespace {
+	// キャラクターCSVのパス.
+	constexpr char CharaCSVPath[] = "Data\\CSV\\CharaStatus.csv";
+}
 
 
 //============================================================================
@@ -11,16 +17,28 @@
 //============================================================================
 CPlayer::CPlayer()
 	: m_pGJK		( nullptr )
-	, m_TurnSpeed	( 0.1f )
 	, m_MoveSpeed	( 0.2f )
 	, m_CamRevision	( 4.f )
 	, m_SumVec		( ZEROVEC3 )
-	, m_AutoAim		(false)
-	, m_Homing		(false)
+	, m_AutoAim		( false )
+	, m_Homing		( false )
 {
 	// 初期化.
 	m_CharaInfo.HP = m_CharaInfo.MaxHP;
 	m_CharaInfo.Ammo = m_CharaInfo.MaxAmmo;
+
+
+	// キャラクターCSVの情報保存用.
+	std::unordered_map<std::string, std::string> m_StateList;
+	// キャラクターCSVの情報取得.
+	m_StateList = FileManager::CSVLoad(CharaCSVPath);
+
+	// 空でない場合は、外部で調整するべき変数の値を入れていく.
+	if (!m_StateList.empty())
+	{
+		m_MoveSpeed		= StrToFloat(m_StateList["PlayerMoveSpeed"]);
+		m_CamRevision	= StrToFloat(m_StateList["CameraRevision"]);
+	}
 }
 CPlayer::~CPlayer()
 {
@@ -142,10 +160,9 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, Collider floor, Collider c
 		// エネミーと弾が当たった場合.
 		if ( pointsbe.Col ) {
 			// ヘッドショット判定(気室判定).
-			if (m_pBullets[i]->GetPos().y < egg->GetPos().y + m_EggAirRoomY) 
-			{ 
-				// HPを3倍減らす.
-				egg->TripleDecreHP();
+			if (m_pBullets[i]->GetPos().y < egg->GetPos().y + m_EggAirRoomY) {
+				// HPをクリティカルダメージ分減らす.
+				egg->CritDamage();
 				// エフェクトの再生.
 				hEffect = CEffect::Play(CEffect::CritHit, egg->GetPos());
 				// 命中種類の設定.
@@ -153,9 +170,9 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, Collider floor, Collider c
 				// クリティカル命中音を鳴らす.
 				CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_CritHit);
 			}
-			else  {
-				// HPを減らす.
-				egg->DecreHP();
+			else {
+				// HPを胴体ダメージ分減らす.
+				egg->BodyDamage();
 				// エフェクトがズレていたのでずらしてからエフェクトの再生.
 				D3DXVECTOR3 enemypos = egg->GetPos();
 				enemypos.y += 2.f;

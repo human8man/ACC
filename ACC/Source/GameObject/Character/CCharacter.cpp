@@ -20,6 +20,8 @@ CCharacter::CCharacter()
 	, m_pGun				( nullptr )
 	, m_pMeshBullet			( nullptr )
 	, m_pMeshGun			( nullptr )
+	, m_BodyDamage			( 1 )
+	, m_CritDamage			( 2 )
 	, m_GunRadius			( 1.f )
 	, m_GunRotRevision		( -1.5f )
 	, m_GunPosRevision		( -30.f )
@@ -74,6 +76,8 @@ CCharacter::CCharacter()
 	// ‹ó‚Å‚È‚¢ê‡‚ÍAŠO•”‚Å’²®‚·‚é‚×‚«•Ï”‚Ì’l‚ğ“ü‚ê‚Ä‚¢‚­.
 	if (!m_StateList.empty())
 	{
+		m_BodyDamage		= StrToInt(m_StateList["BodyDamage"]);
+		m_CritDamage		= StrToInt(m_StateList["CritDamage"]);
 		m_GunRadius			= StrToFloat(m_StateList["GunRadius"]);
 		m_GunRotRevision	= StrToFloat(m_StateList["GunRotRevision"]);
 		m_GunPosRevision	= StrToFloat(m_StateList["GunPosRevision"]);
@@ -89,9 +93,7 @@ CCharacter::CCharacter()
 		m_CharaInfo.MaxHP	= StrToInt(m_StateList["CharaHPMax"]);
 		m_CharaInfo.MaxAmmo	= StrToInt(m_StateList["CharaAmmoMax"]);
 	}
-
 }
-
 CCharacter::~CCharacter()
 {
 	m_pCrossRay.reset();

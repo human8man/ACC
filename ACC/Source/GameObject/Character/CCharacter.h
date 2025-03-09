@@ -33,12 +33,12 @@ public:
 	virtual void Draw(D3DXMATRIX& View, D3DXMATRIX& Proj,LIGHT& Light) override;
 
 
-	void CanJump()		 { m_CanJump = true;			}	// ジャンプを可能にする.
-	void ResetGravity()	 { m_Gravity = m_GravityValue;	}	// 重力をリセットする.
-	void AddGravity()	 { m_Gravity += m_GravityValue;	}	// 重力を加算していく.
-	void UseGravity()	 { m_vPosition.y -= m_Gravity;	}	// 加算した重力をキャラのY値に減算.
-	void DecreHP()		 { m_CharaInfo.HP--;			}	// HPを減らす.
-	void TripleDecreHP() { m_CharaInfo.HP -= 3;			}	// HPを3倍減らす.
+	void CanJump()		{ m_CanJump = true;					}	// ジャンプを可能にする.
+	void ResetGravity()	{ m_Gravity = m_GravityValue;		}	// 重力をリセットする.
+	void AddGravity()	{ m_Gravity += m_GravityValue;		}	// 重力を加算していく.
+	void UseGravity()	{ m_vPosition.y -= m_Gravity;		}	// 加算した重力をキャラのY値に減算.
+	void BodyDamage()	{ m_CharaInfo.HP -= m_BodyDamage;	}	// HPを胴体ダメージ分減らす.
+	void CritDamage()	{ m_CharaInfo.HP -= m_CritDamage;	}	// HPをクリティカルダメージ分減らす.
 
 	
 	RAY GetRayY()			const { return *m_pRayY; }		// Y軸方向へ伸ばしたレイを取得.
@@ -54,6 +54,11 @@ protected:
 	std::unique_ptr<CStaticMesh>			m_pMeshBullet;	// 弾メッシュ.
 	std::unique_ptr<CGun>					m_pGun;			// 銃クラス.
 	std::vector<std::unique_ptr<CBullet>>	m_pBullets;		// 弾クラス配列.
+
+	// ヒット時に使うダメージ変数.
+	int m_BodyDamage;	// 胴体に命中していた場合.
+
+	int m_CritDamage;	// 気室に命中(ヘッドショット)していた場合.
 
 	// 銃関連.
 	float m_GunRadius;		// 銃の半径.

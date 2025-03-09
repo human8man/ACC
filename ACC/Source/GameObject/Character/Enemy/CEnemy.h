@@ -52,7 +52,6 @@ private:
 	// GJKクラス.
 	std::unique_ptr<CGJK> m_pGJK;
 
-	float m_TurnSpeed;			// 回転速度.
 	float m_MoveSpeed;			// 移動速度.
 	float m_CamRevision;		// カメラ座標の補正値.
 
