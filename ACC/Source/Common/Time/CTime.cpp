@@ -9,7 +9,6 @@ CTime::CTime()
 	, m_LastTime	( std::chrono::steady_clock::now() )
 {
 }
-
 CTime::~CTime()
 {
 }

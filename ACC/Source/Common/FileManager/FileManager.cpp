@@ -169,6 +169,41 @@ Json FileManager::MapToJson( const std::unordered_map<std::string, std::vector<s
 
 
 //============================================================================
+//		CSVファイルを開く.
+//============================================================================
+std::unordered_map<std::string, std::string> FileManager::CSVLoad( const std::string& FilePath )
+{
+	// 結果を格納する変数.
+	std::unordered_map<std::string, std::string> m_StateList;
+
+	// ファイルを開く.
+	std::ifstream file( FilePath );
+	// ファイルが開けなかった場合は空のマップを返す.
+	if (!file) { return{}; }
+	
+	// ファイルを1行ずつ読み込む.
+	std::string line;
+	while ( std::getline( file, line ))
+	{
+		// コメントアウト行をスキップ.
+		if (line.empty() || line.substr(0, 2) == "//") continue;
+
+		// 1行のデータを分解するためのストリーム.
+		std::istringstream stream(line);
+		std::string key, value;
+
+		// キーと値を取得（カンマ区切り）.
+		if ( std::getline( stream, key, ',' ) && std::getline( stream, value, ',' )) {
+			m_StateList[key] = value;
+		}
+	}
+
+	// 読み込んだデータを返す.
+	return m_StateList;
+}
+
+
+//============================================================================
 //		ファイルディレクトリを作成.
 //============================================================================
 HRESULT FileManager::CreateFileDirectory( const std::string& FilePath ) 

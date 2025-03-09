@@ -13,7 +13,7 @@
 #include "Sprite/2D/UI/CLoseUI/CLoseUI.h"
 #include "Sprite/2D/UI/CWinUI/CWinUI.h"
 
-#include "Common/Random/CRandom.h"
+#include "Random/CRandom.h"
 
 
 //============================================================================
@@ -38,8 +38,8 @@ CGame::CGame(HWND hWnd)
 	, m_pWinUI		( nullptr )
 	, m_pLoseUI		( nullptr )
 
-	, m_HitKind		(0)
-	, m_CylinderMax	(9)
+	, m_HitKind		( 0 )
+	, m_CylinderMax	( 9 )
 {
 	// ライト情報.
 	m_Light.vDirection	= D3DXVECTOR3( 1.5f, 1.f, -1.f );
@@ -539,7 +539,7 @@ void CGame::RaytoObjeCol()
 //-----------------------------------------------------------------------------
 void CGame::UIUpdate()
 {
-	// プレイヤーのHPが０になったとき(バグった時)敗北UIを作成.
+	// プレイヤーがHP０の場合、もしくは地面抜けしていた場合、勝利UIを作成.
 	if (m_pLoseUI == nullptr
 	&& (m_pPlayer->GetCharaInfo().HP <= 0|| m_pPlayer->GetPos().y < -100.f)) 
 	{
@@ -551,7 +551,7 @@ void CGame::UIUpdate()
 		CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_Lose);
 	}
 
-	// 敵のHPが０になったとき(バグった時)勝利UIを作成.
+	// 敵がHP０の場合、もしくは地面抜けしていた場合、勝利UIを作成.
 	if (m_pWinUI == nullptr 
 	&& (m_pEnemy->GetCharaInfo().HP <= 0|| m_pEnemy->GetPos().y < -100.f)) 
 	{

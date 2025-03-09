@@ -73,10 +73,9 @@ HRESULT CEffect::LoadData()
 	EffectList EList[] =
 	{
 		// u""は、UTF-16エンコーディングの文字列リテラルで、const char16_t*に代入可能.
-		{ enList::BodyHit,			u"Data\\Effekseer\\BodyHit.efk"			},
-		{ enList::BodyHitCrit,		u"Data\\Effekseer\\BodyHitCrit.efk"		},
-		{ enList::ShieldHit,		u"Data\\Effekseer\\ShieldHit.efk"		},
-		{ enList::ShieldHitCrit,	u"Data\\Effekseer\\ShieldHitCrit.efk"	},
+		{ enList::CritHit,	u"Data\\Effekseer\\BodyHitCrit.efk"	},
+		{ enList::Hit,		u"Data\\Effekseer\\ShieldHit.efk"	},
+		{ enList::Dust,		u"Data\\Effekseer\\Dust.efk"		},
 	};
 
 	// 配列の最大要素数を算出（配列全体のサイズ／配列１つ分のサイズ）.

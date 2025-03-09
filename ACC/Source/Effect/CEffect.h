@@ -47,11 +47,13 @@ public:
 	// エフェクト種類列挙型.
 	enum enList
 	{
-		BodyHit	= 0,	// 仮で設定.
-		BodyHitCrit,	// 仮で設定.
-		ShieldHit,		// 仮で設定.
-		ShieldHitCrit,	// 仮で設定.
-		Max,			// 最大数.	
+		CritHit,	// クリティカル(ヘッドショット).
+		Hit,		// 命中.
+
+		GunFire,	// 発射時の銃口のエフェクト.
+		Dust,		// ダスト.
+
+		Max,		// 最大数.	
 	};
 
 public:

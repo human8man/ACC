@@ -1,5 +1,6 @@
 #include "CBullet.h"
-#include "Common/Time/CTime.h"
+#include "Time/CTime.h"
+
 
 //============================================================================
 //		’eƒNƒ‰ƒX.
@@ -10,7 +11,6 @@ CBullet::CBullet()
 	, m_DeleteTime		( CTime::GetInstance()->GetDeltaTime() * 600.f )
 {
 }
-
 CBullet::~CBullet()
 {
 }

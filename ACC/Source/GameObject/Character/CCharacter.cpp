@@ -1,6 +1,13 @@
 #include "CCharacter.h"
 #include "Camera/CCamera.h"
-#include "Common/Time/CTime.h"
+#include "Time/CTime.h"
+#include "FileManager/FileManager.h"
+
+
+namespace {
+	// キャラクターCSVのパス.
+	constexpr char CharaCSVPath[] = "Data\\CSV\\CharaStatus.csv";
+}
 
 
 //============================================================================
@@ -19,7 +26,7 @@ CCharacter::CCharacter()
 	, m_Gravity				( 0.0098f )
 	, m_GravityValue		( 0.0098f )
 	, m_ReloadTime			( 0.f )
-	, m_ReloadTimeMax		( CTime::GetInstance()->GetDeltaTime() * 180.f )
+	, m_ReloadTimeMax		( CTime::GetInstance()->GetDeltaTime() * 120.f )
 	, m_BulletCoolTime		( 0.f )
 	, m_BulletCoolTimeMax	( CTime::GetInstance()->GetDeltaTime() * 60.f )
 	, m_BulletSpeed			( 2.3f )
@@ -46,8 +53,9 @@ CCharacter::CCharacter()
 	// 弾と銃のメッシュ設定.
 	m_pMeshGun		= std::make_unique<CStaticMesh>();
 	m_pMeshBullet	= std::make_unique<CStaticMesh>();
-	m_pMeshGun		->Init( _T("Data\\Mesh\\Static\\Gun\\Gun.x" ) );
-	m_pMeshBullet	->Init( _T("Data\\Mesh\\Static\\Bullet\\bullet.x" ) );
+	m_pMeshGun		->Init( _T( "Data\\Mesh\\Static\\Gun\\Gun.x" ) );
+	m_pMeshBullet	->Init( _T( "Data\\Mesh\\Static\\Bullet\\bullet.x" ) );
+
 
 	// 銃の設定.
 	m_pGun	= std::make_unique<CGun>();
@@ -56,6 +64,32 @@ CCharacter::CCharacter()
 	// キャラの初期情報.
 	m_CharaInfo.MaxHP = 20;
 	m_CharaInfo.MaxAmmo = 6;
+
+
+	// キャラクターCSVの情報保存用.
+	std::unordered_map<std::string, std::string> m_StateList;
+	// キャラクターCSVの情報取得.
+	m_StateList = FileManager::CSVLoad(CharaCSVPath);
+	
+	// 空でない場合は、外部で調整するべき変数の値を入れていく.
+	if (!m_StateList.empty())
+	{
+		m_GunRadius			= StrToFloat(m_StateList["GunRadius"]);
+		m_GunRotRevision	= StrToFloat(m_StateList["GunRotRevision"]);
+		m_GunPosRevision	= StrToFloat(m_StateList["GunPosRevision"]);
+		m_GravityValue		= StrToFloat(m_StateList["GravityValue"]);
+		m_ReloadTimeMax		= StrToFloat( m_StateList["ReloadTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
+		m_BulletCoolTimeMax	= StrToFloat(m_StateList["BulletCoolTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
+		m_BulletSpeed		= StrToFloat(m_StateList["BulletSpeed"]);
+		m_JumpPowerMax		= StrToFloat(m_StateList["JumpPowerMax"]);
+		m_DashCoolTimeMax	= StrToFloat(m_StateList["DashCoolTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
+		m_DashTimeMax		= StrToFloat(m_StateList["DashTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
+		m_DashSpeed			= StrToFloat(m_StateList["DashSpeed"]);
+		m_EggAirRoomY		= StrToFloat(m_StateList["EggAirRoomY"]);
+		m_CharaInfo.MaxHP	= StrToInt(m_StateList["CharaHPMax"]);
+		m_CharaInfo.MaxAmmo	= StrToInt(m_StateList["CharaAmmoMax"]);
+	}
+
 }
 
 CCharacter::~CCharacter()
