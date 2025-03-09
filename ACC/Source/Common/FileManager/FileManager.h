@@ -43,16 +43,17 @@ namespace FileManager {
 
 	// json形式でjsonファイルを開く.
 	Json JsonLoad( const std::string& FilePath );
-
 	// json形式をjsonファイルで書き込む.
 	HRESULT JsonSave( const std::string& FilePath, const Json& Data );
-
 	// json を std::unordered_map に変換.
 	std::unordered_map<std::string, std::string> JsonToMap( const Json& Json );
 
 	// std::unordered_map を json に変換.
 	Json MapToJson( const std::unordered_map<std::string, std::string> Map );
 	Json MapToJson( const std::unordered_map<std::string, std::vector<std::string>> Map );
+
+	// CSVファイルを開く.
+	std::unordered_map<std::string, std::string> CSVLoad(const std::string& FilePath);
 
 	// ファイルディレクトリを作成する.
 	HRESULT CreateFileDirectory( const std::string& FilePath );

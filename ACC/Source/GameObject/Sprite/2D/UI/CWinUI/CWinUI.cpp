@@ -88,19 +88,19 @@ void CWinUI::Init()
 //=============================================================================
 void CWinUI::Update()
 {
-	m_SpawnTime -= CTime::GetInstance()->GetDeltaTime();
+	if (m_SpawnTime >= 0) { m_SpawnTime -= CTime::GetInstance()->GetDeltaTime(); }
 
 	//----------------------------------------------------------------------------
 	//		それぞれのUIの更新.
 	//----------------------------------------------------------------------------
-	for (size_t i = 0; i < m_pUIs.size(); ++i) {
+	for (size_t i = 0; i < m_pUIs.size(); ++i) 
+	{
 		// 背景を透過させる.
-		if (i == WinSprite::Black) { 
-			m_pUIs[i]->SetAlpha(0.4f);
-		}
+		if (i == WinSprite::Black) { m_pUIs[i]->SetAlpha(0.6f); }
 
+		// 出現時間が終了した場合.
 		if(m_SpawnTime < 0.f){
-			// ゲームを開始する.
+			// タイトル画面に遷移.
 			CSceneManager::GetInstance()->LoadScene(SceneList::Title);
 			CSoundManager::GetInstance()->Stop(CSoundManager::enList::BGM_Game);
 		}

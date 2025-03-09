@@ -36,7 +36,8 @@ public:
 	virtual void Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light ) override;
 
 	// ’e‚ªíœ‰Â”\‚©.
-	bool DeleteBullet() const { return (m_DeleteTime < 0); }	
+	bool DeleteBullet() const { return (m_DeleteTime < 0); }
+	D3DXVECTOR3 GetMoveVec() const { return m_MoveDirection; }
 
 private:
 	D3DXVECTOR3	m_MoveDirection;	// ˆÚ“®•ûŒü.

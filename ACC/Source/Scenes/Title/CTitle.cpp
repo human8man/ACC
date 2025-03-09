@@ -35,7 +35,6 @@ CTitle::CTitle(HWND hWnd)
 	m_hWnd = hWnd;
 	m_Light.vDirection = D3DXVECTOR3(1.f, 5.f, 0.f);	//ƒ‰ƒCƒg•ûŒü.
 }
-
 CTitle::~CTitle()
 {
 	Release();
@@ -77,7 +76,7 @@ void CTitle::Create()
 HRESULT CTitle::LoadData()
 {
 	m_pEgg->Init(_T("Data\\Mesh\\Static\\Player\\egg.x"));
-	m_pEgg->SetPos(D3DXVECTOR3(9.f, -1.5f, 5.f));
+	m_pEgg->SetPos(D3DXVECTOR3(10.f, -1.f, 4.f));
 
 	return S_OK;
 }

@@ -1,10 +1,10 @@
 #include "CEnemy.h"
 #include "DirectSound/CSoundManager.h"
-#include "Common/DirectInput/CDirectInput.h"
+#include "DirectInput/CDirectInput.h"
 #include "Camera/CCamera.h"
 #include "Effect/CEffect.h"
 
-#include "Common/Random/CRandom.h"
+#include "Random/CRandom.h"
 
 
 //=============================================================================
@@ -97,6 +97,9 @@ void CEnemy::Collision(std::unique_ptr<CPlayer>& egg, Collider floor, Collider c
 
 		// 柱や床にあたった場合削除.
 		if (pointsbc.Col || pointsbf.Col) {
+			// エフェクトの再生.
+			hEffect = CEffect::Play(CEffect::Dust, m_pBullets[i]->GetPos() - m_pBullets[i]->GetMoveVec() * 2);
+
 			m_pBullets[i].reset();
 			m_pBullets.erase(m_pBullets.begin() + i);
 			--i;
@@ -277,5 +280,4 @@ void CEnemy::Act(std::unique_ptr<CPlayer>& chara)
 
 	// 合計のベクトル量分位置を更新.
 	m_vPosition += m_SumVec + DashVec;
-
 }

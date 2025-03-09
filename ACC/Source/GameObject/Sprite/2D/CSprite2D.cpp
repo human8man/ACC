@@ -56,12 +56,12 @@ HRESULT CSprite2D::Init(const std::string& lpFileName)
 	m_pContext11 = m_pDx11->GetContext();
 
 	// スプライト情報の取得.
-	if (FAILED(SpriteStateDataLoad( lpFileName ))) return E_FAIL;
-
+	if ( FAILED( SpriteStateDataLoad( lpFileName ))) return E_FAIL;
 	// シェーダ作成.
-	if (FAILED(CreateShader())) { return E_FAIL; }
+	if ( FAILED( CreateShader())) return E_FAIL;
 	// 板ポリゴン作成.
-	if( FAILED( CreateModel() )){ return E_FAIL; }
+	if ( FAILED( CreateModel())) return E_FAIL;
+
 	// テクスチャ作成(パスの型を変換後).
 	std::wstring wideStr;
 	int bufferSize = MultiByteToWideChar(CP_UTF8, 0, lpFileName.c_str(), -1, nullptr, 0);
@@ -69,10 +69,10 @@ HRESULT CSprite2D::Init(const std::string& lpFileName)
 	wideStr.resize(bufferSize);
 	MultiByteToWideChar(CP_UTF8, 0, lpFileName.c_str(), -1, &wideStr[0], bufferSize);
 
-
-	if( FAILED( CreateTexture( wideStr.c_str() ) ) ){ return E_FAIL; }
+	// テクスチャ作成.
+	if( FAILED( CreateTexture( wideStr.c_str() ) ) ) return E_FAIL; 
 	// サンプラ作成.
-	if( FAILED( CreateSampler() ) ){ return E_FAIL; }
+	if( FAILED( CreateSampler() ) ) return E_FAIL; 
 
 	return S_OK;
 }
@@ -106,8 +106,7 @@ HRESULT CSprite2D::CreateShader()
 	UINT uCompileFlag = 0;
 
 #ifdef _DEBUG
-	uCompileFlag =
-		D3D10_SHADER_DEBUG | D3D10_SHADER_SKIP_OPTIMIZATION;
+	uCompileFlag = D3D10_SHADER_DEBUG | D3D10_SHADER_SKIP_OPTIMIZATION;
 #endif
 
 	// HLSLからバーテックスシェーダのブロブを作成.
@@ -187,17 +186,17 @@ HRESULT CSprite2D::CreateShader()
 	// HLSLからピクセルシェーダのブロブを作成.
 	if (FAILED(
 		D3DX11CompileFromFile(
-			SHADER_NAME,		//シェーダファイル名（HLSLファイル）.
-			nullptr,			//マクロ定義の配列へのポインタ（未使用）.
-			nullptr,			//インクルードファイルを扱うインターフェイスへのポインタ（未使用）.
-			"PS_Main",			//シェーダエントリーポイント関数の名前.
-			"ps_5_0",			//シェーダのモデルを指定する文字列（プロファイル）.
-			uCompileFlag,		//シェーダコンパイルフラグ.
-			0,					//エフェクトコンパイルフラグ（未使用）.
-			nullptr,			//スレッド ポンプ インターフェイスへのポインタ（未使用）.
-			&pCompiledShader,	//ブロブを格納するメモリへのポインタ.
-			&pErrors,			//エラーと警告一覧を格納するメモリへのポインタ.
-			nullptr )))			//戻り値へのポインタ（未使用）.
+			SHADER_NAME,		// シェーダファイル名（HLSLファイル）.
+			nullptr,			// マクロ定義の配列へのポインタ（未使用）.
+			nullptr,			// インクルードファイルを扱うインターフェイスへのポインタ（未使用）.
+			"PS_Main",			// シェーダエントリーポイント関数の名前.
+			"ps_5_0",			// シェーダのモデルを指定する文字列（プロファイル）.
+			uCompileFlag,		// シェーダコンパイルフラグ.
+			0,					// エフェクトコンパイルフラグ（未使用）.
+			nullptr,			// スレッド ポンプ インターフェイスへのポインタ（未使用）.
+			&pCompiledShader,	// ブロブを格納するメモリへのポインタ.
+			&pErrors,			// エラーと警告一覧を格納するメモリへのポインタ.
+			nullptr )))			// 戻り値へのポインタ（未使用）.
 	{
 		_ASSERT_EXPR( false, _T( "hlsl読み込み失敗" ) );
 		return E_FAIL;
@@ -211,7 +210,7 @@ HRESULT CSprite2D::CreateShader()
 			pCompiledShader->GetBufferPointer(),
 			pCompiledShader->GetBufferSize(),
 			nullptr,
-			&m_pPixelShader )))	//(out)ピクセルシェーダ.
+			&m_pPixelShader )))	// (out)ピクセルシェーダ.
 	{
 		_ASSERT_EXPR( false, _T( "ピクセルシェーダ作成失敗" ) );
 		return E_FAIL;
@@ -444,7 +443,7 @@ void CSprite2D::Render()
 //=============================================================================
 HRESULT CSprite2D::SpriteStateDataLoad(const std::string& FilePath)
 {
-	Json	m_SpriteStateData = nullptr;	// スプライト情報データ.
+	Json m_SpriteStateData = nullptr;	// スプライト情報データ.
 
 	// 補正値テキストの読み込み.
 	std::string TextPath = FilePath;
@@ -458,7 +457,7 @@ HRESULT CSprite2D::SpriteStateDataLoad(const std::string& FilePath)
 
 	// ファイルが無いためファイルを作成する.
 	if (m_SpriteStateData.empty()) {
-		if (FAILED(CreateSpriteState(FilePath))) return E_FAIL;
+		if ( FAILED( CreateSpriteState(FilePath))) return E_FAIL;
 
 		// 作成できたためもう一度読み込み直す.
 		SpriteStateDataLoad(FilePath);
@@ -480,7 +479,7 @@ HRESULT CSprite2D::SpriteStateDataLoad(const std::string& FilePath)
 	// ファイルパスを更新する.
 	m_SpriteStateData["FilePath"] = TextPath;
 	if (FAILED(FileManager::JsonSave(TextPath, m_SpriteStateData))) return E_FAIL;
-#endif	// #if _DEBUG.
+#endif
 
 	return S_OK;
 }

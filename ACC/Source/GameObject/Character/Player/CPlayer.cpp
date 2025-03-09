@@ -22,7 +22,6 @@ CPlayer::CPlayer()
 	m_CharaInfo.HP = m_CharaInfo.MaxHP;
 	m_CharaInfo.Ammo = m_CharaInfo.MaxAmmo;
 }
-
 CPlayer::~CPlayer()
 {
 }
@@ -129,7 +128,11 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, Collider floor, Collider c
 		pointsbe = m_pGJK->GJK(Bullet, enemyegg);
 
 		// 柱や床にあたった場合削除.
-		if (pointsbc.Col || pointsbf.Col) {
+		if (pointsbc.Col || pointsbf.Col)
+		{
+			// エフェクトの再生.
+			hEffect = CEffect::Play(CEffect::Dust, m_pBullets[i]->GetPos() - m_pBullets[i]->GetMoveVec() * 2);
+
 			m_pBullets[i].reset();
 			m_pBullets.erase(m_pBullets.begin() + i);
 			--i;
@@ -144,7 +147,7 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, Collider floor, Collider c
 				// HPを3倍減らす.
 				egg->TripleDecreHP();
 				// エフェクトの再生.
-				hEffect = CEffect::Play(CEffect::BodyHitCrit, egg->GetPos());
+				hEffect = CEffect::Play(CEffect::CritHit, egg->GetPos());
 				// 命中種類の設定.
 				m_HitKind = HitKind::Crit;
 				// クリティカル命中音を鳴らす.
@@ -156,7 +159,7 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, Collider floor, Collider c
 				// エフェクトがズレていたのでずらしてからエフェクトの再生.
 				D3DXVECTOR3 enemypos = egg->GetPos();
 				enemypos.y += 2.f;
-				hEffect = CEffect::Play(CEffect::ShieldHit, enemypos);
+				hEffect = CEffect::Play(CEffect::Hit, enemypos);
 				// 命中種類の設定.
 				m_HitKind = HitKind::Hit;
 				// 命中音を鳴らす.
