@@ -3,8 +3,13 @@
 #include "DirectInput/CDirectInput.h"
 #include "Camera/CCamera.h"
 #include "Effect/CEffect.h"
-
 #include "Random/CRandom.h"
+#include "FileManager/FileManager.h"
+
+namespace {
+	// キャラクターCSVのパス.
+	constexpr char CharaCSVPath[] = "Data\\CSV\\CharaStatus.csv";
+}
 
 
 //=============================================================================
@@ -13,7 +18,6 @@
 CEnemy::CEnemy()
 	: m_pGJK				( nullptr )
 	, m_MoveSpeed			( 0.2f )
-	, m_CamRevision			( 4.f )
 	, m_SumVec				( ZEROVEC3 )
 	
 	, m_SelectMoveTime		( 0.f )
@@ -21,8 +25,19 @@ CEnemy::CEnemy()
 {
 	m_CharaInfo.HP = m_CharaInfo.MaxHP;
 	m_CharaInfo.Ammo = m_CharaInfo.MaxAmmo;
-}
 
+
+	// キャラクターCSVの情報保存用.
+	std::unordered_map<std::string, std::string> m_StateList;
+	// キャラクターCSVの情報取得.
+	m_StateList = FileManager::CSVLoad(CharaCSVPath);
+
+	// 空でない場合は、外部で調整するべき変数の値を入れていく.
+	if (!m_StateList.empty()) {
+		m_MoveSpeed			= StrToFloat(m_StateList["EnemyMoveSpeed"]);
+		m_SelectMoveTimeMax = StrToFloat(m_StateList["SelectMoveTimeMax"]);
+	}
+}
 CEnemy::~CEnemy()
 {
 }

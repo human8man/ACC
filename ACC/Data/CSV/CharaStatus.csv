@@ -17,7 +17,6 @@ BodyDamage,1
 CritDamage,2
 // キャラの気室(ヘッドショット)判定になる範囲{1.0}
 EggAirRoomY,1.0
-
 // 重力{0.0098}
 GravityValue,0.0098
 
@@ -47,3 +46,8 @@ DashSpeed,2.6
 PlayerMoveSpeed,0.2
 // カメラの高さ{4.0}
 CameraRevision,4.0
+
+// プレイヤーの移動速度{0.2}
+EnemyMoveSpeed,0.2
+// 次の行動決定までの時間{60.0}
+SelectMoveTimeMax,60.0
