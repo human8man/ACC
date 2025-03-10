@@ -57,7 +57,6 @@ protected:
 
 	// ヒット時に使うダメージ変数.
 	int m_BodyDamage;	// 胴体に命中していた場合.
-
 	int m_CritDamage;	// 気室に命中(ヘッドショット)していた場合.
 
 	// 銃関連.

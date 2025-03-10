@@ -53,7 +53,6 @@ private:
 	std::unique_ptr<CGJK> m_pGJK;
 
 	float m_MoveSpeed;			// 移動速度.
-	float m_CamRevision;		// カメラ座標の補正値.
 
 	bool m_Hit;					// 命中したか.
 	int	 m_HitKind;				// 命中の種類.
