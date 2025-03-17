@@ -9,6 +9,9 @@ class CSceneBase;
 
 // シーンリスト列挙型.
 enum SceneList {
+	
+	UIEditor = -1,
+
 	Title,
 	Game,
 };

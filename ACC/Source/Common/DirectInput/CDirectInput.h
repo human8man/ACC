@@ -7,7 +7,6 @@
 #pragma comment( lib, "dinput8.lib" )
 
 #include "Singleton/CSingleton.h"
-#include "XInput/CXInput.h"
 
 
 //==============================================================================

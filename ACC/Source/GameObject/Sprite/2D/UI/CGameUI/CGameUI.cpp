@@ -1,11 +1,16 @@
 #include "CGameUI.h"
+
 #include "DirectX/CDirectX11.h"
 #include "DirectSound/CSoundManager.h"
-#include "Common/Time/CTime.h"
+#include "Time/CTime.h"
+#include "FileManager/FileManager.h"
 
 
 namespace {
-	constexpr char FadeImagePath[] = "Data\\Texture\\Game";
+	// UICSVのパス.
+	constexpr char UICSVPath[] = "Data\\CSV\\UIStatus.csv";
+	// 画像のパス.
+	constexpr char GameImagePath[] = "Data\\Texture\\Game";
 }
 
 
@@ -23,6 +28,16 @@ CGameUI::CGameUI()
 	, m_AutoAim			( false )
 	, m_Homing			( false )
 {
+	// キャラクターCSVの情報保存用.
+	std::unordered_map<std::string, std::string> m_StateList;
+	// キャラクターCSVの情報取得.
+	m_StateList = FileManager::CSVLoad(UICSVPath);
+
+	// 空でない場合は、外部で調整するべき変数の値を入れていく.
+	if (!m_StateList.empty())
+	{
+		m_ViewHitTimeMax = StrToFloat(m_StateList["Game_HitViewTime"]) * CTime::GetInstance()->GetDeltaTime();
+	}
 }
 
 CGameUI::~CGameUI()
@@ -39,7 +54,7 @@ void CGameUI::Create()
 	int index = 0;
 	
 	// 指定したディレクトリ内を走査.
-	for (const auto& entry : std::filesystem::directory_iterator(FadeImagePath)) {
+	for (const auto& entry : std::filesystem::directory_iterator(GameImagePath)) {
 		// 文末がjsonの場合やり直す.
 		std::string Extension = entry.path().string();
 		Extension.erase(0, entry.path().string().rfind("."));

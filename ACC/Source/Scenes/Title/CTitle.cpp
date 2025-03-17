@@ -8,11 +8,6 @@
 #include "Camera/CCamera.h"
 
 
-#if _DEBUG
-#include "ImGui/CImGui.h"
-#endif
-
-
 namespace {
 	// タイトル画面UIのパス.
 	constexpr char TitleImagePath[] = "Data\\Texture\\Title";
@@ -101,7 +96,9 @@ void CTitle::Update()
 	// BGM再生.
 	CSoundManager::GetInstance()->PlayLoop(CSoundManager::enList::BGM_Title);
 
-	CMouse* Mouse = CInput::GetInstance()->CDMouse();
+	CMouse*	Mouse	= CInput::GetInstance()->CDMouse();
+	CKey*	Key		= CInput::GetInstance()->CDKeyboard();
+
 	m_pEgg->SetRotY(m_pEgg->GetRot().y + 0.01f);
 
 	// マウス位置を取得.
@@ -161,11 +158,25 @@ void CTitle::Update()
 
 
 		// スタートボタンにカーソルが重なっている時.
-		if (i == TitleSprite::StartButton && m_pUIs[i]->GetPatternNo().x) {
-			if (Mouse->IsLAction()) {
-				// ゲームを開始する.
-				CSceneManager::GetInstance()->LoadScene(SceneList::Game);
-				CSoundManager::GetInstance()->Stop(CSoundManager::enList::BGM_Title);
+		if (i == TitleSprite::StartButton) 
+		{
+			// すでにカーソルで選択されている場合.
+			if ( m_pUIs[i]->GetPatternNo().x ) {
+				if (Mouse->IsLAction()) {
+					// ゲームを開始する.
+					CSceneManager::GetInstance()->LoadScene(SceneList::Game);
+					CSoundManager::GetInstance()->Stop(CSoundManager::enList::BGM_Title);
+				}
+			}
+			else {
+				// SPACEキーでゲーム開始.
+				if (Key->IsKeyAction(DIK_SPACE)) {
+					// 選択状態にする.
+					m_pUIs[i]->SetPatternNo(1, 0);
+					// ゲームを開始する.
+					CSceneManager::GetInstance()->LoadScene(SceneList::Game);
+					CSoundManager::GetInstance()->Stop(CSoundManager::enList::BGM_Title);
+				}
 			}
 		}
 	}
