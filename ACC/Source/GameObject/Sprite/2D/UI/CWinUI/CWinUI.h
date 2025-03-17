@@ -30,11 +30,6 @@ public:
 	void Release();		// 解放処理.
 
 private:
-	HWND		m_hWnd;
-	LIGHT		m_Light;
-	D3DXMATRIX	m_mView;
-	D3DXMATRIX	m_mProj;
-
 	// 画像情報リスト.
 	std::vector<std::string> m_SpriteDataList;	// スプライト情報をまとめる配列.
 	std::vector<D3DXVECTOR3> m_SpritePosList;	// スプライト座標をまとめる配列.

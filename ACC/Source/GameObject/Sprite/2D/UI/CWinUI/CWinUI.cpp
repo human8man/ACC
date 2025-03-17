@@ -2,13 +2,14 @@
 
 #include "Scenes/SceneManager/CSceneManager.h"
 #include "Sprite/2D/UI/CUIObject.h"
-#include "DirectInput/CDirectInput.h"
 #include "DirectSound/CSoundManager.h"
 #include "Time/CTime.h"
-#include "Easing/Easing.h"
+#include "FileManager/FileManager.h"
 
 
 namespace {
+	// UICSVのパス.
+	constexpr char UICSVPath[] = "Data\\CSV\\UIStatus.csv";
 	// WinUIのパス.
 	constexpr char WinImagePath[] = "Data\\Texture\\Win";
 }
@@ -18,10 +19,7 @@ namespace {
 //		WinUIクラス.
 //=============================================================================
 CWinUI::CWinUI()
-	: m_Light			()
-	, m_mView			()
-	, m_mProj			()
-	, m_SpriteDataList	()
+	: m_SpriteDataList	()
 	, m_SpritePosList	()
 	, m_pUIs			()
 	, m_pSprite2Ds		()
@@ -29,9 +27,17 @@ CWinUI::CWinUI()
 	, m_SpawnTimeMax	( CTime::GetInstance()->GetDeltaTime() * 300.f )
 	, m_SpawnTime		( m_SpawnTimeMax )
 {
-	m_Light.vDirection = D3DXVECTOR3(1.f, 5.f, 0.f);	//ライト方向.
-}
+	// キャラクターCSVの情報保存用.
+	std::unordered_map<std::string, std::string> m_StateList;
+	// キャラクターCSVの情報取得.
+	m_StateList = FileManager::CSVLoad(UICSVPath);
 
+	// 空でない場合は、外部で調整するべき変数の値を入れていく.
+	if (!m_StateList.empty())
+	{
+		m_SpawnTimeMax = StrToFloat(m_StateList["Win_SpawnTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
+	}
+}
 CWinUI::~CWinUI()
 {
 	Release();

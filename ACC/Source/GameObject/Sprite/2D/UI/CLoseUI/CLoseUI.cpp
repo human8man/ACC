@@ -2,16 +2,16 @@
 
 #include "Scenes/SceneManager/CSceneManager.h"
 #include "Sprite/2D/UI/CUIObject.h"
-#include "Common/DirectInput/CDirectInput.h"
 #include "DirectSound/CSoundManager.h"
-
-#include "Common/Time/CTime.h"
-#include "Common/Easing/Easing.h"
+#include "Time/CTime.h"
+#include "FileManager/FileManager.h"
 
 
 namespace {
+	// UICSVのパス.
+	constexpr char UICSVPath[] = "Data\\CSV\\UIStatus.csv";
 	// LoseUIのパス.
-	constexpr char OptionImagePath[] = "Data\\Texture\\Lose";
+	constexpr char LoseImagePath[] = "Data\\Texture\\Lose";
 }
 
 
@@ -19,10 +19,7 @@ namespace {
 //		LoseUIクラス.
 //=================================================================================================
 CLoseUI::CLoseUI()
-	: m_Light			()
-	, m_mView			()
-	, m_mProj			()
-	, m_SpriteDataList	()
+	: m_SpriteDataList	()
 	, m_SpritePosList	()
 	, m_pUIs			()
 	, m_pSprite2Ds		()
@@ -30,10 +27,17 @@ CLoseUI::CLoseUI()
 	, m_SpawnTimeMax	( CTime::GetInstance()->GetDeltaTime() * 300.f )
 	, m_SpawnTime		( m_SpawnTimeMax )
 {
-	m_hWnd = nullptr;
-	m_Light.vDirection = D3DXVECTOR3(1.f, 5.f, 0.f);
-}
+	// キャラクターCSVの情報保存用.
+	std::unordered_map<std::string, std::string> m_StateList;
+	// キャラクターCSVの情報取得.
+	m_StateList = FileManager::CSVLoad(UICSVPath);
 
+	// 空でない場合は、外部で調整するべき変数の値を入れていく.
+	if (!m_StateList.empty())
+	{
+		m_SpawnTimeMax = StrToFloat(m_StateList["Lose_SpawnTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
+	}
+}
 CLoseUI::~CLoseUI()
 {
 	Release();
@@ -48,7 +52,7 @@ void CLoseUI::Create()
 	int index = 0;
 
 	// 指定したディレクトリ内を走査.
-	for (const auto& entry : std::filesystem::directory_iterator(OptionImagePath)) {
+	for (const auto& entry : std::filesystem::directory_iterator(LoseImagePath)) {
 		// 文末がjsonの場合やり直す.
 		std::string Extension = entry.path().string();
 		Extension.erase(0, entry.path().string().rfind("."));

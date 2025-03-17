@@ -1,6 +1,7 @@
 #include "CSceneManager.h"
 
 #include "Scenes/CSceneBase.h"
+#include "Scenes/UIEditor/CUIEditor.h"
 #include "Scenes/Game/CGame.h"
 #include "Scenes/Title/CTitle.h"
 
@@ -99,13 +100,14 @@ void CSceneManager::Update()
 	// ここでのみImGuiのUpdateを回す.
 	CImGui::GetInstance()->Update();
 
+	// シーン選択のIMGUIを作成.
 	ImGui::Begin("SceneSelect");
-	if (ImGui::Button("Game")) {
-		GetInstance()->LoadScene(SceneList::Game);
-	}
-	if (ImGui::Button("Title")) {
-		GetInstance()->LoadScene(SceneList::Title);
-	}
+	if (ImGui::Button("Game")) { GetInstance()->LoadScene(SceneList::Game); }
+	if (ImGui::Button("Title")) { GetInstance()->LoadScene(SceneList::Title); }
+
+	ImGui::Text("\n");
+	ImGui::Text(IMGUI_JP("-----デバッグ用シーン------------------------------------"));
+	if (ImGui::Button("UIEditor")) { GetInstance()->LoadScene(SceneList::UIEditor); }
 	ImGui::End();
 #endif
 
@@ -189,6 +191,8 @@ std::unique_ptr<CSceneBase> CSceneManager::CreateScene(SceneList No)
 		return std::make_unique<CTitle>( m_hWnd );
 	case Game:
 		return std::make_unique<CGame>( m_hWnd );
+	case UIEditor:
+		return std::make_unique<CUIEditor>( m_hWnd );
 	default:
 		return nullptr;
 	}

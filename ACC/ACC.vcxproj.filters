@@ -13,95 +13,20 @@
     <Filter Include="Source\Collision">
       <UniqueIdentifier>{485a6eae-4b9e-483e-b8a7-6179daf5739e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Collision\BoundingSphere">
-      <UniqueIdentifier>{57069445-2ada-487d-80c2-22247ade9b63}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\Collision\Ray">
       <UniqueIdentifier>{e17cb82a-8a34-49bc-b568-5e94419bbfdc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Collision\GJK">
+      <UniqueIdentifier>{18f96188-2579-4537-b8f8-b21622e48bbf}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source\Common">
       <UniqueIdentifier>{f02962d7-5dc6-4dca-9b3f-11323587be56}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\DebugText">
-      <UniqueIdentifier>{3f1d82fd-a6f3-4eb8-9ed8-2a63512bd23b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\DirectSound">
-      <UniqueIdentifier>{dd5c4a89-39c0-46ec-8668-7096c21a7fc2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Effect">
-      <UniqueIdentifier>{20f73dcd-b598-43cb-ba41-1b48e8286a6a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\GameObject">
-      <UniqueIdentifier>{e3b63c77-c51f-4bee-addd-f297a9c75e72}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\MainLoop">
-      <UniqueIdentifier>{fc970b15-e740-42c6-9b82-6e890e45b7c4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Scenes">
-      <UniqueIdentifier>{056b3097-5ce1-424f-920a-8df62d6c6f83}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\DirectX">
-      <UniqueIdentifier>{7e801bf1-cbc5-42d0-8264-8ff4079a3e4f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\GameObject\Character">
-      <UniqueIdentifier>{7ee69661-62c6-4eb6-aa21-52d516105ae4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\GameObject\Mesh">
-      <UniqueIdentifier>{396309aa-312d-473c-a31a-09176d68430c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\GameObject\Object">
-      <UniqueIdentifier>{1173f977-a02e-4316-9c99-caf60e461523}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\GameObject\Sprite">
-      <UniqueIdentifier>{22fc7dff-208a-45a3-b099-a519152dccc7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\GameObject\Character\Player">
-      <UniqueIdentifier>{4285ee2d-a7da-4a74-9c85-e51d50a042fd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\GameObject\Character\Enemy">
-      <UniqueIdentifier>{5150d283-8dde-45ac-bccb-648ad11d1a57}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\GameObject\Mesh\Skin">
-      <UniqueIdentifier>{4d86a69e-25d3-4e59-9cda-0b4ad8331e36}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\GameObject\Mesh\Static">
-      <UniqueIdentifier>{7dab392c-2007-402d-9afd-cff88f736555}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\GameObject\Sprite\2D">
-      <UniqueIdentifier>{8cfba3b3-bf7e-4719-aa38-bc9434cb7775}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\GameObject\Sprite\3D">
-      <UniqueIdentifier>{33990d2a-0c7d-4354-b2ee-a9f67592e023}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\GameObject\Sprite\2D\UI">
-      <UniqueIdentifier>{8456f0a8-21f4-4b07-82a4-c4952cd3f26c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\GameObject\Sprite\3D\Explosion">
-      <UniqueIdentifier>{90eb58cb-93d7-4405-8ed9-9fa87f7b43f3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\GameObject\Object\Ground">
-      <UniqueIdentifier>{8f4231fd-e8db-4281-a87f-713fe108ce47}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\GameObject\Object\Shot">
-      <UniqueIdentifier>{f2935b26-3018-43af-9909-0d75a25aed13}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Scenes\Game">
-      <UniqueIdentifier>{0a894832-f83f-4569-b565-5172556ed7d2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Common\ImGui">
       <UniqueIdentifier>{a831d488-a0e7-405a-a8bb-36e95cfa3238}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Common\ImGui\lib">
       <UniqueIdentifier>{603af206-8254-47e9-8ac4-bb46312dc583}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Scenes\SceneManager">
-      <UniqueIdentifier>{1947e8ad-1e94-404f-b81b-ef888ea33fc7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\GameObject\Camera">
-      <UniqueIdentifier>{052dee3d-fff4-4775-9042-00d50b4a4a9f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\GameObject\Sprite\2D\UI\CUIFade">
-      <UniqueIdentifier>{d22dc98d-1be9-44e2-b0ba-c5bf8c2dfd7f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Common\Singleton">
       <UniqueIdentifier>{c22bd6b5-c9bf-42e7-8f84-cc59e19351d7}</UniqueIdentifier>
@@ -115,23 +40,107 @@
     <Filter Include="Source\Common\Easing">
       <UniqueIdentifier>{f516dcd3-d07b-438c-9739-2de3d15b2d12}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Scenes\Title">
-      <UniqueIdentifier>{6cf3da2e-2534-40ab-8403-6960a7a0a15b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\Common\FileManager">
       <UniqueIdentifier>{6c6279af-dd69-430c-9586-4f3b2be4e954}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Common\FileManager\LoadImage">
       <UniqueIdentifier>{a54edffe-bb53-4fcb-b438-c594423495a2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Collision\GJK">
-      <UniqueIdentifier>{18f96188-2579-4537-b8f8-b21622e48bbf}</UniqueIdentifier>
+    <Filter Include="Source\Common\Time">
+      <UniqueIdentifier>{f35d224a-e0f4-4524-84da-8cff2967acb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Common\nlohmann">
+      <UniqueIdentifier>{a4244895-8d76-406c-a039-8b3afc9f608f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Common\Random">
+      <UniqueIdentifier>{cd52f5cd-f762-4be4-9aeb-549818726e78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Common\Mesh">
+      <UniqueIdentifier>{396309aa-312d-473c-a31a-09176d68430c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Common\Mesh\Skin">
+      <UniqueIdentifier>{4d86a69e-25d3-4e59-9cda-0b4ad8331e36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Common\Mesh\Static">
+      <UniqueIdentifier>{7dab392c-2007-402d-9afd-cff88f736555}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\DirectSound">
+      <UniqueIdentifier>{dd5c4a89-39c0-46ec-8668-7096c21a7fc2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Effect">
+      <UniqueIdentifier>{20f73dcd-b598-43cb-ba41-1b48e8286a6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GameObject">
+      <UniqueIdentifier>{e3b63c77-c51f-4bee-addd-f297a9c75e72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GameObject\Character">
+      <UniqueIdentifier>{7ee69661-62c6-4eb6-aa21-52d516105ae4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GameObject\Character\Player">
+      <UniqueIdentifier>{4285ee2d-a7da-4a74-9c85-e51d50a042fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GameObject\Character\Enemy">
+      <UniqueIdentifier>{5150d283-8dde-45ac-bccb-648ad11d1a57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GameObject\Object">
+      <UniqueIdentifier>{1173f977-a02e-4316-9c99-caf60e461523}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\GameObject\Object\Gun">
       <UniqueIdentifier>{08624e15-233a-442b-95e9-b0e1a757c827}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Common\Time">
-      <UniqueIdentifier>{f35d224a-e0f4-4524-84da-8cff2967acb0}</UniqueIdentifier>
+    <Filter Include="Source\GameObject\Object\Bullet">
+      <UniqueIdentifier>{f2935b26-3018-43af-9909-0d75a25aed13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GameObject\Sprite">
+      <UniqueIdentifier>{22fc7dff-208a-45a3-b099-a519152dccc7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GameObject\Sprite\2D">
+      <UniqueIdentifier>{8cfba3b3-bf7e-4719-aa38-bc9434cb7775}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GameObject\Sprite\2D\UI">
+      <UniqueIdentifier>{8456f0a8-21f4-4b07-82a4-c4952cd3f26c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GameObject\Sprite\2D\UI\CUIFade">
+      <UniqueIdentifier>{d22dc98d-1be9-44e2-b0ba-c5bf8c2dfd7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GameObject\Sprite\2D\UI\CEndUI">
+      <UniqueIdentifier>{f363360b-ec90-434e-9988-654f511789d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GameObject\Sprite\2D\UI\CGameUI">
+      <UniqueIdentifier>{c278b0ef-e410-44ac-ac33-3a640b6a05f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GameObject\Sprite\2D\UI\CWinUI">
+      <UniqueIdentifier>{95e2a17a-8384-48a7-975c-ff8bad67012d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GameObject\Sprite\2D\UI\CLoseUI">
+      <UniqueIdentifier>{4869e6b6-927e-45d2-822d-03e24684ff55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GameObject\Sprite\3D">
+      <UniqueIdentifier>{33990d2a-0c7d-4354-b2ee-a9f67592e023}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GameObject\Sprite\3D\Explosion">
+      <UniqueIdentifier>{90eb58cb-93d7-4405-8ed9-9fa87f7b43f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GameObject\Camera">
+      <UniqueIdentifier>{052dee3d-fff4-4775-9042-00d50b4a4a9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\MainLoop">
+      <UniqueIdentifier>{fc970b15-e740-42c6-9b82-6e890e45b7c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Scenes">
+      <UniqueIdentifier>{056b3097-5ce1-424f-920a-8df62d6c6f83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Scenes\Game">
+      <UniqueIdentifier>{0a894832-f83f-4569-b565-5172556ed7d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Scenes\SceneManager">
+      <UniqueIdentifier>{1947e8ad-1e94-404f-b81b-ef888ea33fc7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Scenes\Title">
+      <UniqueIdentifier>{6cf3da2e-2534-40ab-8403-6960a7a0a15b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\DirectX">
+      <UniqueIdentifier>{7e801bf1-cbc5-42d0-8264-8ff4079a3e4f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -184,21 +193,6 @@
     </ClCompile>
     <ClCompile Include="Source\GameObject\Character\Player\CPlayer.cpp">
       <Filter>Source\GameObject\Character\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\GameObject\Mesh\Static\CStaticMesh.cpp">
-      <Filter>Source\GameObject\Mesh\Static</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\GameObject\Mesh\Static\CStaticMeshObject.cpp">
-      <Filter>Source\GameObject\Mesh\Static</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\GameObject\Mesh\Skin\CSkinMesh.cpp">
-      <Filter>Source\GameObject\Mesh\Skin</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\GameObject\Mesh\Skin\CSkinMeshObject.cpp">
-      <Filter>Source\GameObject\Mesh\Skin</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\GameObject\Mesh\Skin\CSkinMeshParser.cpp">
-      <Filter>Source\GameObject\Mesh\Skin</Filter>
     </ClCompile>
     <ClCompile Include="Source\GameObject\Sprite\CSpriteObject.cpp">
       <Filter>Source\GameObject\Sprite</Filter>
@@ -291,15 +285,42 @@
       <Filter>Source\GameObject\Object\Gun</Filter>
     </ClCompile>
     <ClCompile Include="Source\GameObject\Object\Bullet\CBullet.cpp">
-      <Filter>Source\GameObject\Object\Shot</Filter>
+      <Filter>Source\GameObject\Object\Bullet</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Common\Time\CTime.cpp" />
-    <ClCompile Include="Source\Common\Random\CRandom.cpp" />
-    <ClCompile Include="Source\GameObject\Sprite\2D\UI\CEndUI\CEndUI.cpp" />
-    <ClCompile Include="Source\GameObject\Sprite\2D\UI\CGameUI\CGameUI.cpp" />
-    <ClCompile Include="Source\GameObject\Sprite\2D\UI\CLoseUI\CLoseUI.cpp" />
-    <ClCompile Include="Source\GameObject\Sprite\2D\UI\COptionUI\COptionUI.cpp" />
-    <ClCompile Include="Source\GameObject\Sprite\2D\UI\CWinUI\CWinUI.cpp" />
+    <ClCompile Include="Source\Common\Time\CTime.cpp">
+      <Filter>Source\Common\Time</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Common\Random\CRandom.cpp">
+      <Filter>Source\Common\Random</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GameObject\Sprite\2D\UI\CLoseUI\CLoseUI.cpp">
+      <Filter>Source\GameObject\Sprite\2D\UI\CLoseUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GameObject\Sprite\2D\UI\CWinUI\CWinUI.cpp">
+      <Filter>Source\GameObject\Sprite\2D\UI\CWinUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GameObject\Sprite\2D\UI\CGameUI\CGameUI.cpp">
+      <Filter>Source\GameObject\Sprite\2D\UI\CGameUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GameObject\Sprite\2D\UI\CEndUI\CEndUI.cpp">
+      <Filter>Source\GameObject\Sprite\2D\UI\CEndUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Common\Mesh\Skin\CSkinMesh.cpp">
+      <Filter>Source\Common\Mesh\Skin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Common\Mesh\Skin\CSkinMeshObject.cpp">
+      <Filter>Source\Common\Mesh\Skin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Common\Mesh\Skin\CSkinMeshParser.cpp">
+      <Filter>Source\Common\Mesh\Skin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Common\Mesh\Static\CStaticMeshObject.cpp">
+      <Filter>Source\Common\Mesh\Static</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Common\Mesh\Static\CStaticMesh.cpp">
+      <Filter>Source\Common\Mesh\Static</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scenes\UIEditor\CUIEditor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Collision\Ray\CRay.h">
@@ -337,21 +358,6 @@
     </ClInclude>
     <ClInclude Include="Source\GameObject\Character\Player\CPlayer.h">
       <Filter>Source\GameObject\Character\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GameObject\Mesh\Static\CStaticMesh.h">
-      <Filter>Source\GameObject\Mesh\Static</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GameObject\Mesh\Static\CStaticMeshObject.h">
-      <Filter>Source\GameObject\Mesh\Static</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GameObject\Mesh\Skin\CSkinMesh.h">
-      <Filter>Source\GameObject\Mesh\Skin</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GameObject\Mesh\Skin\CSkinMeshObject.h">
-      <Filter>Source\GameObject\Mesh\Skin</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GameObject\Mesh\Skin\CSkinMeshParser.h">
-      <Filter>Source\GameObject\Mesh\Skin</Filter>
     </ClInclude>
     <ClInclude Include="Source\GameObject\Sprite\CSpriteObject.h">
       <Filter>Source\GameObject\Sprite</Filter>
@@ -444,15 +450,57 @@
       <Filter>Source\GameObject\Object\Gun</Filter>
     </ClInclude>
     <ClInclude Include="Source\GameObject\Object\Bullet\CBullet.h">
-      <Filter>Source\GameObject\Object\Shot</Filter>
+      <Filter>Source\GameObject\Object\Bullet</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Common\Time\CTime.h" />
-    <ClInclude Include="Source\Common\Random\CRandom.h" />
-    <ClInclude Include="Source\GameObject\Sprite\2D\UI\CEndUI\CEndUI.h" />
-    <ClInclude Include="Source\GameObject\Sprite\2D\UI\CGameUI\CGameUI.h" />
-    <ClInclude Include="Source\GameObject\Sprite\2D\UI\CLoseUI\CLoseUI.h" />
-    <ClInclude Include="Source\GameObject\Sprite\2D\UI\COptionUI\COptionUI.h" />
-    <ClInclude Include="Source\GameObject\Sprite\2D\UI\CWinUI\CWinUI.h" />
+    <ClInclude Include="Source\Common\Time\CTime.h">
+      <Filter>Source\Common\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Common\Random\CRandom.h">
+      <Filter>Source\Common\Random</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameObject\Sprite\2D\UI\CLoseUI\CLoseUI.h">
+      <Filter>Source\GameObject\Sprite\2D\UI\CLoseUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameObject\Sprite\2D\UI\CWinUI\CWinUI.h">
+      <Filter>Source\GameObject\Sprite\2D\UI\CWinUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameObject\Sprite\2D\UI\CGameUI\CGameUI.h">
+      <Filter>Source\GameObject\Sprite\2D\UI\CGameUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameObject\Sprite\2D\UI\CEndUI\CEndUI.h">
+      <Filter>Source\GameObject\Sprite\2D\UI\CEndUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Common\nlohmann\adl_serializer.hpp">
+      <Filter>Source\Common\nlohmann</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Common\nlohmann\byte_container_with_subtype.hpp">
+      <Filter>Source\Common\nlohmann</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Common\nlohmann\json.hpp">
+      <Filter>Source\Common\nlohmann</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Common\nlohmann\json_fwd.hpp">
+      <Filter>Source\Common\nlohmann</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Common\nlohmann\ordered_map.hpp">
+      <Filter>Source\Common\nlohmann</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Common\Mesh\Skin\CSkinMesh.h">
+      <Filter>Source\Common\Mesh\Skin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Common\Mesh\Skin\CSkinMeshObject.h">
+      <Filter>Source\Common\Mesh\Skin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Common\Mesh\Skin\CSkinMeshParser.h">
+      <Filter>Source\Common\Mesh\Skin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Common\Mesh\Static\CStaticMeshObject.h">
+      <Filter>Source\Common\Mesh\Static</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Common\Mesh\Static\CStaticMesh.h">
+      <Filter>Source\Common\Mesh\Static</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scenes\UIEditor\CUIEditor.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Common\Easing\Easing.inl">

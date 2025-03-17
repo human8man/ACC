@@ -72,9 +72,6 @@ void CInput::Release()
 //-----------------------------------------------------------------------------
 void CInput::InputUpdate()
 {
-	XINPUT_STATE state;
-	bool isConnected = (XInputGetState(0, &state) == ERROR_SUCCESS);
-
 	// キーとマウスの更新.
 	m_Key.Update();
 	m_Mouse.Update();
