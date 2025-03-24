@@ -40,6 +40,8 @@ public:
 	// 透過度設定関数.
 	void SetAlpha( float alpha ) { m_Alpha = alpha; }
 
+
+	const float& GetAlpha() const { return m_Alpha; }				// 透過度を取得.
 	const D3DXVECTOR3& GetPos()		 const { return m_vPosition; }	// 座標情報を取得.
 	const D3DXVECTOR3& GetRot()		 const { return m_vRotation; }	// 回転情報をを取得.
 	const D3DXVECTOR3& GetScale()	 const { return m_vScale;	 }	// サイズを取得.

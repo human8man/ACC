@@ -443,7 +443,7 @@ void CSprite2D::Render()
 //=============================================================================
 HRESULT CSprite2D::SpriteStateDataLoad(const std::string& FilePath)
 {
-	Json m_SpriteStateData = nullptr;	// スプライト情報データ.
+	Json m_SpriteStateData = nullptr;	// 画像情報.
 
 	// 補正値テキストの読み込み.
 	std::string TextPath = FilePath;
@@ -463,17 +463,31 @@ HRESULT CSprite2D::SpriteStateDataLoad(const std::string& FilePath)
 		SpriteStateDataLoad(FilePath);
 		return S_OK;
 	}
-	
-	// スプライト情報の取得.
-	m_SpriteState.Pos.x = m_SpriteStateData["Pos"]["x"].get<float>();
-	m_SpriteState.Pos.y = m_SpriteStateData["Pos"]["y"].get<float>();
-	m_SpriteState.Pos.z = m_SpriteStateData["Pos"]["z"].get<float>();
-	m_SpriteState.Disp.w = m_SpriteStateData["Disp"]["w"];
-	m_SpriteState.Disp.h = m_SpriteStateData["Disp"]["h"];
-	m_SpriteState.Base.w = m_SpriteStateData["Base"]["w"];
-	m_SpriteState.Base.h = m_SpriteStateData["Base"]["h"];
-	m_SpriteState.Stride.w = m_SpriteStateData["Stride"]["w"];
-	m_SpriteState.Stride.h = m_SpriteStateData["Stride"]["h"];
+
+	// 画像のパスの取得.
+	if (m_SpriteStateData.contains("FilePath")) {
+		if (m_SpriteStateData["FilePath"].is_string()) {
+			m_SpriteState.Path = m_SpriteStateData["FilePath"].get<std::string>();
+		}
+	}
+
+	m_SpriteState.Pos.x		= m_SpriteStateData["Pos"]["x"].get<float>();
+	m_SpriteState.Pos.y		= m_SpriteStateData["Pos"]["y"].get<float>();
+	m_SpriteState.Pos.z		= m_SpriteStateData["Pos"]["z"].get<float>();
+	m_SpriteState.Disp.w	= m_SpriteStateData["Disp"]["w"];
+	m_SpriteState.Disp.h	= m_SpriteStateData["Disp"]["h"];
+	m_SpriteState.Base.w	= m_SpriteStateData["Base"]["w"];
+	m_SpriteState.Base.h	= m_SpriteStateData["Base"]["h"];
+	m_SpriteState.Stride.w	= m_SpriteStateData["Stride"]["w"];
+	m_SpriteState.Stride.h	= m_SpriteStateData["Stride"]["h"];
+
+	m_Alpha			= m_SpriteStateData["Alpha"].get<float>();
+	m_vScale.x		= m_SpriteStateData["Scale"]["x"].get<float>();
+	m_vScale.y		= m_SpriteStateData["Scale"]["y"].get<float>();
+	m_vScale.z		= m_SpriteStateData["Scale"]["z"].get<float>();
+	m_vRotation.x	= m_SpriteStateData["Rotate"]["x"].get<float>();
+	m_vRotation.y	= m_SpriteStateData["Rotate"]["y"].get<float>();
+	m_vRotation.z	= m_SpriteStateData["Rotate"]["z"].get<float>();
 
 #if _DEBUG
 	// ファイルパスを更新する.
@@ -497,7 +511,7 @@ HRESULT CSprite2D::CreateSpriteState(const std::string& FilePath)
 	// 画像の幅、高さの取得.
 	const D3DXVECTOR2& BaseSize = LoadImageFile::GetImageSize(FilePath);
 
-	// 情報を追加していく.
+	// 画像情報のデフォルトの値を追加していく.
 	Json SpriteState;
 	SpriteState["Pos"]["x"] = 0.0;
 	SpriteState["Pos"]["y"] = 0.0;
@@ -508,6 +522,14 @@ HRESULT CSprite2D::CreateSpriteState(const std::string& FilePath)
 	SpriteState["Base"]["h"] = BaseSize.y;
 	SpriteState["Stride"]["w"] = BaseSize.x;
 	SpriteState["Stride"]["h"] = BaseSize.y;
+
+	SpriteState["Alpha"] = 1.0;
+	SpriteState["Scale"]["x"] = 1.0;
+	SpriteState["Scale"]["y"] = 1.0;
+	SpriteState["Scale"]["z"] = 1.0;
+	SpriteState["Rotate"]["x"] = 0.0;
+	SpriteState["Rotate"]["y"] = 0.0;
+	SpriteState["Rotate"]["z"] = 0.0;
 
 	// スプライト情報の作成.
 	if (FAILED(FileManager::JsonSave(TextPath, SpriteState))) return E_FAIL;

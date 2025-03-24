@@ -29,10 +29,11 @@ public:
 	// スプライト構造体.
 	struct SPRITE_STATE
 	{
-		WHSIZE Disp;	// 表示幅高さ.
-		WHSIZE Base;	// 元画像幅高さ.
-		WHSIZE Stride;	// 1コマあたりの幅高さ.
-		D3DXVECTOR3 Pos;// 画像座標.
+		WHSIZE Disp;		// 表示幅高さ.
+		WHSIZE Base;		// 元画像幅高さ.
+		WHSIZE Stride;		// 1コマあたりの幅高さ.
+		D3DXVECTOR3 Pos;	// 画像座標.
+		std::string Path;	// パス.
 	};
 
 	// コンスタントバッファのアプリ側の定義.
