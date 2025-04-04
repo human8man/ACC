@@ -33,7 +33,9 @@ public:
 		WHSIZE Base;		// 元画像幅高さ.
 		WHSIZE Stride;		// 1コマあたりの幅高さ.
 		D3DXVECTOR3 Pos;	// 画像座標.
+		D3DXVECTOR3 m_vScale;
 		std::string Path;	// パス.
+		std::string Name;	// 名前.
 	};
 
 	// コンスタントバッファのアプリ側の定義.
@@ -76,19 +78,19 @@ public:
 	void Render();
 
 	// 座標情報を設定.
-	void SetPosition(const D3DXVECTOR3& vPos) {	m_vPosition = vPos;	}
+	void SetPosition(const D3DXVECTOR3& pos) {	m_vPosition = pos;	}
 	void SetPositionX( float x ){ m_vPosition.x = x; }
 	void SetPositionY( float y ){ m_vPosition.y = y; }
 	void SetPositionZ( float z ){ m_vPosition.z = z; }
 
 	// 回転情報を設定.
-	void SetRotation(const D3DXVECTOR3& vRot){	m_vRotation = vRot;	}
+	void SetRotation(const D3DXVECTOR3& rot){	m_vRotation = rot;	}
 	void SetRotationY( float y ){ m_vRotation.y = y; }
 	void SetRotationX( float x ){ m_vRotation.x = x; }
 	void SetRotationZ( float z ){ m_vRotation.z = z; }
 
 	// 拡縮情報を設定.
-	void SetScale(const D3DXVECTOR3& vScale) { m_vScale = vScale; }
+	void SetScale(const D3DXVECTOR3& scale) { m_vScale = scale; }
 
 	// α値を設定.
 	void SetAlpha(float alpha) { m_Alpha = alpha; }
@@ -99,14 +101,38 @@ public:
 		m_PatternNo.y = y;
 	}
 
+	// 画像の元サイズを設定.
+	void SetBase(D3DXVECTOR2 base) { 
+		m_SpriteState.Base = WHSIZE(base.x, base.y); 
+		CreateModel(); 
+	}
+	// 画像の表示範囲を設定.
+	void SetDisp(D3DXVECTOR2 disp) { 
+		m_SpriteState.Disp = WHSIZE(disp.x, disp.y);
+		CreateModel(); 
+	}
+	// パターン番号を設定した際に乗算される幅、高さの設定.
+	void SetStride(D3DXVECTOR2 stride) {
+		m_SpriteState.Stride = WHSIZE(stride.x, stride.y); 
+		CreateModel(); 
+	}
+
+
 	// jsonファイルのスプライト情報を取得.
 	HRESULT SpriteStateDataLoad(const std::string& FilePath);
 	// スプライト情報をまとめたjsonファイルの作成.
 	HRESULT CreateSpriteState(const std::string& FilePath);
 
+	// 透過度を取得.
+	float GetAlpha() const { return m_Alpha; }
+	// スケール値を取得.
+	D3DXVECTOR3 GetScale()		const{ return m_vScale;}
+	// 回転情報を取得.
+	D3DXVECTOR3 GetRotation()	const{ return m_vRotation;}
 	// 最大パターン数(マス目)を取得.
-	POINTS GetPatternMax() const { return m_PatternMax; }
-	SPRITE_STATE GetSpriteData() const { return m_SpriteState; }
+	POINTS		GetPatternMax()	const { return m_PatternMax; }
+	// 画像情報を取得.
+	SPRITE_STATE GetSpriteData()const { return m_SpriteState; }
 private:
 	CDirectX11*				m_pDx11;
 	ID3D11Device*			m_pDevice11;

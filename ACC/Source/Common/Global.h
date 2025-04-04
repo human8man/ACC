@@ -39,10 +39,15 @@
 //=============================================================================
 //		定数.
 //=============================================================================
-constexpr int WND_W = 1280;		 // ウィンドウの幅(int).
-constexpr int WND_H = 720;		 // ウィンドウの高さ(int).
-constexpr float FWND_W = 1280.f; // ウィンドウの幅(float).
-constexpr float FWND_H = 720.f;	 // ウィンドウの高さ(float).
+constexpr int WND_W = 1280;			// ウィンドウの幅(int).
+constexpr int WND_H = 720;			// ウィンドウの高さ(int).
+constexpr float FWND_W = 1280.f;	// ウィンドウの幅(float).
+constexpr float FWND_H = 720.f;		// ウィンドウの高さ(float).
+
+// フルスクリーン(毎フレーム判定をとり、別のクラス同士で参照させるためextern).
+extern bool FULLSCREEN;
+// フルスクリーン時のUI調整用の変数.
+extern float FULLSCREENSCALE;
 
 constexpr int FPS   = 60;	 // フレームレート.
 constexpr int STIC_LOW = 60; // スティック入力のデッドゾーン.

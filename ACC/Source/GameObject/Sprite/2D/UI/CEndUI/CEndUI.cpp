@@ -1,8 +1,6 @@
 #include "CEndUI.h"
 
 #include "Scenes/SceneManager/CSceneManager.h"
-#include "Sprite/2D/UI/CUIObject.h"
-#include "Common/DirectInput/CDirectInput.h"
 #include "DirectSound/CSoundManager.h"
 
 
@@ -83,9 +81,6 @@ void CEndUI::Update()
 	POINT MousePos;
 	GetCursorPos(&MousePos);
 
-	// ウィンドウ位置を計算.
-	m_WindowRect = WindowRectMath();
-
 	//----------------------------------------------------------------------------
 	//		それぞれのUIの更新.
 	//----------------------------------------------------------------------------
@@ -99,7 +94,7 @@ void CEndUI::Update()
 		D3DXVECTOR2 SquareDisp = D3DXVECTOR2(m_pUIs[i]->GetSpriteData().Disp.w, m_pUIs[i]->GetSpriteData().Disp.h);
 
 		// 点と四角の当たり判定.
-		if (CUIObject::PointInSquare(MousePos, SquarePos + m_WindowRect, SquareDisp))
+		if (m_pUIs[i]->PointInSquare(MousePos, m_pUIs[i]->WindowRect(m_hWnd)))
 		{
 			//	前回選択されていなかった場合SEを鳴らす.
 			if (m_pUIs[i]->GetPatternNo().x == 0) {
@@ -152,36 +147,4 @@ void CEndUI::Release()
 {
 	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pUIs[i]); }
 	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pSprite2Ds[i]); }
-}
-
-
-//-----------------------------------------------------------------------------
-//		ウィンドウ位置の計算をまとめた関数.
-//-----------------------------------------------------------------------------
-D3DXVECTOR2 CEndUI::WindowRectMath()
-{
-	// ウィンドウ全体の位置とサイズを取得（ウィンドウタブや枠を含む）.
-	RECT WindowRect;
-	GetWindowRect(m_hWnd, &WindowRect);
-
-	// クライアント領域の位置とサイズを取得（ウィンドウ内の描画範囲）.
-	RECT clientRect;
-	GetClientRect(m_hWnd, &clientRect);
-
-	// クライアント領域の左上と右下の座標を初期化.
-	POINT topLeft = { clientRect.left, clientRect.top };
-	POINT bottomRight = { clientRect.right, clientRect.bottom };
-
-	// クライアント領域の座標をスクリーン座標系に変換.
-	ClientToScreen(m_hWnd, &topLeft);
-	ClientToScreen(m_hWnd, &bottomRight);
-
-	// ウィンドウ全体の左上座標とクライアント領域の左上座標の差分を計算.
-	int borderLeft = topLeft.x - WindowRect.left;
-	int borderTop = topLeft.y - WindowRect.top;
-
-	// フレーム幅を含んだウィンドウの位置を返す.
-	return D3DXVECTOR2(
-		static_cast<float>(borderLeft + WindowRect.left),
-		static_cast<float>(borderTop + WindowRect.top));
 }

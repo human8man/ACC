@@ -48,5 +48,7 @@ private:
 	std::string m_ScenePath;	// 現在のシーンパス.
 	D3DXVECTOR2 m_OffsetPos;	// マウス座標と画像座標のズレ補正値.
 
-	bool m_MovedSomething;		// 何か変更があった際に保存確認フラグを立てる.
+	bool	m_MovedSomething;		// 何か変更があった際に保存確認フラグを立てる.
+	int		m_SelectedUIIndex;
+	char	m_SearchBuffer[64] = ""; // 検索用バッファ.
 };

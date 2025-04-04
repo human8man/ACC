@@ -250,6 +250,7 @@
     <ClCompile Include="Source\Common\DirectInput\CMouse.cpp" />
     <ClCompile Include="Source\Common\FileManager\FileManager.cpp" />
     <ClCompile Include="Source\Common\FileManager\LoadImage\LoadImage.cpp" />
+    <ClCompile Include="Source\Common\Global.cpp" />
     <ClCompile Include="Source\Common\ImGui\CImGui.cpp" />
     <ClCompile Include="Source\Common\ImGui\library\imgui.cpp" />
     <ClCompile Include="Source\Common\ImGui\library\imgui_demo.cpp" />

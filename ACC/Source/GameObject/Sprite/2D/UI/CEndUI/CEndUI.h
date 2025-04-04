@@ -35,11 +35,6 @@ public:
 
 	// Endシーンが削除可能かを取得.
 	bool GetDeleteFlag() const { return m_EndDeleteFlag; }
-
-private:
-	// ウィンドウ位置の計算をまとめた関数.
-	D3DXVECTOR2 WindowRectMath();
-
 private:
 	HWND m_hWnd;	// ウィンドウハンドル.
 

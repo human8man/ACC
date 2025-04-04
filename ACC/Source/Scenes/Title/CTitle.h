@@ -2,6 +2,7 @@
 
 #include "Scenes/CSceneBase.h"
 #include "Sprite/2D/CSprite2D.h"
+#include "Sprite/2D/UI/CUIObject.h"
 #include "DirectInput/CDirectInput.h"
 
 //前方宣言
@@ -33,10 +34,6 @@ public:
 	void Update() override;			// 更新処理.
 	void Draw() override;			// 描画処理.
 	void Release() override;		// 解放処理.
-
-private:
-	// 点と四角の当たり判定(スプライト用).
-	bool PointInSquare(POINT ppos, D3DXVECTOR2 spos, D3DXVECTOR2 sposs);
 
 private:
 	LIGHT		m_Light;

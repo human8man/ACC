@@ -6,8 +6,8 @@
 //		UIオブジェクトクラス.
 //=============================================================================
 CUIObject::CUIObject()
-	: m_pSprite		( nullptr )
-	, m_PatternNo	()
+	: m_pSprite			( nullptr )
+	, m_PatternNo		()
 {
 }
 CUIObject::~CUIObject()
@@ -21,6 +21,10 @@ CUIObject::~CUIObject()
 //=============================================================================
 void CUIObject::Update()
 {
+	// フルスクリーンの場合値を変更する.
+	if (FULLSCREEN)	{ FULLSCREENSCALE = 1.5f; }
+	else			{ FULLSCREENSCALE = 1.f; }
+
 	if( m_pSprite == nullptr ){ return; }
 }
 
@@ -48,20 +52,68 @@ void CUIObject::Draw()
 	CDirectX11::GetInstance()->SetDepth(true);
 }
 
+void CUIObject::AttachSprite(CSprite2D& pSprite)
+{
+	m_pSprite = &pSprite;
+	m_vRotation = m_pSprite->GetRotation();
+	m_vScale = m_pSprite->GetScale();
+	m_Alpha = m_pSprite->GetAlpha();
+
+	// パターン番号を設定.
+	m_PatternNo;
+
+}
+
+
+//===================================================
+//		ウィンドウの描画開始位置を取得.
+//===================================================
+D3DXVECTOR2 CUIObject::WindowRect(HWND hwnd)
+{
+	// ウィンドウ全体の位置とサイズを取得（ウィンドウタブや枠を含む）.
+	RECT WindowRect;
+	GetWindowRect(hwnd, &WindowRect);
+
+	// クライアント領域の位置とサイズを取得（ウィンドウ内の描画範囲）.
+	RECT clientRect;
+	GetClientRect(hwnd, &clientRect);
+
+	// クライアント領域の左上と右下の座標を初期化.
+	POINT topLeft = { clientRect.left, clientRect.top };
+	POINT bottomRight = { clientRect.right, clientRect.bottom };
+
+	// クライアント領域の座標をスクリーン座標系に変換.
+	ClientToScreen(hwnd, &topLeft);
+	ClientToScreen(hwnd, &bottomRight);
+
+	// ウィンドウ全体の左上座標とクライアント領域の左上座標の差分を計算.
+	int borderLeft	= topLeft.x - WindowRect.left;
+	int borderTop	= topLeft.y - WindowRect.top;
+
+	// フレーム幅を含んだウィンドウの位置を返す.
+	return D3DXVECTOR2(
+		static_cast<float>(borderLeft + WindowRect.left),
+		static_cast<float>(borderTop + WindowRect.top));
+}
+
 
 //=============================================================================
 //		点と四角のあたり判定.
 //=============================================================================
-bool CUIObject::PointInSquare(POINT ppos, D3DXVECTOR2 spos, D3DXVECTOR2 sposs)
+bool CUIObject::PointInSquare(POINT ppos, D3DXVECTOR2 windowpos)
 {
-	if (spos.x < ppos.x
-	&&  spos.y < ppos.y
-	&&  ppos.x < spos.x + sposs.x
-	&&  ppos.y < spos.y + sposs.y)
+	D3DXVECTOR3 pos = {
+		m_vPosition.x * FULLSCREENSCALE + windowpos.x,
+		m_vPosition.y * FULLSCREENSCALE + windowpos.y,
+		m_vPosition.z * FULLSCREENSCALE };
+
+ 	if (pos.x < ppos.x
+	&&  pos.y < ppos.y
+	&& ppos.x < pos.x + m_pSprite->GetSpriteData().Disp.w * m_vScale.x * FULLSCREENSCALE 
+	&& ppos.y < pos.y + m_pSprite->GetSpriteData().Disp.h * m_vScale.y * FULLSCREENSCALE )
 	{
 		return true;
 	}
-
 	return false;
 }
 

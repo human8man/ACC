@@ -272,12 +272,12 @@ HRESULT CSprite2D::CreateModel()
 
 	// バッファ構造体.
 	D3D11_BUFFER_DESC bd;
-	bd.Usage			= D3D11_USAGE_DEFAULT;		// 使用方法（デフォルト）.
-	bd.ByteWidth		= sizeof(VERTEX) * uVerMax;	// 頂点のサイズ.
-	bd.BindFlags		= D3D11_BIND_VERTEX_BUFFER;	// 頂点バッファとして扱う.
-	bd.CPUAccessFlags	= 0;	// CPUからはアクセスしない.
-	bd.MiscFlags		= 0;	// その他のフラグ（未使用）.
-	bd.StructureByteStride = 0;	// 構造体のサイズ（未使用）.
+	bd.Usage				= D3D11_USAGE_DEFAULT;		// 使用方法（デフォルト）.
+	bd.ByteWidth			= sizeof(VERTEX) * uVerMax;	// 頂点のサイズ.
+	bd.BindFlags			= D3D11_BIND_VERTEX_BUFFER;	// 頂点バッファとして扱う.
+	bd.CPUAccessFlags		= 0;	// CPUからはアクセスしない.
+	bd.MiscFlags			= 0;	// その他のフラグ（未使用）.
+	bd.StructureByteStride	= 0;	// 構造体のサイズ（未使用）.
 
 	// サブリソースデータ構造体.
 	D3D11_SUBRESOURCE_DATA InitData;
@@ -471,6 +471,11 @@ HRESULT CSprite2D::SpriteStateDataLoad(const std::string& FilePath)
 		}
 	}
 
+	// 画像のファイル名を保存.
+	std::string ImageName = FilePath.substr(FilePath.find_last_of("\\/") + 1);
+	ImageName = ImageName.substr(0, ImageName.find_last_of(".")); // 拡張子削除.
+	m_SpriteState.Name		= ImageName;
+
 	m_SpriteState.Pos.x		= m_SpriteStateData["Pos"]["x"].get<float>();
 	m_SpriteState.Pos.y		= m_SpriteStateData["Pos"]["y"].get<float>();
 	m_SpriteState.Pos.z		= m_SpriteStateData["Pos"]["z"].get<float>();
@@ -481,7 +486,7 @@ HRESULT CSprite2D::SpriteStateDataLoad(const std::string& FilePath)
 	m_SpriteState.Stride.w	= m_SpriteStateData["Stride"]["w"];
 	m_SpriteState.Stride.h	= m_SpriteStateData["Stride"]["h"];
 
-	m_Alpha			= m_SpriteStateData["Alpha"].get<float>();
+	m_Alpha			= m_SpriteStateData["Alpha"];
 	m_vScale.x		= m_SpriteStateData["Scale"]["x"].get<float>();
 	m_vScale.y		= m_SpriteStateData["Scale"]["y"].get<float>();
 	m_vScale.z		= m_SpriteStateData["Scale"]["z"].get<float>();
