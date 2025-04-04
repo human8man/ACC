@@ -20,7 +20,7 @@ public:
 	virtual void Draw();
 
 	// スプライトを接続する.
-	void AttachSprite( CSprite2D& pSprite ){ m_pSprite = &pSprite; }
+	void AttachSprite(CSprite2D& pSprite);
 	// スプライトを切り離す.
 	void DetachSprite(){ m_pSprite = nullptr; }
 
@@ -29,20 +29,27 @@ public:
 		m_PatternNo.x = x;
 		m_PatternNo.y = y;
 	}
+	// 画像の元サイズを設定.
+	void SetBase(D3DXVECTOR2& base) { m_pSprite->SetBase(base); }
+	// 画像の表示範囲を設定.
+	void SetDisp(D3DXVECTOR2& disp) { m_pSprite->SetDisp(disp); }
+	// パターン番号を設定した際に乗算される幅、高さの設定.
+	void SetStride(D3DXVECTOR2& stride) { m_pSprite->SetStride(stride); }
 
 	// パターン番号を取得.
 	POINTS GetPatternNo() const { return m_PatternNo; }
 	// スプライト情報の取得.
 	CSprite2D::SPRITE_STATE GetSpriteData() const { return m_pSprite->GetSpriteData(); }
 
-
+	// ウィンドウの描画開始位置を取得.
+	D3DXVECTOR2 WindowRect(HWND hwnd);
 	// 点と四角のあたり判定.
-	bool PointInSquare(POINT ppos, D3DXVECTOR2 spos, D3DXVECTOR2 sposs);
+	bool PointInSquare(POINT ppos, D3DXVECTOR2 windowpos);
 
 protected:
 	void Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light ) override final;
 
 protected:
 	CSprite2D*	m_pSprite;
-	POINTS		m_PatternNo;	//パターン番号(マス目).
+	POINTS		m_PatternNo;	// パターン番号(マス目).
 };

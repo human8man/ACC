@@ -2,16 +2,16 @@
 #include "DirectX/CDirectX9.h"
 #include "DirectX/CDirectX11.h"
 #include "Scenes/SceneManager/CSceneManager.h"
-#include "Common/DirectInput/CDirectInput.h"
+#include "DirectInput/CDirectInput.h"
 #include "DirectSound/CSoundManager.h"
 #include "Camera/CCamera.h"
 #include "Effect/CEffect.h"
-#include "Common/Time/CTime.h"
+#include "Time/CTime.h"
 
 
 // ImGuiはデバッグ時のみ使用する.
 #ifdef _DEBUG
-#include "Common/ImGui/CImGui.h"
+#include "ImGui/CImGui.h"
 #endif
 
 
@@ -238,6 +238,7 @@ HRESULT CMain::InitWindow(
 	rectWindow.h = rect.bottom - rect.top;
 
 	// 自宅テレワーク時のx,y座標.
+	//rectWindow.x = 1920;
 	rectWindow.x = 0;
 	rectWindow.y = 0;
 

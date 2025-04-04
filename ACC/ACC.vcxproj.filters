@@ -321,6 +321,7 @@
       <Filter>Source\Common\Mesh\Static</Filter>
     </ClCompile>
     <ClCompile Include="Source\Scenes\UIEditor\CUIEditor.cpp" />
+    <ClCompile Include="Source\Common\Global.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Collision\Ray\CRay.h">
