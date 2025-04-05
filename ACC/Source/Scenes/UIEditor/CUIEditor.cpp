@@ -164,8 +164,7 @@ void CUIEditor::Update()
 					m_OffsetPos = D3DXVECTOR2(pos.x - MousePos.x, pos.y - MousePos.y);
 				}
 			}
-			if (m_DoDrag)
-			{
+			if (m_DoDrag) {
 				posdrag = true;
 				// 補正値+マウス座標した座標を入れる.
 				pos = D3DXVECTOR3(MousePos.x + m_OffsetPos.x, MousePos.y + m_OffsetPos.y, pos.z);
