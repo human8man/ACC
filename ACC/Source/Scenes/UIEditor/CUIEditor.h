@@ -34,6 +34,8 @@ public:
 private:
 	// 選択したシーンのUIを読み込み.
 	void SelectSceneLoad(UISceneList scene);
+	// UI選択時に仮変数等を初期化する.
+	void SelectInit();
 	// 現在シーンのUI情報を保存.
 	HRESULT SaveScene();
 
@@ -51,4 +53,11 @@ private:
 	bool	m_MovedSomething;		// 何か変更があった際に保存確認フラグを立てる.
 	int		m_SelectedUIIndex;
 	char	m_SearchBuffer[64] = ""; // 検索用バッファ.
+
+	// パターン確認用の変数.
+	POINTS	m_PatternNo;		// 仮のパターン.
+	POINTS	m_PatternMax;		// 仮の最大パターン.
+	bool	m_PatternAuto;		// パターンを自動で進める.
+	float	m_AnimationSpeed;	// 送り速度(フレーム).
+	float	m_AnimationSpeedMax;// 最大送り速度(フレーム).
 };
