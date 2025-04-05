@@ -2,7 +2,8 @@
 #include "nlohmann/json.hpp"
 #include "FileManager/FileManager.h"
 #include "FileManager/LoadImage/LoadImage.h"
-
+#include "DirectSound/CSoundManager.h"
+#include "Time/CTime.h"
 
 #ifdef _DEBUG
 #include "ImGui/CImGui.h"
@@ -40,7 +41,10 @@ CUIEditor::~CUIEditor()
 //=============================================================================
 void CUIEditor::Create()
 {
+	CSoundManager::GetInstance()->Stop(CSoundManager::enList::BGM_Title);
+	CSoundManager::GetInstance()->Stop(CSoundManager::enList::BGM_Game);
 	SelectSceneLoad(UISceneList::Title);
+	SelectInit();
 }
 
 
@@ -58,6 +62,17 @@ HRESULT CUIEditor::LoadData()
 //=============================================================================
 void CUIEditor::Init()
 {
+}
+
+
+//-----------------------------------------------------------------------------
+//		UI選択時に仮変数等を初期化する.
+//-----------------------------------------------------------------------------
+void CUIEditor::SelectInit()
+{
+	m_PatternNo		= POINTS(0, 0);
+	m_PatternMax	= POINTS(1, 1);
+	m_PatternAuto	= false;
 }
 
 
@@ -111,20 +126,25 @@ void CUIEditor::Update()
 			bool isSelected = (m_SelectedUIIndex == i);
 			if (ImGui::Selectable(m_pUIs[i]->GetSpriteData().Name.c_str(), isSelected)) {
 				m_SelectedUIIndex = i; // 選択更新.
+				SelectInit();
 			}
 		}
 		ImGui::EndChild();
 		ImGui::TreePop();
 	}
 
-	// 選択中のオブジェクトを編集.
+	//-----------------------------------------------------------
+	//		選択中のオブジェクトの編集.
+	//-----------------------------------------------------------
 	if (m_SelectedUIIndex >= 0 && m_SelectedUIIndex < m_pUIs.size()) {
 		// 選択されたUIを呼びやすくする.
 		CUIObject* selectedUI = m_pUIs[m_SelectedUIIndex];
 		// 選択されているUIを表示.
 		ImGui::Text(IMGUI_JP("選択されているUI: %s"), selectedUI->GetSpriteData().Name.c_str());
 
-		// 座標の調整.
+		//-----------------------------------------------------------
+		//		座標の調整.
+		//-----------------------------------------------------------
 		if (ImGui::TreeNode(IMGUI_JP("座標"))) {
 			D3DXVECTOR3 pos	= selectedUI->GetPos();
 			bool posdrag	= ImGui::DragFloat3("##Position", pos, 1.f);
@@ -138,7 +158,9 @@ void CUIEditor::Update()
 			ImGui::TreePop();
 		}
 
-		// 画像情報の調整.
+		//-----------------------------------------------------------
+		//		画像情報の調整.
+		//-----------------------------------------------------------
 		if (ImGui::TreeNode(IMGUI_JP("画像情報"))) {
 			D3DXVECTOR2 base	= D3DXVECTOR2(selectedUI->GetSpriteData().Base.w, selectedUI->GetSpriteData().Base.h);
 			D3DXVECTOR2 disp	= D3DXVECTOR2(selectedUI->GetSpriteData().Disp.w, selectedUI->GetSpriteData().Disp.h);
@@ -169,7 +191,98 @@ void CUIEditor::Update()
 			ImGui::TreePop();
 		}
 
-		// その他の情報の調整.
+		//-----------------------------------------------------------
+		//		画像パターンを試す.
+		//-----------------------------------------------------------
+		if (ImGui::TreeNode(IMGUI_JP("画像パターンを試す"))) {
+			 m_PatternNo = selectedUI->GetPatternNo();
+			int pattern[2] = { m_PatternNo.x,m_PatternNo.y };
+			int patternmax[2] = { m_PatternMax.x,m_PatternMax.y };
+
+
+			// パターンの最大数を決める.
+			ImGui::Text(IMGUI_JP("パターンの上限"));
+			ImGui::PushItemWidth(100.0f);
+			ImGui::InputInt("##x", &patternmax[0]); ImGui::SameLine(); ImGui::InputInt("##y", &patternmax[1]);
+			ImGui::PopItemWidth(); 
+			// 下限は1固定.
+			if (patternmax[0] < 1) { patternmax[0] = 1; }
+			if (patternmax[1] < 1) { patternmax[1] = 1; }
+			m_PatternMax = POINTS(patternmax[0], patternmax[1]);
+
+			// パターンのクリック調整.
+			if (ImGui::TreeNode(IMGUI_JP("クリック調整"))) {
+				ImGui::PushItemWidth(100.0f);
+				ImGui::InputInt("##xclickpattern", &pattern[0]); ImGui::SameLine(); ImGui::InputInt("##yclickpattern", &pattern[1]);
+				ImGui::PopItemWidth();
+				ImGui::TreePop();
+			}
+
+			// パターンのオートラン調整.
+			if (ImGui::TreeNode(IMGUI_JP("オートラン調整"))) {
+				// 実行中の処理.
+				if (m_PatternAuto) {
+					ImGui::Text("On");
+					m_AnimationSpeed -= CTime::GetInstance()->GetDeltaTime();
+					if (m_AnimationSpeed < 0) {
+						m_AnimationSpeed = m_AnimationSpeedMax * CTime::GetInstance()->GetDeltaTime();
+						pattern[0]++;
+
+						// xが最大値を超え、yが最大値の場合アニメーションが最初から送られるようにする.
+						if (m_PatternMax.x < pattern[0] && m_PatternMax.y == pattern[1]) {
+							// yが0以下になった場合は初期状態にする.
+							pattern[0] = 0; pattern[1] = 0;
+						}
+					}
+				}
+				else {
+					ImGui::Text("Off");
+					m_AnimationSpeed = m_AnimationSpeedMax * CTime::GetInstance()->GetDeltaTime();
+				}
+				ImGui::PushItemWidth(100.0f);
+				// 実行の切り替え.
+				if (ImGui::Button(IMGUI_JP("切替"))) { m_PatternAuto = !m_PatternAuto; }
+				// 送り速度の設定.
+				ImGui::InputFloat(IMGUI_JP("送り速度設定(フレーム)"), &m_AnimationSpeedMax);
+				ImGui::PopItemWidth();
+
+				ImGui::TreePop();
+			}
+
+			// Xが最大値を超えた場合.
+			if (m_PatternMax.x < pattern[0]) {
+				// Yが最大値以上の場合、Xを最大値にする.
+				if (m_PatternMax.y <= pattern[1]) {
+					pattern[0] = m_PatternMax.x;
+				}
+				else {
+					pattern[0] = 0; pattern[1]++;
+				}
+			}
+			else if (pattern[0] < 0) {
+				// 最低値は0に固定し、yの値を繰り下げる.
+				pattern[0] = 0; pattern[1]--;
+			}
+
+			// Yが最大値を超えた場合.
+			if (m_PatternMax.y < pattern[1]) {
+				pattern[0] = m_PatternMax.x;
+				pattern[1] = m_PatternMax.y;
+			}
+			else if (pattern[1] < 0) {
+				// yが0以下になった場合は初期状態にする.
+				pattern[0] = 0; pattern[1] = 0;
+			}
+
+			// 反映する.
+			m_PatternNo = POINTS(pattern[0], pattern[1]);
+			selectedUI->SetPatternNo(m_PatternNo.x, m_PatternNo.y);
+			ImGui::TreePop();
+		}
+
+		//-----------------------------------------------------------
+		//		その他の情報の調整.
+		//-----------------------------------------------------------
 		if (ImGui::TreeNode(IMGUI_JP("その他"))) {
 			float alpha = selectedUI->GetAlpha();
 			D3DXVECTOR3 scale	= selectedUI->GetScale();
