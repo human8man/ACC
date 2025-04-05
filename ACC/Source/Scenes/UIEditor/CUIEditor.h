@@ -48,11 +48,14 @@ private:
 	std::vector<CSprite2D*> m_pSprite2Ds;		// Sprite2Dクラス.
 
 	std::string m_ScenePath;	// 現在のシーンパス.
-	D3DXVECTOR2 m_OffsetPos;	// マウス座標と画像座標のズレ補正値.
 
 	bool	m_MovedSomething;		// 何か変更があった際に保存確認フラグを立てる.
 	int		m_SelectedUIIndex;
 	char	m_SearchBuffer[64] = ""; // 検索用バッファ.
+	
+	// マウス操作用の変数.
+	D3DXVECTOR2 m_OffsetPos;	// マウス座標と画像座標のズレ補正値.
+	bool m_DoDrag;				// ドラッグ中.
 
 	// パターン確認用の変数.
 	POINTS	m_PatternNo;		// 仮のパターン.

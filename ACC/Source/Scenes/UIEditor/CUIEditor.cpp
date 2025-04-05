@@ -4,6 +4,7 @@
 #include "FileManager/LoadImage/LoadImage.h"
 #include "DirectSound/CSoundManager.h"
 #include "Time/CTime.h"
+#include "DirectInput/CDirectInput.h"
 
 #ifdef _DEBUG
 #include "ImGui/CImGui.h"
@@ -30,6 +31,7 @@ namespace {
 //============================================================================
 CUIEditor::CUIEditor(HWND hWnd)
 {
+	m_hWnd = hWnd;
 }
 CUIEditor::~CUIEditor()
 {
@@ -146,9 +148,29 @@ void CUIEditor::Update()
 		//		座標の調整.
 		//-----------------------------------------------------------
 		if (ImGui::TreeNode(IMGUI_JP("座標"))) {
+			// ドラッグ用にマウス操作のDirectInpuを用意.
+			CMouse* Mouse = CInput::GetInstance()->CDMouse();
 			D3DXVECTOR3 pos	= selectedUI->GetPos();
 			bool posdrag	= ImGui::DragFloat3("##Position", pos, 1.f);
 			bool posinput	= ImGui::InputFloat3("##InputPos", pos);
+
+			// マウス位置を取得.
+			POINT MousePos;
+			GetCursorPos(&MousePos);
+			// 画像範囲内で左クリック入力中の場合、ドラッグ操作を開始.
+			if (selectedUI->PointInSquare(MousePos, selectedUI->WindowRect(m_hWnd)) && !m_DoDrag) {
+				if (Mouse->IsLAction() ) { 
+					m_DoDrag = true; 
+					m_OffsetPos = D3DXVECTOR2(pos.x - MousePos.x, pos.y - MousePos.y);
+				}
+			}
+			if (m_DoDrag) {
+				posdrag = true;
+				// 補正値+マウス座標した座標を入れる.
+				pos = D3DXVECTOR3(MousePos.x + m_OffsetPos.x, MousePos.y + m_OffsetPos.y, pos.z);
+				// マウスの左クリックを話した場合、ドラッグ操作を停止.
+				if (!Mouse->IsLDown()) { m_DoDrag = false; }
+			}
 
 			// 変更があった場合保存する.
 			if (posdrag || posinput) {
