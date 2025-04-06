@@ -2,7 +2,6 @@
 
 #include "Scenes/CSceneBase.h"
 #include "Sprite/2D/UI/CUIObject.h"
-#include "DirectInput/CDirectInput.h"
 
 
 //=============================================================================

@@ -61,8 +61,8 @@ void CPlayer::Update(std::unique_ptr<CEnemy>& chara)
 	if ( m_DashTime >= 0.f )	{ m_DashTime -= CTime::GetInstance()->GetDeltaTime(); }
 	if ( m_ReloadTime >= 0.f )	{
 		m_ReloadTime -= CTime::GetInstance()->GetDeltaTime(); 
+		// リロード終了時にSEを鳴らす.
 		if (m_ReloadTime < 0.f) {
-			// リロード終了.
 			CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_ReloadEnd);
 		}
 	}
@@ -92,7 +92,7 @@ void CPlayer::Update(std::unique_ptr<CEnemy>& chara)
 
 			// 弾座標から敵座標のベクトルを出す.
 			shootdir = EnemyPos - m_pBullets[i]->GetPos();
-			D3DXVec3Normalize(&shootdir, &shootdir);	// 正規化.
+			D3DXVec3Normalize(&shootdir, &shootdir); // 正規化.
 
 			// 弾の初期位置,移動方向の単位ベクトル,速度を設定.
 			m_pBullets[i]->Init( m_pBullets[i]->GetPos(), shootdir, m_BulletSpeed);
@@ -111,12 +111,19 @@ void CPlayer::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 {
 	// プレイヤーは描画しない.
 	// CCharacter::Draw( View, Proj, Light );
-	
-	// 弾の描画.
-	for (size_t i = 0; i < m_pBullets.size(); ++i) { m_pBullets[i]->Draw(View, Proj, Light); }
+
+	// エフェクト事に必要なハンドルを用意.
+	static ::EsHandle hEffect = -1;
+
+	// 弾とそのエフェクトの描画.
+	for (size_t i = 0; i < m_pBullets.size(); ++i) { 
+		hEffect = CEffect::Play(CEffect::BulletSmoke, m_pBullets[i]->GetPos());
+		m_pBullets[i]->Draw(View, Proj, Light);
+	}
 
 	// 銃の描画.
 	m_pGun->Draw(View, Proj, Light);
+
 }
 
 
@@ -127,7 +134,7 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, Collider floor, Collider c
 {
 	Collider Bullet,enemyegg;
 
-	/// エフェクト事に必要なハンドルを用意.
+	// エフェクト事に必要なハンドルを用意.
 	static ::EsHandle hEffect = -1;
 
 	// 敵データを取得.
@@ -201,6 +208,9 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, Collider floor, Collider c
 //-----------------------------------------------------------------------------
 void CPlayer::KeyInput(std::unique_ptr<CEnemy>& chara)
 {
+	// エフェクト事に必要なハンドルを用意.
+	static ::EsHandle hEffect = -1;
+
 	CKey* Key = CInput::GetInstance()->CDKeyboard();
 	CMouse* Mouse = CInput::GetInstance()->CDMouse();
 
@@ -321,6 +331,8 @@ void CPlayer::KeyInput(std::unique_ptr<CEnemy>& chara)
 				m_pGun->GetShootPos(),
 				shootdir,
 				m_BulletSpeed);
+			
+			hEffect = CEffect::Play(CEffect::GunFire, m_pGun->GetShootPos());
 
 			// 射撃音を鳴らす.
 			CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_Shot);
