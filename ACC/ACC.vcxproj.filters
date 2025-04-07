@@ -203,9 +203,6 @@
     <ClCompile Include="Source\GameObject\Sprite\2D\CSprite2D.cpp">
       <Filter>Source\GameObject\Sprite\2D</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GameObject\Sprite\3D\Explosion\CExplosion.cpp">
-      <Filter>Source\GameObject\Sprite\3D\Explosion</Filter>
-    </ClCompile>
     <ClCompile Include="Source\GameObject\Sprite\3D\CSprite3D.cpp">
       <Filter>Source\GameObject\Sprite\3D</Filter>
     </ClCompile>
@@ -368,9 +365,6 @@
     </ClInclude>
     <ClInclude Include="Source\GameObject\Sprite\2D\CSprite2D.h">
       <Filter>Source\GameObject\Sprite\2D</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GameObject\Sprite\3D\Explosion\CExplosion.h">
-      <Filter>Source\GameObject\Sprite\3D\Explosion</Filter>
     </ClInclude>
     <ClInclude Include="Source\GameObject\Sprite\3D\CSprite3D.h">
       <Filter>Source\GameObject\Sprite\3D</Filter>

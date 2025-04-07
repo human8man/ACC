@@ -1,5 +1,7 @@
 #include "CSprite3D.h"
 #include "DirectX/CDirectX11.h"
+#include "FileManager/LoadImage/LoadImage.h"
+#include "FileManager/FileManager.h"
 
 
 // シェーダファイル名（ディレクトリも含む）.
@@ -46,22 +48,30 @@ CSprite3D::~CSprite3D()
 //=============================================================================
 //		初期化処理.
 //=============================================================================
-HRESULT CSprite3D::Init( LPCTSTR lpFileName, SPRITE_STATE& pSs)
+HRESULT CSprite3D::Init(const std::string& lpFileName)
 {
 	m_pDx11 = CDirectX11::GetInstance();
 	m_pDevice11 = m_pDx11->GetDevice();
 	m_pContext11 = m_pDx11->GetContext();
 
-	m_SpriteState = pSs;
-
+	// スプライト情報の取得.
+	if( FAILED( SpriteStateDataLoad( lpFileName ))) return E_FAIL;
 	// シェーダ作成.
-	if( FAILED( CreateShader() )) { return E_FAIL; }
+	if( FAILED( CreateShader() )) return E_FAIL;
 	// 板ポリゴン作成.
-	if( FAILED( CreateModel() )) { return E_FAIL; }
+	if( FAILED( CreateModel() )) return E_FAIL;
+
+	// テクスチャ作成(パスの型を変換後).
+	std::wstring wideStr;
+	int bufferSize = MultiByteToWideChar(CP_UTF8, 0, lpFileName.c_str(), -1, nullptr, 0);
+	if (bufferSize <= 0) { return E_FAIL; }
+	wideStr.resize(bufferSize);
+	MultiByteToWideChar(CP_UTF8, 0, lpFileName.c_str(), -1, &wideStr[0], bufferSize);
+
 	// テクスチャ作成.
-	if( FAILED( CreateTexture( lpFileName ) ) ) { return E_FAIL; }
+	if( FAILED( CreateTexture(wideStr.c_str()))) return E_FAIL;
 	// サンプラ作成.
-	if( FAILED( CreateSampler() ) ) { return E_FAIL; }
+	if( FAILED( CreateSampler())) return E_FAIL;
 
 	return S_OK;
 }
@@ -353,7 +363,7 @@ void CSprite3D::Render( D3DXMATRIX& mView,D3DXMATRIX& mProj )
 	mWorld = mScale * mRot * mTrans;
 
 	// ビルボード用.
-	if( m_Billboard == true ){
+	if( m_Billboard ){
 		D3DXMATRIX CancelRotation = mView;// ビュー行列.
 		CancelRotation._41 = CancelRotation._42 = CancelRotation._43 = 0.f;// xyzを0にする.
 		// CancelRotationの逆行列を求めます.
@@ -417,4 +427,110 @@ void CSprite3D::Render( D3DXMATRIX& mView,D3DXMATRIX& mProj )
 
 	// アルファブレンド無効にする.
 	m_pDx11->SetAlphaBlend( false );
+}
+
+
+//=============================================================================
+//		スプライト情報の読込.
+//=============================================================================
+HRESULT CSprite3D::SpriteStateDataLoad(const std::string& FilePath)
+{
+	Json m_SpriteStateData = nullptr;	// 画像情報.
+
+	// 補正値テキストの読み込み.
+	std::string TextPath = FilePath;
+	TextPath.erase(TextPath.rfind("\\"), TextPath.size()) += "\\OffSet.json";
+	Json OffSetData = FileManager::JsonLoad(TextPath);
+
+	// 同じ名前のテキストの読み込み.
+	TextPath = FilePath;
+	TextPath.erase(TextPath.find("."), TextPath.size()) += ".json";
+	m_SpriteStateData = FileManager::JsonLoad(TextPath);
+
+	// ファイルが無いためファイルを作成する.
+	if (m_SpriteStateData.empty()) {
+		if (FAILED(CreateSpriteState(FilePath))) return E_FAIL;
+
+		// 作成できたためもう一度読み込み直す.
+		SpriteStateDataLoad(FilePath);
+		return S_OK;
+	}
+
+	// 画像のパスの取得.
+	if (m_SpriteStateData.contains("FilePath")) {
+		if (m_SpriteStateData["FilePath"].is_string()) {
+			m_SpriteState.Path = m_SpriteStateData["FilePath"].get<std::string>();
+		}
+	}
+
+	// 画像のファイル名を保存.
+	std::string ImageName = FilePath.substr(FilePath.find_last_of("\\/") + 1);
+	ImageName = ImageName.substr(0, ImageName.find_last_of(".")); // 拡張子削除.
+	m_SpriteState.Name = ImageName;
+
+	m_SpriteState.Pos.x = m_SpriteStateData["Pos"]["x"].get<float>();
+	m_SpriteState.Pos.y = m_SpriteStateData["Pos"]["y"].get<float>();
+	m_SpriteState.Pos.z = m_SpriteStateData["Pos"]["z"].get<float>();
+	m_SpriteState.Disp.w = m_SpriteStateData["Disp"]["w"];
+	m_SpriteState.Disp.h = m_SpriteStateData["Disp"]["h"];
+	m_SpriteState.Base.w = m_SpriteStateData["Base"]["w"];
+	m_SpriteState.Base.h = m_SpriteStateData["Base"]["h"];
+	m_SpriteState.Stride.w = m_SpriteStateData["Stride"]["w"];
+	m_SpriteState.Stride.h = m_SpriteStateData["Stride"]["h"];
+
+	m_Alpha = m_SpriteStateData["Alpha"];
+	m_vScale.x = m_SpriteStateData["Scale"]["x"].get<float>();
+	m_vScale.y = m_SpriteStateData["Scale"]["y"].get<float>();
+	m_vScale.z = m_SpriteStateData["Scale"]["z"].get<float>();
+	m_vRotation.x = m_SpriteStateData["Rotate"]["x"].get<float>();
+	m_vRotation.y = m_SpriteStateData["Rotate"]["y"].get<float>();
+	m_vRotation.z = m_SpriteStateData["Rotate"]["z"].get<float>();
+
+#if _DEBUG
+	// ファイルパスを更新する.
+	m_SpriteStateData["FilePath"] = TextPath;
+	if (FAILED(FileManager::JsonSave(TextPath, m_SpriteStateData))) return E_FAIL;
+#endif
+
+	return S_OK;
+}
+
+
+//=============================================================================
+//		スプライト情報をまとめたjsonファイルの作成.
+//=============================================================================
+HRESULT CSprite3D::CreateSpriteState(const std::string& FilePath)
+{
+	// 作成するファイルパス.
+	std::string TextPath = FilePath;
+	TextPath.erase(TextPath.find("."), TextPath.size()) += ".json";
+
+	// 画像の幅、高さの取得.
+	const D3DXVECTOR2& BaseSize = LoadImageFile::GetImageSize(FilePath);
+
+	// 画像情報のデフォルトの値を追加していく.
+	Json SpriteState;
+	SpriteState["Pos"]["x"] = 0.0;
+	SpriteState["Pos"]["y"] = 0.0;
+	SpriteState["Pos"]["z"] = 0.0;
+	SpriteState["Disp"]["w"] = BaseSize.x;
+	SpriteState["Disp"]["h"] = BaseSize.y;
+	SpriteState["Base"]["w"] = BaseSize.x;
+	SpriteState["Base"]["h"] = BaseSize.y;
+	SpriteState["Stride"]["w"] = BaseSize.x;
+	SpriteState["Stride"]["h"] = BaseSize.y;
+
+	SpriteState["Alpha"] = 1.0;
+	SpriteState["Scale"]["x"] = 1.0;
+	SpriteState["Scale"]["y"] = 1.0;
+	SpriteState["Scale"]["z"] = 1.0;
+	SpriteState["Rotate"]["x"] = 0.0;
+	SpriteState["Rotate"]["y"] = 0.0;
+	SpriteState["Rotate"]["z"] = 0.0;
+
+	// スプライト情報の作成.
+	if (FAILED(FileManager::JsonSave(TextPath, SpriteState))) return E_FAIL;
+
+	// 作成成功.
+	return S_OK;
 }

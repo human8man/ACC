@@ -29,5 +29,9 @@ public:
 	}
 
 protected:
+	// 子クラスを抽象クラスにしないために必要.
+	void Draw(D3DXMATRIX& mView, D3DXMATRIX& mProj, LIGHT& Light ) override final;
+
+protected:
 	CSprite3D* m_pSprite;
 };

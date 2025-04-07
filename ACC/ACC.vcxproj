@@ -293,7 +293,6 @@
     <ClCompile Include="Source\GameObject\Sprite\2D\UI\CUIObject.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\2D\UI\CWinUI\CWinUI.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\3D\CSprite3D.cpp" />
-    <ClCompile Include="Source\GameObject\Sprite\3D\Explosion\CExplosion.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\CSpriteObject.cpp" />
     <ClCompile Include="Source\MainLoop\CMain.cpp" />
     <ClCompile Include="Source\MainLoop\WinMain.cpp" />
@@ -356,7 +355,6 @@
     <ClInclude Include="Source\GameObject\Sprite\2D\UI\CUIObject.h" />
     <ClInclude Include="Source\GameObject\Sprite\2D\UI\CWinUI\CWinUI.h" />
     <ClInclude Include="Source\GameObject\Sprite\3D\CSprite3D.h" />
-    <ClInclude Include="Source\GameObject\Sprite\3D\Explosion\CExplosion.h" />
     <ClInclude Include="Source\GameObject\Sprite\CSpriteObject.h" />
     <ClInclude Include="Source\MainLoop\CMain.h" />
     <ClInclude Include="Source\Scenes\CSceneBase.h" />

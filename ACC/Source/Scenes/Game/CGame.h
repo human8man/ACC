@@ -5,6 +5,7 @@
 #include "DirectX/CDirectX9.h"
 #include "DirectX/CDirectX11.h"
 
+#include "Sprite/CSpriteObject.h"
 #include "Collision/GJK/CGJK.h"
 
 
@@ -18,6 +19,7 @@ class CGameUI;
 class CRandom;
 class CWinUI;
 class CLoseUI;
+class CEnemyFrame;
 
 //============================================================================
 //		ゲームクラス.
@@ -77,9 +79,9 @@ private:
 	std::unique_ptr<CRay> m_pCamRay;	// レイクラス.
 
 	// UI.
-	std::unique_ptr<CGameUI> m_pGameUI;	// UIクラス.
-	std::unique_ptr<CWinUI>	 m_pWinUI;	// 勝利クラス.
-	std::unique_ptr<CLoseUI> m_pLoseUI;	// 敗北クラス.
+	std::unique_ptr<CGameUI>		m_pGameUI;		// UIクラス.
+	std::unique_ptr<CWinUI>			m_pWinUI;		// 勝利クラス.
+	std::unique_ptr<CLoseUI>		m_pLoseUI;		// 敗北クラス.
 
 	std::vector<D3DXVECTOR3> m_SpawnPoints;	// スポーン地点配列.
 

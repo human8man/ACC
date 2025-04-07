@@ -11,6 +11,7 @@ public:
 	enum GameSprite {
 		Bullets,
 		Crosshair,
+		EnemyFrame,
 		HP,
 		LowHP,
 		Reload,
