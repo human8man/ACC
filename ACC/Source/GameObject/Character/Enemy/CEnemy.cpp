@@ -74,8 +74,14 @@ void CEnemy::Draw(D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light)
 {
 	CCharacter::Draw( View, Proj, Light );
 
-	// 弾の描画.
-	for (size_t i = 0; i < m_pBullets.size(); ++i) { m_pBullets[i]->Draw(View, Proj, Light); }
+	// エフェクト事に必要なハンドルを用意.
+	static ::EsHandle hEffect = -1;
+
+	// 弾とそのエフェクトの描画.
+	for (size_t i = 0; i < m_pBullets.size(); ++i) {
+		hEffect = CEffect::Play(CEffect::BulletSmoke, m_pBullets[i]->GetPos());
+		m_pBullets[i]->Draw(View, Proj, Light);
+	}
 
 	// 銃の描画.
 	m_pGun->Draw(View, Proj, Light);

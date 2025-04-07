@@ -25,9 +25,13 @@ public:
 	// スプライト構造体.
 	struct SPRITE_STATE
 	{
-		WHSIZE Disp;	// 表示幅高さ.
-		WHSIZE Base;	// 元画像幅高さ.
-		WHSIZE Stride;	// １コマあたりの幅高さ.
+		WHSIZE Disp;		// 表示幅高さ.
+		WHSIZE Base;		// 元画像幅高さ.
+		WHSIZE Stride;		// 1コマあたりの幅高さ.
+		D3DXVECTOR3 Pos;	// 画像座標.
+		D3DXVECTOR3 m_vScale;
+		std::string Path;	// パス.
+		std::string Name;	// 名前.
 	};
 
 	// コンスタントバッファのアプリ側の定義.
@@ -50,7 +54,7 @@ public:
 	~CSprite3D();
 
 	// 初期化処理.
-	HRESULT Init( LPCTSTR lpFileName, SPRITE_STATE& pSs );
+	HRESULT Init( const std::string& lpFileName );
 
 	// 解放処理.
 	void Release();
@@ -97,6 +101,10 @@ public:
 	// ビルボードのON/OFF切り替え.
 	void SetBillboard( bool flag ) { m_Billboard = flag; }
 
+	// jsonファイルのスプライト情報を取得.
+	HRESULT SpriteStateDataLoad(const std::string& FilePath);
+	// スプライト情報をまとめたjsonファイルの作成.
+	HRESULT CreateSpriteState(const std::string& FilePath);
 private:
 	CDirectX11*				m_pDx11;
 	ID3D11Device*			m_pDevice11;

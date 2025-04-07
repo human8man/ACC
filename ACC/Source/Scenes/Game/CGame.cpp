@@ -12,7 +12,6 @@
 #include "Sprite/2D/UI/CGameUI/CGameUI.h"
 #include "Sprite/2D/UI/CLoseUI/CLoseUI.h"
 #include "Sprite/2D/UI/CWinUI/CWinUI.h"
-
 #include "Random/CRandom.h"
 
 
@@ -57,18 +56,13 @@ CGame::~CGame()
 void CGame::Create()
 {
 	// インスタンス生成.
-	m_pEgg		= std::make_unique<CStaticMesh>();
-	m_pFloor	= std::make_unique<CStaticMesh>(); 
-	for (int i = 0; i < m_CylinderMax; ++i) {
-		auto cylinder = std::make_unique<CStaticMesh>();
-		cylinder->Init(_T("Data\\Mesh\\Static\\Stage\\Rectangular.x"));
-		m_pCylinders.push_back(std::move(cylinder));
-	}
-	m_pPlayer	= std::make_unique<CPlayer>();
-	m_pEnemy	= std::make_unique<CEnemy>();
-	m_pCamRay	= std::make_unique<CRay>();
-	m_pGameUI	= std::make_unique<CGameUI>();
-	m_pGameUI	->Create();
+	m_pEgg			= std::make_unique<CStaticMesh>();
+	m_pFloor		= std::make_unique<CStaticMesh>();
+	m_pPlayer		= std::make_unique<CPlayer>();
+	m_pEnemy		= std::make_unique<CEnemy>();
+	m_pCamRay		= std::make_unique<CRay>();
+	m_pGameUI		= std::make_unique<CGameUI>();
+	m_pGameUI		->Create();
 
 	// スポーン地点の設定.
 	m_SpawnPoints = {
@@ -77,7 +71,13 @@ void CGame::Create()
 		{  50.f, 5.f, -50.f },
 		{ -50.f, 5.f, -50.f }
 	};
-
+	
+	// 柱の生成.
+	for (int i = 0; i < m_CylinderMax; ++i) {
+		auto cylinder = std::make_unique<CStaticMesh>();
+		cylinder->Init(_T("Data\\Mesh\\Static\\Stage\\Rectangular.x"));
+		m_pCylinders.push_back(std::move(cylinder));
+	}
 }
 
 
@@ -247,9 +247,9 @@ void CGame::Draw()
 	// エフェクトの描画.
 	CEffect::GetInstance()->Draw(m_mView, m_mProj, m_Light);
 
-
 	// UIの描画.
 	m_pGameUI->Draw();
+
 
 	// 勝利と敗北画面の描画.
 	if (m_pLoseUI != nullptr) { m_pLoseUI->Draw(); }

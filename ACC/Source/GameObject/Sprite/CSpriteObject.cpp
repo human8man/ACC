@@ -41,3 +41,12 @@ void CSpriteObject::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj )
 	// レンダリング.
 	m_pSprite->Render( View, Proj );
 }
+
+
+//-----------------------------------------------------------------------------
+//		子クラスを抽象クラスにしないために必要.
+//-----------------------------------------------------------------------------
+void CSpriteObject::Draw(D3DXMATRIX& mView, D3DXMATRIX& mProj, LIGHT& Light)
+{
+	Draw(mView, mProj);
+}

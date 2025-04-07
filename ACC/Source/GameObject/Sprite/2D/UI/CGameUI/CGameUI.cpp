@@ -105,6 +105,8 @@ void CGameUI::Update(std::unique_ptr<CPlayer>& chara)
 void CGameUI::Draw()
 {
 	for ( size_t i = 0; i < m_pUIs.size(); ++i ) {
+		// “GƒtƒŒ[ƒ€‚Í•Ê‚Åˆ—.
+		if (i == GameSprite::EnemyFrame) { continue; }
 
 		// ’eUI‚Ì•`‰æÝ’è.
 		if(i == GameSprite::Bullets) {
