@@ -42,5 +42,5 @@ public:
 private:
 	D3DXVECTOR3	m_MoveDirection;	// ˆÚ“®•ûŒü.
 	float		m_MoveSpeed;		// ˆÚ“®‘¬“x.
-	int			m_DeleteTime;		// ‰ð•ú‚Ü‚Å‚ÌŽžŠÔ.
+	float		m_DeleteTime;		// ‰ð•ú‚Ü‚Å‚ÌŽžŠÔ.
 };

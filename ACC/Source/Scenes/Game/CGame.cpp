@@ -322,12 +322,12 @@ void CGame::CollisionJudge()
 void CGame::InitEPPos(CRandom& random, std::unique_ptr<CPlayer>& player, std::unique_ptr<CEnemy>& enemy)
 {
 	// スポーンポイントのインデックスをランダムに取得.
-	int PIndex = random.GetRandomInt(0, m_SpawnPoints.size() - 1);
+	int PIndex = random.GetRandomInt(0, static_cast<int>(m_SpawnPoints.size()) - 1);
 
 	// 敵のスポーンポイントをプレイヤーと異なる場所にする.
 	int EIndex;
 	do {
-		EIndex = random.GetRandomInt(0, m_SpawnPoints.size() - 1);
+		EIndex = random.GetRandomInt(0, static_cast<int> (m_SpawnPoints.size()) - 1);
 	} while (EIndex == PIndex);
 
 	// プレイヤーと敵の位置を設定.

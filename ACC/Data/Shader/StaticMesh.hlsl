@@ -55,18 +55,18 @@ VS_OUTPUT VS_Main(
 
 	//法線をモデルの姿勢に合わせる.
 	// (モデルが回転すれば法線も回転させる必要があるため).
-	output.Normal = mul( Norm, (float3x3)g_mW );
+	output.Normal = mul( Norm.xyz, (float3x3)g_mW );
 	output.Normal = normalize( output.Normal );
 
 	//ライト方向:
 	// ディレクショナルライトは、どこでも同じ方向.位置は無関係.
-	output.Light = normalize( g_vLightDir );
+	output.Light = normalize( g_vLightDir ).xyz;
 
 	output.PosWorld = mul( Pos, g_mW );
 
 	//視線ベクトル:
 	// ワールド空間上での頂点から頂点へ向かうベクトル.
-	output.EyeVector = normalize( g_CameraPos - output.PosWorld );
+    output.EyeVector = normalize(g_CameraPos - output.PosWorld).xyz;
 
 	//テクスチャ座標.
 	output.UV = UV;
@@ -115,18 +115,18 @@ VS_OUTPUT VS_NoTex(
 
 	//法線をモデルの姿勢に合わせる.
 	// (モデルが回転すれば法線も回転させる必要があるため).
-	output.Normal = mul( Norm, ( float3x3 )g_mW );
+	output.Normal = mul( Norm.xyz, ( float3x3 )g_mW );
 	output.Normal = normalize( output.Normal );
 
 	//ライト方向:
 	// ディレクショナルライトは、どこでも同じ方向.位置は無関係.
-	output.Light = normalize( g_vLightDir );
+	output.Light = normalize( g_vLightDir ).xyz;
 
 	output.PosWorld = mul( Pos, g_mW );
 
 	//視線ベクトル:
 	// ワールド空間上での頂点から頂点へ向かうベクトル.
-	output.EyeVector = normalize( g_CameraPos - output.PosWorld );
+	output.EyeVector = normalize( g_CameraPos - output.PosWorld ).xyz;
 
 
 	return output;
