@@ -216,7 +216,7 @@ std::unique_ptr<CSceneBase> CSceneManager::CreateScene(SceneList No)
 void CSceneManager::ChangeShowCursor(bool flag)
 {
 	// ƒJ[ƒ\ƒ‹ó‘Ô‚Ìæ“¾.
-	CURSORINFO cursorInfo;
+	CURSORINFO cursorInfo = {};
 	cursorInfo.cbSize = sizeof(CURSORINFO);
 	GetCursorInfo(&cursorInfo);
 

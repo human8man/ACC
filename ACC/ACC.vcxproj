@@ -132,6 +132,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>Source\Effect\Effekseer\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>dinput8.lib;dxguid.lib;d3d11.lib;d3dcompiler.lib;dxgi.lib;dsound.lib;ole32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

@@ -46,9 +46,10 @@ public:
 	const D3DXVECTOR3& GetRot()		const { return m_vRotation; }	// 回転情報をを取得.
 	const D3DXVECTOR3& GetScale()	const { return m_vScale;	 }	// サイズを取得.
 	// オブジェクト情報(座標情報,回転情報,サイズ)を取得.
-	const ObjectInfo& GetObjeInfo()	const { return ObjectInfo{ m_vPosition, m_vRotation, m_vScale }; }
+	const ObjectInfo& GetObjeInfo()	const { return m_ObjectInfo = ObjectInfo{ m_vPosition, m_vRotation, m_vScale }; }
 
 protected:
+	mutable ObjectInfo m_ObjectInfo;	// オブジェクト情報.
 	D3DXVECTOR3	m_vPosition;	// 座標情報.
 	D3DXVECTOR3	m_vRotation;	// 回転情報.
 	D3DXVECTOR3	m_vScale;		// サイズ.
