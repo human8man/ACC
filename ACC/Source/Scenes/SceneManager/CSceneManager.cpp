@@ -16,9 +16,9 @@
 #endif
 
 
-//=================================================================================================
+//=============================================================================
 //		シーンマネージャークラス.
-//=================================================================================================
+//=============================================================================
 CSceneManager::CSceneManager()
 	: m_hWnd			()
 	, m_SceneNo			()
@@ -34,9 +34,9 @@ CSceneManager::~CSceneManager()
 }
 
 
-//=================================================================================================
+//=============================================================================
 //		シーンマネージャー構築関数.
-//=================================================================================================
+//=============================================================================
 HRESULT CSceneManager::Create(HWND hWnd)
 {
 	//自身のインスタンス
@@ -63,9 +63,9 @@ HRESULT CSceneManager::Create(HWND hWnd)
 }
 
 
-//=================================================================================================
+//=============================================================================
 //		更新処理.
-//=================================================================================================
+//=============================================================================
 void CSceneManager::Update()
 {
 	CKey* Key = CInput::GetInstance()->CDKeyboard();
@@ -77,20 +77,24 @@ void CSceneManager::Update()
 
 	// ESCが押された場合.
 	if (Key->IsKeyAction(DIK_ESCAPE)) {
-		// ENDUIが存在しない場合出現.
 		if (m_pEndUI == nullptr) {
+			ChangeShowCursor(true); 
 			m_pEndUI = std::make_unique<CEndUI>();
 			m_pEndUI->Create(m_hWnd);
 			m_EndDeleteFlag = false;
 		}
-		// ENDUIが存在する場合削除.
 		else if (m_pEndUI != nullptr) {
+			if (m_SceneNo == SceneList::Title) { ChangeShowCursor(true); }
+			else{ ChangeShowCursor(false); }
+
 			m_EndDeleteFlag = true;
 		}
 	}
 
 	// EndUI削除フラグがあった場合.
 	if (m_EndDeleteFlag) {
+		if (m_SceneNo == SceneList::Title) { ChangeShowCursor(true); }
+		else { ChangeShowCursor(false); }
 		m_pEndUI.reset();
 		m_EndDeleteFlag = false;
 	}
@@ -114,6 +118,11 @@ void CSceneManager::Update()
 	ImGui::Text(IMGUI_JP("-----デバッグ用シーン------------------------------------"));
 	if (ImGui::Button("UIEditor")) { GetInstance()->LoadScene(SceneList::UIEditor); }
 	ImGui::End();
+
+	ImGui::Begin("MousePos");
+	POINT pos;
+	if (GetCursorPos(&pos)) { ImGui::Text("%d,%d", pos.x, pos.y); }
+	ImGui::End();
 #endif
 
 	if (m_pEndUI == nullptr) {
@@ -126,29 +135,21 @@ void CSceneManager::Update()
 			m_pScene->LoadData();
 		}
 
-		// フェード中でない間、Update()を回す.
+		// フェード中以外、Update()を回す.
 		//	フェードのピーク時に一度だけ通し、フェード明け用の背景を作成する.
-		if (!m_pFade->GetFading() || m_pFade->GetFadePeak())
-		{
+		if (!m_pFade->GetFading() || m_pFade->GetFadePeak()) {
 			GetInstance()->m_pScene->Update();
 		}
 
 		// フェードUIの更新処理.
 		m_pFade->Update();
 	}
-
-#if _DEBUG
-	ImGui::Begin("MousePos");
-	POINT pos;
-	if (GetCursorPos(&pos)) { ImGui::Text("%d,%d", pos.x, pos.y); }
-	ImGui::End();
-#endif
 }
 
 
-//=================================================================================================
+//=============================================================================
 //		描画処理.
-//=================================================================================================
+//=============================================================================
 void CSceneManager::Draw()
 {
 	m_pScene->Draw();
@@ -164,9 +165,9 @@ void CSceneManager::Draw()
 }
 
 
-//=================================================================================================
+//=============================================================================
 //		シーンマネージャー破棄.
-//=================================================================================================
+//=============================================================================
 void CSceneManager::Release()
 {
 	m_pScene->Release();
@@ -174,9 +175,9 @@ void CSceneManager::Release()
 }
 
 
-//=================================================================================================
+//=============================================================================
 //		指定したシーンを読み込む.
-//=================================================================================================
+//=============================================================================
 void CSceneManager::LoadScene(SceneList Scene)
 {
 	m_pFade->DoFade(120);
@@ -184,22 +185,49 @@ void CSceneManager::LoadScene(SceneList Scene)
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 //		指定されたシーンの生成.
-//----------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 std::unique_ptr<CSceneBase> CSceneManager::CreateScene(SceneList No)
 {
 	m_SceneNo = No;
+
 	switch (No)
 	{
 	case Title:
+		ChangeShowCursor(true);
 		return std::make_unique<CTitle>( m_hWnd );
 	case Game:
+		ChangeShowCursor(false);
 		return std::make_unique<CGame>( m_hWnd );
 	case UIEditor:
+		ChangeShowCursor(true);
 		return std::make_unique<CUIEditor>( m_hWnd );
 	default:
 		return nullptr;
 	}
 	return nullptr;
+}
+
+
+//-----------------------------------------------------------------------------
+//		カーソルの表示切替.
+//-----------------------------------------------------------------------------
+void CSceneManager::ChangeShowCursor(bool flag)
+{
+	// カーソル状態の取得.
+	CURSORINFO cursorInfo;
+	cursorInfo.cbSize = sizeof(CURSORINFO);
+	GetCursorInfo(&cursorInfo);
+
+	// ShowCursorが重複して呼び出されないようにする.
+	if (cursorInfo.flags != CURSOR_SHOWING && flag) {
+		
+		ShowCursor(flag); 
+	}
+	else if (cursorInfo.flags == CURSOR_SHOWING && !flag) { 
+
+		ShowCursor(flag); 
+	}
+
 }

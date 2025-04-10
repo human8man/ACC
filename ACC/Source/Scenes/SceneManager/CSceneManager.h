@@ -40,6 +40,8 @@ public:
 private:
 	// 指定されたシーンの生成.
 	std::unique_ptr<CSceneBase> CreateScene(SceneList No);
+	// カーソルの表示切替.
+	void ChangeShowCursor(bool flag);
 
 private:
 	HWND m_hWnd;

@@ -93,8 +93,6 @@ void CTitle::Init()
 //=================================================================================================
 void CTitle::Update()
 {
-	//カーソルを表示させる.
-	ShowCursor(true);
 	// BGM再生.
 	CSoundManager::GetInstance()->PlayLoop(CSoundManager::enList::BGM_Title);
 
