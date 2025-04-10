@@ -296,15 +296,21 @@ LRESULT CALLBACK CMain::MsgProc(
 	//		ウィンドウが起動中の場合.
 	//---------------------------------------------------------------
 	case WM_ACTIVATE:
+		// カーソル状態の取得.
+		CURSORINFO cursorInfo;
+		cursorInfo.cbSize = sizeof(CURSORINFO);
+		GetCursorInfo(&cursorInfo);
+
 		// ウィンドウがアクティブの場合.
 		if (LOWORD(wParam) == WA_INACTIVE) {
 			// マウスの操作を有効.
 			CCamera::GetInstance()->SetUseMouse(true);
+			if (cursorInfo.flags != CURSOR_SHOWING) { ShowCursor(true); }
 		}
-		// ウィンドウが非アクティブの場合.
 		else {
 			// マウスの操作を無効.
 			CCamera::GetInstance()->SetUseMouse(false);
+			if (cursorInfo.flags == CURSOR_SHOWING) { ShowCursor(false); }
 		}
 		break;
 	//---------------------------------------------------------------

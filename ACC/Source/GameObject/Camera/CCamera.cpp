@@ -80,7 +80,6 @@ void CCamera::Update()
 
 	// ベクトル計算をし、注視点に代入.
 	MouseMove(m_MouseMoveDis);
-	ShowCursor(m_CanMoveMouse);
 
 	// レイに関する処理.
 	m_pRay.Position	= m_Camera.Pos;						// レイ座標をカメラ座標にする.
@@ -130,9 +129,6 @@ void CCamera::KeyInput()
 		m_Camera.Pos.y  += Yvalue;
 		m_Camera.Look.y += Yvalue;
 	}
-
-	// マウスカーソルの表示.
-	ShowCursor(m_CanMoveMouse);
 }
 
 

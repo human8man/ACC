@@ -72,10 +72,10 @@ struct CAMERA {
 
 // ライト情報.
 struct LIGHT {
-	D3DXVECTOR3	Position;	// 位置.
-	D3DXVECTOR3	vDirection;	// 方向.
-	D3DXMATRIX	mRotation;	// 回転行列.
-	float		Intensity;	// 強度(明るさ).
+	D3DXVECTOR3	Position;			// 位置.
+	D3DXVECTOR3	vDirection;			// 方向.
+	D3DXMATRIX	mRotation;			// 回転行列.
+	float		Intensity = 0.5;	// 強度(明るさ).
 };
 
 // オブジェクトの座標、回転、サイズをまとめた構造体.
