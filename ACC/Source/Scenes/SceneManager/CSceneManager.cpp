@@ -69,15 +69,20 @@ HRESULT CSceneManager::Create(HWND hWnd)
 void CSceneManager::Update()
 {
 	CKey* Key = CInput::GetInstance()->CDKeyboard();
+	BOOL isFullscreen = FALSE;
+	IDXGISwapChain* swappchain = CDirectX11::GetInstance()->GetSwapChain();
 
-	if (Key->IsKeyDown(DIK_LALT) && Key->IsKeyAction(DIK_RETURN)) {
-		FULLSCREEN = !FULLSCREEN;
-	}
+	BOOL isfullscreen;
+
+#pragma warning(suppress : 6387)
+	swappchain->GetFullscreenState(&isfullscreen, nullptr);
+	FULLSCREEN = isfullscreen;
 
 	// ESC‚ª‰Ÿ‚³‚ê‚½ê‡.
 	if (Key->IsKeyAction(DIK_ESCAPE)) {
 		if (m_pEndUI == nullptr) {
 			ChangeShowCursor(true);
+
 			m_pEndUI = std::make_unique<CEndUI>();
 			m_pEndUI->Create(m_hWnd);
 			m_EndDeleteFlag = false;
