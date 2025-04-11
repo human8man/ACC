@@ -81,8 +81,8 @@ void CSceneManager::Update()
 	// UIに使うためのウィンドウのスケールを計算.
 	RECT rect = {};
 	GetClientRect(m_hWnd, &rect);
-	float NOWFWND_W = static_cast<float>(rect.right - rect.left);
-	float NOWFWND_H = static_cast<float>(rect.bottom - rect.top);
+	NOWFWND_W = static_cast<float>(rect.right - rect.left);
+	NOWFWND_H = static_cast<float>(rect.bottom - rect.top);
 	FULLSCREENSCALEX = NOWFWND_W / FWND_W;
 	FULLSCREENSCALEY = NOWFWND_H / FWND_H;
 
