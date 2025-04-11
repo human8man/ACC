@@ -320,12 +320,7 @@ LRESULT CALLBACK CMain::MsgProc(
 				}
 			}
 			else {
-				if (scene->GetSceneNo() == SceneList::Title) {
-					CCamera::GetInstance()->SetUseMouse(true);
-				}
-				else {
-					CCamera::GetInstance()->SetUseMouse(false);
-				}
+				CCamera::GetInstance()->SetUseMouse(true);
 				if (cursorInfo.flags != CURSOR_SHOWING) { ShowCursor(true); }
 			}
 		}
