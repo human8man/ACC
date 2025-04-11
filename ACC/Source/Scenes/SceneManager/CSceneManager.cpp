@@ -70,8 +70,7 @@ void CSceneManager::Update()
 {
 	CKey* Key = CInput::GetInstance()->CDKeyboard();
 
-	if (Key->IsKeyDown(DIK_LALT) && Key->IsKeyAction(DIK_RETURN)
-	||	Key->IsKeyAction(DIK_LALT) && Key->IsKeyDown(DIK_RETURN)) {
+	if (Key->IsKeyDown(DIK_LALT) && Key->IsKeyAction(DIK_RETURN)) {
 		FULLSCREEN = !FULLSCREEN;
 	}
 
