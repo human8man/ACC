@@ -99,14 +99,14 @@ D3DXVECTOR2 CUIObject::WindowRect(HWND hwnd)
 bool CUIObject::PointInSquare(POINT ppos, D3DXVECTOR2 windowpos)
 {
 	D3DXVECTOR3 pos = {
-		m_vPosition.x * FULLSCREENSCALE + windowpos.x,
-		m_vPosition.y * FULLSCREENSCALE + windowpos.y,
-		m_vPosition.z * FULLSCREENSCALE };
+		m_vPosition.x * FULLSCREENSCALEX + windowpos.x,
+		m_vPosition.y * FULLSCREENSCALEY + windowpos.y,
+		0.f};
 
  	if (pos.x < ppos.x
 	&&  pos.y < ppos.y
-	&& ppos.x < pos.x + m_pSprite->GetSpriteData().Disp.w * m_vScale.x * FULLSCREENSCALE 
-	&& ppos.y < pos.y + m_pSprite->GetSpriteData().Disp.h * m_vScale.y * FULLSCREENSCALE )
+	&& ppos.x < pos.x + m_pSprite->GetSpriteData().Disp.w * m_vScale.x * FULLSCREENSCALEX 
+	&& ppos.y < pos.y + m_pSprite->GetSpriteData().Disp.h * m_vScale.y * FULLSCREENSCALEY )
 	{
 		return true;
 	}
