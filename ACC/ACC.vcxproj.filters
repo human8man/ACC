@@ -320,9 +320,11 @@
     <ClCompile Include="Source\Common\Mesh\Static\CStaticMesh.cpp">
       <Filter>Source\Common\Mesh\Static</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Common\Global.cpp" />
     <ClCompile Include="Source\Scenes\UIEditor\CUIEditor.cpp">
       <Filter>Source\Scenes\UIEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Common\Global.cpp">
+      <Filter>Source\Common</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

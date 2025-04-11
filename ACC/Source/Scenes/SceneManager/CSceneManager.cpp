@@ -78,7 +78,7 @@ void CSceneManager::Update()
 	// ESC‚ª‰Ÿ‚³‚ê‚½ê‡.
 	if (Key->IsKeyAction(DIK_ESCAPE)) {
 		if (m_pEndUI == nullptr) {
-			ChangeShowCursor(true); 
+			ChangeShowCursor(true);
 			m_pEndUI = std::make_unique<CEndUI>();
 			m_pEndUI->Create(m_hWnd);
 			m_EndDeleteFlag = false;
@@ -222,12 +222,11 @@ void CSceneManager::ChangeShowCursor(bool flag)
 
 	// ShowCursor‚ªd•¡‚µ‚ÄŒÄ‚Ño‚³‚ê‚È‚¢‚æ‚¤‚É‚·‚é.
 	if (cursorInfo.flags != CURSOR_SHOWING && flag) {
-		
+		CCamera::GetInstance()->SetUseMouse(flag);
 		ShowCursor(flag); 
 	}
 	else if (cursorInfo.flags == CURSOR_SHOWING && !flag) { 
-
-		ShowCursor(flag); 
+		CCamera::GetInstance()->SetUseMouse(flag);
+		ShowCursor(flag);
 	}
-
 }

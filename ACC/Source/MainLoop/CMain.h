@@ -38,4 +38,5 @@ private:
 	HWND	m_hWnd;			// ウィンドウハンドル.
 
 	int		m_ColorStep;	// ウィンドウ枠を虹色にする関数用の変数.
+	static bool	m_WasWindowActive;	// 前フレームのウィンドウのアクティブ状態.
 };
