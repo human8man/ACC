@@ -21,10 +21,6 @@ CUIObject::~CUIObject()
 //=============================================================================
 void CUIObject::Update()
 {
-	// フルスクリーンの場合値を変更する.
-	if (FULLSCREEN)	{ FULLSCREENSCALE = 1.5f; }
-	else			{ FULLSCREENSCALE = 1.f; }
-
 	if( m_pSprite == nullptr ){ return; }
 }
 
@@ -52,16 +48,16 @@ void CUIObject::Draw()
 	CDirectX11::GetInstance()->SetDepth(true);
 }
 
+
+//=============================================================================
+//		スプライトを接続する.
+//=============================================================================
 void CUIObject::AttachSprite(CSprite2D& pSprite)
 {
 	m_pSprite = &pSprite;
 	m_vRotation = m_pSprite->GetRotation();
 	m_vScale = m_pSprite->GetScale();
 	m_Alpha = m_pSprite->GetAlpha();
-
-	// パターン番号を設定.
-	m_PatternNo;
-
 }
 
 

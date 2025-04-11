@@ -78,6 +78,10 @@ void CSceneManager::Update()
 	swappchain->GetFullscreenState(&isfullscreen, nullptr);
 	FULLSCREEN = isfullscreen;
 
+	// フルスクリーンの場合値を変更する.
+	if (FULLSCREEN) { FULLSCREENSCALE = FULLFWND_W / FWND_W; }
+	else { FULLSCREENSCALE = 1.f; }
+
 	// ESCが押された場合.
 	if (Key->IsKeyAction(DIK_ESCAPE)) {
 		if (m_pEndUI == nullptr) {
