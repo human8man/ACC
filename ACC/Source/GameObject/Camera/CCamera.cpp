@@ -7,8 +7,9 @@
 //===================================================================
 CCamera::CCamera()
 	: m_Camera			()
-	, m_NowCurorPos		( RESETPOS )
-	, m_BeforCursorPos	( RESETPOS )
+	, m_WindowMid		( NOWFWND_W / 2, NOWFWND_H / 2 )
+	, m_NowCurorPos		( m_WindowMid )
+	, m_BeforCursorPos	( m_WindowMid )
 	, m_MouseMoveDis	( ZEROVEC2 )
 	, m_CameraRot		( ZEROVEC3 )
 	, m_DirectionPos	( ZEROVEC3 )
@@ -51,6 +52,8 @@ void CCamera::Init()
 //===================================================================
 void CCamera::Update()
 {
+	m_WindowMid = POINT(NOWFWND_W / 2, NOWFWND_H / 2);
+
 	// マウス移動量の初期化.
 	m_MouseMoveDis = ZEROVEC2;
 
@@ -73,8 +76,8 @@ void CCamera::Update()
 			m_MouseMoveDis.y = static_cast<float>(m_NowCurorPos.y - m_BeforCursorPos.y);
 
 			// マウス位置を画面中央に初期化.
-			SetCursorPos(WND_WM, WND_HM);	// 現在のマウス位置リセット.
-			m_BeforCursorPos = RESETPOS;	// 過去のマウス位置リセット.
+			SetCursorPos(m_WindowMid.x, m_WindowMid.y);	// 現在のマウス位置リセット.
+			m_BeforCursorPos = m_WindowMid;	// 過去のマウス位置リセット.
 		}
 	}
 

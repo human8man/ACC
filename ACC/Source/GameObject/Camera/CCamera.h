@@ -20,11 +20,6 @@ public:
 		Back,
 	};
 
-	// WND_WM(M = MID)は全体で使わなさそうなのでここで宣言.
-	static constexpr int WND_HM = WND_H / 2;
-	static constexpr int WND_WM = WND_W / 2;
-	static constexpr POINT RESETPOS = { WND_WM, WND_HM };
-
 public:
 	friend class CSingleton<CCamera>;// シングルトンクラスをフレンド宣言.
 	CCamera();
@@ -72,6 +67,8 @@ private:
 private:
 	CAMERA	m_Camera;			// カメラ情報.
 	RAY		m_pRay;				// カメラの向きレイ.
+
+	POINT	m_WindowMid;		// 画面の中央.
 	POINT	m_NowCurorPos;		// 現在のマウスの位置.
 	POINT	m_BeforCursorPos;	// 過去のマウスの位置.
 
@@ -90,4 +87,5 @@ private:
 
 	bool	m_CanMoveCamera;	// カメラのキー操作が可能か.
 	bool	m_CanMoveMouse;		// マウスが自由に移動できるか.
+
 };
