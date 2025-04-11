@@ -31,8 +31,8 @@ const TCHAR APP_NAME[]	= _T( "ACC" );
 //		メインループクラス.
 //=================================================
 CMain::CMain()
-	: m_hWnd	  ( nullptr )
-	, m_ColorStep (0)
+	: m_hWnd		( nullptr )
+	, m_ColorStep	(0)
 {
 }
 
@@ -265,21 +265,21 @@ HRESULT CMain::InitWindow(
 	return S_OK;
 }
 
+bool CMain::m_WasWindowActive = false;
 
 //-----------------------------------------------
 //		ウィンドウ関数（メッセージ毎の処理）.
 //-----------------------------------------------
 LRESULT CALLBACK CMain::MsgProc(
 	HWND hWnd, UINT uMsg,
-	WPARAM wParam, LPARAM lParam )
+	WPARAM wParam, LPARAM lParam)
 {
 #ifdef _DEBUG
-	if (CImGui::SetWin(hWnd, uMsg, wParam, lParam)) {
-		return true;
-	}
+	if (CImGui::SetWin(hWnd, uMsg, wParam, lParam)) { return true; }
 #endif
 
-	switch( uMsg ) {
+	switch (uMsg)
+	{
 	//---------------------------------------------------------------
 	//		タイトルバーのカスタマイズ（デフォルトのものを非表示にする）
 	//---------------------------------------------------------------
@@ -290,29 +290,47 @@ LRESULT CALLBACK CMain::MsgProc(
 	//---------------------------------------------------------------
 	case WM_DESTROY:
 		// アプリケーションの終了をWindowsに通知する.
-		PostQuitMessage( 0 );
+		PostQuitMessage(0);
 		break;
 	//---------------------------------------------------------------
 	//		ウィンドウが起動中の場合.
 	//---------------------------------------------------------------
 	case WM_ACTIVATE:
-		// カーソル状態の取得.
-		CURSORINFO cursorInfo;
-		cursorInfo.cbSize = sizeof(CURSORINFO);
-		GetCursorInfo(&cursorInfo);
+	{
+		bool isActive = (LOWORD(wParam) != WA_INACTIVE);
 
-		// ウィンドウがアクティブの場合.
-		if (LOWORD(wParam) == WA_INACTIVE) {
-			// マウスの操作を有効.
-			CCamera::GetInstance()->SetUseMouse(true);
-			if (cursorInfo.flags != CURSOR_SHOWING) { ShowCursor(true); }
-		}
-		else {
-			// マウスの操作を無効.
-			CCamera::GetInstance()->SetUseMouse(false);
-			if (cursorInfo.flags == CURSOR_SHOWING) { ShowCursor(false); }
+		if (m_WasWindowActive != isActive) {
+			m_WasWindowActive = isActive;
+			CSceneManager* scene = CSceneManager::GetInstance();
+
+			// カーソル状態の取得.
+			CURSORINFO cursorInfo = {};
+			cursorInfo.cbSize = sizeof(CURSORINFO);
+			GetCursorInfo(&cursorInfo);
+
+			// アクティブに切り替わった場合.
+			if (isActive) {
+				if (scene->GetSceneNo() == SceneList::Title) {
+					CCamera::GetInstance()->SetUseMouse(true);
+					if (cursorInfo.flags != CURSOR_SHOWING) { ShowCursor(true); }
+				}
+				else {
+					CCamera::GetInstance()->SetUseMouse(false);
+					if (cursorInfo.flags == CURSOR_SHOWING) { ShowCursor(false); }
+				}
+			}
+			else {
+				if (scene->GetSceneNo() == SceneList::Title) {
+					CCamera::GetInstance()->SetUseMouse(true);
+				}
+				else {
+					CCamera::GetInstance()->SetUseMouse(false);
+				}
+				if (cursorInfo.flags != CURSOR_SHOWING) { ShowCursor(true); }
+			}
 		}
 		break;
+	}
 	//---------------------------------------------------------------
 	//		ウィンドウのDPI(Dot Per Inch)が変更されたとき.
 	//---------------------------------------------------------------
@@ -345,7 +363,7 @@ LRESULT CALLBACK CMain::MsgProc(
 	}
 
 	//メインに返す情報.
-	return DefWindowProc( hWnd, uMsg, wParam, lParam );
+	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
 
