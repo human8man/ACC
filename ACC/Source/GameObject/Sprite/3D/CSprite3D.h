@@ -29,7 +29,7 @@ public:
 		WHSIZE Base;		// 元画像幅高さ.
 		WHSIZE Stride;		// 1コマあたりの幅高さ.
 		D3DXVECTOR3 Pos;	// 画像座標.
-		D3DXVECTOR3 m_vScale;
+		D3DXVECTOR3 Scale;	// 画像倍率.
 		std::string Path;	// パス.
 		std::string Name;	// 名前.
 	};
