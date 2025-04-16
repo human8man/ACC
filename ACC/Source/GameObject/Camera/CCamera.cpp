@@ -1,5 +1,5 @@
 ﻿#include "CCamera.h"
-#include "Common/DirectInput/CDirectInput.h"
+#include "DirectInput/CDirectInput.h"
 
 
 //===================================================================
@@ -7,7 +7,7 @@
 //===================================================================
 CCamera::CCamera()
 	: m_Camera			()
-	, m_WindowMid		( NOWFWND_W / 2, NOWFWND_H / 2 )
+	, m_WindowMid		(static_cast<LONG>(NOWFWND_W / 2.f), static_cast<LONG>(NOWFWND_H / 2.f))
 	, m_NowCurorPos		( m_WindowMid )
 	, m_BeforCursorPos	( m_WindowMid )
 	, m_MouseMoveDis	( ZEROVEC2 )
@@ -52,7 +52,7 @@ void CCamera::Init()
 //===================================================================
 void CCamera::Update()
 {
-	m_WindowMid = POINT(NOWFWND_W / 2, NOWFWND_H / 2);
+	m_WindowMid = POINT(static_cast<LONG>(NOWFWND_W / 2.f), static_cast<LONG>(NOWFWND_H / 2.f));
 
 	// マウス移動量の初期化.
 	m_MouseMoveDis = ZEROVEC2;
