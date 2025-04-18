@@ -139,6 +139,9 @@ public:
 	LPD3DXMESH GetMesh()	const { return m_Model.pMesh; }	// メッシュを取得.
 	LPD3DXMESH GetMeshForRay()	const { return m_ModelForRay.pMesh; }		// レイとの当たり判定用のメッシュを取得.
 	std::vector<D3DXVECTOR3>GetVertices()	const { return m_Vertices; }	// メッシュの頂点情報を取得.
+	ID3D11Buffer*		GetIndexBuffer() const { return m_ppIndexBuffer[0]; }
+	ID3D11Buffer*		GetVertexBuffer() const { return m_pVertexBuffer; }
+	ID3D11InputLayout*	GetVertexLayout() const { return m_pVertexLayout; }
 
 	// レイとメッシュの当たり判定( Hit判定、交差点、長さを返す).
 	RayInfo IsHitForRay( const RAY& pRay  );
@@ -167,7 +170,7 @@ private:
 	LPDIRECT3DDEVICE9		m_pDevice9;	// Dx9デバイスオブジェクト.
 
 	CDirectX11*				m_pDx11;
-	ID3D11Device*			m_pDevice11;	// デバイスｵﾌﾞｼﾞｪｸﾄ.
+	ID3D11Device*			m_pDevice11;	// デバイスオブジェクト.
 	ID3D11DeviceContext*	m_pContext11;	// デバイスコンテキスト.
 
 	ID3D11VertexShader*		m_pVertexShader;	// 頂点シェーダ.

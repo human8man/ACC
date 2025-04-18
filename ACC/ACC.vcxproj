@@ -239,6 +239,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Collision\Line\CMeshLine.cpp" />
     <ClCompile Include="Source\Collision\GJK\CGJK.cpp" />
     <ClCompile Include="Source\Collision\Ray\CRay.cpp" />
     <ClCompile Include="Source\Common\DirectInput\CDirectInput.cpp">
@@ -320,6 +321,7 @@
     <ClInclude Include="Source\Common\ImGui\library\imstb_rectpack.h" />
     <ClInclude Include="Source\Common\ImGui\library\imstb_textedit.h" />
     <ClInclude Include="Source\Common\ImGui\library\imstb_truetype.h" />
+    <ClInclude Include="Source\Collision\Line\CMeshLine.h" />
     <ClInclude Include="Source\Common\MyMacro.h" />
     <ClInclude Include="Source\Common\nlohmann\adl_serializer.hpp" />
     <ClInclude Include="Source\Common\nlohmann\byte_container_with_subtype.hpp" />

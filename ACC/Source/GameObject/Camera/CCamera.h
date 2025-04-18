@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include "Common/Global.h"
-#include "Common/Singleton/CSingleton.h"
+#include "Global.h"
+#include "Singleton/CSingleton.h"
 #include "Collision/Ray/CRay.h"
 
 

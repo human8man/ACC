@@ -145,6 +145,9 @@
     <Filter Include="Source\Scenes\UIEditor">
       <UniqueIdentifier>{6691f530-f7d2-4f6b-9dc1-dda3fff69c7f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Collision\Line">
+      <UniqueIdentifier>{d54d1e13-1b7e-4ee4-91db-b011defee1cb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Data\Shader\Sprite3D.hlsl">
@@ -326,6 +329,9 @@
     <ClCompile Include="Source\Common\Global.cpp">
       <Filter>Source\Common</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Collision\Line\CMeshLine.cpp">
+      <Filter>Source\Collision\Line</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Collision\Ray\CRay.h">
@@ -504,6 +510,9 @@
     </ClInclude>
     <ClInclude Include="Source\Scenes\UIEditor\CUIEditor.h">
       <Filter>Source\Scenes\UIEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Collision\Line\CMeshLine.h">
+      <Filter>Source\Collision\Line</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
