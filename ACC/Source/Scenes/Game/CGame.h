@@ -12,6 +12,7 @@
 class CStaticMesh;
 class CGJK;
 class CRay;
+class CMeshLine;
 class CEnemy;
 class CPlayer;
 class CCharacter;
@@ -75,13 +76,14 @@ private:
 	std::unique_ptr<CEnemy>		m_pEnemy;	// 敵クラス.
 
 	// 当たり判定.
-	std::unique_ptr<CGJK> m_pGJK;		// GJKクラス.
-	std::unique_ptr<CRay> m_pCamRay;	// レイクラス.
+	std::unique_ptr<CGJK>		m_pGJK;			// GJKクラス.
+	std::unique_ptr<CRay>		m_pCamRay;		// レイクラス.
+	std::unique_ptr<CMeshLine>	m_pMeshLine;	// メッシュ線クラス.
 
 	// UI.
-	std::unique_ptr<CGameUI>		m_pGameUI;		// UIクラス.
-	std::unique_ptr<CWinUI>			m_pWinUI;		// 勝利クラス.
-	std::unique_ptr<CLoseUI>		m_pLoseUI;		// 敗北クラス.
+	std::unique_ptr<CGameUI>	m_pGameUI;	// UIクラス.
+	std::unique_ptr<CWinUI>		m_pWinUI;	// 勝利クラス.
+	std::unique_ptr<CLoseUI>	m_pLoseUI;	// 敗北クラス.
 
 	std::vector<D3DXVECTOR3> m_SpawnPoints;	// スポーン地点配列.
 

@@ -1,0 +1,73 @@
+#pragma once
+
+// 警告についてのコード分析を無効にする.4005:再定義.
+#pragma warning(disable:4005)
+
+// 前方宣言.
+class CDirectX11;
+class CStaticMesh;
+
+// 頂点の構造体.
+struct VERTEX
+{
+	D3DXVECTOR3 Pos;
+};
+
+//============================================================================
+//		メッシュの表示クラス.
+//============================================================================
+class CMeshLine
+{
+public:
+	//------------------------------------------------------
+	//	構造体.
+	//------------------------------------------------------
+	// コンスタントバッファのアプリ側の定義.
+	//	※シェーダ内のコンスタントバッファと一致している必要あり.
+	struct SHADER_CONSTANT_BUFFER
+	{
+		D3DXMATRIX	mWVP;
+		D3DXVECTOR4	vColor;
+	};
+
+public:
+	CMeshLine();
+	~CMeshLine();
+
+	// 初期化.
+	HRESULT Init();
+
+	// 解放.
+	void Release();
+
+	// シェーダ作成.
+	HRESULT CreateShader();
+
+	// レンダリング用.
+	void Render(D3DXMATRIX& mView, D3DXMATRIX& mProj);
+
+
+	void DrawMeshWireframeFromVertices(
+		const CStaticMesh& originalVertices,
+		const D3DXMATRIX& worldMatrix,
+		const D3DXMATRIX& viewMatrix,
+		const D3DXMATRIX& projectionMatrix,
+		const D3DXVECTOR4& color);
+
+private:
+	CDirectX11*				m_pDx11;
+	ID3D11Device*			m_pDevice11;
+	ID3D11DeviceContext*	m_pContext11;
+
+	ID3D11VertexShader*	m_pVertexShader;	// 頂点シェーダ.
+	ID3D11InputLayout*	m_pVertexLayout;	// 頂点レイアウト.
+	ID3D11PixelShader*	m_pPixelShader;		// ピクセルシェーダ.
+	
+	ID3D11Buffer*	m_pConstantBuffer;	// コンスタントバッファ.
+	ID3D11Buffer*	m_pVertexBuffer;	// 頂点バッファ.
+	ID3D11Buffer*	m_pIndexBuffer;		// 頂点バッファ.
+
+	std::vector<D3DXVECTOR3> m_Vertices;	// メッシュ頂点情報.
+	D3DXVECTOR3		m_vPosition;	// 座標.
+	D3DXVECTOR3		m_vRotation;	// 回転.
+};

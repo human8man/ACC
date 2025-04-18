@@ -6,6 +6,7 @@
 
 #include "Effect/CEffect.h"
 
+#include "Collision/Line/CMeshLine.h"
 #include "Camera/CCamera.h"
 #include "Character/Player/CPlayer.h"
 #include "Character/Enemy/CEnemy.h"
@@ -33,6 +34,7 @@ CGame::CGame(HWND hWnd)
 
 	, m_pGJK		( nullptr )
 	, m_pCamRay		( nullptr )
+	, m_pMeshLine	( nullptr )
 
 	, m_pWinUI		( nullptr )
 	, m_pLoseUI		( nullptr )
@@ -61,6 +63,7 @@ void CGame::Create()
 	m_pPlayer		= std::make_unique<CPlayer>();
 	m_pEnemy		= std::make_unique<CEnemy>();
 	m_pCamRay		= std::make_unique<CRay>();
+	m_pMeshLine		= std::make_unique<CMeshLine>();
 	m_pGameUI		= std::make_unique<CGameUI>();
 	m_pGameUI		->Create();
 
@@ -153,6 +156,7 @@ HRESULT CGame::LoadData()
 
 	// カメラのレイ情報を取得.
 	m_pCamRay->Init(CCamera::GetInstance()->GetRay());
+	m_pMeshLine->Init();
 
 	return S_OK;
 }
@@ -243,6 +247,36 @@ void CGame::Draw()
 	for (auto& cylinder : m_pCylinders) {
 		cylinder->Render(m_mView, m_mProj, m_Light);
 	}
+
+
+	// ワールド変換行列.
+	D3DXMATRIX mTrans, mRot, mScale;
+
+	// 拡大縮小行列.
+	D3DXMatrixScaling(&mScale, 
+		m_pEnemy->GetScale().x,
+		m_pEnemy->GetScale().y, 
+		m_pEnemy->GetScale().z);
+
+	// 回転行列.
+	D3DXMATRIX mYaw, mPitch, mRoll;
+	D3DXMatrixRotationY(&mYaw,	 m_pEnemy->GetRot().y);
+	D3DXMatrixRotationX(&mPitch, m_pEnemy->GetRot().x);
+	D3DXMatrixRotationZ(&mRoll,	 m_pEnemy->GetRot().z);
+	mRot = mYaw * mPitch * mRoll;
+
+	// 平行移動行列.
+	D3DXMatrixTranslation(&mTrans, 
+		m_pEnemy->GetPos().x, 
+		m_pEnemy->GetPos().y, 
+		m_pEnemy->GetPos().z);
+
+	// ワールド行列 = 拡大 * 回転 * 平行移動.
+	D3DXMATRIX mWorld = mScale * mRot * mTrans;
+	D3DXVECTOR4 color = { 1.f,0.f,0.f,1.f };
+	m_pMeshLine->DrawMeshWireframeFromVertices(*m_pEnemy->GetMesh(),mWorld, m_mView, m_mProj, color);
+
+	m_pMeshLine->Render(m_mView, m_mProj);
 
 	// エフェクトの描画.
 	CEffect::GetInstance()->Draw(m_mView, m_mProj, m_Light);
