@@ -51,7 +51,7 @@ void CEnemy::Update(std::unique_ptr<CPlayer>& chara)
 	// 毎フレームリセットする.
 	m_SumVec = ZEROVEC3;
 	// 適当に回す.
-	m_vRotation.y += 2.f;
+	// m_vRotation.y += 2.f;
 	
 	// クールタイム処理.
 	if ( m_DashTime			>= 0.f) { m_DashTime		-= CTime::GetInstance()->GetDeltaTime(); }

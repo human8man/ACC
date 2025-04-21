@@ -6,6 +6,7 @@
 // ‘O•ûéŒ¾.
 class CDirectX11;
 class CStaticMesh;
+class CCharacter;
 
 // ’¸“_‚Ì\‘¢‘Ì.
 struct VERTEX
@@ -48,8 +49,8 @@ public:
 
 
 	void DrawMeshWireframeFromVertices(
-		const CStaticMesh& originalVertices,
-		const D3DXMATRIX& worldMatrix,
+		const CStaticMesh& mesh,
+		const CCharacter& chara,
 		const D3DXMATRIX& viewMatrix,
 		const D3DXMATRIX& projectionMatrix,
 		const D3DXVECTOR4& color);
