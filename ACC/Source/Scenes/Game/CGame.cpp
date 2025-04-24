@@ -241,7 +241,6 @@ void CGame::Draw()
 	D3DXVECTOR4 color = { 0.f,1.f,0.f,1.f };
 
 	m_pFloor	->Render(	m_mView, m_mProj, m_Light );	// ’n–Ê‚Ì•`‰æ.
-	m_pPlayer	->Draw(		m_mView, m_mProj, m_Light );	// ƒvƒŒƒCƒ„[‚Ì•`‰æ.
 	m_pEnemy	->Draw(		m_mView, m_mProj, m_Light );	// “G‚Ì•`‰æ.
 
 	// ’Œ‚Ì•`‰æ.
@@ -255,6 +254,7 @@ void CGame::Draw()
 		m_pMeshLine->Render(m_mView, m_mProj);
 		CDirectX11::GetInstance()->SetDepth(true);
 	}
+	m_pPlayer->Draw(m_mView, m_mProj, m_Light);	// ƒvƒŒƒCƒ„[‚Ì•`‰æ.
 
 	// ƒGƒtƒFƒNƒg‚Ì•`‰æ.
 	CEffect::GetInstance()->Draw(m_mView, m_mProj, m_Light);

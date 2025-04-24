@@ -1,7 +1,7 @@
 #include "CMeshLine.h"
 #include "DirectX/CDirectX11.h"
 #include "Mesh/Static/CStaticMeshObject.h"
-#include "Character/CCharacter.h"
+#include "CGameObject.h"
 
 
 // シェーダファイル名（ディレクトリも含む）.
@@ -20,6 +20,7 @@ CMeshLine::CMeshLine()
 	, m_pPixelShader	( nullptr )
 	, m_pConstantBuffer	( nullptr )
 	, m_pVertexBuffer	( nullptr )
+	, m_pIndexBuffer	( nullptr )
 	, m_vPosition		()
 	, m_vRotation		()
 {
@@ -300,7 +301,7 @@ void CMeshLine::Render(D3DXMATRIX& mView, D3DXMATRIX& mProj)
 	UINT vertexCount = 0;
 	if (!m_Vertices.empty())
 	{
-		vertexCount = m_Vertices.size();
+		vertexCount = static_cast<UINT>(m_Vertices.size());
 		if (vertexCount % 3 == 0) // 三角形メッシュと仮定
 		{
 			vertexCount = vertexCount * 2; // 各辺に2つの頂点
@@ -322,7 +323,7 @@ void CMeshLine::Render(D3DXMATRIX& mView, D3DXMATRIX& mProj)
 //=============================================================================
 void CMeshLine::DrawMeshWireframeFromVertices(
 	const CStaticMesh& mesh,
-	const CCharacter& chara,
+	const CGameObject& chara,
 	const D3DXMATRIX& viewMatrix,
 	const D3DXMATRIX& projectionMatrix,
 	const D3DXVECTOR4& color)
@@ -386,7 +387,7 @@ void CMeshLine::DrawMeshWireframeFromVertices(
 	D3D11_BUFFER_DESC bd;
 	ZeroMemory(&bd, sizeof(bd));
 	bd.Usage = D3D11_USAGE_DYNAMIC;
-	bd.ByteWidth = sizeof(D3DXVECTOR3) * lineListVertices.size();
+	bd.ByteWidth = static_cast <UINT>(sizeof(D3DXVECTOR3) * lineListVertices.size());
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
@@ -431,7 +432,7 @@ void CMeshLine::DrawMeshWireframeFromVertices(
 	directx11->GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
 	// プリミティブをレンダリング.
-	directx11->GetContext()->Draw(lineListVertices.size(), 0);
+	directx11->GetContext()->Draw(static_cast<UINT>(lineListVertices.size()), 0);
 
 	// 作成した頂点バッファを解放.
 	SAFE_RELEASE(pWireframeVertexBuffer);
