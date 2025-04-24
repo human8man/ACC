@@ -184,6 +184,37 @@ void CStaticMesh::Render( D3DXMATRIX& mView, D3DXMATRIX& mProj, LIGHT& Light )
 
 
 //============================================================================
+//		インデックスバッファを取得.
+//============================================================================
+std::vector<ID3D11Buffer*> CStaticMesh::GetIndexBuffer() const
+{
+	std::vector<ID3D11Buffer*> indexBuffers;
+	for (DWORD No = 0; No < m_NumAttr; No++)
+	{
+		indexBuffers.emplace_back(m_ppIndexBuffer[No]);
+	}
+	return indexBuffers;
+}
+
+
+//============================================================================
+//		インデックスを取得.
+//============================================================================
+std::vector<DWORD> CStaticMesh::GetIndex() const
+{
+	std::vector<DWORD> index;
+
+	// インデックスをstd::vector<DWORD>に追加.
+	for (DWORD No = 0; No < m_NumAttr; No++)
+	{
+		index.emplace_back(m_pMaterials[m_AttrID[No]].dwNumFace);
+	}
+
+	return index;
+}
+
+
+//============================================================================
 //		レイとメッシュの当たり判定.
 //============================================================================
 RayInfo CStaticMesh::IsHitForRay(const RAY& pRay )

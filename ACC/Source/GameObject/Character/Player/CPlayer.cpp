@@ -131,7 +131,7 @@ void CPlayer::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 		// ウォールハック中はメッシュ線が出現.
 		if (m_WallHack) {
 			CDirectX11::GetInstance()->SetDepth(false);
-			m_pMeshLine->DrawMeshWireframeFromVertices(*m_pBullets[i]->GetMesh(), *m_pBullets[i], View, Proj, color);
+			m_pMeshLine->DrawMeshWireframeFromVertices(*m_pBullets[i]->GetMesh(), *m_pBullets[i], View, Proj, color, 5.f);
 			m_pMeshLine->Render(View, Proj);
 			CDirectX11::GetInstance()->SetDepth(true);
 		}
@@ -139,7 +139,6 @@ void CPlayer::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 
 	// 銃の描画.
 	m_pGun->Draw(View, Proj, Light);
-
 }
 
 

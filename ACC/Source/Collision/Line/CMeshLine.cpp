@@ -20,7 +20,7 @@ CMeshLine::CMeshLine()
 	, m_pPixelShader	( nullptr )
 	, m_pConstantBuffer	( nullptr )
 	, m_pVertexBuffer	( nullptr )
-	, m_pIndexBuffer	( nullptr )
+	, m_pIndexBuffer	()
 	, m_vPosition		()
 	, m_vRotation		()
 {
@@ -322,11 +322,12 @@ void CMeshLine::Render(D3DXMATRIX& mView, D3DXMATRIX& mProj)
 //		
 //=============================================================================
 void CMeshLine::DrawMeshWireframeFromVertices(
-	const CStaticMesh& mesh,
-	const CGameObject& chara,
-	const D3DXMATRIX& viewMatrix,
-	const D3DXMATRIX& projectionMatrix,
-	const D3DXVECTOR4& color)
+	const CStaticMesh&	mesh,
+	const CGameObject&	object,
+	const D3DXMATRIX&	viewMatrix,
+	const D3DXMATRIX&	projectionMatrix,
+	const D3DXVECTOR4&	color,
+	const float&		scale)
 {
 	//-----------------------------------------------------
 	//		ワールド行列計算.
@@ -336,67 +337,33 @@ void CMeshLine::DrawMeshWireframeFromVertices(
 
 	// 拡大縮小行列.
 	D3DXMatrixScaling(&mScale,
-		chara.GetScale().x,
-		chara.GetScale().y,
-		chara.GetScale().z);
-
+		object.GetScale().x * scale,
+		object.GetScale().y * scale,
+		object.GetScale().z * scale);
+	
 	// 回転行列.
 	D3DXMATRIX mYaw, mPitch, mRoll;
-	D3DXMatrixRotationY(&mYaw,		chara.GetRot().y);
-	D3DXMatrixRotationX(&mPitch,	chara.GetRot().x);
-	D3DXMatrixRotationZ(&mRoll,		chara.GetRot().z);
+	D3DXMatrixRotationY(&mYaw,		object.GetRot().y);
+	D3DXMatrixRotationX(&mPitch,	object.GetRot().x);
+	D3DXMatrixRotationZ(&mRoll,		object.GetRot().z);
 	mRot = mYaw * mPitch * mRoll;
 
 	// 平行移動行列.
 	D3DXMatrixTranslation(&mTrans,
-		chara.GetPos().x,
-		chara.GetPos().y,
-		chara.GetPos().z);
+		object.GetPos().x,
+		object.GetPos().y,
+		object.GetPos().z);
 
 	// ワールド行列 = 拡大 * 回転 * 平行移動.
 	D3DXMATRIX mWorld = mScale * mRot * mTrans;
-	
 
 	//-----------------------------------------------------
 	//		メッシュの頂点を線分のリスト形式に変換.
 	//-----------------------------------------------------
 	CDirectX11* directx11 = CDirectX11::GetInstance();
-	std::vector<D3DXVECTOR3> originalVertices = mesh.GetVertices();
-	std::vector<D3DXVECTOR3> lineListVertices;
-
-	lineListVertices.clear();
-	if (originalVertices.size() < 3) return;
-
-	for (size_t i = 0; i + 2 < originalVertices.size(); i += 3)
-	{
-		D3DXVECTOR3 v1 = originalVertices[i], 
-			v2 = originalVertices[i + 1], 
-			v3 = originalVertices[i + 2];
-
-		//lineListVertices.push_back(v1);
-		//lineListVertices.push_back(v2);
-
-		lineListVertices.push_back(v2);
-		lineListVertices.push_back(v3);
-
-		//lineListVertices.push_back(v3);
-		//lineListVertices.push_back(v1);
-	}
-
-	// ワイヤーフレーム用の頂点バッファを作成し、データを書き込む.
-	D3D11_BUFFER_DESC bd;
-	ZeroMemory(&bd, sizeof(bd));
-	bd.Usage = D3D11_USAGE_DYNAMIC;
-	bd.ByteWidth = static_cast <UINT>(sizeof(D3DXVECTOR3) * lineListVertices.size());
-	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-
-	D3D11_SUBRESOURCE_DATA InitData;
-	ZeroMemory(&InitData, sizeof(InitData));
-	InitData.pSysMem = lineListVertices.data();
-
-	ID3D11Buffer* pWireframeVertexBuffer = nullptr;
-	if (FAILED(directx11->GetDevice()->CreateBuffer(&bd, &InitData, &pWireframeVertexBuffer))) { return; }
+	m_pVertexBuffer = mesh.GetVertexBuffer();
+	m_pIndexBuffer = mesh.GetIndexBuffer();
+	m_Indices = mesh.GetIndex();
 
 	// 使用するシェーダの登録.
 	directx11->GetContext()->VSSetShader(m_pVertexShader, nullptr, 0);
@@ -405,25 +372,25 @@ void CMeshLine::DrawMeshWireframeFromVertices(
 	// コンスタントバッファの設定.
 	D3D11_MAPPED_SUBRESOURCE pData;
 	SHADER_CONSTANT_BUFFER cb;
-	if (SUCCEEDED(directx11->GetContext()->Map(m_pConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &pData)))
+	if (SUCCEEDED(
+		directx11->GetContext()->Map(
+			m_pConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &pData)))
 	{
 		D3DXMATRIX m = mWorld * viewMatrix * projectionMatrix;
 		D3DXMatrixTranspose(&m, &m);
 		cb.mWVP = m;
 		cb.vColor = color;
-		memcpy_s(pData.pData, pData.RowPitch, &cb, sizeof(cb));
+		memcpy_s(pData.pData, pData.RowPitch, (void*)(&cb), sizeof(cb));
 		directx11->GetContext()->Unmap(m_pConstantBuffer, 0);
 		directx11->GetContext()->VSSetConstantBuffers(0, 1, &m_pConstantBuffer);
 		directx11->GetContext()->PSSetConstantBuffers(0, 1, &m_pConstantBuffer);
 	}
 
 	// ワイヤーフレーム用の頂点バッファをセット.
-	UINT stride = sizeof(D3DXVECTOR3);
+	UINT stride = mesh.GetMesh()->GetNumBytesPerVertex();
 	UINT offset = 0;
-	directx11->GetContext()->IASetVertexBuffers(0, 1, &pWireframeVertexBuffer, &stride, &offset);
+	directx11->GetContext()->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
 	
-	// インデックスバッファの設定を削除.
-	directx11->GetContext()->IASetIndexBuffer(nullptr, DXGI_FORMAT_R16_UINT, 0);
 
 	// 頂点インプットレイアウトをセット.
 	directx11->GetContext()->IASetInputLayout(mesh.GetVertexLayout());
@@ -432,8 +399,9 @@ void CMeshLine::DrawMeshWireframeFromVertices(
 	directx11->GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
 	// プリミティブをレンダリング.
-	directx11->GetContext()->Draw(static_cast<UINT>(lineListVertices.size()), 0);
-
-	// 作成した頂点バッファを解放.
-	SAFE_RELEASE(pWireframeVertexBuffer);
+	for (size_t i = 0; i < m_pIndexBuffer.size();i++)
+	{
+		directx11->GetContext()->IASetIndexBuffer(m_pIndexBuffer[i], DXGI_FORMAT_R32_UINT, 0);
+		directx11->GetContext()->DrawIndexed(m_Indices[i] * 3, 0, 0);
+	}
 }

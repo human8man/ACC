@@ -250,7 +250,7 @@ void CGame::Draw()
 	if (m_pPlayer->GetWallHack())
 	{
 		CDirectX11::GetInstance()->SetDepth(false);
-		m_pMeshLine->DrawMeshWireframeFromVertices(*m_pEnemy->GetMesh(), *m_pEnemy, m_mView, m_mProj, color);
+		m_pMeshLine->DrawMeshWireframeFromVertices(*m_pEnemy->GetMesh(), *m_pEnemy, m_mView, m_mProj, color,1.f);
 		m_pMeshLine->Render(m_mView, m_mProj);
 		CDirectX11::GetInstance()->SetDepth(true);
 	}
