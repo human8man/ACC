@@ -139,9 +139,13 @@ public:
 	LPD3DXMESH GetMesh()	const { return m_Model.pMesh; }	// メッシュを取得.
 	LPD3DXMESH GetMeshForRay()	const { return m_ModelForRay.pMesh; }		// レイとの当たり判定用のメッシュを取得.
 	std::vector<D3DXVECTOR3>GetVertices()	const { return m_Vertices; }	// メッシュの頂点情報を取得.
-	ID3D11Buffer*		GetIndexBuffer() const { return m_ppIndexBuffer[0]; }
 	ID3D11Buffer*		GetVertexBuffer() const { return m_pVertexBuffer; }
 	ID3D11InputLayout*	GetVertexLayout() const { return m_pVertexLayout; }
+
+	// インデックスバッファを取得.
+	std::vector<ID3D11Buffer*> GetIndexBuffer() const;
+	// インデックスを取得.
+	std::vector<DWORD> GetIndex() const;
 
 	// レイとメッシュの当たり判定( Hit判定、交差点、長さを返す).
 	RayInfo IsHitForRay( const RAY& pRay  );

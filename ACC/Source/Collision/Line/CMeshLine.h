@@ -48,12 +48,22 @@ public:
 	void Render(D3DXMATRIX& mView, D3DXMATRIX& mProj);
 
 
+	/****************************************************************
+	// @brief メッシュからワイヤーフレーム.
+	// @param mesh				メッシュ.
+	// @param object			オブジェクト.
+	// @param viewMatrix		ビュー行列.
+	// @param projectionMatrix	プロジェクション行列.
+	// @param color				色.
+	// @param scale				スケール.
+	****************************************************************/
 	void DrawMeshWireframeFromVertices(
-		const CStaticMesh& mesh,
-		const CGameObject& chara,
-		const D3DXMATRIX& viewMatrix,
-		const D3DXMATRIX& projectionMatrix,
-		const D3DXVECTOR4& color);
+		const CStaticMesh&	mesh,
+		const CGameObject&	object,
+		const D3DXMATRIX&	viewMatrix,
+		const D3DXMATRIX&	projectionMatrix,
+		const D3DXVECTOR4&	color,
+		const float&		scale);
 
 private:
 	CDirectX11*				m_pDx11;
@@ -66,7 +76,8 @@ private:
 	
 	ID3D11Buffer*	m_pConstantBuffer;	// コンスタントバッファ.
 	ID3D11Buffer*	m_pVertexBuffer;	// 頂点バッファ.
-	ID3D11Buffer*	m_pIndexBuffer;		// 頂点バッファ.
+	std::vector<ID3D11Buffer*>	m_pIndexBuffer;	// インデックスバッファ.
+	std::vector<DWORD>			m_Indices;		// インデックス数.
 
 	std::vector<D3DXVECTOR3> m_Vertices;	// メッシュ頂点情報.
 	D3DXVECTOR3		m_vPosition;	// 座標.
