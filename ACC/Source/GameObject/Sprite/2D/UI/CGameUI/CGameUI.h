@@ -16,7 +16,8 @@ public:
 		LowHP,
 		Reload,
 		AutoAim,
-		Homing
+		Homing,
+		WallHack
 	};
 
 public:
@@ -49,4 +50,5 @@ private:
 
 	bool	m_AutoAim;	// オートエイム.
 	bool	m_Homing;	// ホーミング.
+	bool	m_WallHack;	// ホーミング.
 };

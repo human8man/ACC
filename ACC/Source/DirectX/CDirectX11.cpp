@@ -229,7 +229,7 @@ HRESULT CDirectX11::CreateAlphaBlendState()
 	ZeroMemory( &BlendDesc, sizeof( BlendDesc ) );	// 初期化.
 
 	BlendDesc.IndependentBlendEnable = false;	// false	:RenderTarget[0]のメンバのみ使用する.
-												// true	:RenderTarget[0～7]が使用できる.
+												// true		:RenderTarget[0～7]が使用できる.
 												// （レンダーターゲット毎に独立したブレンド処理）.
 	
 	BlendDesc.AlphaToCoverageEnable					= false;						// アルファトゥカバレージを使用する.
@@ -280,8 +280,7 @@ void CDirectX11::SetAlphaBlend( bool flag )
 //============================================================================
 void CDirectX11::SetDepth(bool flag)
 {
-	ID3D11DepthStencilState* pTmp
-		= ( flag == true ) ? m_pDepthStencilStateOn : m_pDepthStencilStateOff;
+	ID3D11DepthStencilState* pTmp = ( flag == true ) ? m_pDepthStencilStateOn : m_pDepthStencilStateOff;
 
 	// 深度設定をセット.
 	m_pContext11->OMSetDepthStencilState( pTmp, 1 );
@@ -361,18 +360,18 @@ HRESULT CDirectX11::CreateColorBackBufferRTV()
 HRESULT CDirectX11::CreateDepthStencilBackBufferRTV()
 {
 	// デプス（深さor深度）ステンシルビュー用のテクスチャを作成.
-	D3D11_TEXTURE2D_DESC	descDepth;
-	descDepth.Width		= WND_W;	// 幅.
-	descDepth.Height	= WND_H;	// 高さ.
-	descDepth.MipLevels	= 1;		// ミップマップレベル：1.
-	descDepth.ArraySize	= 1;		// 配列数：1.
-	descDepth.SampleDesc.Count	 = 1;	// マルチサンプルの数.
-	descDepth.SampleDesc.Quality = 0;	// マルチサンプルのクオリティ.
-	descDepth.CPUAccessFlags	 = 0;	// CPUからはアクセスしない.
-	descDepth.MiscFlags			 = 0;	// その他の設定なし.
-	descDepth.Format	= DXGI_FORMAT_D32_FLOAT;	// 32ビットフォーマット.
-	descDepth.Usage		= D3D11_USAGE_DEFAULT;		// 使用方法：デフォルト.
-	descDepth.BindFlags	= D3D11_BIND_DEPTH_STENCIL;	// 深度（ステンシルとして使用）.
+	D3D11_TEXTURE2D_DESC			descDepth;
+	descDepth.Width					= WND_W;	// 幅.
+	descDepth.Height				= WND_H;	// 高さ.
+	descDepth.MipLevels				= 1;		// ミップマップレベル：1.
+	descDepth.ArraySize				= 1;		// 配列数：1.
+	descDepth.SampleDesc.Count		= 1;		// マルチサンプルの数.
+	descDepth.SampleDesc.Quality	= 0;		// マルチサンプルのクオリティ.
+	descDepth.CPUAccessFlags		= 0;		// CPUからはアクセスしない.
+	descDepth.MiscFlags				= 0;		// その他の設定なし.
+	descDepth.Format				= DXGI_FORMAT_D32_FLOAT;	// 32ビットフォーマット.
+	descDepth.Usage					= D3D11_USAGE_DEFAULT;		// 使用方法：デフォルト.
+	descDepth.BindFlags				= D3D11_BIND_DEPTH_STENCIL;	// 深度（ステンシルとして使用）.
 
 	if( FAILED(
 		m_pDevice11->CreateTexture2D(

@@ -45,7 +45,6 @@ CGame::CGame(HWND hWnd)
 	// ƒ‰ƒCƒgî•ñ.
 	m_Light.vDirection	= D3DXVECTOR3( 1.5f, 1.f, -1.f );
 }
-
 CGame::~CGame()
 {
 	Release();
@@ -239,26 +238,29 @@ void CGame::Draw()
 	CCamera::GetInstance()->Camera(m_mView);
 	CSceneBase::Projection(m_mProj);
 
-	m_pFloor	->Render( m_mView, m_mProj, m_Light );	// ’n–Ê‚Ì•`‰æ.
-	m_pPlayer	->Draw( m_mView, m_mProj, m_Light );	// ƒvƒŒƒCƒ„[‚Ì•`‰æ.
-	m_pEnemy	->Draw( m_mView, m_mProj, m_Light );	// “G‚Ì•`‰æ.
+	D3DXVECTOR4 color = { 0.f,1.f,0.f,1.f };
+
+	m_pFloor	->Render(	m_mView, m_mProj, m_Light );	// ’n–Ê‚Ì•`‰æ.
+	m_pPlayer	->Draw(		m_mView, m_mProj, m_Light );	// ƒvƒŒƒCƒ„[‚Ì•`‰æ.
+	m_pEnemy	->Draw(		m_mView, m_mProj, m_Light );	// “G‚Ì•`‰æ.
 
 	// ’Œ‚Ì•`‰æ.
-	for (auto& cylinder : m_pCylinders) {
-		cylinder->Render(m_mView, m_mProj, m_Light);
+	for (auto& cylinder : m_pCylinders) { cylinder->Render(m_mView, m_mProj, m_Light); }
+
+
+	if (m_pPlayer->GetWallHack())
+	{
+		CDirectX11::GetInstance()->SetDepth(false);
+		m_pMeshLine->DrawMeshWireframeFromVertices(*m_pEnemy->GetMesh(), *m_pEnemy, m_mView, m_mProj, color);
+		m_pMeshLine->Render(m_mView, m_mProj);
+		CDirectX11::GetInstance()->SetDepth(true);
 	}
-
-	D3DXVECTOR4 color = { 0.f,1.f,0.f,1.f };
-	m_pMeshLine->DrawMeshWireframeFromVertices(*m_pEnemy->GetMesh(), *m_pEnemy, m_mView, m_mProj, color);
-
-	m_pMeshLine->Render(m_mView, m_mProj);
 
 	// ƒGƒtƒFƒNƒg‚Ì•`‰æ.
 	CEffect::GetInstance()->Draw(m_mView, m_mProj, m_Light);
-
+	
 	// UI‚Ì•`‰æ.
 	m_pGameUI->Draw();
-
 
 	// Ÿ—˜‚Æ”s–k‰æ–Ê‚Ì•`‰æ.
 	if (m_pLoseUI != nullptr) { m_pLoseUI->Draw(); }
