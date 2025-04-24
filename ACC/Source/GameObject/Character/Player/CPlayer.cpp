@@ -5,6 +5,8 @@
 #include "Character/Enemy/CEnemy.h"
 #include "Effect/CEffect.h"
 #include "FileManager/FileManager.h"
+#include "Collision/Line/CMeshLine.h"
+#include "DirectX/CDirectX11.h"
 
 namespace {
 	// キャラクターCSVのパス.
@@ -17,6 +19,7 @@ namespace {
 //============================================================================
 CPlayer::CPlayer()
 	: m_pGJK		( nullptr )
+	, m_pMeshLine	( nullptr )
 	, m_MoveSpeed	( 0.2f )
 	, m_CamRevision	( 4.f )
 	, m_SumVec		( ZEROVEC3 )
@@ -33,6 +36,9 @@ CPlayer::CPlayer()
 	std::unordered_map<std::string, std::string> m_StateList;
 	// キャラクターCSVの情報取得.
 	m_StateList = FileManager::CSVLoad(CharaCSVPath);
+	
+	m_pMeshLine = std::make_unique<CMeshLine>();
+	m_pMeshLine->Init();
 
 	// 空でない場合は、外部で調整するべき変数の値を入れていく.
 	if (!m_StateList.empty())
@@ -116,10 +122,19 @@ void CPlayer::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 	// エフェクト事に必要なハンドルを用意.
 	static ::EsHandle hEffect = -1;
 
+	D3DXVECTOR4 color = { 0.f,0.f,1.f,1.f };
+
 	// 弾とそのエフェクトの描画.
 	for (size_t i = 0; i < m_pBullets.size(); ++i) { 
 		hEffect = CEffect::Play(CEffect::BulletSmoke, m_pBullets[i]->GetPos());
-		m_pBullets[i]->Draw(View, Proj, Light);
+
+		// ウォールハック中はメッシュ線が出現.
+		if (m_WallHack) {
+			CDirectX11::GetInstance()->SetDepth(false);
+			m_pMeshLine->DrawMeshWireframeFromVertices(*m_pBullets[i]->GetMesh(), *m_pBullets[i], View, Proj, color);
+			m_pMeshLine->Render(View, Proj);
+			CDirectX11::GetInstance()->SetDepth(true);
+		}
 	}
 
 	// 銃の描画.
