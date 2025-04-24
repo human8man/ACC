@@ -27,6 +27,7 @@ CGameUI::CGameUI()
 	, m_ViewHitTimeMax	( CTime::GetInstance()->GetDeltaTime() * 60.f )
 	, m_AutoAim			( false )
 	, m_Homing			( false )
+	, m_WallHack		( false )
 {
 	// キャラクターCSVの情報保存用.
 	std::unordered_map<std::string, std::string> m_StateList;
@@ -91,6 +92,7 @@ void CGameUI::Update(std::unique_ptr<CPlayer>& chara)
 
 	// ゲーム画面UIに必要な情報の設定.
 	m_Homing		= chara->GetHoming();
+	m_WallHack		= chara->GetWallHack();
 	m_AutoAim		= chara->GetAutoAim();
 	m_ReloadTime	= chara->GetReloadTime();
 	m_HP			= chara->GetCharaInfo().HP;
@@ -146,6 +148,7 @@ void CGameUI::Draw()
 		// チート系のUI描画設定.
 		if (i == GameSprite::AutoAim) {m_pUIs[i]->SetPatternNo(m_AutoAim, 0);}
 		if (i == GameSprite::Homing)  {m_pUIs[i]->SetPatternNo(m_Homing, 0);}
+		if (i == GameSprite::WallHack)  {m_pUIs[i]->SetPatternNo(m_WallHack, 0);}
 
 		m_pUIs[i]->Draw();
 	}

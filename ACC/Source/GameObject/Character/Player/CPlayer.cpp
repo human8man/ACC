@@ -22,6 +22,7 @@ CPlayer::CPlayer()
 	, m_SumVec		( ZEROVEC3 )
 	, m_AutoAim		( false )
 	, m_Homing		( false )
+	, m_WallHack	( false )
 {
 	// 初期化.
 	m_CharaInfo.HP = m_CharaInfo.MaxHP;
@@ -357,6 +358,7 @@ void CPlayer::KeyInput(std::unique_ptr<CEnemy>& chara)
 	//----------------------------------------------------------------------
 	if (Key->IsKeyAction(DIK_1)) { m_AutoAim = !m_AutoAim; }
 	if (Key->IsKeyAction(DIK_2)) { m_Homing = !m_Homing; }
+	if (Key->IsKeyAction(DIK_3)) { m_WallHack = !m_WallHack; }
 
 
 	// 合計のベクトル量分位置を更新.
