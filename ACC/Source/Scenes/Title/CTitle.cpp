@@ -42,6 +42,7 @@ CTitle::CTitle(HWND hWnd)
 	, m_pUIs			()
 	, m_pSprite2Ds		()
 	, m_pEgg			()
+	, m_Start			( false )
 {
 	m_hWnd = hWnd;
 	m_Light.vDirection = D3DXVECTOR3(1.f, 5.f, 0.f);	//ライト方向.
@@ -57,8 +58,6 @@ CTitle::~CTitle()
 //=================================================================================================
 void CTitle::Create()
 {
-	//int index = 0;
-
 	for (size_t i = 0;i < TitleImageList.size();++i)
 	{
 		// インスタンス生成.
@@ -93,6 +92,7 @@ HRESULT CTitle::LoadData()
 //=================================================================================================
 void CTitle::Init()
 {
+	m_Start = false;
 	CCamera::GetInstance()->Init();	// カメラの初期化.
 }
 
@@ -122,10 +122,6 @@ void CTitle::Update()
 		if (std::find(ignoreList.begin(), ignoreList.end(), 
 			m_pUIs[i]->GetSpriteData().Name) != ignoreList.end()) { continue; }
 
-		// UIのサイズと座標を変換する.
-		D3DXVECTOR2 SquarePos	= D3DXVECTOR2( m_pUIs[i]->GetPos().x, m_pUIs[i]->GetPos().y );
-		D3DXVECTOR2 SquareDisp	= D3DXVECTOR2( m_pUIs[i]->GetSpriteData().Disp.w, m_pUIs[i]->GetSpriteData().Disp.h );
-
 		// 点と四角の当たり判定.
 		if (m_pUIs[i]->PointInSquare(MousePos, CLIENTRECT))
 		{
@@ -144,23 +140,23 @@ void CTitle::Update()
 		{
 			// すでにカーソルで選択されている場合.
 			if ( m_pUIs[i]->GetPatternNo().x ) {
-				if (Mouse->IsLAction()) {
-					// ゲームを開始する.
-					CSceneManager::GetInstance()->LoadScene(SceneList::Game);
-					CSoundManager::GetInstance()->Stop(CSoundManager::enList::BGM_Title);
-				}
+				if (Mouse->IsLAction()) { m_Start = true; }
 			}
 			else {
 				// SPACEキーでゲーム開始.
 				if (Key->IsKeyAction(DIK_SPACE)) {
 					// 選択状態にする.
 					m_pUIs[i]->SetPatternNo(1, 0);
-					// ゲームを開始する.
-					CSceneManager::GetInstance()->LoadScene(SceneList::Game);
-					CSoundManager::GetInstance()->Stop(CSoundManager::enList::BGM_Title);
+					m_Start = true;
 				}
 			}
 		}
+	}
+
+	if (m_Start) {
+		// ゲームを開始する.
+		CSceneManager::GetInstance()->LoadScene(SceneList::Game);
+		CSoundManager::GetInstance()->Stop(CSoundManager::enList::BGM_Title);
 	}
 }
 
