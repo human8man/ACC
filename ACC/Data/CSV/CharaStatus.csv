@@ -51,3 +51,5 @@ CameraRevision,4.0
 EnemyMoveSpeed,0.2
 // 次の行動決定までの時間{60.0}
 SelectMoveTimeMax,60.0
+// プレイヤー方向への移動確立(最大100%){10}
+MoveToPlayer,2

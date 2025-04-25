@@ -4,9 +4,8 @@
 #include "Scenes/CSceneBase.h"
 #include "DirectX/CDirectX9.h"
 #include "DirectX/CDirectX11.h"
-
-#include "Sprite/CSpriteObject.h"
 #include "Collision/GJK/CGJK.h"
+#include "Sprite/CSpriteObject.h"
 
 
 class CStaticMesh;
@@ -21,6 +20,7 @@ class CRandom;
 class CWinUI;
 class CLoseUI;
 class CEnemyFrame;
+
 
 //============================================================================
 //		ÉQÅ[ÉÄÉNÉâÉX.

@@ -16,26 +16,33 @@ namespace {
 CCharacter::CCharacter()
 	: m_pRayY				( nullptr )
 	, m_pCrossRay			( nullptr )
-	, m_pBullets			()
-	, m_pGun				( nullptr )
-	, m_pMeshBullet			( nullptr )
+
 	, m_pMeshGun			( nullptr )
+	, m_pMeshBullet			( nullptr )
+	, m_pMeshLine			( nullptr )
+	, m_pGun				( nullptr )
+	, m_pBullets			()
+
 	, m_BodyDamage			( 1 )
 	, m_CritDamage			( 2 )
+
 	, m_GunRadius			( 1.f )
 	, m_GunRotRevision		( -1.5f )
 	, m_GunPosRevision		( -30.f )
 	, m_Gravity				( 0.0098f )
 	, m_GravityValue		( 0.0098f )
+
 	, m_ReloadTime			( 0.f )
 	, m_ReloadTimeMax		( CTime::GetInstance()->GetDeltaTime() * 120.f )
 	, m_BulletCoolTime		( 0.f )
 	, m_BulletCoolTimeMax	( CTime::GetInstance()->GetDeltaTime() * 60.f )
 	, m_BulletSpeed			( 2.3f )
 	, m_CanShot				( true )
+
 	, m_JumpPower			( 0.f )
 	, m_JumpPowerMax		( 0.784f )
 	, m_CanJump				( false )
+
 	, m_DashCoolTime		( 0.f )
 	, m_DashCoolTimeMax		( CTime::GetInstance()->GetDeltaTime() * 60.f )
 	, m_DashTime			( 0.f )
@@ -43,7 +50,9 @@ CCharacter::CCharacter()
 	, m_DashSpeed			( 2.6f )
 	, m_CanDash				( true )
 	, DashVec				( ZEROVEC3 )
+
 	, m_EggAirRoomY			( 1.f )
+
 	, m_CharaInfo			()
 {
 	// ƒŒƒC‚Ìİ’è.
@@ -58,6 +67,9 @@ CCharacter::CCharacter()
 	m_pMeshGun		->Init( _T( "Data\\Mesh\\Static\\Gun\\Gun.x" ) );
 	m_pMeshBullet	->Init( _T( "Data\\Mesh\\Static\\Bullet\\bullet.x" ) );
 
+	// ƒƒbƒVƒ…ü‚Ìİ’è.
+	m_pMeshLine = std::make_unique<CMeshLine>();
+	m_pMeshLine->Init();
 
 	// e‚Ìİ’è.
 	m_pGun	= std::make_unique<CGun>();

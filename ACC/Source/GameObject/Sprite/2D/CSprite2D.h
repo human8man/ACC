@@ -33,10 +33,27 @@ public:
 		WHSIZE Base;		// 元画像幅高さ.
 		WHSIZE Stride;		// 1コマあたりの幅高さ.
 		D3DXVECTOR3 Pos;	// 画像座標.
-		D3DXVECTOR3 m_vScale;
+		D3DXVECTOR3 Scale;	// スケール.
 		std::string Path;	// パス.
 		std::string Name;	// 名前.
+		bool IsDisp;		// 表示するか.
+		bool IsGrab;		// つかまれているか(UIEditorで使用).
+		bool IsLock;		// 固定するか(UIEditorで使用).
+
+		SPRITE_STATE()
+			: Disp		( 0, 0 )
+			, Base		( 0, 0 )
+			, Stride	( 0, 0 )
+			, Pos		( 0.f,0.f,0.f )
+			, Scale		( 1.f,1.f,1.f )
+			, Path		( "" )
+			, Name		( "" )
+			, IsDisp	( true )
+			, IsGrab	( false )
+			, IsLock	( false )
+		{}
 	};
+
 
 	// コンスタントバッファのアプリ側の定義.
 	//	※シェーダ内のコンスタントバッファと一致している必要あり.

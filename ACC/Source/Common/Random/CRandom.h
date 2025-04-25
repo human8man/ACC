@@ -33,6 +33,9 @@ public:
 	****************************************************************/
 	float GetRandomFloat(float min, float max);
 
+	// 50%‚ÌŠm—¦‚Å true ‚Ü‚½‚Í false ‚ð•Ô‚·.
+	bool GetRandomBool();
+
 private:
 	std::mt19937 m_RandomEngine;
 };

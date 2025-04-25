@@ -1,10 +1,11 @@
 #include "CEnemy.h"
-#include "DirectSound/CSoundManager.h"
-#include "DirectInput/CDirectInput.h"
 #include "Camera/CCamera.h"
 #include "Effect/CEffect.h"
 #include "Random/CRandom.h"
+#include "DirectX/CDirectX11.h"
 #include "FileManager/FileManager.h"
+#include "DirectInput/CDirectInput.h"
+#include "DirectSound/CSoundManager.h"
 
 namespace {
 	// キャラクターCSVのパス.
@@ -18,10 +19,16 @@ namespace {
 CEnemy::CEnemy()
 	: m_pGJK				( nullptr )
 	, m_MoveSpeed			( 0.2f )
-	, m_SumVec				( ZEROVEC3 )
 	
+	, m_WallHack			( false )
+	, m_Hit					( false )
+	, m_HitKind				( false )
 	, m_SelectMoveTime		( 0.f )
 	, m_SelectMoveTimeMax	( CTime::GetInstance()->GetDeltaTime() * 60.f )
+	
+	, m_MoveKind			( MoveKind::Wait )
+	, m_MoveToPlayer		( 10 )
+	, m_SumVec				( ZEROVEC3 )
 {
 	m_CharaInfo.HP = m_CharaInfo.MaxHP;
 	m_CharaInfo.Ammo = m_CharaInfo.MaxAmmo;
@@ -36,6 +43,7 @@ CEnemy::CEnemy()
 	if (!m_StateList.empty()) {
 		m_MoveSpeed			= StrToFloat(m_StateList["EnemyMoveSpeed"]);
 		m_SelectMoveTimeMax = StrToFloat(m_StateList["SelectMoveTimeMax"]);
+		m_MoveToPlayer		= StrToInt(m_StateList["MoveToPlayer"]);
 	}
 }
 CEnemy::~CEnemy()
@@ -50,8 +58,6 @@ void CEnemy::Update(std::unique_ptr<CPlayer>& chara)
 {
 	// 毎フレームリセットする.
 	m_SumVec = ZEROVEC3;
-	// 適当に回す.
-	// m_vRotation.y += 2.f;
 	
 	// クールタイム処理.
 	if ( m_DashTime			>= 0.f) { m_DashTime		-= CTime::GetInstance()->GetDeltaTime(); }
@@ -62,6 +68,8 @@ void CEnemy::Update(std::unique_ptr<CPlayer>& chara)
 
 	// 行動をまとめた関数.
 	Act(chara);
+	
+	m_WallHack = chara->GetWallHack();
 
 	CCharacter::Update();
 }
@@ -77,10 +85,20 @@ void CEnemy::Draw(D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light)
 	// エフェクト事に必要なハンドルを用意.
 	static ::EsHandle hEffect = -1;
 
+	D3DXVECTOR4 color = { 1.f,0.f,0.f,1.f };
+
 	// 弾とそのエフェクトの描画.
 	for (size_t i = 0; i < m_pBullets.size(); ++i) {
 		hEffect = CEffect::Play(CEffect::BulletSmoke, m_pBullets[i]->GetPos());
 		m_pBullets[i]->Draw(View, Proj, Light);
+
+		// ウォールハック中はメッシュ線が出現.
+		if (m_WallHack) {
+			CDirectX11::GetInstance()->SetDepth(false);
+			m_pMeshLine->DrawMeshWireframeFromVertices(*m_pBullets[i]->GetMesh(), *m_pBullets[i], View, Proj, color, 5.f);
+			m_pMeshLine->Render(View, Proj);
+			CDirectX11::GetInstance()->SetDepth(true);
+		}
 	}
 
 	// 銃の描画.
@@ -165,42 +183,47 @@ void CEnemy::Act(std::unique_ptr<CPlayer>& chara)
 	//-------------------------------------------------------------------------
 	//		ランダムで移動.
 	//-------------------------------------------------------------------------
+	{
+		// 次の行動決定までの時間が 0 以下の場合.
+		if (m_SelectMoveTime <= 0.f) {
 
-	// 次の行動決定までの時間が 0 以下の場合.
-	if (m_SelectMoveTime <= 0.f) {
-		m_MoveKind = random.GetRandomInt(0, MoveKind::max - 1);
-		m_SelectMoveTime = m_SelectMoveTimeMax;
+			// プレイヤーへの移動とランダム移動の確率計算.
+			if (random.GetRandomInt(0, 100) < m_MoveToPlayer) { m_MoveKind = MoveKind::Straight; }
+			else { m_MoveKind = random.GetRandomInt(0, MoveKind::max - 1); }
+
+			// 次の行動選択までのクールタイムを設定.
+			m_SelectMoveTime = m_SelectMoveTimeMax;
+		}
+
+		// ダッシュ中は操作できないようにする.
+		if (m_DashTime <= 0.f) {
+			// 操作が可能な間は初期化する.
+			DashVec = ZEROVEC3;
+
+			// 敵の向きベクトルを計算(プレイヤーが正面).
+			D3DXVECTOR3 camDir = chara->GetPos() - m_vPosition;
+			camDir.y = 0.f;	// Y情報があると飛び始めるのでYの要素を抜く.
+			D3DXVec3Normalize(&camDir, &camDir); // 正規化.
+
+			// 移動する方向ベクトル.
+			D3DXVECTOR3 forward(ZEROVEC3);
+			D3DXVECTOR3 left(ZEROVEC3);
+			D3DXVECTOR3 upvec(0.f, 1.f, 0.f);
+
+			// 左ベクトルを求める.
+			D3DXVec3Cross(&left, &camDir, &upvec);
+			D3DXVec3Normalize(&left, &left);
+
+			if (m_MoveKind == MoveKind::Straight)	{ forward += camDir;	}
+			if (m_MoveKind == MoveKind::Back)		{ forward -= camDir;	}
+			if (m_MoveKind == MoveKind::Left)		{ forward += left;		}
+			if (m_MoveKind == MoveKind::Right)		{ forward -= left;		}
+			if (m_MoveKind == MoveKind::Wait)		{ forward = ZEROVEC3;	}
+
+			// 最終的なベクトル量を速度にかけ合計ベクトルに渡す.
+			m_SumVec += forward * m_MoveSpeed;
+		}
 	}
-
-	// ダッシュ中は操作できないようにする.
-	if (m_DashTime <= 0.f) {
-		// 操作が可能な間は初期化する.
-		DashVec = ZEROVEC3;
-
-		// カメラの向きベクトルを取得.
-		D3DXVECTOR3 camDir = CCamera::GetInstance()->GetCamDir();
-		camDir.y = 0.f;	// Y情報があると飛び始めるのでYの要素を抜く.
-		D3DXVec3Normalize(&camDir, &camDir); // 正規化.
-
-		// 移動する方向ベクトル.
-		D3DXVECTOR3 forward(ZEROVEC3);
-		D3DXVECTOR3 left(ZEROVEC3);
-		D3DXVECTOR3 upvec(0, 1, 0);
-
-		// 左ベクトルを求める.
-		D3DXVec3Cross(&left, &camDir, &upvec);
-		D3DXVec3Normalize(&left, &left);
-
-		if (m_MoveKind == MoveKind::Straight)	{ forward += camDir; }
-		if (m_MoveKind == MoveKind::Back)		{ forward -= camDir; }
-		if (m_MoveKind == MoveKind::Left)		{ forward += left; }
-		if (m_MoveKind == MoveKind::Right)		{ forward -= left; }
-		if (m_MoveKind == MoveKind::Wait)		{ forward = ZEROVEC3; }
-
-		// 最終的なベクトル量を速度にかけ合計ベクトルに渡す.
-		m_SumVec += forward * m_MoveSpeed;
-	}
-
 
 	//-------------------------------------------------------------------------
 	//		ランダムでダッシュ.

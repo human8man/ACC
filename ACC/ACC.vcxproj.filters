@@ -332,6 +332,7 @@
     <ClCompile Include="Source\Collision\Line\CMeshLine.cpp">
       <Filter>Source\Collision\Line</Filter>
     </ClCompile>
+    <ClCompile Include="Source\GameObject\Sprite\2D\SpriteManager\SpriteManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Collision\Ray\CRay.h">
@@ -514,6 +515,7 @@
     <ClInclude Include="Source\Collision\Line\CMeshLine.h">
       <Filter>Source\Collision\Line</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GameObject\Sprite\2D\SpriteManager\SpriteManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Common\Easing\Easing.inl">

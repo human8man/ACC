@@ -1,12 +1,13 @@
 #include "CMain.h"
-#include "DirectX/CDirectX9.h"
-#include "DirectX/CDirectX11.h"
-#include "Scenes/SceneManager/CSceneManager.h"
-#include "DirectInput/CDirectInput.h"
-#include "DirectSound/CSoundManager.h"
+#include "Time/CTime.h"
 #include "Camera/CCamera.h"
 #include "Effect/CEffect.h"
-#include "Time/CTime.h"
+#include "DirectX/CDirectX9.h"
+#include "DirectX/CDirectX11.h"
+#include "DirectInput/CDirectInput.h"
+#include "DirectSound/CSoundManager.h"
+#include "Scenes/SceneManager/CSceneManager.h"
+#include "Sprite/2D/SpriteManager/SpriteManager.h"
 
 
 // ImGuiはデバッグ時のみ使用する.
@@ -66,6 +67,9 @@ HRESULT CMain::Create() const
 
 	// EffectManagerのデータ読み込み.
 	if (FAILED(CEffect::GetInstance()->LoadData())) { return E_FAIL; }
+
+	// SpriteManagerの読み込み.
+	if (FAILED(CSpriteManager::GetInstance()->SpriteLoad())) { return E_FAIL; }
 
 #ifdef _DEBUG
 	// ImGuiの構築.

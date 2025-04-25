@@ -1,12 +1,11 @@
 #include "CPlayer.h"
-#include "DirectSound/CSoundManager.h"
-#include "DirectInput/CDirectInput.h"
-#include "Camera/CCamera.h"
-#include "Character/Enemy/CEnemy.h"
 #include "Effect/CEffect.h"
-#include "FileManager/FileManager.h"
-#include "Collision/Line/CMeshLine.h"
+#include "Camera/CCamera.h"
 #include "DirectX/CDirectX11.h"
+#include "Character/Enemy/CEnemy.h"
+#include "FileManager/FileManager.h"
+#include "DirectInput/CDirectInput.h"
+#include "DirectSound/CSoundManager.h"
 
 namespace {
 	// キャラクターCSVのパス.
@@ -19,7 +18,6 @@ namespace {
 //============================================================================
 CPlayer::CPlayer()
 	: m_pGJK		( nullptr )
-	, m_pMeshLine	( nullptr )
 	, m_MoveSpeed	( 0.2f )
 	, m_CamRevision	( 4.f )
 	, m_SumVec		( ZEROVEC3 )
@@ -37,8 +35,6 @@ CPlayer::CPlayer()
 	// キャラクターCSVの情報取得.
 	m_StateList = FileManager::CSVLoad(CharaCSVPath);
 	
-	m_pMeshLine = std::make_unique<CMeshLine>();
-	m_pMeshLine->Init();
 
 	// 空でない場合は、外部で調整するべき変数の値を入れていく.
 	if (!m_StateList.empty())

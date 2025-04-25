@@ -1,10 +1,7 @@
 #pragma once
 #include "Character/CCharacter.h"
 
-
 class CEnemy;
-class CMeshLine;
-
 
 // Hit情報.
 enum HitKind {
@@ -49,7 +46,6 @@ private:
 private:
 	// GJKクラス.
 	std::unique_ptr<CGJK> m_pGJK;
-	std::unique_ptr<CMeshLine>	m_pMeshLine;	// メッシュ線クラス.
 
 	float m_MoveSpeed;	 // 移動速度.
 	float m_CamRevision; // カメラ座標の補正値.

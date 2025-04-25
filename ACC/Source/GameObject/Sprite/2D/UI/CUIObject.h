@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CGameObject.h"
-#include "../CSprite2D.h"
+#include "Sprite/2D/CSprite2D.h"
 
 
 //=============================================================================

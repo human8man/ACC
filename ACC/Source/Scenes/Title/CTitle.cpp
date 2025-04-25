@@ -1,10 +1,11 @@
 #include "CTitle.h"
 
-#include "Scenes/SceneManager/CSceneManager.h"
+#include "Camera/CCamera.h"
+#include "Mesh/Static/CStaticMesh.h"
 #include "DirectInput/CDirectInput.h"
 #include "DirectSound/CSoundManager.h"
-#include "Mesh/Static/CStaticMesh.h"
-#include "Camera/CCamera.h"
+#include "Scenes/SceneManager/CSceneManager.h"
+#include "Sprite/2D/SpriteManager/SpriteManager.h"
 
 #ifdef _DEBUG
 #include "ImGui/CImGui.h"
@@ -13,6 +14,12 @@
 namespace {
 	// タイトル画面UIのパス.
 	constexpr char TitleImagePath[] = "Data\\Texture\\Title";
+	
+	std::vector<std::string> TitleImageList = {
+		"0Black",
+		"StartButton",
+		"Title"
+	};
 }
 
 
@@ -44,6 +51,20 @@ CTitle::~CTitle()
 void CTitle::Create()
 {
 	int index = 0;
+
+	for (size_t i = 0;i < TitleImageList.size();++i)
+	{
+		// インスタンス生成.
+		m_pSprite2Ds.push_back(CSpriteManager::GetInstance()->GetSprite(TitleImageList[i]));
+		m_pUIs.push_back(new CUIObject());
+
+
+		// 画像データの読み込み.
+		//m_pSprite2Ds[index]->Init(entry.path().string());
+		m_pUIs[index]->AttachSprite(*m_pSprite2Ds[index]);
+		m_pUIs[index]->SetPos(m_pSprite2Ds[index]->GetSpriteData().Pos);
+		m_SpritePosList.push_back(m_pUIs[index]->GetPos());
+	}
 
 	// 指定したディレクトリ内を走査.
 	for (const auto& entry : std::filesystem::directory_iterator(TitleImagePath)) {

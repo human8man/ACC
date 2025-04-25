@@ -1,11 +1,12 @@
 #pragma once
 
-#include "Mesh/Static/CStaticMeshObject.h"
-#include "Collision/Ray/CRay.h"
-#include "Object/Bullet/CBullet.h"
+#include "Time/CTime.h"
 #include "Object/Gun/CGun.h"
 #include "Collision/GJK/CGJK.h"
-#include "Common/Time/CTime.h"
+#include "Collision/Ray/CRay.h"
+#include "Object/Bullet/CBullet.h"
+#include "Collision/Line/CMeshLine.h"
+#include "Mesh/Static/CStaticMeshObject.h"
 
 
 //============================================================================
@@ -48,12 +49,13 @@ public:
 
 protected:
 	std::unique_ptr<RAY>		m_pRayY;		// Y方向へ伸ばしたレイ.
-	std::unique_ptr<CROSSRAY>	m_pCrossRay;	// 十字（前後左右に伸ばした）レイ
+	std::unique_ptr<CROSSRAY>	m_pCrossRay;	// 十字（前後左右に伸ばした）レイ.
 	
-	std::unique_ptr<CStaticMesh>			m_pMeshGun;			// 銃メッシュ.
-	std::unique_ptr<CStaticMesh>			m_pMeshBullet;		// 弾メッシュ.
-	std::unique_ptr<CGun>					m_pGun;				// 銃クラス.
-	std::vector<std::unique_ptr<CBullet>>	m_pBullets;			// 弾クラス配列.
+	std::unique_ptr<CStaticMesh>			m_pMeshGun;		// 銃メッシュ.
+	std::unique_ptr<CStaticMesh>			m_pMeshBullet;	// 弾メッシュ.
+	std::unique_ptr<CMeshLine>				m_pMeshLine;	// メッシュ線クラス.
+	std::unique_ptr<CGun>					m_pGun;			// 銃クラス.
+	std::vector<std::unique_ptr<CBullet>>	m_pBullets;		// 弾クラス配列.
 
 	// ヒット時に使うダメージ変数.
 	int m_BodyDamage;	// 胴体に命中していた場合.
