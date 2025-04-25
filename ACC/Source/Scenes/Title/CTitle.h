@@ -41,4 +41,5 @@ private:
 	std::vector<CSprite2D*> m_pSprite2Ds;	// Sprite2Dクラス.
 
 	CStaticMesh* m_pEgg;	// 卵.
+	bool m_Start;	// ゲーム開始フラグ.
 };

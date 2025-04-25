@@ -60,66 +60,38 @@ public:
 	// 音量を適用させる.
 	void ApplyVolumeSetting();
 	
-	// SEを再生する.
-	static void PlaySE( enList list ) {
-		CSoundManager::GetInstance()->m_pSound[list]->Play();
-	}
+	// 一度だけ再生する.
+	static void Play			( enList list );
 	// ループ再生する.
-	static void PlayLoop( enList list ) {
-		CSoundManager::GetInstance()->m_pSound[list]->PlayLoop();
-	}
+	static void PlayLoop		( enList list );
 	// 停止する.
-	static void Stop( enList list ) {
-		CSoundManager::GetInstance()->m_pSound[list]->Stop();
-	}
-	static void MiniStop( enList list ) {
-		CSoundManager::GetInstance()->m_pSound[list]->MiniStop();
-	}
+	static void Stop			( enList list );
+	// 再生位置を戻さずに停止.
+	static void MiniStop		( enList list );
 
 	// 再生中かを確認.
-	static bool IsPlaying( enList list ){
-		return CSoundManager::GetInstance()->m_pSound[list]->IsPlaying();
-	}
+	static bool IsPlaying		( enList list );
 
 	// 常に最初から再生する.
-	static void PlayEx( enList list, I3DL2_ENV_PRESET preset ) {
-		CSoundManager::GetInstance()->m_pSound[list]->PlayEx(preset);
-	}
+	static void PlayEx			( enList list, I3DL2_ENV_PRESET preset );
 	// ループ再生.
-	static void playLoopEx( enList list, I3DL2_ENV_PRESET preset ) {
-		CSoundManager::GetInstance()->m_pSound[list]->playLoopEx(preset);
-	}
-
+	static void playLoopEx		( enList list, I3DL2_ENV_PRESET preset );
 
 	// パンニングを設定する.
-	static void SetPan( enList list,LONG pan ) {
-		CSoundManager::GetInstance()->m_pSound[list]->SetPan(pan);
-	}
+	static void SetPan			( enList list, LONG pan );
 	// 周波数を設定する.
-	static void SetFrequency( enList list,DWORD freq ) {
-		CSoundManager::GetInstance()->m_pSound[list]->SetFrequency(freq);
-	}
+	static void SetFrequency	( enList list, DWORD freq );
 	// 音量を設定する.
-	static void SetVolume( enList list,LONG volume ) {
-		CSoundManager::GetInstance()->m_pSound[list]->SetVolume(volume);
-	}
+	static void SetVolume		( enList list, LONG volume );
 
 	// パンニングを設定する.
-	static LONG GetPan( enList list ) {
-		return CSoundManager::GetInstance()->m_pSound[list]->GetPan();
-	}
+	static LONG GetPan			( enList list );
 	// 周波数を取得する.
-	static DWORD GetFrequency( enList list ) {
-		return CSoundManager::GetInstance()->m_pSound[list]->GetFrequency();
-	}
+	static DWORD GetFrequency	( enList list );
 	// 音量を取得する.
-	static LONG GetVolume( enList list ) {
-		return CSoundManager::GetInstance()->m_pSound[list]->GetVolume();
-	}
+	static LONG GetVolume		( enList list );
 	// エフェクトパラメータの取得.
-	static void GetPreset(enList list, I3DL2_ENV_PRESET presetNo) {
-		CSoundManager::GetInstance()->m_pSound[list]->GetPreset(presetNo);
-	}
+	static void GetPreset		( enList list, I3DL2_ENV_PRESET presetNo );
 
 	// MasterVolumeの取得.
 	float GetMasterVol() { return m_MasterVolume; }
