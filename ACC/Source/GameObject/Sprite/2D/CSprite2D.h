@@ -133,6 +133,10 @@ public:
 		m_SpriteState.Stride = WHSIZE(stride.x, stride.y); 
 		CreateModel(); 
 	}
+	// スプライトのファイルパスを設定.
+	void SetFilePath(const std::string& FilePath) { 
+		m_SpriteState.Path = FilePath; 
+	}
 
 
 	// jsonファイルのスプライト情報を取得.

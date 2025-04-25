@@ -41,8 +41,6 @@ public:
 	// スプライト情報の取得.
 	CSprite2D::SPRITE_STATE GetSpriteData() const { return m_pSprite->GetSpriteData(); }
 
-	// ウィンドウの描画開始位置を取得.
-	D3DXVECTOR2 WindowRect(HWND hwnd);
 	// 点と四角のあたり判定.
 	bool PointInSquare(POINT ppos, D3DXVECTOR2 windowpos);
 

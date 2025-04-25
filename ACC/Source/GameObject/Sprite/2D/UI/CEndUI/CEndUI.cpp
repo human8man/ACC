@@ -94,7 +94,7 @@ void CEndUI::Update()
 		D3DXVECTOR2 SquareDisp = D3DXVECTOR2(m_pUIs[i]->GetSpriteData().Disp.w, m_pUIs[i]->GetSpriteData().Disp.h);
 
 		// 点と四角の当たり判定.
-		if (m_pUIs[i]->PointInSquare(MousePos, m_pUIs[i]->WindowRect(m_hWnd)))
+		if (m_pUIs[i]->PointInSquare(MousePos,CLIENTRECT))
 		{
 			//	前回選択されていなかった場合SEを鳴らす.
 			if (m_pUIs[i]->GetPatternNo().x == 0) {

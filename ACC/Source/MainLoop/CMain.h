@@ -29,6 +29,8 @@ private:
 		HWND hWnd,	   UINT uMsg,
 		WPARAM wParam, LPARAM lParam );
 
+	// ウィンドウの位置を計算.
+	void WindowPosMath(HWND hwnd);
 	// ウィンドウをダークモードにする関数.
 	bool setUseImmersiveDarkMode(HWND hwnd, bool dark_mode);
 	// ウィンドウの枠を虹色に変色させる関数.

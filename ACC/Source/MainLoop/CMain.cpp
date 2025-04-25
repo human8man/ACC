@@ -49,13 +49,16 @@ CMain::~CMain()
 HRESULT CMain::Create() const
 {
 	// DirectX9構築.
-	if (FAILED(CDirectX9::GetInstance()		->Create(m_hWnd))) { return E_FAIL; }
+	if (FAILED(CDirectX9::GetInstance()		->Create(m_hWnd)))	{ return E_FAIL; }
 	// DirectX11構築.
-	if (FAILED(CDirectX11::GetInstance()	->Create(m_hWnd))) { return E_FAIL; }
+	if (FAILED(CDirectX11::GetInstance()	->Create(m_hWnd)))	{ return E_FAIL; }
+
+	// SpriteManagerの読み込み.
+	if (FAILED(CSpriteManager::GetInstance()->SpriteLoad()))	{ return E_FAIL; }
 	// シーンマネージャー構築.
-	if (FAILED(CSceneManager::GetInstance()	->Create(m_hWnd))) { return E_FAIL; }
+	if (FAILED(CSceneManager::GetInstance()	->Create(m_hWnd)))	{ return E_FAIL; }
 	// DirectInput構築.
-	if (FAILED(CInput::GetInstance()		->Create(m_hWnd))) { return E_FAIL; }
+	if (FAILED(CInput::GetInstance()		->Create(m_hWnd)))	{ return E_FAIL; }
 
 	// EffectManagerの構築.
 	if (FAILED(CEffect::GetInstance()->Create(
@@ -67,9 +70,6 @@ HRESULT CMain::Create() const
 
 	// EffectManagerのデータ読み込み.
 	if (FAILED(CEffect::GetInstance()->LoadData())) { return E_FAIL; }
-
-	// SpriteManagerの読み込み.
-	if (FAILED(CSpriteManager::GetInstance()->SpriteLoad())) { return E_FAIL; }
 
 #ifdef _DEBUG
 	// ImGuiの構築.
@@ -153,6 +153,8 @@ void CMain::Loop()
 
 			// ウィンドウのボーダーを虹色にする.
 			// SetRainbowBorder(m_hWnd);
+			// ウィンドウ座標の計算.
+			WindowPosMath(m_hWnd);
 
 			// 更新処理.
 			Update();
@@ -363,6 +365,38 @@ LRESULT CALLBACK CMain::MsgProc(
 
 	//メインに返す情報.
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
+}
+
+
+//------------------------------------------------------------------------------
+//		ウィンドウをダークモードにする関数.
+//------------------------------------------------------------------------------
+void CMain::WindowPosMath(HWND hwnd)
+{
+	// ウィンドウ全体の位置とサイズを取得（ウィンドウタブや枠を含む）.
+	RECT WindowRect;
+	GetWindowRect(hwnd, &WindowRect);
+
+	// クライアント領域の位置とサイズを取得（ウィンドウ内の描画範囲）.
+	RECT clientRect;
+	GetClientRect(hwnd, &clientRect);
+
+	// クライアント領域の左上と右下の座標を初期化.
+	POINT topLeft		= { clientRect.left, clientRect.top };
+	POINT bottomRight	= { clientRect.right, clientRect.bottom };
+
+	// クライアント領域の座標をスクリーン座標系に変換.
+	ClientToScreen(hwnd, &topLeft);
+	ClientToScreen(hwnd, &bottomRight);
+
+	// ウィンドウ全体の左上座標とクライアント領域の左上座標の差分を計算.
+	int borderLeft	= topLeft.x - WindowRect.left;
+	int borderTop	= topLeft.y - WindowRect.top;
+	
+	WINDOWRECT = D3DXVECTOR2(WindowRect.left, WindowRect.right);
+	CLIENTRECT = D3DXVECTOR2(
+		borderLeft + WindowRect.left,
+		borderTop + WindowRect.top);
 }
 
 

@@ -52,7 +52,9 @@ void CCamera::Init()
 //===================================================================
 void CCamera::Update()
 {
-	m_WindowMid = POINT(static_cast<LONG>(NOWFWND_W / 2.f), static_cast<LONG>(NOWFWND_H / 2.f));
+	m_WindowMid = POINT(
+		CLIENTRECT.x + static_cast<LONG>(NOWFWND_W / 2.f),
+		CLIENTRECT.y + static_cast<LONG>(NOWFWND_H / 2.f));
 
 	// マウス移動量の初期化.
 	m_MouseMoveDis = ZEROVEC2;
