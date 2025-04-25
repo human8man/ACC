@@ -1,10 +1,10 @@
 #include "CUIEditor.h"
+#include "Time/CTime.h"
 #include "nlohmann/json.hpp"
 #include "FileManager/FileManager.h"
-#include "FileManager/LoadImage/LoadImage.h"
-#include "DirectSound/CSoundManager.h"
-#include "Time/CTime.h"
 #include "DirectInput/CDirectInput.h"
+#include "DirectSound/CSoundManager.h"
+#include "FileManager/LoadImage/LoadImage.h"
 
 #ifdef _DEBUG
 #include "ImGui/CImGui.h"

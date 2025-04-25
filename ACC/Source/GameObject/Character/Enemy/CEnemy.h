@@ -52,14 +52,16 @@ private:
 	// GJKクラス.
 	std::unique_ptr<CGJK> m_pGJK;
 
-	float m_MoveSpeed;			// 移動速度.
+	float m_MoveSpeed;	// 移動速度.
 
-	bool m_Hit;					// 命中したか.
-	int	 m_HitKind;				// 命中の種類.
+	bool m_WallHack;	// プレイヤーがウォールハック使用中か.
+	bool m_Hit;			// 命中したか.
+	int	 m_HitKind;		// 命中の種類.
 
 	float m_SelectMoveTime;		// 次の行動決定までの時間.
 	float m_SelectMoveTimeMax;	// 次の行動決定までの最大時間.
 
 	int			m_MoveKind;		// 行動種類.
+	int			m_MoveToPlayer;	// プレイヤーへの移動確率(最大100%).
 	D3DXVECTOR3 m_SumVec;		// 合計のベクトル量.
 };

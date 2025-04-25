@@ -32,3 +32,16 @@ float CRandom::GetRandomFloat(float min, float max)
 	std::uniform_real_distribution<float> dist(min, max); // 浮動小数の一様分布を定義.
 	return dist(m_RandomEngine); // 乱数を生成して返す.
 }
+
+
+//=============================================================================
+//		50%の確率で true または false を返す.
+//=============================================================================
+bool CRandom::GetRandomBool()
+{
+	// 0から1までの整数の一様分布を定義 (0と1のどちらか).
+	std::uniform_int_distribution<int> dist(0, 1);
+
+	// 乱数を生成. 0が出たら false, 1が出たら true を返す.
+	return (dist(m_RandomEngine) == 1);
+}

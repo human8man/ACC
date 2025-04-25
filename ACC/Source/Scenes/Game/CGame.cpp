@@ -241,14 +241,15 @@ void CGame::Draw()
 	D3DXVECTOR4 color = { 0.f,1.f,0.f,1.f };
 
 	m_pFloor	->Render(	m_mView, m_mProj, m_Light );	// ’n–Ê‚Ì•`‰æ.
-	m_pEnemy	->Draw(		m_mView, m_mProj, m_Light );	// “G‚Ì•`‰æ.
 
 	// ’Œ‚Ì•`‰æ.
 	for (auto& cylinder : m_pCylinders) { cylinder->Render(m_mView, m_mProj, m_Light); }
 
 
-	if (m_pPlayer->GetWallHack())
-	{
+	m_pEnemy->Draw(m_mView, m_mProj, m_Light);	// “G‚Ì•`‰æ.
+
+	// ƒEƒH[ƒ‹ƒnƒbƒN‹N“®’†‚Í“G‚ÌƒtƒŒ[ƒ€‚ð•`‰æ.
+	if (m_pPlayer->GetWallHack()) {
 		CDirectX11::GetInstance()->SetDepth(false);
 		m_pMeshLine->DrawMeshWireframeFromVertices(*m_pEnemy->GetMesh(), *m_pEnemy, m_mView, m_mProj, color,1.f);
 		m_pMeshLine->Render(m_mView, m_mProj);
