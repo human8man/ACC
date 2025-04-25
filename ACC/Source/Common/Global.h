@@ -53,6 +53,10 @@ extern bool FULLSCREEN;
 // フルスクリーン時のUI調整用の変数.
 extern float FULLSCREENSCALEX;
 extern float FULLSCREENSCALEY;
+// ウィンドウ位置.
+extern D3DXVECTOR2 WINDOWRECT;
+// ウィンドウの描画開始位置.
+extern D3DXVECTOR2 CLIENTRECT;
 
 constexpr int FPS   = 60;	 // フレームレート.
 constexpr int STIC_LOW = 60; // スティック入力のデッドゾーン.

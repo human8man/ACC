@@ -158,7 +158,7 @@ void CUIEditor::Update()
 			POINT MousePos;
 			GetCursorPos(&MousePos);
 			// 画像範囲内で左クリック入力中の場合、ドラッグ操作を開始.
-			if (selectedUI->PointInSquare(MousePos, selectedUI->WindowRect(m_hWnd)) && !m_DoDrag) {
+			if (selectedUI->PointInSquare(MousePos, CLIENTRECT) && !m_DoDrag) {
 				if (Mouse->IsLAction() ) { 
 					m_DoDrag = true; 
 					m_OffsetPos = D3DXVECTOR2(pos.x - MousePos.x, pos.y - MousePos.y);

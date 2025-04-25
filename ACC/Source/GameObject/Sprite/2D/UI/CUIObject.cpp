@@ -61,36 +61,6 @@ void CUIObject::AttachSprite(CSprite2D& pSprite)
 }
 
 
-//===================================================
-//		ウィンドウの描画開始位置を取得.
-//===================================================
-D3DXVECTOR2 CUIObject::WindowRect(HWND hwnd)
-{
-	// ウィンドウ全体の位置とサイズを取得（ウィンドウタブや枠を含む）.
-	RECT WindowRect;
-	GetWindowRect(hwnd, &WindowRect);
-
-	// クライアント領域の位置とサイズを取得（ウィンドウ内の描画範囲）.
-	RECT clientRect;
-	GetClientRect(hwnd, &clientRect);
-
-	// クライアント領域の左上と右下の座標を初期化.
-	POINT topLeft = { clientRect.left, clientRect.top };
-	POINT bottomRight = { clientRect.right, clientRect.bottom };
-
-	// クライアント領域の座標をスクリーン座標系に変換.
-	ClientToScreen(hwnd, &topLeft);
-	ClientToScreen(hwnd, &bottomRight);
-
-	// ウィンドウ全体の左上座標とクライアント領域の左上座標の差分を計算.
-	int borderLeft	= topLeft.x - WindowRect.left;
-	int borderTop	= topLeft.y - WindowRect.top;
-
-	// フレーム幅を含んだウィンドウの位置を返す.
-	return D3DXVECTOR2(
-		static_cast<float>(borderLeft + WindowRect.left),
-		static_cast<float>(borderTop + WindowRect.top));
-}
 
 
 //=============================================================================

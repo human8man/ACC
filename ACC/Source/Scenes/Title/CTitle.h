@@ -17,14 +17,6 @@ class CTitle
 	: public CSceneBase
 {
 public:
-	// Titleで使用するスプライト名を追加していく(名前順).
-	enum TitleSprite {
-		FullScreen,
-		StartButton,
-		Title,
-	};
-
-public:
 	CTitle(HWND hWnd);
 	~CTitle();
 

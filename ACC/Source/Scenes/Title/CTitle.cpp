@@ -15,9 +15,16 @@ namespace {
 	// タイトル画面UIのパス.
 	constexpr char TitleImagePath[] = "Data\\Texture\\Title";
 	
+	// UIリスト.
 	std::vector<std::string> TitleImageList = {
-		"0Black",
+		"Black",
 		"StartButton",
+		"Title"
+	};
+
+	// 非処理UIリスト.
+	std::vector<std::string> ignoreList = {
+		"Black",
 		"Title"
 	};
 }
@@ -50,7 +57,7 @@ CTitle::~CTitle()
 //=================================================================================================
 void CTitle::Create()
 {
-	int index = 0;
+	//int index = 0;
 
 	for (size_t i = 0;i < TitleImageList.size();++i)
 	{
@@ -60,30 +67,11 @@ void CTitle::Create()
 
 
 		// 画像データの読み込み.
-		//m_pSprite2Ds[index]->Init(entry.path().string());
-		m_pUIs[index]->AttachSprite(*m_pSprite2Ds[index]);
-		m_pUIs[index]->SetPos(m_pSprite2Ds[index]->GetSpriteData().Pos);
-		m_SpritePosList.push_back(m_pUIs[index]->GetPos());
+		m_pUIs[i]->AttachSprite(*m_pSprite2Ds[i]);
+		m_pUIs[i]->SetPos(m_pSprite2Ds[i]->GetSpriteData().Pos);
+		m_SpritePosList.push_back(m_pUIs[i]->GetPos());
 	}
 
-	// 指定したディレクトリ内を走査.
-	for (const auto& entry : std::filesystem::directory_iterator(TitleImagePath)) {
-		// 文末がjsonの場合やり直す.
-		std::string Extension = entry.path().string();
-		Extension.erase(0, entry.path().string().rfind("."));
-		if (Extension == ".json") continue;
-
-		// インスタンス生成.
-		m_pSprite2Ds.push_back(new CSprite2D());
-		m_pUIs.push_back(new CUIObject());
-
-		// 画像データの読み込み.
-		m_pSprite2Ds[index]->Init(entry.path().string());
-		m_pUIs[index]->AttachSprite(*m_pSprite2Ds[index]);
-		m_pUIs[index]->SetPos(m_pSprite2Ds[index]->GetSpriteData().Pos);
-		m_SpritePosList.push_back(m_pUIs[index]->GetPos());
-		index++;
-	}
 	m_pEgg = new CStaticMesh();
 }
 
@@ -130,16 +118,16 @@ void CTitle::Update()
 	//		それぞれのUIの更新.
 	//----------------------------------------------------------------------------
 	for (size_t i = 0; i < m_pUIs.size(); ++i) {
-		// 背景の処理はいらないので早期に切る.
-		if (i == TitleSprite::FullScreen) { continue; }
-		if (i == TitleSprite::Title) { continue; }
+		// 処理のいらないUIを早期に切る.
+		if (std::find(ignoreList.begin(), ignoreList.end(), 
+			m_pUIs[i]->GetSpriteData().Name) != ignoreList.end()) { continue; }
 
 		// UIのサイズと座標を変換する.
 		D3DXVECTOR2 SquarePos	= D3DXVECTOR2( m_pUIs[i]->GetPos().x, m_pUIs[i]->GetPos().y );
 		D3DXVECTOR2 SquareDisp	= D3DXVECTOR2( m_pUIs[i]->GetSpriteData().Disp.w, m_pUIs[i]->GetSpriteData().Disp.h );
 
 		// 点と四角の当たり判定.
-		if (m_pUIs[i]->PointInSquare(MousePos, m_pUIs[i]->WindowRect(m_hWnd)))
+		if (m_pUIs[i]->PointInSquare(MousePos, CLIENTRECT))
 		{
 			//	前回選択されていなかった場合SEを鳴らす.
 			if ( m_pUIs[i]->GetPatternNo().x == 0 ) {
@@ -152,7 +140,7 @@ void CTitle::Update()
 		}
 
 		// スタートボタンにカーソルが重なっている時.
-		if (i == TitleSprite::StartButton) 
+		if (m_pUIs[i]->GetSpriteData().Name == TitleImageList[1])
 		{
 			// すでにカーソルで選択されている場合.
 			if ( m_pUIs[i]->GetPatternNo().x ) {
@@ -188,7 +176,7 @@ void CTitle::Draw()
 	// UIそれぞれの描画処理.
 	for (size_t i = 0; i < m_pUIs.size(); ++i) {
 		m_pUIs[i]->Draw();
-		if (i == TitleSprite::FullScreen)
+		if (m_pUIs[i]->GetSpriteData().Name == TitleImageList[0])
 		{
 			m_pEgg->Render(m_mView, m_mProj, m_Light);
 		}
