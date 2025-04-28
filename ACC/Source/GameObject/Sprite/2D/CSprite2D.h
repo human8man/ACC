@@ -138,14 +138,18 @@ public:
 		m_SpriteState.Path = FilePath; 
 	}
 
+	// スプライトのファイルパスを設定.
+	void SetSpriteName(const std::string& name) {
+		m_SpriteState.Name = name;
+	}
 
 	// jsonファイルのスプライト情報を取得.
-	HRESULT SpriteStateDataLoad(const std::string& FilePath);
+	HRESULT SpriteStateDataLoad	(const std::string& FilePath);
 	// スプライト情報をまとめたjsonファイルの作成.
-	HRESULT CreateSpriteState(const std::string& FilePath);
+	HRESULT CreateSpriteState	(const std::string& FilePath);
 
 	// 透過度を取得.
-	float GetAlpha() const { return m_Alpha; }
+	float		GetAlpha()		const { return m_Alpha; }
 	// スケール値を取得.
 	D3DXVECTOR3 GetScale()		const{ return m_vScale;}
 	// 回転情報を取得.

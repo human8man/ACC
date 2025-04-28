@@ -98,7 +98,7 @@ void CEndUI::Update()
 		{
 			//	前回選択されていなかった場合SEを鳴らす.
 			if (m_pUIs[i]->GetPatternNo().x == 0) {
-				CSoundManager::GetInstance()->PlaySE(CSoundManager::SE_SelectMove);
+				CSoundManager::GetInstance()->Play(CSoundManager::SE_SelectMove);
 			}
 			m_pUIs[i]->SetPatternNo(1, 0);
 		}

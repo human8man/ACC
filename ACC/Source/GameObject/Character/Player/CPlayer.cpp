@@ -66,7 +66,7 @@ void CPlayer::Update(std::unique_ptr<CEnemy>& chara)
 		m_ReloadTime -= CTime::GetInstance()->GetDeltaTime(); 
 		// リロード終了時にSEを鳴らす.
 		if (m_ReloadTime < 0.f) {
-			CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_ReloadEnd);
+			CSoundManager::GetInstance()->Play(CSoundManager::enList::SE_ReloadEnd);
 		}
 	}
 	if ( m_DashCoolTime >= 0.f )	{ m_DashCoolTime	-= CTime::GetInstance()->GetDeltaTime(); }
@@ -186,7 +186,7 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, Collider floor, Collider c
 				// 命中種類の設定.
 				m_HitKind = HitKind::Crit;
 				// クリティカル命中音を鳴らす.
-				CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_CritHit);
+				CSoundManager::GetInstance()->Play(CSoundManager::enList::SE_CritHit);
 			}
 			else {
 				// HPを胴体ダメージ分減らす.
@@ -198,7 +198,7 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, Collider floor, Collider c
 				// 命中種類の設定.
 				m_HitKind = HitKind::Hit;
 				// 命中音を鳴らす.
-				CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_Hit);
+				CSoundManager::GetInstance()->Play(CSoundManager::enList::SE_Hit);
 			}
 
 			// 命中した.
@@ -295,7 +295,7 @@ void CPlayer::KeyInput(std::unique_ptr<CEnemy>& chara)
 			DashVec = m_SumVec * m_DashSpeed;
 			m_CanDash = false;
 		}
-		CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_Dash);
+		CSoundManager::GetInstance()->Play(CSoundManager::enList::SE_Dash);
 	}
 
 	//----------------------------------------------------------------------
@@ -304,7 +304,7 @@ void CPlayer::KeyInput(std::unique_ptr<CEnemy>& chara)
 	if (Key->IsKeyAction(DIK_SPACE) && m_CanJump) {
 		m_JumpPower = m_JumpPowerMax;
 		m_CanJump = false;
-		CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_Jump);
+		CSoundManager::GetInstance()->Play(CSoundManager::enList::SE_Jump);
 	}
 	// ジャンプ力をY値に加算.
 	m_vPosition.y += m_JumpPower;
@@ -346,11 +346,11 @@ void CPlayer::KeyInput(std::unique_ptr<CEnemy>& chara)
 			hEffect = CEffect::Play(CEffect::GunFire, m_pGun->GetShootPos());
 
 			// 射撃音を鳴らす.
-			CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_Shot);
+			CSoundManager::GetInstance()->Play(CSoundManager::enList::SE_Shot);
 		}
 		else if (m_CanShot && m_CharaInfo.Ammo == 0 && m_ReloadTime <= 0) {
 			// 空打ち音を鳴らす.
-			CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_NoAmmo);
+			CSoundManager::GetInstance()->Play(CSoundManager::enList::SE_NoAmmo);
 		}
 	}
 
@@ -360,7 +360,7 @@ void CPlayer::KeyInput(std::unique_ptr<CEnemy>& chara)
 	if (Key->IsKeyAction(DIK_R)) {
 		m_CharaInfo.Ammo = m_CharaInfo.MaxAmmo;
 		m_ReloadTime = m_ReloadTimeMax;
-		CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_Reload);
+		CSoundManager::GetInstance()->Play(CSoundManager::enList::SE_Reload);
 	}
 
 	//----------------------------------------------------------------------
