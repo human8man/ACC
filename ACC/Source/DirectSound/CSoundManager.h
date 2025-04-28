@@ -68,6 +68,8 @@ public:
 	static void Stop			( enList list );
 	// Ä¶ˆÊ’u‚ğ–ß‚³‚¸‚É’â~.
 	static void MiniStop		( enList list );
+	// ‚·‚×‚Ä‚Ì‰¹‚ğ’â~.
+	static void AllStop			();
 
 	// Ä¶’†‚©‚ğŠm”F.
 	static bool IsPlaying		( enList list );

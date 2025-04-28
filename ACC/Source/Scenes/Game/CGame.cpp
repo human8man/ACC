@@ -560,7 +560,7 @@ void CGame::UIUpdate()
 		m_pLoseUI->Create();
 
 		// ”s–k‚ÌŒø‰Ê‰¹‚ğ–Â‚ç‚·.
-		CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_Lose);
+		CSoundManager::GetInstance()->Play(CSoundManager::enList::SE_Lose);
 	}
 
 	// “G‚ªHP‚O‚Ìê‡A‚à‚µ‚­‚Í’n–Ê”²‚¯‚µ‚Ä‚¢‚½ê‡AŸ—˜UI‚ğì¬.
@@ -572,7 +572,7 @@ void CGame::UIUpdate()
 		m_pWinUI->Create();
 
 		// Ÿ—˜‚ÌŒø‰Ê‰¹‚ğ–Â‚ç‚·.
-		CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_Win);
+		CSoundManager::GetInstance()->Play(CSoundManager::enList::SE_Win);
 	}
 	
 	// Ÿ—˜‚â”s–k‰æ–Ê‚ÌXVˆ—.

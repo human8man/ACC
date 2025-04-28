@@ -152,12 +152,12 @@ void CEnemy::Collision(std::unique_ptr<CPlayer>& egg, Collider floor, Collider c
 			if (m_pBullets[i]->GetPos().y < egg->GetPos().y + m_EggAirRoomY) {
 				// HPをクリティカルダメージ分減らす.
 				egg->CritDamage();
-				CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_DamageCrit);
+				CSoundManager::GetInstance()->Play(CSoundManager::enList::SE_DamageCrit);
 			}
 			else {
 				// HPを胴体ダメージ分減らす.
 				egg->BodyDamage();
-				CSoundManager::GetInstance()->PlaySE(CSoundManager::enList::SE_Damage);
+				CSoundManager::GetInstance()->Play(CSoundManager::enList::SE_Damage);
 			}
 
 			// 命中した.

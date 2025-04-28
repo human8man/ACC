@@ -43,8 +43,7 @@ CUIEditor::~CUIEditor()
 //=============================================================================
 void CUIEditor::Create()
 {
-	CSoundManager::GetInstance()->Stop(CSoundManager::enList::BGM_Title);
-	CSoundManager::GetInstance()->Stop(CSoundManager::enList::BGM_Game);
+	CSoundManager::GetInstance()->AllStop();
 	SelectSceneLoad(UISceneList::Title);
 	SelectInit();
 }
