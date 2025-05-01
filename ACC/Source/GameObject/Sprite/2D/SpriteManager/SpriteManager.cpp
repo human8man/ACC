@@ -18,7 +18,6 @@ CSpriteManager::CSpriteManager()
 }
 CSpriteManager::~CSpriteManager()
 {
-	m_SpriteList.clear();
 }
 
 
@@ -57,11 +56,21 @@ HRESULT CSpriteManager::SpriteLoad()
 
 
 //=============================================================================
+//		解放処理.
+//=============================================================================
+void CSpriteManager::Release()
+{
+	m_SpriteList.clear();
+	m_SpriteNames.clear();
+}
+
+
+//=============================================================================
 //		スプライト情報を取得.
 //=============================================================================
 CSprite2D* CSpriteManager::GetSprite(const std::string& filename)
 {
-	// 指定したエフェクトを取得.
+	// 指定したスプライトを取得.
 	for (auto& s : GetInstance()->m_SpriteList) {
 		if (s.first != filename) continue;
 		return s.second.get();
@@ -76,7 +85,7 @@ CSprite2D* CSpriteManager::GetSprite(const std::string& filename)
 //=============================================================================
 std::string CSpriteManager::GetFilePath(const std::string& filename)
 {
-	// 指定したエフェクトを取得.
+	// 指定したスプライトを取得.
 	for (auto& s : GetInstance()->m_SpriteList) {
 		if (s.first != filename) continue;
 		return s.second->GetSpriteData().Path;

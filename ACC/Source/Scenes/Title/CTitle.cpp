@@ -7,16 +7,13 @@
 #include "Scenes/SceneManager/CSceneManager.h"
 #include "Sprite/2D/SpriteManager/SpriteManager.h"
 
-#ifdef _DEBUG
-#include "ImGui/CImGui.h"
-#endif
 
 namespace {
 	// タイトル画面UIのパス.
 	constexpr char TitleImagePath[] = "Data\\Texture\\Title";
 	
 	// UIリスト.
-	std::vector<std::string> TitleImageList = {
+	std::vector<std::string> ImageList = {
 		"Black",
 		"StartButton",
 		"StartButton",
@@ -62,9 +59,9 @@ void CTitle::Create()
 {
 	std::unordered_map<std::string, int> nameCounts; // 名前ごとの出現回数を記録.
 
-	for (size_t i = 0; i < TitleImageList.size(); ++i)
+	for (size_t i = 0; i < ImageList.size(); ++i)
 	{
-		std::string baseName = TitleImageList[i];
+		std::string baseName = ImageList[i];
 		std::string numberedName;
 
 		if (nameCounts.count(baseName) == 0)
@@ -79,11 +76,13 @@ void CTitle::Create()
 		}
 
 		// インスタンス生成
-		m_pSprite2Ds.push_back(CSpriteManager::GetInstance()->GetSprite(baseName)); // ←ここはbaseNameでいい！
+		m_pSprite2Ds.push_back(CSpriteManager::GetInstance()->GetSprite(baseName));
 		m_pUIs.push_back(new CUIObject());
 
+		CSprite2D* pSprite = CSpriteManager::GetInstance()->GetSprite(ImageList[i]);
+
 		// 画像データの読み込み
-		m_pUIs.back()->AttachSprite(*m_pSprite2Ds.back());
+		m_pUIs.back()->AttachSprite(pSprite);
 		m_pUIs.back()->SetPos(m_pSprite2Ds.back()->GetSpriteData().Pos);
 		m_SpritePosList.push_back(m_pUIs.back()->GetPos());
 
@@ -198,7 +197,7 @@ void CTitle::Draw()
 	// UIそれぞれの描画処理.
 	for (size_t i = 0; i < m_pUIs.size(); ++i) {
 		m_pUIs[i]->Draw();
-		if (m_pUIs[i]->GetSpriteData().Name == TitleImageList[0])
+		if (m_pUIs[i]->GetSpriteData().Name == ImageList[0])
 		{
 			m_pEgg->Render(m_mView, m_mProj, m_Light);
 		}

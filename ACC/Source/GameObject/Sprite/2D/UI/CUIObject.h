@@ -20,7 +20,7 @@ public:
 	virtual void Draw();
 
 	// スプライトを接続する.
-	void AttachSprite(CSprite2D& pSprite);
+	void AttachSprite(CSprite2D* pSprite);
 	// スプライトを切り離す.
 	void DetachSprite();
 

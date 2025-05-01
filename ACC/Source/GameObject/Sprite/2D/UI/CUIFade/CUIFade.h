@@ -9,15 +9,6 @@
 class CUIFade
 {
 public:
-	// ‰æ‘œí—Ş‚²‚Æ‚É”Ô†‚ğU‚è“–‚Ä‚é.
-	enum FadeSprite {
-		Black,
-		Gray,
-		Number,
-		White,
-	};
-
-public:
 	CUIFade();
 	 ~CUIFade();
 

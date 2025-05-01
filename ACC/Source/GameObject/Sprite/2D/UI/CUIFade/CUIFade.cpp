@@ -1,12 +1,18 @@
 #include "CUIFade.h"
 #include "DirectX/CDirectX11.h"
 #include "DirectSound/CSoundManager.h"
+#include "Sprite/2D/SpriteManager/SpriteManager.h"
 
 
 namespace {
 	// json 読込につかうパスの設定.
 	constexpr char FadeImagePath[] = "Data\\Texture\\other";
+
+	// UIリスト.
+	std::string FadeImage = "Black";
+
 }
+
 
 //=============================================================================
 //		フェードクラス.
@@ -35,26 +41,15 @@ CUIFade::~CUIFade()
 //=================================================================================================
 void CUIFade::Create()
 {
-	int index = 0;
+	// インスタンス生成
+	m_pSprite2Ds.push_back(new CSprite2D);
+	m_pUIs.push_back(new CUIObject());
+	m_pSprite2Ds.back() = CSpriteManager::GetInstance()->GetSprite(FadeImage);
 
-	// 指定したディレクトリ内を走査.
-	for (const auto& entry : std::filesystem::directory_iterator(FadeImagePath)) {
-		// 文末がjsonの場合やり直す.
-		std::string Extension = entry.path().string();
-		Extension.erase(0, entry.path().string().rfind("."));
-		if (Extension == ".json") continue;
-
-		// インスタンス生成.
-		m_pSprite2Ds.push_back(new CSprite2D());
-		m_pUIs.push_back(new CUIObject());
-
-		// 画像データの読み込み.
-		m_pSprite2Ds[index]->Init(entry.path().string());
-		m_pUIs[index]->AttachSprite(*m_pSprite2Ds[index]);
-		m_pUIs[index]->SetPos(m_pSprite2Ds[index]->GetSpriteData().Pos);
-		m_SpritePosList.push_back(m_pUIs[index]->GetPos());
-		index++;
-	}
+	// 画像データの読み込み
+	m_pUIs.back()->AttachSprite(m_pSprite2Ds.back());
+	m_pUIs.back()->SetPos(m_pSprite2Ds.back()->GetSpriteData().Pos);
+	m_SpritePosList.push_back(m_pUIs.back()->GetPos());
 }
 
 
@@ -63,69 +58,59 @@ void CUIFade::Create()
 //=================================================================================================
 void CUIFade::Update()
 {
-	// いつか追加されるかもしれない画像用にfor.
-	for ( size_t i = 0; i < m_pUIs.size(); ++i ) 
-	{
-		//------------------------------------------
-		//		黒画像の場合.
-		//------------------------------------------
-		if ( i == FadeSprite::Black )
-		{
-			// フェード開始.
-			if ( m_FadeStart ) {
-				m_FadeStart = false;
-				m_Fading	= true;
-				m_FadePeak	= false;
-				m_FadeEnd	= false;
+	// フェード開始.
+	if ( m_FadeStart ) {
+		m_FadeStart = false;
+		m_Fading = true;
+		m_FadePeak = false;
+		m_FadeEnd = false;
+		m_Peaking = false;
+
+		m_AddAlpha = m_AAVMAXVAL;
+	}
+
+	// フェード中.
+	if ( m_Fading ) {
+		// ピーク時間中.
+		if ( m_Peaking ) {
+			m_FadeAlpha = 1.f;	// アルファを1で固定.
+			m_PeakCnt--;
+
+			if ( m_PeakCnt <= 0 ) {
+				m_AddAlpha = -m_AAVMAXVAL;
 				m_Peaking = false;
-
-				m_AddAlpha	= m_AAVMAXVAL;
-			}
-
-			// フェード中.
-			if( m_Fading ) {
-				// ピーク時間中.
-				if ( m_Peaking ) {
-					m_FadeAlpha = 1.f;	// アルファを1で固定.
-					m_PeakCnt--;
-
-					if (m_PeakCnt <= 0) {
-						m_AddAlpha = -m_AAVMAXVAL;
-						m_Peaking  = false;
-					}
-				}
-				else {
-					m_FadeAlpha += m_AddAlpha;
-				}
-
-				// フェードの上限についていない場合.
-				if ( !m_FadePeak ) {
-					// アルファの最大値を超えた場合.
-					if ( 1.f < m_FadeAlpha )
-					{
-						m_FadePeak = true;
-						m_Peaking  = true;
-					}
-				}
-				else {
-					m_FadePeak = false;
-				}
-
-				// フェード終了.
-				if ( m_FadeAlpha <= 0 ) {
-					m_FadeAlpha = 0.f;
-					m_Fading	= false;
-					m_FadeEnd	= true;
-				}
 			}
 		}
+		else {
+			m_FadeAlpha += m_AddAlpha;
+		}
 
-		// スプライトの方のアルファにセット.
-		m_pUIs[i]->SetAlpha( m_FadeAlpha );
+		// フェードの上限についていない場合.
+		if ( !m_FadePeak ) {
+			// アルファの最大値を超えた場合.
+			if ( 1.f < m_FadeAlpha )
+			{
+				m_FadePeak = true;
+				m_Peaking = true;
+			}
+		}
+		else {
+			m_FadePeak = false;
+		}
 
-		// 更新.
-		m_pUIs[i]->Update();
+		// フェード終了.
+		if ( m_FadeAlpha <= 0 ) {
+			m_FadeAlpha = 0.f;
+			m_Fading = false;
+			m_FadeEnd = true;
+		}
 	}
+
+	// スプライトの方のアルファにセット.
+	m_pUIs[0]->SetAlpha( m_FadeAlpha );
+
+	// 更新.
+	m_pUIs[0]->Update();
 }
 
 
@@ -134,12 +119,7 @@ void CUIFade::Update()
 //=================================================================================================
 void CUIFade::Draw()
 {
-	for ( size_t i = 0; i < m_pUIs.size(); ++i )
-	{
-		// 黒画像以外の描画をしない
-		if (i != FadeSprite::Black) { continue; }
-		m_pUIs[i]->Draw();
-	}
+	m_pUIs[0]->Draw();
 }
 
 
@@ -148,6 +128,6 @@ void CUIFade::Draw()
 //=================================================================================================
 void CUIFade::Release()
 {
-	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pUIs[i]); }
-	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pSprite2Ds[i]); }
+	SAFE_DELETE( m_pUIs[0] );
+	SAFE_DELETE( m_pSprite2Ds[0] );
 }

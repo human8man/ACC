@@ -110,6 +110,7 @@ void CMain::Update()
 void CMain::Release()
 {
 	CSoundManager::GetInstance()->Release();
+	CSpriteManager::GetInstance()->Release();
 	CSceneManager::GetInstance()->Release();
 	CInput::GetInstance()->Release();
 }
