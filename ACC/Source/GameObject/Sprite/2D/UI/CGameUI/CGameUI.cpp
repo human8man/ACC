@@ -67,7 +67,7 @@ void CGameUI::Create()
 
 		// ‰æ‘œƒf[ƒ^‚Ì“Ç‚Ýž‚Ý.
 		m_pSprite2Ds[index]->Init(entry.path().string());
-		m_pUIs[index]->AttachSprite(*m_pSprite2Ds[index]);
+		m_pUIs[index]->AttachSprite(m_pSprite2Ds[index]);
 		m_pUIs[index]->SetPos(m_pSprite2Ds[index]->GetSpriteData().Pos);
 		m_SpritePosList.push_back(m_pUIs[index]->GetPos());
 		index++;

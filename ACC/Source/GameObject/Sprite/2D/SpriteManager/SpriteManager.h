@@ -19,6 +19,8 @@ public:
 
 	// スプライトの読み込み.
 	HRESULT SpriteLoad();
+	// 解放処理.
+	void Release();
 
 	// スプライト情報を取得.
 	CSprite2D* GetSprite(const std::string& filename);
@@ -27,6 +29,7 @@ public:
 
 	// 保存しているスプライトの名前リストの取得.
 	Sprite_List GetSpriteNames() { return GetInstance()->m_SpriteNames; }
+
 
 
 private:

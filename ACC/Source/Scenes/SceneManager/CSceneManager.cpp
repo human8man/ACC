@@ -182,7 +182,7 @@ void CSceneManager::Draw()
 //=============================================================================
 void CSceneManager::Release()
 {
-	m_pScene->Release();
+	//m_pScene->Release();
 	m_pFade->Release();
 }
 

@@ -52,9 +52,9 @@ void CUIObject::Draw()
 //=============================================================================
 //		スプライトを接続する.
 //=============================================================================
-void CUIObject::AttachSprite(CSprite2D& pSprite)
+void CUIObject::AttachSprite(CSprite2D* pSprite)
 {
-	m_pSprite = &pSprite;
+	m_pSprite = new CSprite2D(*pSprite);
 	m_vRotation = m_pSprite->GetRotation();
 	m_vScale = m_pSprite->GetScale();
 	m_Alpha = m_pSprite->GetAlpha();

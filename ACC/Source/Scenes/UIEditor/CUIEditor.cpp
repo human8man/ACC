@@ -5,6 +5,7 @@
 #include "DirectInput/CDirectInput.h"
 #include "DirectSound/CSoundManager.h"
 #include "FileManager/LoadImage/LoadImage.h"
+#include "Sprite/2D/SpriteManager/SpriteManager.h"
 
 #ifdef _DEBUG
 #include "ImGui/CImGui.h"
@@ -400,7 +401,7 @@ void CUIEditor::SelectSceneLoad(UISceneList scene)
 
 		// 画像データの読み込み.
 		sprite->Init(entry.path().string());
-		ui->AttachSprite(*sprite);
+		ui->AttachSprite(sprite);
 		ui->SetPos(sprite->GetSpriteData().Pos);
 
 		// リストに追加.
