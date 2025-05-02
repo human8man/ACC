@@ -244,8 +244,8 @@ HRESULT CMain::InitWindow(
 	rectWindow.w = rect.right - rect.left;
 	rectWindow.h = rect.bottom - rect.top;
 
-	// 自宅テレワーク時のx,y座標.
-	//rectWindow.x = 1920;
+	// 自宅時のx,y座標.
+	// rectWindow.x = 1920;
 	rectWindow.x = 0;
 	rectWindow.y = 0;
 

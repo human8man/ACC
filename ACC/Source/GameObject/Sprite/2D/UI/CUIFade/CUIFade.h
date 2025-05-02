@@ -15,7 +15,6 @@ public:
 	void Create();	// 作成処理.
 	void Update();	// 更新処理.
 	void Draw();	// 描画処理.
-	void Release();	// 解放処理.
 
 	// フェードを開始する(黒が表示されている時間).
 	void DoFade(int peaktime) { m_FadeStart = true; m_PeakCnt = peaktime; }

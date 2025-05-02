@@ -443,7 +443,7 @@ HRESULT CUIEditor::SaveScene()
 		SpriteState["Rotate"]["z"]	= m_pUIs[i]->GetRot().z;
 
 		// スプライト情報の作成.
-		if (FAILED(FileManager::JsonSave(TextPath, SpriteState))) return E_FAIL;
+		if ( FAILED( FileManager::JsonSave( TextPath, SpriteState ))) return E_FAIL;
 	}
 	return S_OK;
 }

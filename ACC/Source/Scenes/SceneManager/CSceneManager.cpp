@@ -27,10 +27,8 @@ CSceneManager::CSceneManager()
 	, m_EndDeleteFlag	( false )
 {
 }
-
 CSceneManager::~CSceneManager()
 {
-	Release();
 }
 
 
@@ -182,8 +180,7 @@ void CSceneManager::Draw()
 //=============================================================================
 void CSceneManager::Release()
 {
-	//m_pScene->Release();
-	m_pFade->Release();
+	m_pScene->Release();
 }
 
 

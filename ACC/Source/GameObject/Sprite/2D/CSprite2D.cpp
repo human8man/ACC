@@ -434,7 +434,6 @@ void CSprite2D::Render()
 
 	// アルファブレンド無効にする.
 	m_pDx11->SetAlphaBlend( false );
-
 }
 
 
