@@ -8,9 +8,9 @@
     "h": 64.0,
     "w": 64.0
   },
-  "FilePath": "Data\\Texture\\Game\\zAutoAim.json",
+  "FilePath": "Data\\Texture\\Game\\Homing.json",
   "Pos": {
-    "x": 0.0,
+    "x": 64.0,
     "y": 0.0,
     "z": 0.0
   },

@@ -12,13 +12,6 @@ class CLoseUI
 	:public CUIObject
 {
 public:
-	// Loseで使用するスプライト名を追加していく(名前順).
-	enum LoseSprite {
-		Black,
-		Lose
-	};
-
-public:
 	CLoseUI();
 	~CLoseUI();
 

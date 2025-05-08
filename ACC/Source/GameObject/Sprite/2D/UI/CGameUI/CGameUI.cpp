@@ -4,13 +4,23 @@
 #include "DirectSound/CSoundManager.h"
 #include "Time/CTime.h"
 #include "FileManager/FileManager.h"
+#include "Sprite/2D/SpriteManager/SpriteManager.h"
 
 
 namespace {
 	// UICSVのパス.
 	constexpr char UICSVPath[] = "Data\\CSV\\UIStatus.csv";
-	// 画像のパス.
-	constexpr char GameImagePath[] = "Data\\Texture\\Game";
+	// UIリスト.
+	std::vector<std::string> ImageList = {
+		"Bullets",
+		"Crosshair",
+		"HP",
+		"LowHP",
+		"Reload",
+		"AutoAim",
+		"Homing",
+		"WallHack"
+	};
 }
 
 
@@ -40,7 +50,6 @@ CGameUI::CGameUI()
 		m_ViewHitTimeMax = StrToFloat(m_StateList["Game_HitViewTime"]) * CTime::GetInstance()->GetDeltaTime();
 	}
 }
-
 CGameUI::~CGameUI()
 {
 	Release();
@@ -52,25 +61,35 @@ CGameUI::~CGameUI()
 //=================================================================================================
 void CGameUI::Create()
 {
-	int index = 0;
-	
-	// 指定したディレクトリ内を走査.
-	for (const auto& entry : std::filesystem::directory_iterator(GameImagePath)) {
-		// 文末がjsonの場合やり直す.
-		std::string Extension = entry.path().string();
-		Extension.erase(0, entry.path().string().rfind("."));
-		if (Extension == ".json") continue;
+	std::unordered_map<std::string, int> nameCounts; // 名前ごとの出現回数を記録.
+
+	for (size_t i = 0; i < ImageList.size(); ++i)
+	{
+		// 名前被りがある場合の処理.
+		std::string baseName = ImageList[i];
+		std::string numberedName;
+
+		if (nameCounts.count(baseName) == 0) {
+			numberedName = baseName;	// 1個目はそのまま.
+			nameCounts[baseName] = 1;	// 次からは1スタート.
+		}
+		else {
+			numberedName = baseName + "_" + std::to_string(nameCounts[baseName]);
+			nameCounts[baseName]++;
+		}
 
 		// インスタンス生成.
-		m_pSprite2Ds.push_back(new CSprite2D());
+		m_pSprite2Ds.push_back(CSpriteManager::GetInstance()->GetSprite(baseName));
 		m_pUIs.push_back(new CUIObject());
+		CSprite2D* pSprite = CSpriteManager::GetInstance()->GetSprite(ImageList[i]);
 
 		// 画像データの読み込み.
-		m_pSprite2Ds[index]->Init(entry.path().string());
-		m_pUIs[index]->AttachSprite(m_pSprite2Ds[index]);
-		m_pUIs[index]->SetPos(m_pSprite2Ds[index]->GetSpriteData().Pos);
-		m_SpritePosList.push_back(m_pUIs[index]->GetPos());
-		index++;
+		m_pUIs.back()->AttachSprite(pSprite);
+		m_pUIs.back()->SetPos(m_pSprite2Ds.back()->GetSpriteData().Pos);
+		m_SpritePosList.push_back(m_pUIs.back()->GetPos());
+
+		// 変更後の名前につけなおす.
+		m_pUIs.back()->SetSpriteName(numberedName);
 	}
 }
 
@@ -107,18 +126,17 @@ void CGameUI::Update(std::unique_ptr<CPlayer>& chara)
 void CGameUI::Draw()
 {
 	for ( size_t i = 0; i < m_pUIs.size(); ++i ) {
-		// 敵フレームは別で処理.
-		if (i == GameSprite::EnemyFrame) { continue; }
-
+		std::string spritename = m_pUIs[i]->GetSpriteData().Name;
+		
 		// 弾UIの描画設定.
-		if(i == GameSprite::Bullets) {
+		if( spritename == "Bullets" ) {
 			// リロードしていた場合は描画しない.
 			if (m_ReloadTime >= 0.f) { continue; }
 			m_pUIs[i]->SetPatternNo(m_Ammo, 0);
 		}
 
 		// クロスヘアの描画設定.
-		if (i == GameSprite::Crosshair) {
+		if ( spritename == "Crosshair" ) {
 			if (m_ViewHitTime > 0.f) {
 				m_pUIs[i]->SetPatternNo(m_HitKind, 0);
 			}
@@ -128,27 +146,27 @@ void CGameUI::Draw()
 		}
 
 		// HPUIの描画設定.
-		if (i == GameSprite::HP) {
+		if ( spritename == "HP" ) {
 			if (m_HP < 0) { m_HP = 0; }
 			m_pUIs[i]->SetPatternNo(m_HP, 0);
 		}
 
 		// LOWHPUIの描画設定.
-		if (i == GameSprite::LowHP) {
+		if ( spritename == "LowHP" ) {
 			// HPが半分以上の場合は描画しない.
 			if (m_HP > m_HPMax / 2) { continue; }
 		}
 
 		// リロードUIの描画設定.
-		if (i == GameSprite::Reload) {
+		if ( spritename == "Reload" ) {
 			// リロードしていない場合は描画しない.
 			if (m_ReloadTime <= 0.f) { continue; }
 		}
 
 		// チート系のUI描画設定.
-		if (i == GameSprite::AutoAim) {m_pUIs[i]->SetPatternNo(m_AutoAim, 0);}
-		if (i == GameSprite::Homing)  {m_pUIs[i]->SetPatternNo(m_Homing, 0);}
-		if (i == GameSprite::WallHack)  {m_pUIs[i]->SetPatternNo(m_WallHack, 0);}
+		if (spritename == "AutoAim")	{ m_pUIs[i]->SetPatternNo(m_AutoAim, 0); }
+		if (spritename == "Homing")		{ m_pUIs[i]->SetPatternNo(m_Homing, 0); }
+		if (spritename == "WallHack")	{ m_pUIs[i]->SetPatternNo(m_WallHack, 0); }
 
 		m_pUIs[i]->Draw();
 	}
@@ -160,10 +178,6 @@ void CGameUI::Draw()
 //=================================================================================================
 void CGameUI::Release()
 {
-	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) {
-		SAFE_DELETE(m_pUIs[i]);
-	}
-	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) {
-		SAFE_DELETE(m_pSprite2Ds[i]);
-	}
+	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pUIs[i]); }
+	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pSprite2Ds[i]); }
 }

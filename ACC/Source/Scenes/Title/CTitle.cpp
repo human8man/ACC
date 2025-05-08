@@ -9,19 +9,14 @@
 
 
 namespace {
-	// タイトル画面UIのパス.
-	constexpr char TitleImagePath[] = "Data\\Texture\\Title";
-	
 	// UIリスト.
 	std::vector<std::string> ImageList = {
 		"Black",
 		"StartButton",
-		"StartButton",
-		"StartButton",
 		"Title"
 	};
 
-	// 非処理UIリスト.
+	// 非処理のUIリスト.
 	std::vector<std::string> ignoreList = {
 		"Black",
 		"Title"
@@ -61,32 +56,30 @@ void CTitle::Create()
 
 	for (size_t i = 0; i < ImageList.size(); ++i)
 	{
+		// 名前被りがある場合の処理.
 		std::string baseName = ImageList[i];
 		std::string numberedName;
 
-		if (nameCounts.count(baseName) == 0)
-		{
-			numberedName = baseName;    // 1個目はそのまま
-			nameCounts[baseName] = 1;    // 次からは1スタート
+		if (nameCounts.count(baseName) == 0) {
+			numberedName = baseName;	// 1個目はそのまま.
+			nameCounts[baseName] = 1;	// 次からは1スタート.
 		}
-		else
-		{
+		else {
 			numberedName = baseName + "_" + std::to_string(nameCounts[baseName]);
 			nameCounts[baseName]++;
 		}
 
-		// インスタンス生成
+		// インスタンス生成.
 		m_pSprite2Ds.push_back(CSpriteManager::GetInstance()->GetSprite(baseName));
 		m_pUIs.push_back(new CUIObject());
-
 		CSprite2D* pSprite = CSpriteManager::GetInstance()->GetSprite(ImageList[i]);
 
-		// 画像データの読み込み
+		// 画像データの読み込み.
 		m_pUIs.back()->AttachSprite(pSprite);
 		m_pUIs.back()->SetPos(m_pSprite2Ds.back()->GetSpriteData().Pos);
 		m_SpritePosList.push_back(m_pUIs.back()->GetPos());
 
-		// 名前だけしっかりつける
+		// 変更後の名前につけなおす.
 		m_pUIs.back()->SetSpriteName(numberedName);
 	}
 	m_pEgg = new CStaticMesh();
@@ -137,11 +130,13 @@ void CTitle::Update()
 	//----------------------------------------------------------------------------
 	for (size_t i = 0; i < m_pUIs.size(); ++i) {
 		// 処理のいらないUIを早期に切る.
-		if (std::find(ignoreList.begin(), ignoreList.end(), 
+		if (std::find(
+			ignoreList.begin(),
+			ignoreList.end(), 
 			m_pUIs[i]->GetSpriteData().Name) != ignoreList.end()) { continue; }
 
 		// 点と四角の当たり判定.
-		if (m_pUIs[i]->PointInSquare(MousePos, CLIENTRECT))
+		if ( m_pUIs[i]->PointInSquare( MousePos, CLIENTRECT ) )
 		{
 			//	前回選択されていなかった場合SEを鳴らす.
 			if ( m_pUIs[i]->GetPatternNo().x == 0 ) {
@@ -154,7 +149,7 @@ void CTitle::Update()
 		}
 
 		// 特定の名前の場合.
-		if (m_pUIs[i]->GetSpriteData().Name == "StartButton_1")
+		if ( m_pUIs[i]->GetSpriteData().Name == "StartButton" )
 		{
 			// すでにカーソルで選択されている場合.
 			if ( m_pUIs[i]->GetPatternNo().x ) {
@@ -169,16 +164,9 @@ void CTitle::Update()
 				}
 			}
 		}
-
-		if (m_pUIs[i]->GetSpriteData().Name == "StartButton_2")
-		{
-			D3DXVECTOR3 pos = m_pUIs[i]->GetPos();
-			pos.y += 1;
-			m_pUIs[i]->SetPos(pos);
-		}
 	}
 
-	if (m_Start) {
+	if ( m_Start ) {
 		// ゲームを開始する.
 		CSceneManager::GetInstance()->LoadScene(SceneList::Game);
 		CSoundManager::GetInstance()->AllStop();

@@ -12,26 +12,14 @@ class CEndUI
 	:public CUIObject
 {
 public:
-	// Endシーンで使用するスプライト名を追加(名前順).
-	enum EndSprite {
-		Back,
-		Frame,
-		SelectNo,
-		SelectYes,
-	};
-
-public:
 	CEndUI();
 	~CEndUI();
 
 	void Create(HWND hWnd);	// 作成処理.
 	void Init();			// 初期化処理.
-
 	void Update();			// 更新処理.
 	void Draw();			// 描画処理.
-
 	void Release();			// 解放処理.
-
 
 	// Endシーンが削除可能かを取得.
 	bool GetDeleteFlag() const { return m_EndDeleteFlag; }
