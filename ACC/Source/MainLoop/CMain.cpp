@@ -317,7 +317,8 @@ LRESULT CALLBACK CMain::MsgProc(
 
 			// アクティブに切り替わった場合.
 			if (isActive) {
-				if (scene->GetSceneNo() == SceneList::Title) {
+				if (scene->GetSceneNo() == SceneList::Title 
+				||  scene->GetSceneNo() == SceneList::UIEditor) {
 					CCamera::GetInstance()->SetUseMouse(true);
 					if (cursorInfo.flags != CURSOR_SHOWING) { ShowCursor(true); }
 				}
