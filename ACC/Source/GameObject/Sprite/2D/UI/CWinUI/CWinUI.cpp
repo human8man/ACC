@@ -5,13 +5,17 @@
 #include "DirectSound/CSoundManager.h"
 #include "Time/CTime.h"
 #include "FileManager/FileManager.h"
+#include "Sprite/2D/SpriteManager/SpriteManager.h"
 
 
 namespace {
 	// UICSVのパス.
 	constexpr char UICSVPath[] = "Data\\CSV\\UIStatus.csv";
-	// WinUIのパス.
-	constexpr char WinImagePath[] = "Data\\Texture\\Win";
+	// UIリスト.
+	std::vector<std::string> ImageList = {
+		"Black",
+		"Victory"
+	};
 }
 
 
@@ -49,25 +53,35 @@ CWinUI::~CWinUI()
 //=============================================================================
 void CWinUI::Create()
 {
-	int index = 0;
+	std::unordered_map<std::string, int> nameCounts; // 名前ごとの出現回数を記録.
 
-	// 指定したディレクトリ内を走査.
-	for (const auto& entry : std::filesystem::directory_iterator(WinImagePath)) {
-		// 文末がjsonの場合やり直す.
-		std::string Extension = entry.path().string();
-		Extension.erase(0, entry.path().string().rfind("."));
-		if (Extension == ".json") continue;
+	for (size_t i = 0; i < ImageList.size(); ++i)
+	{
+		// 名前被りがある場合の処理.
+		std::string baseName = ImageList[i];
+		std::string numberedName;
+
+		if (nameCounts.count(baseName) == 0) {
+			numberedName = baseName;	// 1個目はそのまま.
+			nameCounts[baseName] = 1;	// 次からは1スタート.
+		}
+		else {
+			numberedName = baseName + "_" + std::to_string(nameCounts[baseName]);
+			nameCounts[baseName]++;
+		}
 
 		// インスタンス生成.
-		m_pSprite2Ds.push_back(new CSprite2D());
+		m_pSprite2Ds.push_back(CSpriteManager::GetInstance()->GetSprite(baseName));
 		m_pUIs.push_back(new CUIObject());
+		CSprite2D* pSprite = CSpriteManager::GetInstance()->GetSprite(ImageList[i]);
 
 		// 画像データの読み込み.
-		m_pSprite2Ds[index]->Init(entry.path().string());
-		m_pUIs[index]->AttachSprite(m_pSprite2Ds[index]);
-		m_pUIs[index]->SetPos(m_pSprite2Ds[index]->GetSpriteData().Pos);
-		m_SpritePosList.push_back(m_pUIs[index]->GetPos());
-		index++;
+		m_pUIs.back()->AttachSprite(pSprite);
+		m_pUIs.back()->SetPos(m_pSprite2Ds.back()->GetSpriteData().Pos);
+		m_SpritePosList.push_back(m_pUIs.back()->GetPos());
+
+		// 変更後の名前につけなおす.
+		m_pUIs.back()->SetSpriteName(numberedName);
 	}
 }
 
@@ -102,10 +116,10 @@ void CWinUI::Update()
 	for (size_t i = 0; i < m_pUIs.size(); ++i) 
 	{
 		// 背景を透過させる.
-		if (i == WinSprite::Black) { m_pUIs[i]->SetAlpha(0.6f); }
+		if ( m_pUIs[i]->GetSpriteData().Name == "Black" ) { m_pUIs[i]->SetAlpha(0.6f); }
 
 		// 出現時間が終了した場合.
-		if(m_SpawnTime < 0.f){
+		if( m_SpawnTime < 0.f ) {
 			// タイトル画面に遷移.
 			CSceneManager::GetInstance()->LoadScene(SceneList::Title);
 			CSoundManager::GetInstance()->AllStop();

@@ -30,8 +30,6 @@ public:
 	// 保存しているスプライトの名前リストの取得.
 	Sprite_List GetSpriteNames() { return GetInstance()->m_SpriteNames; }
 
-
-
 private:
 	Sprite_map	m_SpriteList;	// スプライトリスト.
 	Sprite_List	m_SpriteNames;	// スプライトの名前リスト.

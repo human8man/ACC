@@ -7,20 +7,6 @@ class CGameUI
 	:public CUIObject
 {
 public:
-	// ‰æ‘œí—Ş‚²‚Æ‚É”Ô†‚ğU‚è“–‚Ä‚é.
-	enum GameSprite {
-		Bullets,
-		Crosshair,
-		EnemyFrame,
-		HP,
-		LowHP,
-		Reload,
-		AutoAim,
-		Homing,
-		WallHack
-	};
-
-public:
 	CGameUI();
 	~CGameUI();
 

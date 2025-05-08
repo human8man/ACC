@@ -2,11 +2,25 @@
 
 #include "Scenes/SceneManager/CSceneManager.h"
 #include "DirectSound/CSoundManager.h"
+#include "Sprite/2D/SpriteManager/SpriteManager.h"
 
 
 namespace {
 	// EndUIのパス.
 	constexpr char OptionImagePath[] = "Data\\Texture\\End";
+	// UIリスト.
+	std::vector<std::string> ImageList = {
+		"EndBack",
+		"Frame",
+		"SelectNo",
+		"SelectYes"
+	};
+
+	// 非処理のUIリスト.
+	std::vector<std::string> ignoreList = {
+		"EndBlack",
+		"Frame",
+	};
 }
 
 
@@ -36,25 +50,35 @@ CEndUI::~CEndUI()
 void CEndUI::Create(HWND hWnd)
 {
 	m_hWnd = hWnd;
-	int index = 0;
+	std::unordered_map<std::string, int> nameCounts; // 名前ごとの出現回数を記録.
 
-	// 指定したディレクトリ内を走査.
-	for (const auto& entry : std::filesystem::directory_iterator(OptionImagePath)) {
-		// 文末がjsonの場合やり直す.
-		std::string Extension = entry.path().string();
-		Extension.erase(0, entry.path().string().rfind("."));
-		if (Extension == ".json") continue;
+	for (size_t i = 0; i < ImageList.size(); ++i)
+	{
+		// 名前被りがある場合の処理.
+		std::string baseName = ImageList[i];
+		std::string numberedName;
+
+		if (nameCounts.count(baseName) == 0) {
+			numberedName = baseName;	// 1個目はそのまま.
+			nameCounts[baseName] = 1;	// 次からは1スタート.
+		}
+		else {
+			numberedName = baseName + "_" + std::to_string(nameCounts[baseName]);
+			nameCounts[baseName]++;
+		}
 
 		// インスタンス生成.
-		m_pSprite2Ds.push_back(new CSprite2D());
+		m_pSprite2Ds.push_back(CSpriteManager::GetInstance()->GetSprite(baseName));
 		m_pUIs.push_back(new CUIObject());
+		CSprite2D* pSprite = CSpriteManager::GetInstance()->GetSprite(ImageList[i]);
 
 		// 画像データの読み込み.
-		m_pSprite2Ds[index]->Init(entry.path().string());
-		m_pUIs[index]->AttachSprite(m_pSprite2Ds[index]);
-		m_pUIs[index]->SetPos(m_pSprite2Ds[index]->GetSpriteData().Pos);
-		m_SpritePosList.push_back(m_pUIs[index]->GetPos());
-		index++;
+		m_pUIs.back()->AttachSprite(pSprite);
+		m_pUIs.back()->SetPos(m_pSprite2Ds.back()->GetSpriteData().Pos);
+		m_SpritePosList.push_back(m_pUIs.back()->GetPos());
+
+		// 変更後の名前につけなおす.
+		m_pUIs.back()->SetSpriteName(numberedName);
 	}
 }
 
@@ -84,10 +108,14 @@ void CEndUI::Update()
 	//----------------------------------------------------------------------------
 	//		それぞれのUIの更新.
 	//----------------------------------------------------------------------------
-	for (size_t i = 0; i < m_pUIs.size(); ++i) {
-		// 処理が必要のないものは早期に返す.
-		if (i == EndSprite::Back) { continue; }
-		if (i == EndSprite::Frame) { continue; }
+	for (size_t i = 0; i < m_pUIs.size(); ++i) { 
+		// 処理のいらないUIを早期に切る.
+		if (std::find(
+			ignoreList.begin(),
+			ignoreList.end(),
+			m_pUIs[i]->GetSpriteData().Name) != ignoreList.end()) { continue; }
+
+		std::string spritename = m_pUIs[i]->GetSpriteData().Name;
 
 		// UIのサイズと座標を変換する.
 		D3DXVECTOR2 SquarePos = D3DXVECTOR2(m_pUIs[i]->GetPos().x, m_pUIs[i]->GetPos().y);
@@ -109,18 +137,17 @@ void CEndUI::Update()
 		bool yesflag = false, noflag = false;
 
 		// Yesにカーソルが重なっている時.
-		if (i == EndSprite::SelectYes && m_pUIs[i]->GetPatternNo().x) {
+		if (spritename == "SelectYes" && m_pUIs[i]->GetPatternNo().x) {
 			if (Mouse->IsLAction()) { yesflag = true; }
 		}
 		if (Key->IsKeyAction(DIK_Y)) { yesflag = true; }
 
 		// Noにカーソルが重なっている時.
-		if (i == EndSprite::SelectNo && m_pUIs[i]->GetPatternNo().x) {
+		if (spritename == "SelectNo" && m_pUIs[i]->GetPatternNo().x) {
 			if (Mouse->IsLAction()) { noflag = true; }
 		}
 		if (Key->IsKeyAction(DIK_N)) { noflag = true; }
 		
-
 		// フラグの結果に合わせて処理をする.
 		if (yesflag) { DestroyWindow(m_hWnd); }
 		if (noflag) { m_EndDeleteFlag = true; }
@@ -134,9 +161,7 @@ void CEndUI::Update()
 void CEndUI::Draw()
 {
 	// UIそれぞれの描画処理.
-	for (size_t i = 0; i < m_pUIs.size(); ++i) {
-		m_pUIs[i]->Draw();
-	}
+	for (size_t i = 0; i < m_pUIs.size(); ++i) { m_pUIs[i]->Draw(); }
 }
 
 

@@ -5,12 +5,8 @@
 
 
 namespace {
-	// json 読込につかうパスの設定.
-	constexpr char FadeImagePath[] = "Data\\Texture\\other";
-
 	// UIリスト.
 	std::string FadeImage = "Black";
-
 }
 
 
@@ -18,15 +14,19 @@ namespace {
 //		フェードクラス.
 //=============================================================================
 CUIFade::CUIFade()
-	: m_FadeStart	( false )
+	: m_pSprite2D	( nullptr )
 	, m_Fading		( false )
-	, m_FadePeak	( false )
-	, m_FadeEnd		( false )
+	, m_FirstPeak	( false )
+	, m_Peak		( false )
+	, m_BeforePeak	( false )
+	, m_End			( false )
 	, m_Peaking		( false )
 
 	, m_FadeAlpha	( 0.f )
 	, m_AddAlpha	( 0.f )
-	, m_AAVMAXVAL	( 0.02f )
+	, m_InAddAlpha	( 0.f )
+	, m_OutAddAlpha	( 0.f )
+	
 	, m_PeakCnt		( 0 )
 {
 }
@@ -41,14 +41,15 @@ CUIFade::~CUIFade()
 void CUIFade::Create()
 {
 	// インスタンス生成
-	m_pSprite2Ds.push_back(new CSprite2D);
-	m_pUIs.push_back(new CUIObject());
-	m_pSprite2Ds.back() = CSpriteManager::GetInstance()->GetSprite(FadeImage);
+	m_pSprite2D = CSpriteManager::GetInstance()->GetSprite(FadeImage);
+	m_pUI = std::make_unique<CUIObject>();
 
 	// 画像データの読み込み
-	m_pUIs.back()->AttachSprite(m_pSprite2Ds.back());
-	m_pUIs.back()->SetPos(m_pSprite2Ds.back()->GetSpriteData().Pos);
-	m_SpritePosList.push_back(m_pUIs.back()->GetPos());
+	m_pUI->AttachSprite(m_pSprite2D);
+	m_pUI->SetPos(m_pSprite2D->GetSpriteData().Pos);
+
+	// アルファをセット.
+	m_pUI->SetAlpha(m_FadeAlpha);
 }
 
 
@@ -57,66 +58,71 @@ void CUIFade::Create()
 //=================================================================================================
 void CUIFade::Update()
 {
-	// フェード開始.
-	if ( m_FadeStart ) {
-		m_FadeStart = false;
-		m_Fading = true;
-		m_FadePeak = false;
-		m_FadeEnd = false;
-		m_Peaking = false;
+	// フェード中でない場合切る.
+	if (!m_Fading) { return; }
 
-		m_AddAlpha = m_AAVMAXVAL;
-	}
+	// 一度でも過去と現在のピーク情報が正の場合は不にする.
+	if ( m_BeforePeak && m_BeforePeak == m_Peak ) { m_FirstPeak = false; }
 
-	// フェード中.
-	if ( m_Fading ) {
-		// ピーク時間中.
-		if ( m_Peaking ) {
+	// ピーク時間中.
+	if ( m_Peaking ) {
+		// カウントが0以上の間.
+		if (m_PeakCnt > 0.f) {
 			m_FadeAlpha = 1.f;	// アルファを1で固定.
-			m_PeakCnt--;
-
-			if ( m_PeakCnt <= 0 ) {
-				m_AddAlpha = -m_AAVMAXVAL;
-				m_Peaking = false;
-			}
+			m_PeakCnt -= CTime::GetInstance()->GetDeltaTime();
 		}
-		else {
-			m_FadeAlpha += m_AddAlpha;
-		}
-
-		// フェードの上限についていない場合.
-		if ( !m_FadePeak ) {
-			// アルファの最大値を超えた場合.
-			if ( 1.f < m_FadeAlpha )
-			{
-				m_FadePeak = true;
-				m_Peaking = true;
-			}
-		}
-		else {
-			m_FadePeak = false;
-		}
-
-		// フェード終了.
-		if ( m_FadeAlpha <= 0 ) {
-			m_FadeAlpha = 0.f;
-			m_Fading = false;
-			m_FadeEnd = true;
+		else{
+			m_FadeAlpha -= m_OutAddAlpha;
 		}
 	}
+	// ピークに対していない場合.
+	else {
+		m_FadeAlpha += m_InAddAlpha;	//　アルファ加算.
+		// ピークに達したとき.
+		if ( 1.f < m_FadeAlpha && !m_Peak) {
+			m_Peak = m_Peaking = m_FirstPeak = true;
+		}
+	}
+
+	// フェード終了.
+	if (m_FadeAlpha <= 0) {
+		m_FadeAlpha = 0.f;
+		m_Fading = false;
+		m_End = true;
+	}
+
+	// 前フレームのピーク情報を保存.
+	m_BeforePeak = m_Peak;
 
 	// スプライトの方のアルファにセット.
-	m_pUIs[0]->SetAlpha( m_FadeAlpha );
+	m_pUI->SetAlpha( m_FadeAlpha );
 
 	// 更新.
-	m_pUIs[0]->Update();
+	m_pUI->Update();
 }
 
 
 //=================================================================================================
 //		描画処理.
 //=================================================================================================
-void CUIFade::Draw()
+void CUIFade::Draw() 
 {
-	m_pUIs[0]->Draw();
+	m_pUI->Draw(); 
+}
+
+
+//=================================================================================================
+//		フェード開始処理.
+//=================================================================================================
+void CUIFade::DoFade(int in, int peak, int out)
+{
+	m_Peak = m_Peaking = m_End = m_FirstPeak = m_BeforePeak = false;
+	m_Fading = true;
+
+	float deltatime = CTime::GetInstance()->GetDeltaTime();
+	m_PeakCnt	= peak	* deltatime;
+	
+	// イン/アウト時に加算する値を算出.
+	m_InAddAlpha = 1.f / in;
+	m_OutAddAlpha = 1.f / out;
 }

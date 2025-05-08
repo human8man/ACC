@@ -137,7 +137,7 @@ void CSceneManager::Update()
 
 	if (m_pEndUI == nullptr) {
 		// フェードのピーク時にシーンを切り替える.
-		if (m_pFade->GetFadePeak()) {
+		if (m_pFade->GetFirstPeak()) {
 			m_pScene.release();
 			m_pScene = CreateScene(m_NextSceneNo);
 			m_pScene->Create();
@@ -147,7 +147,7 @@ void CSceneManager::Update()
 
 		// フェード中以外、Update()を回す.
 		//	フェードのピーク時に一度だけ通し、フェード明け用の背景を作成する.
-		if (!m_pFade->GetFading() || m_pFade->GetFadePeak()) {
+		if ( !m_pFade->GetFading() || m_pFade->GetFirstPeak()) {
 			GetInstance()->m_pScene->Update();
 		}
 
@@ -189,7 +189,7 @@ void CSceneManager::Release()
 //=============================================================================
 void CSceneManager::LoadScene(SceneList Scene)
 {
-	m_pFade->DoFade(120);
+	m_pFade->DoFade(30,90,30);
 	m_NextSceneNo = Scene;
 }
 
