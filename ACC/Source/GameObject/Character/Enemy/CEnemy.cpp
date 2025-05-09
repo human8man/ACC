@@ -59,8 +59,8 @@ void CEnemy::Update(std::unique_ptr<CPlayer>& chara)
 	m_SumVec = ZEROVEC3;
 	// ƒvƒŒƒCƒ„[‚ÉŒü‚«‚ð‡‚í‚¹‚é.
 	float deltaX = chara->GetPos().x - m_vPosition.x;
-	float deltaY = chara->GetPos().z - m_vPosition.z;
-	float targetAngleRad1 = std::atan2(deltaY, deltaX);
+	float deltaZ = chara->GetPos().z - m_vPosition.z;
+	float targetAngleRad1 = std::atan2(deltaZ, deltaX);
 
 	m_vRotation.y = targetAngleRad1;
 	

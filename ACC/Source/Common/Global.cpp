@@ -2,6 +2,7 @@
 
 // ‚±‚±‚ÅÄ’è‹`‚µ‰Šú‰».
 bool	FULLSCREEN = false;
+bool	RAINBOW_WINDOW = false;
 
 float	FULLSCREENSCALEX = 1.f;
 float	FULLSCREENSCALEY = 1.f;
