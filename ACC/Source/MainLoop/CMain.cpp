@@ -137,7 +137,7 @@ void CMain::Loop()
 	ZeroMemory( &msg, sizeof( msg ) );
 
 	// ダークモードに変更.
-	setUseImmersiveDarkMode( m_hWnd, true );
+	SetUseImmersiveDarkMode( m_hWnd, true );
 
 	while( msg.message != WM_QUIT )
 	{
@@ -153,7 +153,11 @@ void CMain::Loop()
 			sync_old = sync_now;	// 現在時間に置き換え.
 
 			// ウィンドウのボーダーを虹色にする.
-			// SetRainbowBorder(m_hWnd);
+			if (RAINBOW_WINDOW) {
+				SetRainbowBorder(m_hWnd);
+			}
+			else { ResetBorder(m_hWnd); }
+
 			// ウィンドウ座標の計算.
 			WindowPosMath(m_hWnd);
 
@@ -405,7 +409,7 @@ void CMain::WindowPosMath(HWND hwnd)
 //------------------------------------------------------------------------------
 //		ウィンドウをダークモードにする関数.
 //------------------------------------------------------------------------------
-bool CMain::setUseImmersiveDarkMode(HWND hwnd, bool dark_mode)
+bool CMain::SetUseImmersiveDarkMode(HWND hwnd, bool dark_mode)
 {
 	// ダークモードにする.
 	BOOL value = dark_mode;
@@ -447,4 +451,17 @@ void CMain::SetRainbowBorder(HWND hwnd)
 	if (m_ColorStep > 1000) {
 		m_ColorStep = 0;
 	}
+}
+
+
+//------------------------------------------------------------------------------
+//		ウィンドウの枠リセット関数.
+//------------------------------------------------------------------------------
+void CMain::ResetBorder(HWND hwnd)
+{
+	// sin関数を使用して、赤、緑、青の色成分を計算.
+	COLORREF color = RGB(0,0,0);
+
+	// ウィンドウの枠線の色を変更.
+	DwmSetWindowAttribute(hwnd, DWMWA_BORDER_COLOR, &color, sizeof(color));
 }

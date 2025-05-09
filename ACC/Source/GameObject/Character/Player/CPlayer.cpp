@@ -371,7 +371,7 @@ void CPlayer::KeyInput(std::unique_ptr<CEnemy>& chara)
 	if (Key->IsKeyAction(DIK_1)) { m_AutoAim = !m_AutoAim; }
 	if (Key->IsKeyAction(DIK_2)) { m_Homing = !m_Homing; }
 	if (Key->IsKeyAction(DIK_3)) { m_WallHack = !m_WallHack; }
-	if (Key->IsKeyAction(DIK_4)) { m_TriggerHappy = !m_TriggerHappy; }
+	if (Key->IsKeyAction(DIK_4)) { m_TriggerHappy = !m_TriggerHappy; RAINBOW_WINDOW = m_TriggerHappy; }
 
 
 	// 合計のベクトル量分位置を更新.

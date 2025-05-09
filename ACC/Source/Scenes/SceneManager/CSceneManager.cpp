@@ -200,6 +200,7 @@ void CSceneManager::LoadScene(SceneList Scene)
 std::unique_ptr<CSceneBase> CSceneManager::CreateScene(SceneList No)
 {
 	m_SceneNo = No;
+	RAINBOW_WINDOW = false;
 
 	switch (No)
 	{

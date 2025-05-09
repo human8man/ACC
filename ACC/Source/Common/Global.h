@@ -50,6 +50,7 @@ extern float NOWFWND_H;	// フルウィンドウの高さ(float).
 
 // フルスクリーン(毎フレーム判定をとり、別のクラス同士で参照させるためextern).
 extern bool FULLSCREEN;
+extern bool RAINBOW_WINDOW;
 // フルスクリーン時のUI調整用の変数.
 extern float FULLSCREENSCALEX;
 extern float FULLSCREENSCALEY;

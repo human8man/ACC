@@ -25,7 +25,6 @@ CCamera::CCamera()
 {
 	Init();
 }
-
 CCamera::~CCamera()
 {
 }

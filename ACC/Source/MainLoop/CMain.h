@@ -32,9 +32,10 @@ private:
 	// ウィンドウの位置を計算.
 	void WindowPosMath(HWND hwnd);
 	// ウィンドウをダークモードにする関数.
-	bool setUseImmersiveDarkMode(HWND hwnd, bool dark_mode);
+	bool SetUseImmersiveDarkMode(HWND hwnd, bool dark_mode);
 	// ウィンドウの枠を虹色に変色させる関数.
 	void SetRainbowBorder(HWND hwnd);
+	void ResetBorder(HWND hwnd);
 
 private:
 	HWND	m_hWnd;			// ウィンドウハンドル.
