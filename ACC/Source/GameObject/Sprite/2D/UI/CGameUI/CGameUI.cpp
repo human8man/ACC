@@ -17,9 +17,11 @@ namespace {
 		"HP",
 		"LowHP",
 		"Reload",
+		"Infinity",
 		"AutoAim",
 		"Homing",
-		"WallHack"
+		"WallHack",
+		"TriggerHappy"
 	};
 }
 
@@ -38,6 +40,7 @@ CGameUI::CGameUI()
 	, m_AutoAim			( false )
 	, m_Homing			( false )
 	, m_WallHack		( false )
+	, m_TriggerHappy	( false )
 {
 	// キャラクターCSVの情報保存用.
 	std::unordered_map<std::string, std::string> m_StateList;
@@ -112,6 +115,7 @@ void CGameUI::Update(std::unique_ptr<CPlayer>& chara)
 	// ゲーム画面UIに必要な情報の設定.
 	m_Homing		= chara->GetHoming();
 	m_WallHack		= chara->GetWallHack();
+	m_TriggerHappy	= chara->GetTriggerHappy();
 	m_AutoAim		= chara->GetAutoAim();
 	m_ReloadTime	= chara->GetReloadTime();
 	m_HP			= chara->GetCharaInfo().HP;
@@ -131,7 +135,7 @@ void CGameUI::Draw()
 		// 弾UIの描画設定.
 		if( spritename == "Bullets" ) {
 			// リロードしていた場合は描画しない.
-			if (m_ReloadTime >= 0.f) { continue; }
+			if (m_ReloadTime >= 0.f || m_TriggerHappy) { continue; }
 			m_pUIs[i]->SetPatternNo(m_Ammo, 0);
 		}
 
@@ -160,13 +164,19 @@ void CGameUI::Draw()
 		// リロードUIの描画設定.
 		if ( spritename == "Reload" ) {
 			// リロードしていない場合は描画しない.
-			if (m_ReloadTime <= 0.f) { continue; }
+			if (m_ReloadTime <= 0.f || m_TriggerHappy) { continue; }
+		}
+		// リロードUIの描画設定.
+		if ( spritename == "Infinity" ) {
+			// リロードしていない場合は描画しない.
+			if (!m_TriggerHappy) { continue; }
 		}
 
 		// チート系のUI描画設定.
-		if (spritename == "AutoAim")	{ m_pUIs[i]->SetPatternNo(m_AutoAim, 0); }
-		if (spritename == "Homing")		{ m_pUIs[i]->SetPatternNo(m_Homing, 0); }
-		if (spritename == "WallHack")	{ m_pUIs[i]->SetPatternNo(m_WallHack, 0); }
+		if (spritename == "AutoAim")		{ m_pUIs[i]->SetPatternNo(m_AutoAim, 0);		}
+		if (spritename == "Homing")			{ m_pUIs[i]->SetPatternNo(m_Homing, 0);			}
+		if (spritename == "WallHack")		{ m_pUIs[i]->SetPatternNo(m_WallHack, 0);		}
+		if (spritename == "TriggerHappy")	{ m_pUIs[i]->SetPatternNo(m_TriggerHappy, 0);	}
 
 		m_pUIs[i]->Draw();
 	}

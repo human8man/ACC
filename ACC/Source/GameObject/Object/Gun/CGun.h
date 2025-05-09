@@ -23,9 +23,9 @@ public:
 
 	/****************************************************************
 	* @brief 銃の位置をプレイヤーに合わせて変更する.
-	* @param center		: プレイヤー座標.
-	* @param radius		: プレイヤーからの距離 (半径).
-	* @param playerYaw	: プレイヤーの Yaw 回転角度 (rot.y, ラジアン単位).
+	* @param center		: オブジェクト座標.
+	* @param radius		: オブジェクトからの距離 (半径).
+	* @param playerYaw	: オブジェクトの Yaw 回転角度 (rot.y, ラジアン単位).
 	****************************************************************/
 	void UpdateGunPos( const D3DXVECTOR3& center, float radius, float playerYaw );
 private:
