@@ -26,8 +26,8 @@ GunRadius,1.0
 GunRotRevision,-1.5
 // 銃の回転座標補正値(度){-30.0}
 GunPosRevision,-30.0
-// リロードにかかる時間{90.0}
-ReloadTimeMax,90.0
+// リロードにかかる時間{120.0}
+ReloadTimeMax,120.0
 // コッキング時間{20.0}
 BulletCoolTimeMax,20.0
 // 弾速{2.3}
@@ -52,4 +52,4 @@ EnemyMoveSpeed,0.2
 // 次の行動決定までの時間{60.0}
 SelectMoveTimeMax,60.0
 // プレイヤー方向への移動確立(最大100%){10}
-MoveToPlayer,2
+MoveToPlayer,10

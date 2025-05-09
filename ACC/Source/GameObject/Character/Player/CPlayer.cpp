@@ -29,12 +29,10 @@ CPlayer::CPlayer()
 	m_CharaInfo.HP = m_CharaInfo.MaxHP;
 	m_CharaInfo.Ammo = m_CharaInfo.MaxAmmo;
 
-
 	// キャラクターCSVの情報保存用.
 	std::unordered_map<std::string, std::string> m_StateList;
 	// キャラクターCSVの情報取得.
 	m_StateList = FileManager::CSVLoad(CharaCSVPath);
-	
 
 	// 空でない場合は、外部で調整するべき変数の値を入れていく.
 	if (!m_StateList.empty())
@@ -324,12 +322,16 @@ void CPlayer::KeyInput(std::unique_ptr<CEnemy>& chara)
 	// 左クリックが押された場合.
 	if (Mouse->IsLAction()){
 		// 射撃条件が整っている場合.
-		if (m_CanShot && m_CharaInfo.Ammo != 0 && m_ReloadTime <= 0) {
-			// クールタイムや残弾数の設定.
-			m_CanShot = false;
-			m_CharaInfo.Ammo--;
-			m_BulletCoolTime = m_BulletCoolTimeMax;
-			
+		if (m_CanShot && m_CharaInfo.Ammo != 0 && m_ReloadTime <= 0 || m_TriggerHappy) 
+		{
+			// 連射モードでない場合.
+			if (!m_TriggerHappy) {
+				// クールタイムや残弾数の設定.
+				m_CanShot = false;
+				m_CharaInfo.Ammo--;
+				m_BulletCoolTime = m_BulletCoolTimeMax;
+			}
+
 			// 弾を作成する.
 			m_pBullets.push_back(std::make_unique<CBullet>());
 
@@ -369,6 +371,7 @@ void CPlayer::KeyInput(std::unique_ptr<CEnemy>& chara)
 	if (Key->IsKeyAction(DIK_1)) { m_AutoAim = !m_AutoAim; }
 	if (Key->IsKeyAction(DIK_2)) { m_Homing = !m_Homing; }
 	if (Key->IsKeyAction(DIK_3)) { m_WallHack = !m_WallHack; }
+	if (Key->IsKeyAction(DIK_4)) { m_TriggerHappy = !m_TriggerHappy; }
 
 
 	// 合計のベクトル量分位置を更新.

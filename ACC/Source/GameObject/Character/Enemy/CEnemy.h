@@ -61,7 +61,11 @@ private:
 	float m_SelectMoveTime;		// 次の行動決定までの時間.
 	float m_SelectMoveTimeMax;	// 次の行動決定までの最大時間.
 
-	int			m_MoveKind;		// 行動種類.
-	int			m_MoveToPlayer;	// プレイヤーへの移動確率(最大100%).
-	D3DXVECTOR3 m_SumVec;		// 合計のベクトル量.
+	int	m_MoveKind;			// 行動種類.
+	int	m_MoveToPlayer;		// プレイヤーへの移動確率(最大100%).
+	int m_DashProbability;	// ダッシュを使う確率.
+	int m_JumpProbability;	// ジャンプを使う確率.
+	int m_ShootProbability;	// 射撃する確率.
+
+	D3DXVECTOR3 m_SumVec;	// 合計のベクトル量.
 };

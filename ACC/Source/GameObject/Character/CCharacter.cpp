@@ -35,7 +35,7 @@ CCharacter::CCharacter()
 	, m_ReloadTime			( 0.f )
 	, m_ReloadTimeMax		( CTime::GetInstance()->GetDeltaTime() * 120.f )
 	, m_BulletCoolTime		( 0.f )
-	, m_BulletCoolTimeMax	( CTime::GetInstance()->GetDeltaTime() * 60.f )
+	, m_BulletCoolTimeMax	( CTime::GetInstance()->GetDeltaTime() * 20.f )
 	, m_BulletSpeed			( 2.3f )
 	, m_CanShot				( true )
 
@@ -124,9 +124,6 @@ CCharacter::~CCharacter()
 //============================================================================
 void CCharacter::Update()
 {
-	// スタティックメッシュオブジェクトの更新処理(たぶんいらない).
-	CStaticMeshObject::Update();
-
 	// 銃をキャラの周りで回す処理.
 	m_pGun->UpdateGunPos(
 		m_vPosition,

@@ -34,7 +34,8 @@ private:
 	float	m_ViewHitTime;		// ヒット表示時間.
 	float	m_ViewHitTimeMax;	// ヒット最大表示時間.
 
-	bool	m_AutoAim;	// オートエイム.
-	bool	m_Homing;	// ホーミング.
-	bool	m_WallHack;	// ホーミング.
+	bool	m_AutoAim;		// オートエイム.
+	bool	m_Homing;		// ホーミング.
+	bool	m_WallHack;		// ウォールハック.
+	bool	m_TriggerHappy;	// 連射モード.
 };

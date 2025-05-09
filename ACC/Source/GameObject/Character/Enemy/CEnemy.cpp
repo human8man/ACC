@@ -24,7 +24,7 @@ CEnemy::CEnemy()
 	, m_Hit					( false )
 	, m_HitKind				( false )
 	, m_SelectMoveTime		( 0.f )
-	, m_SelectMoveTimeMax	( CTime::GetInstance()->GetDeltaTime() * 60.f )
+	, m_SelectMoveTimeMax	( CTime::GetInstance()->GetDeltaTime() * 10.f )
 	
 	, m_MoveKind			( MoveKind::Wait )
 	, m_MoveToPlayer		( 10 )
@@ -32,7 +32,6 @@ CEnemy::CEnemy()
 {
 	m_CharaInfo.HP = m_CharaInfo.MaxHP;
 	m_CharaInfo.Ammo = m_CharaInfo.MaxAmmo;
-
 
 	// キャラクターCSVの情報保存用.
 	std::unordered_map<std::string, std::string> m_StateList;
@@ -42,7 +41,7 @@ CEnemy::CEnemy()
 	// 空でない場合は、外部で調整するべき変数の値を入れていく.
 	if (!m_StateList.empty()) {
 		m_MoveSpeed			= StrToFloat(m_StateList["EnemyMoveSpeed"]);
-		m_SelectMoveTimeMax = StrToFloat(m_StateList["SelectMoveTimeMax"]);
+		m_SelectMoveTimeMax = StrToFloat(m_StateList["SelectMoveTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
 		m_MoveToPlayer		= StrToInt(m_StateList["MoveToPlayer"]);
 	}
 }
@@ -58,6 +57,12 @@ void CEnemy::Update(std::unique_ptr<CPlayer>& chara)
 {
 	// 毎フレームリセットする.
 	m_SumVec = ZEROVEC3;
+	// プレイヤーに向きを合わせる.
+	float deltaX = chara->GetPos().x - m_vPosition.x;
+	float deltaY = chara->GetPos().z - m_vPosition.z;
+	float targetAngleRad1 = std::atan2(deltaY, deltaX);
+
+	m_vRotation.y = targetAngleRad1;
 	
 	// クールタイム処理.
 	if ( m_DashTime			>= 0.f) { m_DashTime		-= CTime::GetInstance()->GetDeltaTime(); }
@@ -125,13 +130,11 @@ void CEnemy::Collision(std::unique_ptr<CPlayer>& egg, Collider floor, Collider c
 		// 弾データを取得.
 		Bullet.SetVertex( m_pBullets[i]->GetObjeInfo(), m_pMeshBullet->GetVertices());
 
-
 		// 当たり判定情報用の変数を宣言.
 		CollisionPoints pointsbc, pointsbf, pointsbe;
 		pointsbc = m_pGJK->GJK(Bullet, cylinder);
 		pointsbf = m_pGJK->GJK(Bullet, floor);
 		pointsbe = m_pGJK->GJK(Bullet, enemyegg);
-
 
 		// 柱や床にあたった場合削除.
 		if (pointsbc.Col || pointsbf.Col) {
@@ -181,54 +184,59 @@ void CEnemy::Act(std::unique_ptr<CPlayer>& chara)
 	CRandom random;
 	
 	//-------------------------------------------------------------------------
-	//		ランダムで移動.
+	//		移動決定処理.
 	//-------------------------------------------------------------------------
-	{
-		// 次の行動決定までの時間が 0 以下の場合.
-		if (m_SelectMoveTime <= 0.f) {
+#pragma region 移動決定処理
+	// 次の行動決定までの時間が 0 以下の場合.
+	if (m_SelectMoveTime <= 0.f) {
 
-			// プレイヤーへの移動とランダム移動の確率計算.
-			if (random.GetRandomInt(0, 100) < m_MoveToPlayer) { m_MoveKind = MoveKind::Straight; }
-			else { m_MoveKind = random.GetRandomInt(0, MoveKind::max - 1); }
-
-			// 次の行動選択までのクールタイムを設定.
-			m_SelectMoveTime = m_SelectMoveTimeMax;
+		// プレイヤーへの移動とランダム移動の確率計算.
+		if (random.GetRandomInt(0, 100) < m_MoveToPlayer) { 
+			m_MoveKind = MoveKind::Straight; 
+		}
+		else { 
+			m_MoveKind = random.GetRandomInt(0, MoveKind::max - 1); 
 		}
 
-		// ダッシュ中は操作できないようにする.
-		if (m_DashTime <= 0.f) {
-			// 操作が可能な間は初期化する.
-			DashVec = ZEROVEC3;
-
-			// 敵の向きベクトルを計算(プレイヤーが正面).
-			D3DXVECTOR3 camDir = chara->GetPos() - m_vPosition;
-			camDir.y = 0.f;	// Y情報があると飛び始めるのでYの要素を抜く.
-			D3DXVec3Normalize(&camDir, &camDir); // 正規化.
-
-			// 移動する方向ベクトル.
-			D3DXVECTOR3 forward(ZEROVEC3);
-			D3DXVECTOR3 left(ZEROVEC3);
-			D3DXVECTOR3 upvec(0.f, 1.f, 0.f);
-
-			// 左ベクトルを求める.
-			D3DXVec3Cross(&left, &camDir, &upvec);
-			D3DXVec3Normalize(&left, &left);
-
-			if (m_MoveKind == MoveKind::Straight)	{ forward += camDir;	}
-			if (m_MoveKind == MoveKind::Back)		{ forward -= camDir;	}
-			if (m_MoveKind == MoveKind::Left)		{ forward += left;		}
-			if (m_MoveKind == MoveKind::Right)		{ forward -= left;		}
-			if (m_MoveKind == MoveKind::Wait)		{ forward = ZEROVEC3;	}
-
-			// 最終的なベクトル量を速度にかけ合計ベクトルに渡す.
-			m_SumVec += forward * m_MoveSpeed;
-		}
+		// 次の行動選択までのクールタイムを設定.
+		m_SelectMoveTime = m_SelectMoveTimeMax;
 	}
 
-	//-------------------------------------------------------------------------
-	//		ランダムでダッシュ.
-	//-------------------------------------------------------------------------
+	// ダッシュ中は操作できないようにする.
+	if (m_DashTime <= 0.f) {
+		// 操作が可能な間は初期化する.
+		DashVec = ZEROVEC3;
 
+		// 敵の向きベクトルを計算(プレイヤーが正面).
+		D3DXVECTOR3 camDir = chara->GetPos() - m_vPosition;
+		camDir.y = 0.f;	// Y情報があると飛び始めるのでYの要素を抜く.
+		D3DXVec3Normalize(&camDir, &camDir); // 正規化.
+
+		// 移動する方向ベクトル.
+		D3DXVECTOR3 forward(ZEROVEC3);
+		D3DXVECTOR3 left(ZEROVEC3);
+		D3DXVECTOR3 upvec(0.f, 1.f, 0.f);
+
+		// 左ベクトルを求める.
+		D3DXVec3Cross(&left, &camDir, &upvec);
+		D3DXVec3Normalize(&left, &left);
+
+		if (m_MoveKind == MoveKind::Straight)	{ forward += camDir;	}
+		if (m_MoveKind == MoveKind::Back)		{ forward -= camDir;	}
+		if (m_MoveKind == MoveKind::Left)		{ forward += left;		}
+		if (m_MoveKind == MoveKind::Right)		{ forward -= left;		}
+		if (m_MoveKind == MoveKind::Wait)		{ forward = ZEROVEC3;	}
+
+		// 最終的なベクトル量を速度にかけ合計ベクトルに渡す.
+		m_SumVec += forward * m_MoveSpeed;
+	}
+#pragma endregion
+
+
+	//-------------------------------------------------------------------------
+	//		ダッシュ処理.
+	//-------------------------------------------------------------------------
+#pragma region ダッシュ処理
 	// クールタイムが終了していたらダッシュ可能に.
 	if (m_DashCoolTime <= 0.f) { m_CanDash = true; }
 
@@ -261,11 +269,13 @@ void CEnemy::Act(std::unique_ptr<CPlayer>& chara)
 			m_CanDash = false;
 		}
 	}
+#pragma endregion
 
 
 	//-------------------------------------------------------------------------
-	//		ランダムジャンプ処理.
+	//		ジャンプ処理.
 	//-------------------------------------------------------------------------
+#pragma region ジャンプ処理
 
 	// ランダムにジャンプのタイミングを決める.
 	bool jump = (random.GetRandomInt(0, 120) == 0);
@@ -278,22 +288,21 @@ void CEnemy::Act(std::unique_ptr<CPlayer>& chara)
 	// ジャンプ力をY値に加算.
 	m_vPosition.y += m_JumpPower;
 
-
 	// カメラのレイHit座標から発射地点のベクトルを計算.
 	D3DXVECTOR3 shootdir = chara->GetPos() - m_pGun->GetShootPos();
 	shootdir.y += 0.2f; // 補正値を入れる.
 	D3DXVec3Normalize(&shootdir, &shootdir);	// 正規化.
-
+#pragma endregion
 
 	//-------------------------------------------------------------------------
-	//		ランダムで射撃.
+	//		射撃処理.
 	//-------------------------------------------------------------------------
-
+#pragma region 射撃処理
 	// クールタイムが終了していたら射撃可能.
 	if (m_BulletCoolTime <= 0.f) { m_CanShot = true; }
 
 	// ランダムに射撃タイミングを決める.
-	bool shot = (random.GetRandomInt(0, 4) == 0);
+	bool shot = (random.GetRandomInt(0, 10) == 0);
 
 	// 射撃条件が整っていた場合.
 	if (shot && m_CanShot && m_CharaInfo.Ammo != 0 && m_ReloadTime <= 0) 
@@ -323,4 +332,5 @@ void CEnemy::Act(std::unique_ptr<CPlayer>& chara)
 
 	// 合計のベクトル量分位置を更新.
 	m_vPosition += m_SumVec + DashVec;
+#pragma endregion
 }
