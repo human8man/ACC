@@ -84,56 +84,16 @@ void CUIEditor::SelectInit()
 void CUIEditor::Update()
 {
 #ifdef _DEBUG
-	//--------------------------------------------------------------
-	//		シーンを選択する.
-	//--------------------------------------------------------------
-	ImGui::Begin(IMGUI_JP("UIEditor用シーン選択"));
-	UISceneList scene;
-	bool click = false;
-	if (ImGui::Button("Title"))	{ scene = UISceneList::Title;	click = true; }
-	if (ImGui::Button("Game"))	{ scene = UISceneList::Game;	click = true; }
-	if (ImGui::Button("Lose"))	{ scene = UISceneList::Lose;	click = true; }
-	if (ImGui::Button("Win"))	{ scene = UISceneList::Win;		click = true; }
-	if (m_MovedSomething && click && (MessageBox(NULL,
-		L"本当に切り替えますか？\n(保存していない場合リセットされます)",  L"確認",
-		MB_YESNO | MB_ICONQUESTION)) == IDYES) {
-		SelectSceneLoad(scene);
-		m_MovedSomething = false;
-	}
-	else if(!m_MovedSomething && click){
-		SelectSceneLoad(scene);
-	}
-
-	ImGui::End();
-
+	// シーンを選択する.
+	ImGuiSelectScene();
 
 	//--------------------------------------------------------------
 	//		UI調整する.
 	//--------------------------------------------------------------
-	ImGui::Begin(IMGUI_JP("UI調整ウィンドウ"));
+	ImGui::Begin(IMGUI_JP("UIエディターウィンドウ"));
 
-	if (ImGui::TreeNodeEx(IMGUI_JP("UIリスト"), ImGuiTreeNodeFlags_DefaultOpen)) {
-		// 検索バー.
-		ImGui::InputText(IMGUI_JP("検索"), m_SearchBuffer, IM_ARRAYSIZE(m_SearchBuffer));
-		// スクロール可能なリスト.
-		ImGui::BeginChild(IMGUI_JP("リスト"), ImVec2(315, 100), true, ImGuiWindowFlags_HorizontalScrollbar);
-
-		for (int i = 0; i < m_pUIs.size(); ++i) {
-			// 検索フィルタリング.
-			if (strlen(m_SearchBuffer) > 0 
-			&& m_pUIs[i]->GetSpriteData().Name.find(m_SearchBuffer) == std::string::npos) {
-				continue;
-			}
-
-			bool isSelected = (m_SelectedUIIndex == i);
-			if (ImGui::Selectable(m_pUIs[i]->GetSpriteData().Name.c_str(), isSelected)) {
-				m_SelectedUIIndex = i; // 選択更新.
-				SelectInit();
-			}
-		}
-		ImGui::EndChild();
-		ImGui::TreePop();
-	}
+	// UIリストの検索関数.
+	ImGuiSearchUI();
 
 	//-----------------------------------------------------------
 	//		選択中のオブジェクトの編集.
@@ -144,198 +104,23 @@ void CUIEditor::Update()
 		// 選択されているUIを表示.
 		ImGui::Text(IMGUI_JP("選択されているUI: %s"), selectedUI->GetSpriteData().Name.c_str());
 
-		//-----------------------------------------------------------
-		//		座標の調整.
-		//-----------------------------------------------------------
-		if (ImGui::TreeNode(IMGUI_JP("座標"))) {
-			// ドラッグ用にマウス操作のDirectInpuを用意.
-			CMouse* Mouse = CInput::GetInstance()->CDMouse();
-			D3DXVECTOR3 pos	= selectedUI->GetPos();
-			bool posdrag	= ImGui::DragFloat3("##Position", pos, 1.f);
-			bool posinput	= ImGui::InputFloat3("##InputPos", pos);
-
-			// マウス位置を取得.
-			POINT MousePos;
-			GetCursorPos(&MousePos);
-			// 画像範囲内で左クリック入力中の場合、ドラッグ操作を開始.
-			if (selectedUI->PointInSquare(MousePos, CLIENTRECT) && !m_DoDrag) {
-				if (Mouse->IsLAction() ) { 
-					m_DoDrag = true; 
-					m_OffsetPos = D3DXVECTOR2(pos.x - MousePos.x, pos.y - MousePos.y);
-				}
-			}
-			if (m_DoDrag) {
-				posdrag = true;
-				// 補正値+マウス座標した座標を入れる.
-				pos = D3DXVECTOR3(MousePos.x + m_OffsetPos.x, MousePos.y + m_OffsetPos.y, pos.z);
-				// マウスの左クリックを話した場合、ドラッグ操作を停止.
-				if (!Mouse->IsLDown()) { m_DoDrag = false; }
-			}
-
-			// 変更があった場合保存する.
-			if (posdrag || posinput) {
-				selectedUI->SetPos(pos); 
-				m_MovedSomething = true;
-			}
-			ImGui::TreePop();
-		}
-
-		//-----------------------------------------------------------
-		//		画像情報の調整.
-		//-----------------------------------------------------------
-		if (ImGui::TreeNode(IMGUI_JP("画像情報"))) {
-			D3DXVECTOR2 base	= D3DXVECTOR2(selectedUI->GetSpriteData().Base.w, selectedUI->GetSpriteData().Base.h);
-			D3DXVECTOR2 disp	= D3DXVECTOR2(selectedUI->GetSpriteData().Disp.w, selectedUI->GetSpriteData().Disp.h);
-			D3DXVECTOR2 stride	= D3DXVECTOR2(selectedUI->GetSpriteData().Stride.w, selectedUI->GetSpriteData().Stride.h);
-
-			ImGui::Text(IMGUI_JP("元のサイズ(x,y)"));
-			bool basedrag	= ImGui::DragFloat2("##BaseDrag", base, 1.f);
-			bool baseinput	= ImGui::InputFloat2("##BaseInput", base);
-
-			ImGui::Text(IMGUI_JP("表示サイズ(x,y)"));
-			bool dispdrag	= ImGui::DragFloat2("##DispDrag", disp, 1.f);
-			bool dispinput	= ImGui::InputFloat2("##DispInput", disp);
-
-			ImGui::Text(IMGUI_JP("分割サイズ(x,y)"));
-			bool stridedrag		= ImGui::DragFloat2("##StrideDrag", stride, 1.f);
-			bool strideinput	= ImGui::InputFloat2("##StrideInput", stride);
-
-			// 変更があった場合保存する.
-			if (basedrag	|| baseinput
-			||	dispdrag	|| dispinput
-			||	stridedrag	|| strideinput)
-			{
-				selectedUI->SetBase(base);
-				selectedUI->SetDisp(disp);
-				selectedUI->SetStride(stride);
-				m_MovedSomething = true;
-			}
-			ImGui::TreePop();
-		}
-
-		//-----------------------------------------------------------
-		//		画像パターンを試す.
-		//-----------------------------------------------------------
-		if (ImGui::TreeNode(IMGUI_JP("画像パターンを試す"))) {
-			 m_PatternNo = selectedUI->GetPatternNo();
-			int pattern[2] = { m_PatternNo.x,m_PatternNo.y };
-			int patternmax[2] = { m_PatternMax.x,m_PatternMax.y };
+		// 座標の調整.
+		ImGuiPosEdit(selectedUI);
+		// Z座標を基準にソート.
+		SortBySpritePosZ(selectedUI);
 
 
-			// パターンの最大数を決める.
-			ImGui::Text(IMGUI_JP("パターンの上限"));
-			ImGui::PushItemWidth(100.0f);
-			ImGui::InputInt("##x", &patternmax[0]); ImGui::SameLine(); ImGui::InputInt("##y", &patternmax[1]);
-			ImGui::PopItemWidth(); 
-			// 下限は1固定.
-			if (patternmax[0] < 1) { patternmax[0] = 1; }
-			if (patternmax[1] < 1) { patternmax[1] = 1; }
-			m_PatternMax = POINTS(patternmax[0], patternmax[1]);
+		// 画像情報の調整.
+		ImGuiInfoEdit(selectedUI);
 
-			// パターンのクリック調整.
-			if (ImGui::TreeNode(IMGUI_JP("クリック調整"))) {
-				ImGui::PushItemWidth(100.0f);
-				ImGui::InputInt("##xclickpattern", &pattern[0]); ImGui::SameLine(); ImGui::InputInt("##yclickpattern", &pattern[1]);
-				ImGui::PopItemWidth();
-				ImGui::TreePop();
-			}
 
-			// パターンのオートラン調整.
-			if (ImGui::TreeNode(IMGUI_JP("オートラン調整"))) {
-				// 実行中の処理.
-				if (m_PatternAuto) {
-					ImGui::Text("On");
-					m_AnimationSpeed -= CTime::GetInstance()->GetDeltaTime();
-					if (m_AnimationSpeed < 0) {
-						m_AnimationSpeed = m_AnimationSpeedMax * CTime::GetInstance()->GetDeltaTime();
-						pattern[0]++;
+		// 画像パターンを試す.
+		ImGuiPatternTest(selectedUI);
 
-						// xが最大値を超え、yが最大値の場合アニメーションが最初から送られるようにする.
-						if (m_PatternMax.x < pattern[0] && m_PatternMax.y == pattern[1]) {
-							// yが0以下になった場合は初期状態にする.
-							pattern[0] = 0; pattern[1] = 0;
-						}
-					}
-				}
-				else {
-					ImGui::Text("Off");
-					m_AnimationSpeed = m_AnimationSpeedMax * CTime::GetInstance()->GetDeltaTime();
-				}
-				ImGui::PushItemWidth(100.0f);
-				// 実行の切り替え.
-				if (ImGui::Button(IMGUI_JP("切替"))) { m_PatternAuto = !m_PatternAuto; }
-				// 送り速度の設定.
-				ImGui::InputFloat(IMGUI_JP("送り速度設定(フレーム)"), &m_AnimationSpeedMax);
-				ImGui::PopItemWidth();
 
-				ImGui::TreePop();
-			}
-
-			// Xが最大値を超えた場合.
-			if (m_PatternMax.x < pattern[0]) {
-				// Yが最大値以上の場合、Xを最大値にする.
-				if (m_PatternMax.y <= pattern[1]) {
-					pattern[0] = m_PatternMax.x;
-				}
-				else {
-					pattern[0] = 0; pattern[1]++;
-				}
-			}
-			else if (pattern[0] < 0) {
-				// 最低値は0に固定し、yの値を繰り下げる.
-				pattern[0] = 0; pattern[1]--;
-			}
-
-			// Yが最大値を超えた場合.
-			if (m_PatternMax.y < pattern[1]) {
-				pattern[0] = m_PatternMax.x;
-				pattern[1] = m_PatternMax.y;
-			}
-			else if (pattern[1] < 0) {
-				// yが0以下になった場合は初期状態にする.
-				pattern[0] = 0; pattern[1] = 0;
-			}
-
-			// 反映する.
-			m_PatternNo = POINTS(pattern[0], pattern[1]);
-			selectedUI->SetPatternNo(m_PatternNo.x, m_PatternNo.y);
-			ImGui::TreePop();
-		}
-
-		//-----------------------------------------------------------
-		//		その他の情報の調整.
-		//-----------------------------------------------------------
-		if (ImGui::TreeNode(IMGUI_JP("その他"))) {
-			float alpha = selectedUI->GetAlpha();
-			D3DXVECTOR3 scale	= selectedUI->GetScale();
-			D3DXVECTOR3 rot		= selectedUI->GetRot();
-
-			ImGui::Text(IMGUI_JP("アルファ"));
-			bool alphaslider	= ImGui::SliderFloat("##AlphaSlider", &alpha, 0.f, 1.f);
-			bool alphainput		= ImGui::InputFloat("##AlphaInput", &alpha);
-
-			ImGui::Text(IMGUI_JP("スケール"));
-			bool scaledrag	= ImGui::DragFloat3("##ScaleDrag", scale, 0.1f);
-			bool scaleinput	= ImGui::InputFloat3("##ScaleInput", scale);
-
-			ImGui::Text(IMGUI_JP("回転"));
-			bool rotdrag	= ImGui::DragFloat3("##RotDrag", rot, 0.1f);
-			bool rotinput	= ImGui::InputFloat3("##RotInput", rot);
-
-			// 変更があった場合保存する.
-			if (alphaslider	|| alphainput
-			||	scaledrag	|| scaleinput
-			||	rotdrag		|| rotinput) 
-			{
-				selectedUI->SetAlpha(alpha);
-				selectedUI->SetScale(scale);
-				selectedUI->SetRot(rot);
-				m_MovedSomething = true;
-			}
-			ImGui::TreePop();
-		}
+		// その他の情報の調整.
+		ImGuiEtcInfoEdit(selectedUI);
 	}
-
 
 	ImGui::End();
 
@@ -446,4 +231,317 @@ HRESULT CUIEditor::SaveScene()
 		if ( FAILED( FileManager::JsonSave( TextPath, SpriteState ))) return E_FAIL;
 	}
 	return S_OK;
+}
+
+
+//-----------------------------------------------------------------------------
+//		Z座標を元にソートする関数.
+//-----------------------------------------------------------------------------
+void CUIEditor::SortBySpritePosZ(CUIObject* object)
+{
+	// 何も座標に関して変更がない場合早期リターン.
+	if (!m_MovedSpritePos) { return; }
+
+	// ソート前の選択されていた UI のポインタを保存
+	CUIObject* pPreviousSelectedUI = object;
+
+	// Z座標を基準にソートする.
+	std::sort(m_pUIs.begin(), m_pUIs.end(), [](const CUIObject* a, const CUIObject* b) {
+		if (a && a->GetPos() && b && b->GetPos()) {
+			return a->GetPos().z < b->GetPos().z;
+		}
+		return false;
+		});
+
+	// ソート後に、以前選択されていた UI がまだリストに存在するか確認し、再選択.
+	if (pPreviousSelectedUI != nullptr)
+	{
+		auto it = std::find(m_pUIs.begin(), m_pUIs.end(), pPreviousSelectedUI);
+		if (it != m_pUIs.end()) {
+			// 再選択.
+			m_SelectedUIIndex = std::distance(m_pUIs.begin(), it);
+		}
+		else {
+			// 以前選択されていたUIがリストにない場合.
+			object = nullptr;
+			m_SelectedUIIndex = 0; // または適切なデフォルト値
+		}
+	}
+
+	m_MovedSpritePos = false;
+}
+
+
+//-----------------------------------------------------------------------------
+//		ImGuiを用いたシーン選択関数.
+//-----------------------------------------------------------------------------
+void CUIEditor::ImGuiSelectScene()
+{
+	ImGui::Begin(IMGUI_JP("UIエディター用シーン選択"));
+	UISceneList scene;
+	bool click = false;
+	if (ImGui::Button("Title")) { scene = UISceneList::Title;	click = true; }
+	if (ImGui::Button("Game")) { scene = UISceneList::Game;	click = true; }
+	if (ImGui::Button("Lose")) { scene = UISceneList::Lose;	click = true; }
+	if (ImGui::Button("Win")) { scene = UISceneList::Win;		click = true; }
+	if (m_MovedSomething && click && (MessageBox(NULL,
+		L"本当に切り替えますか？\n(保存していない場合リセットされます)", L"確認",
+		MB_YESNO | MB_ICONQUESTION)) == IDYES) {
+		SelectSceneLoad(scene);
+		m_MovedSomething = false;
+	}
+	else if (!m_MovedSomething && click) {
+		SelectSceneLoad(scene);
+	}
+
+	ImGui::End();
+}
+
+
+//-----------------------------------------------------------------------------
+//		UIリスト検索関数.
+//-----------------------------------------------------------------------------
+void CUIEditor::ImGuiSearchUI()
+{
+	if (ImGui::TreeNodeEx(IMGUI_JP("UIリスト"), ImGuiTreeNodeFlags_DefaultOpen)) {
+		// 検索バー.
+		ImGui::InputText(IMGUI_JP("検索"), m_SearchBuffer, IM_ARRAYSIZE(m_SearchBuffer));
+		// スクロール可能なリスト.
+		ImGui::BeginChild(IMGUI_JP("リスト"), ImVec2(315, 100), true, ImGuiWindowFlags_HorizontalScrollbar);
+
+		for (int i = 0; i < m_pUIs.size(); ++i) {
+			// 検索フィルタリング.
+			if (strlen(m_SearchBuffer) > 0
+				&& m_pUIs[i]->GetSpriteData().Name.find(m_SearchBuffer) == std::string::npos) {
+				continue;
+			}
+
+			bool isSelected = (m_SelectedUIIndex == i);
+			if (ImGui::Selectable(m_pUIs[i]->GetSpriteData().Name.c_str(), isSelected)) {
+				m_SelectedUIIndex = i; // 選択更新.
+				SelectInit();
+			}
+		}
+		ImGui::EndChild();
+		ImGui::TreePop();
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+//		座標調整関数(選択されたUIObect).
+//-----------------------------------------------------------------------------
+void CUIEditor::ImGuiPosEdit(CUIObject* object)
+{
+	if (ImGui::TreeNode(IMGUI_JP("座標"))) 
+	{
+		// ドラッグ用にマウス操作のDirectInpuを用意.
+		CMouse* Mouse = CInput::GetInstance()->CDMouse();
+		D3DXVECTOR3 pos = object->GetPos();
+		bool posdrag = ImGui::DragFloat3("##Position", pos, 1.f);
+		bool posinput = ImGui::InputFloat3("##InputPos", pos);
+
+		// マウス位置を取得.
+		POINT MousePos;
+		GetCursorPos(&MousePos);
+		// 画像範囲内で左クリック入力中の場合、ドラッグ操作を開始.
+		if (object->PointInSquare(MousePos, CLIENTRECT) && !m_DoDrag) {
+			if (Mouse->IsLAction()) {
+				m_DoDrag = true;
+				m_OffsetPos = D3DXVECTOR2(pos.x - MousePos.x, pos.y - MousePos.y);
+			}
+		}
+		if (m_DoDrag) {
+			posdrag = true;
+			// 補正値+マウス座標した座標を入れる.
+			pos = D3DXVECTOR3(MousePos.x + m_OffsetPos.x, MousePos.y + m_OffsetPos.y, pos.z);
+			// マウスの左クリックを話した場合、ドラッグ操作を停止.
+			if (!Mouse->IsLDown()) { m_DoDrag = false; }
+		}
+
+		// 変更があった場合保存する.
+		if (posdrag || posinput) {
+			object->SetPos(pos);
+			m_MovedSomething = true;
+			m_MovedSpritePos = true;
+		}
+		ImGui::TreePop();
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+//		情報調整関数(選択されたUIObect).
+//-----------------------------------------------------------------------------
+void CUIEditor::ImGuiInfoEdit(CUIObject* object)
+{
+	if (ImGui::TreeNode(IMGUI_JP("画像情報"))) 
+	{
+		// 元、表示、分割それぞれのサイズを代入.
+		D3DXVECTOR2 base = D3DXVECTOR2(
+			object->GetSpriteData().Base.w, 
+			object->GetSpriteData().Base.h);
+		D3DXVECTOR2 disp = D3DXVECTOR2(
+			object->GetSpriteData().Disp.w, 
+			object->GetSpriteData().Disp.h);
+		D3DXVECTOR2 stride = D3DXVECTOR2(
+			object->GetSpriteData().Stride.w, 
+			object->GetSpriteData().Stride.h);
+
+		ImGui::Text(IMGUI_JP("元のサイズ(x,y)"));
+		bool basedrag	= ImGui::DragFloat2("##BaseDrag", base, 1.f);
+		bool baseinput	= ImGui::InputFloat2("##BaseInput", base);
+
+		ImGui::Text(IMGUI_JP("表示サイズ(x,y)"));
+		bool dispdrag	= ImGui::DragFloat2("##DispDrag", disp, 1.f);
+		bool dispinput	= ImGui::InputFloat2("##DispInput", disp);
+
+		ImGui::Text(IMGUI_JP("分割サイズ(x,y)"));
+		bool stridedrag	= ImGui::DragFloat2("##StrideDrag", stride, 1.f);
+		bool strideinput= ImGui::InputFloat2("##StrideInput", stride);
+
+		// 変更があった場合保存する.
+		if (basedrag	|| baseinput
+		||	dispdrag	|| dispinput
+		||	stridedrag	|| strideinput)
+		{
+			object->SetBase(base);
+			object->SetDisp(disp);
+			object->SetStride(stride);
+			m_MovedSomething = true;
+		}
+		ImGui::TreePop();
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+//		画像パターンお試し関数(選択されたUIObect).
+//-----------------------------------------------------------------------------
+void CUIEditor::ImGuiPatternTest(CUIObject* object)
+{
+	if (ImGui::TreeNode(IMGUI_JP("画像パターンを試す"))) 
+	{
+		m_PatternNo = object->GetPatternNo();
+		int pattern[2] = { m_PatternNo.x,m_PatternNo.y };
+		int patternmax[2] = { m_PatternMax.x,m_PatternMax.y };
+
+		// パターンの最大数を決める.
+		ImGui::Text(IMGUI_JP("パターンの上限"));
+		ImGui::PushItemWidth(100.0f);
+		ImGui::InputInt("##x", &patternmax[0]); ImGui::SameLine(); ImGui::InputInt("##y", &patternmax[1]);
+		ImGui::PopItemWidth();
+
+		// 下限は1固定.
+		if (patternmax[0] < 1) { patternmax[0] = 1; }
+		if (patternmax[1] < 1) { patternmax[1] = 1; }
+		m_PatternMax = POINTS(patternmax[0], patternmax[1]);
+
+		// パターンのクリック調整.
+		if (ImGui::TreeNode(IMGUI_JP("クリック調整"))) {
+			ImGui::PushItemWidth(100.0f);
+			ImGui::InputInt("##xclickpattern", &pattern[0]); ImGui::SameLine(); ImGui::InputInt("##yclickpattern", &pattern[1]);
+			ImGui::PopItemWidth();
+			ImGui::TreePop();
+		}
+
+		// パターンのオートラン調整.
+		if (ImGui::TreeNode(IMGUI_JP("オートラン調整"))) {
+			// 実行中の処理.
+			if (m_PatternAuto) {
+				ImGui::Text("On");
+				m_AnimationSpeed -= CTime::GetInstance()->GetDeltaTime();
+				if (m_AnimationSpeed < 0) {
+					m_AnimationSpeed = m_AnimationSpeedMax * CTime::GetInstance()->GetDeltaTime();
+					pattern[0]++;
+
+					// xが最大値を超え、yが最大値の場合アニメーションが最初から送られるようにする.
+					if (m_PatternMax.x < pattern[0] && m_PatternMax.y == pattern[1]) {
+						// yが0以下になった場合は初期状態にする.
+						pattern[0] = 0; pattern[1] = 0;
+					}
+				}
+			}
+			else {
+				ImGui::Text("Off");
+				m_AnimationSpeed = m_AnimationSpeedMax * CTime::GetInstance()->GetDeltaTime();
+			}
+			ImGui::PushItemWidth(100.0f);
+			// 実行の切り替え.
+			if (ImGui::Button(IMGUI_JP("切替"))) { m_PatternAuto = !m_PatternAuto; }
+			// 送り速度の設定.
+			ImGui::InputFloat(IMGUI_JP("送り速度設定(フレーム)"), &m_AnimationSpeedMax);
+			ImGui::PopItemWidth();
+
+			ImGui::TreePop();
+		}
+
+		// Xが最大値を超えた場合.
+		if (m_PatternMax.x < pattern[0]) {
+			// Yが最大値以上の場合、Xを最大値にする.
+			if (m_PatternMax.y <= pattern[1]) {
+				pattern[0] = m_PatternMax.x;
+			}
+			else {
+				pattern[0] = 0; pattern[1]++;
+			}
+		}
+		else if (pattern[0] < 0) {
+			// 最低値は0に固定し、yの値を繰り下げる.
+			pattern[0] = 0; pattern[1]--;
+		}
+
+		// Yが最大値を超えた場合.
+		if (m_PatternMax.y < pattern[1]) {
+			pattern[0] = m_PatternMax.x;
+			pattern[1] = m_PatternMax.y;
+		}
+		else if (pattern[1] < 0) {
+			// yが0以下になった場合は初期状態にする.
+			pattern[0] = 0; pattern[1] = 0;
+		}
+
+		// 反映する.
+		m_PatternNo = POINTS(pattern[0], pattern[1]);
+		object->SetPatternNo(m_PatternNo.x, m_PatternNo.y);
+		ImGui::TreePop();
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+//		その他の情報調整関数(選択されたUIObect).
+//-----------------------------------------------------------------------------
+void CUIEditor::ImGuiEtcInfoEdit(CUIObject* object)
+{
+	if (ImGui::TreeNode(IMGUI_JP("その他")))
+	{
+		float alpha = object->GetAlpha();
+		D3DXVECTOR3 scale = object->GetScale();
+		D3DXVECTOR3 rot = object->GetRot();
+
+		ImGui::Text(IMGUI_JP("アルファ"));
+		bool alphaslider = ImGui::SliderFloat("##AlphaSlider", &alpha, 0.f, 1.f);
+		bool alphainput = ImGui::InputFloat("##AlphaInput", &alpha);
+
+		ImGui::Text(IMGUI_JP("スケール"));
+		bool scaledrag = ImGui::DragFloat3("##ScaleDrag", scale, 0.1f);
+		bool scaleinput = ImGui::InputFloat3("##ScaleInput", scale);
+
+		ImGui::Text(IMGUI_JP("回転"));
+		bool rotdrag = ImGui::DragFloat3("##RotDrag", rot, 0.1f);
+		bool rotinput = ImGui::InputFloat3("##RotInput", rot);
+
+		// 変更があった場合保存する.
+		if (alphaslider	|| alphainput
+		||	scaledrag	|| scaleinput
+		||	rotdrag		|| rotinput)
+		{
+			object->SetAlpha(alpha);
+			object->SetScale(scale);
+			object->SetRot(rot);
+			m_MovedSomething = true;
+		}
+		ImGui::TreePop();
+	}
 }
