@@ -20,12 +20,6 @@ public:
 	void Release(); 
 
 private:
-	std::vector<std::string> m_SpriteDataList;	// スプライト情報をまとめる配列.
-	std::vector<D3DXVECTOR3> m_SpritePosList;	// スプライト座標をまとめる配列.
-
-	std::vector<CUIObject*> m_pUIs;			// UIクラス.
-	std::vector<CSprite2D*> m_pSprite2Ds;	// Sprite2Dクラス.
-
 	int		m_HP;				// HP.
 	int		m_HPMax;			// 最大HP.
 	int		m_Ammo;				// 残弾数.

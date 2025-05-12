@@ -87,5 +87,4 @@ private:
 
 	bool	m_CanMoveCamera;	// カメラのキー操作が可能か.
 	bool	m_CanMoveMouse;		// マウスが自由に移動できるか.
-
 };

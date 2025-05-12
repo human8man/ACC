@@ -64,36 +64,7 @@ CGameUI::~CGameUI()
 //=================================================================================================
 void CGameUI::Create()
 {
-	std::unordered_map<std::string, int> nameCounts; // 名前ごとの出現回数を記録.
-
-	for (size_t i = 0; i < ImageList.size(); ++i)
-	{
-		// 名前被りがある場合の処理.
-		std::string baseName = ImageList[i];
-		std::string numberedName;
-
-		if (nameCounts.count(baseName) == 0) {
-			numberedName = baseName;	// 1個目はそのまま.
-			nameCounts[baseName] = 1;	// 次からは1スタート.
-		}
-		else {
-			numberedName = baseName + "_" + std::to_string(nameCounts[baseName]);
-			nameCounts[baseName]++;
-		}
-
-		// インスタンス生成.
-		m_pSprite2Ds.push_back(CSpriteManager::GetInstance()->GetSprite(baseName));
-		m_pUIs.push_back(new CUIObject());
-		CSprite2D* pSprite = CSpriteManager::GetInstance()->GetSprite(ImageList[i]);
-
-		// 画像データの読み込み.
-		m_pUIs.back()->AttachSprite(pSprite);
-		m_pUIs.back()->SetPos(m_pSprite2Ds.back()->GetSpriteData().Pos);
-		m_SpritePosList.push_back(m_pUIs.back()->GetPos());
-
-		// 変更後の名前につけなおす.
-		m_pUIs.back()->SetSpriteName(numberedName);
-	}
+	LoadSpriteList(ImageList, m_pUIs, m_pSprite2Ds);
 }
 
 

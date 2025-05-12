@@ -8,6 +8,7 @@
 // 前方宣言.
 class CUIObject;
 class CStaticMesh;
+class CTitleUI;
 
 //=============================================================================
 //		タイトルシーンクラス.
@@ -31,13 +32,7 @@ private:
 	D3DXMATRIX	m_mView;
 	D3DXMATRIX	m_mProj;
 
-	// 画像情報リスト.
-	std::vector<std::string> m_SpriteDataList;	// スプライト情報をまとめる配列.
-	std::vector<D3DXVECTOR3> m_SpritePosList;	// スプライト座標をまとめる配列.
-
-	std::vector<CUIObject*> m_pUIs;			// UIクラス.
-	std::vector<CSprite2D*> m_pSprite2Ds;	// Sprite2Dクラス.
-
+	std::unique_ptr<CTitleUI>	m_pTitleUI;	// UIクラス.
 	CStaticMesh* m_pEgg;	// 卵.
 
 	bool m_Start;	// ゲーム開始フラグ.

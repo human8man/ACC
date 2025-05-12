@@ -30,13 +30,6 @@ public:
 	void Release();		// 解放処理.
 
 private:
-	// 画像情報リスト.
-	std::vector<std::string> m_SpriteDataList;	// スプライト情報をまとめる配列.
-	std::vector<D3DXVECTOR3> m_SpritePosList;	// スプライト座標をまとめる配列.
-
-	std::vector<CUIObject*> m_pUIs;			// UIクラス.
-	std::vector<CSprite2D*> m_pSprite2Ds;	// Sprite2Dクラス.
-
 	float m_SpawnTimeMax;	// スポーン最大時間.
 	float m_SpawnTime;		// スポーン時間.
 };
