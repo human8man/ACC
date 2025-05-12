@@ -6,22 +6,7 @@
 #include "DirectSound/CSoundManager.h"
 #include "Scenes/SceneManager/CSceneManager.h"
 #include "Sprite/2D/SpriteManager/SpriteManager.h"
-
-
-namespace {
-	// UIリスト.
-	std::vector<std::string> ImageList = {
-		"Black",
-		"StartButton",
-		"Title"
-	};
-
-	// 非処理のUIリスト.
-	std::vector<std::string> ignoreList = {
-		"Black",
-		"Title"
-	};
-}
+#include "Sprite/2D/UI/CTitleUI/CTitleUI.h"
 
 
 //=================================================================================================
@@ -31,10 +16,7 @@ CTitle::CTitle(HWND hWnd)
 	: m_Light			()
 	, m_mView			()
 	, m_mProj			()
-	, m_SpriteDataList	()
-	, m_SpritePosList	()
-	, m_pUIs			()
-	, m_pSprite2Ds		()
+	, m_pTitleUI		( nullptr )
 	, m_pEgg			()
 	, m_Start			( false )
 {
@@ -52,36 +34,8 @@ CTitle::~CTitle()
 //=================================================================================================
 void CTitle::Create()
 {
-	std::unordered_map<std::string, int> nameCounts; // 名前ごとの出現回数を記録.
-
-	for (size_t i = 0; i < ImageList.size(); ++i)
-	{
-		// 名前被りがある場合の処理.
-		std::string baseName = ImageList[i];
-		std::string numberedName;
-
-		if (nameCounts.count(baseName) == 0) {
-			numberedName = baseName;	// 1個目はそのまま.
-			nameCounts[baseName] = 1;	// 次からは1スタート.
-		}
-		else {
-			numberedName = baseName + "_" + std::to_string(nameCounts[baseName]);
-			nameCounts[baseName]++;
-		}
-
-		// インスタンス生成.
-		m_pSprite2Ds.push_back(CSpriteManager::GetInstance()->GetSprite(baseName));
-		m_pUIs.push_back(new CUIObject());
-		CSprite2D* pSprite = CSpriteManager::GetInstance()->GetSprite(ImageList[i]);
-
-		// 画像データの読み込み.
-		m_pUIs.back()->AttachSprite(pSprite);
-		m_pUIs.back()->SetPos(m_pSprite2Ds.back()->GetSpriteData().Pos);
-		m_SpritePosList.push_back(m_pUIs.back()->GetPos());
-
-		// 変更後の名前につけなおす.
-		m_pUIs.back()->SetSpriteName(numberedName);
-	}
+	m_pTitleUI = std::make_unique<CTitleUI>();
+	m_pTitleUI->Create();
 	m_pEgg = new CStaticMesh();
 }
 
@@ -115,58 +69,10 @@ void CTitle::Update()
 {
 	// BGM再生.
 	CSoundManager::GetInstance()->PlayLoop(CSoundManager::enList::BGM_Title);
-
-	CMouse*	Mouse	= CInput::GetInstance()->CDMouse();
-	CKey*	Key		= CInput::GetInstance()->CDKeyboard();
-
+	m_pTitleUI->Update();
 	m_pEgg->SetRotY(m_pEgg->GetRot().y + 0.01f);
 
-	// マウス位置を取得.
-	POINT MousePos;
-	GetCursorPos(&MousePos);
-
-	//----------------------------------------------------------------------------
-	//		それぞれのUIの更新.
-	//----------------------------------------------------------------------------
-	for (size_t i = 0; i < m_pUIs.size(); ++i) {
-		// 処理のいらないUIを早期に切る.
-		if (std::find(
-			ignoreList.begin(),
-			ignoreList.end(), 
-			m_pUIs[i]->GetSpriteData().Name) != ignoreList.end()) { continue; }
-
-		// 点と四角の当たり判定.
-		if ( m_pUIs[i]->PointInSquare( MousePos, CLIENTRECT ) )
-		{
-			//	前回選択されていなかった場合SEを鳴らす.
-			if ( m_pUIs[i]->GetPatternNo().x == 0 ) {
-				CSoundManager::GetInstance()->Play(CSoundManager::SE_SelectMove);
-			}
-			m_pUIs[i]->SetPatternNo(1, 0);
-		}
-		else {
-			m_pUIs[i]->SetPatternNo(0, 0);
-		}
-
-		// 特定の名前の場合.
-		if ( m_pUIs[i]->GetSpriteData().Name == "StartButton" )
-		{
-			// すでにカーソルで選択されている場合.
-			if ( m_pUIs[i]->GetPatternNo().x ) {
-				if (Mouse->IsLAction()) { m_Start = true; }
-			}
-			else {
-				// SPACEキーでゲーム開始.
-				if (Key->IsKeyAction(DIK_SPACE)) {
-					// 選択状態にする.
-					m_pUIs[i]->SetPatternNo(1, 0);
-					m_Start = true;
-				}
-			}
-		}
-	}
-
-	if ( m_Start ) {
+	if (m_pTitleUI->GetStart()) {
 		// ゲームを開始する.
 		CSceneManager::GetInstance()->LoadScene(SceneList::Game);
 		CSoundManager::GetInstance()->AllStop();
@@ -181,15 +87,8 @@ void CTitle::Draw()
 {
 	CCamera::GetInstance()->Camera(m_mView);
 	CSceneBase::Projection(m_mProj);
-	
-	// UIそれぞれの描画処理.
-	for (size_t i = 0; i < m_pUIs.size(); ++i) {
-		m_pUIs[i]->Draw();
-		if (m_pUIs[i]->GetSpriteData().Name == ImageList[0])
-		{
-			m_pEgg->Render(m_mView, m_mProj, m_Light);
-		}
-	}
+	m_pTitleUI->Draw();
+	m_pEgg->Render(m_mView, m_mProj, m_Light);
 }
 
 
@@ -198,7 +97,6 @@ void CTitle::Draw()
 //=================================================================================================
 void CTitle::Release()
 {
-	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pUIs[i]); }
-	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pSprite2Ds[i]); }
+	m_pTitleUI.reset();
 	SAFE_DELETE(m_pEgg);
 }

@@ -1,6 +1,6 @@
 #include "CUIObject.h"
 #include "DirectX/CDirectX11.h"
-
+#include "Sprite/2D/SpriteManager/SpriteManager.h"
 
 //=============================================================================
 //		UIオブジェクトクラス.
@@ -97,6 +97,53 @@ bool CUIObject::PointInSquare( POINT ppos, D3DXVECTOR2 windowpos )
 void CUIObject::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 {
 	Draw();
+}
+
+
+//=============================================================================
+//		画像名リストのデータ読込.
+//=============================================================================
+void CUIObject::LoadSpriteList(
+	const std::vector<std::string>& name, 
+	std::vector<CUIObject*> &uis, 
+	std::vector<CSprite2D*> &sprites)
+{
+	std::unordered_map<std::string, int> nameCounts; // 名前ごとの出現回数を記録.
+
+	for (size_t i = 0; i < name.size(); ++i)
+	{
+		// 名前被りがある場合の処理.
+		std::string baseName = name[i];
+		std::string numberedName;
+
+		if (nameCounts.count(baseName) == 0) {
+			numberedName = baseName;	// 1個目はそのまま.
+			nameCounts[baseName] = 1;	// 次からは1スタート.
+		}
+		else {
+			numberedName = baseName + "_" + std::to_string(nameCounts[baseName]);
+			nameCounts[baseName]++;
+		}
+
+		// インスタンス生成.
+		sprites.push_back(CSpriteManager::GetInstance()->GetSprite(baseName));
+		uis.push_back(new CUIObject());
+		CSprite2D* pSprite = CSpriteManager::GetInstance()->GetSprite(name[i]);
+
+		// 画像データの読み込み.
+		uis.back()->AttachSprite(pSprite);
+		uis.back()->SetPos(sprites.back()->GetSpriteData().Pos);
+
+		// 変更後の名前につけなおす.
+		uis.back()->SetSpriteName(numberedName);
+	}
+
+	std::sort(uis.begin(), uis.end(), [](const CUIObject* a, const CUIObject* b) {
+		if (a && a->GetPos() && b && b->GetPos()) {
+			return a->GetPos().z < b->GetPos().z;
+		}
+		return false;
+		});
 }
 
 

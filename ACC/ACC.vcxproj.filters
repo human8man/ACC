@@ -148,6 +148,9 @@
     <Filter Include="Source\Collision\Line">
       <UniqueIdentifier>{d54d1e13-1b7e-4ee4-91db-b011defee1cb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\GameObject\Sprite\2D\UI\CTitleUI">
+      <UniqueIdentifier>{bd68dcc4-73de-45eb-80a9-da8a49238688}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Data\Shader\Sprite3D.hlsl">
@@ -335,6 +338,9 @@
     <ClCompile Include="Source\GameObject\Sprite\2D\SpriteManager\SpriteManager.cpp">
       <Filter>Source\GameObject\Sprite</Filter>
     </ClCompile>
+    <ClCompile Include="Source\GameObject\Sprite\2D\UI\CTitleUI\CTitleUI.cpp">
+      <Filter>Source\GameObject\Sprite\2D\UI\CTitleUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Collision\Ray\CRay.h">
@@ -519,6 +525,9 @@
     </ClInclude>
     <ClInclude Include="Source\GameObject\Sprite\2D\SpriteManager\SpriteManager.h">
       <Filter>Source\GameObject\Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameObject\Sprite\2D\UI\CTitleUI\CTitleUI.h">
+      <Filter>Source\GameObject\Sprite\2D\UI\CTitleUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

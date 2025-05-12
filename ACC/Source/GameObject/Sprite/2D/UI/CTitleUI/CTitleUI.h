@@ -6,14 +6,14 @@
 
 
 //=============================================================================
-//		LoseUIクラス.
+//		TitleUIクラス.
 //=============================================================================
-class CLoseUI
+class CTitleUI
 	:public CUIObject
 {
 public:
-	CLoseUI();
-	~CLoseUI();
+	CTitleUI();
+	~CTitleUI();
 
 	void Create();		// 作成処理.
 	HRESULT LoadData();	// 読込処理.
@@ -22,7 +22,8 @@ public:
 	void Draw();		// 描画処理.
 	void Release();		// 解放処理.
 
+	// ゲーム開始フラグの取得.
+	bool GetStart() const { return m_Start; }
 private:
-	float m_SpawnTimeMax;	// スポーン最大時間.
-	float m_SpawnTime;		// スポーン時間.
+	bool m_Start;	// ゲーム開始フラグ.
 };

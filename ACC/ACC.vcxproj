@@ -292,6 +292,7 @@
     <ClCompile Include="Source\GameObject\Sprite\2D\UI\CEndUI\CEndUI.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\2D\UI\CGameUI\CGameUI.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\2D\UI\CLoseUI\CLoseUI.cpp" />
+    <ClCompile Include="Source\GameObject\Sprite\2D\UI\CTitleUI\CTitleUI.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\2D\UI\CUIFade\CUIFade.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\2D\UI\CUIObject.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\2D\UI\CWinUI\CWinUI.cpp" />
@@ -356,6 +357,7 @@
     <ClInclude Include="Source\GameObject\Sprite\2D\UI\CEndUI\CEndUI.h" />
     <ClInclude Include="Source\GameObject\Sprite\2D\UI\CGameUI\CGameUI.h" />
     <ClInclude Include="Source\GameObject\Sprite\2D\UI\CLoseUI\CLoseUI.h" />
+    <ClInclude Include="Source\GameObject\Sprite\2D\UI\CTitleUI\CTitleUI.h" />
     <ClInclude Include="Source\GameObject\Sprite\2D\UI\CUIFade\CUIFade.h" />
     <ClInclude Include="Source\GameObject\Sprite\2D\UI\CUIObject.h" />
     <ClInclude Include="Source\GameObject\Sprite\2D\UI\CWinUI\CWinUI.h" />

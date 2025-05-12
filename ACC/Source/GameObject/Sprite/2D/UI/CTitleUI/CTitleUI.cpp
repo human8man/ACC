@@ -1,4 +1,4 @@
-#include "CLoseUI.h"
+#include "CTitleUI.h"
 
 #include "Scenes/SceneManager/CSceneManager.h"
 #include "Sprite/2D/UI/CUIObject.h"
@@ -9,12 +9,17 @@
 
 
 namespace {
-	// UICSVのパス.
-	constexpr char UICSVPath[] = "Data\\CSV\\UIStatus.csv";
 	// UIリスト.
 	std::vector<std::string> ImageList = {
 		"Black",
-		"Lose"
+		"StartButton",
+		"Title"
+	};
+
+	// 非処理のUIリスト.
+	std::vector<std::string> ignoreList = {
+		"Black",
+		"Title"
 	};
 }
 
@@ -22,22 +27,11 @@ namespace {
 //=================================================================================================
 //		LoseUIクラス.
 //=================================================================================================
-CLoseUI::CLoseUI()
-	: m_SpawnTimeMax	( CTime::GetInstance()->GetDeltaTime() * 300.f )
-	, m_SpawnTime		( m_SpawnTimeMax )
+CTitleUI::CTitleUI()
+	:m_Start ( false )
 {
-	// キャラクターCSVの情報保存用.
-	std::unordered_map<std::string, std::string> m_StateList;
-	// キャラクターCSVの情報取得.
-	m_StateList = FileManager::CSVLoad(UICSVPath);
-
-	// 空でない場合は、外部で調整するべき変数の値を入れていく.
-	if (!m_StateList.empty())
-	{
-		m_SpawnTimeMax = StrToFloat(m_StateList["Lose_SpawnTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
-	}
 }
-CLoseUI::~CLoseUI()
+CTitleUI::~CTitleUI()
 {
 	Release();
 }
@@ -46,7 +40,7 @@ CLoseUI::~CLoseUI()
 //=================================================================================================
 //		作成処理.
 //=================================================================================================
-void CLoseUI::Create()
+void CTitleUI::Create()
 {
 	LoadSpriteList(ImageList, m_pUIs, m_pSprite2Ds);
 }
@@ -55,7 +49,7 @@ void CLoseUI::Create()
 //=================================================================================================
 //		読込処理.
 //=================================================================================================
-HRESULT CLoseUI::LoadData()
+HRESULT CTitleUI::LoadData()
 {
 	return S_OK;
 }
@@ -64,7 +58,7 @@ HRESULT CLoseUI::LoadData()
 //=================================================================================================
 //		初期化処理.
 //=================================================================================================
-void CLoseUI::Init()
+void CTitleUI::Init()
 {
 }
 
@@ -72,23 +66,53 @@ void CLoseUI::Init()
 //=================================================================================================
 //		更新処理.
 //=================================================================================================
-void CLoseUI::Update()
+void CTitleUI::Update()
 {
-	if (m_SpawnTime >= 0) { m_SpawnTime -= CTime::GetInstance()->GetDeltaTime(); }
-
+	CMouse*	Mouse	= CInput::GetInstance()->CDMouse();
+	CKey*	Key		= CInput::GetInstance()->CDKeyboard();
+	
+	// マウス位置を取得.
+	POINT MousePos;
+	GetCursorPos(&MousePos);
+	
 	//----------------------------------------------------------------------------
 	//		それぞれのUIの更新.
 	//----------------------------------------------------------------------------
-	for (size_t i = 0; i < m_pUIs.size(); ++i) 
-	{
-		// 背景を透過させる.
-		if ( m_pUIs[i]->GetSpriteData().Name == "Black") { m_pUIs[i]->SetAlpha(0.6f); }
+	for (size_t i = 0; i < m_pUIs.size(); ++i) {
+		// 処理のいらないUIを早期に切る.
+		if (std::find(
+			ignoreList.begin(),
+			ignoreList.end(), 
+			m_pUIs[i]->GetSpriteData().Name) != ignoreList.end()) { continue; }
 
-		// 出現時間が終了した場合.
-		if (m_SpawnTime < 0.f) {
-			// タイトルに遷移.
-			CSceneManager::GetInstance()->LoadScene(SceneList::Title);
-			CSoundManager::GetInstance()->AllStop();
+		// 点と四角の当たり判定.
+		if ( m_pUIs[i]->PointInSquare( MousePos, CLIENTRECT ) )
+		{
+			//	前回選択されていなかった場合SEを鳴らす.
+			if ( m_pUIs[i]->GetPatternNo().x == 0 ) {
+				CSoundManager::GetInstance()->Play(CSoundManager::SE_SelectMove);
+			}
+			m_pUIs[i]->SetPatternNo(1, 0);
+		}
+		else {
+			m_pUIs[i]->SetPatternNo(0, 0);
+		}
+
+		// 特定の名前の場合.
+		if ( m_pUIs[i]->GetSpriteData().Name == "StartButton" )
+		{
+			// すでにカーソルで選択されている場合.
+			if ( m_pUIs[i]->GetPatternNo().x ) {
+				if (Mouse->IsLAction()) { m_Start = true; }
+			}
+			else {
+				// SPACEキーでゲーム開始.
+				if (Key->IsKeyAction(DIK_SPACE)) {
+					// 選択状態にする.
+					m_pUIs[i]->SetPatternNo(1, 0);
+					m_Start = true;
+				}
+			}
 		}
 	}
 }
@@ -97,8 +121,8 @@ void CLoseUI::Update()
 //=================================================================================================
 //		描画処理.
 //=================================================================================================
-void CLoseUI::Draw()
-{	
+void CTitleUI::Draw()
+{
 	// UIそれぞれの描画処理.
 	for (size_t i = 0; i < m_pUIs.size(); ++i) { m_pUIs[i]->Draw(); }
 }
@@ -107,7 +131,7 @@ void CLoseUI::Draw()
 //=================================================================================================
 //		解放処理.
 //=================================================================================================
-void CLoseUI::Release()
+void CTitleUI::Release()
 {
 	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pUIs[i]); }
 	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pSprite2Ds[i]); }

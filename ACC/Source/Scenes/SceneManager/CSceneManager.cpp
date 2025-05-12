@@ -89,8 +89,8 @@ void CSceneManager::Update()
 		if (m_pEndUI == nullptr) {
 			ChangeShowCursor(true);
 
-			m_pEndUI = std::make_unique<CEndUI>();
-			m_pEndUI->Create(m_hWnd);
+			m_pEndUI = std::make_unique<CEndUI>(m_hWnd);
+			m_pEndUI->Create();
 			m_EndDeleteFlag = false;
 		}
 		else if (m_pEndUI != nullptr) {
