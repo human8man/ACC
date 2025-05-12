@@ -38,6 +38,24 @@ private:
 	// 現在シーンのUI情報を保存.
 	HRESULT SaveScene();
 
+	//-------------------------------------------
+	//	ImGuiを用いている関数.
+	//-------------------------------------------
+	// シーン選択関数.
+	void ImGuiSelectScene();
+	// UIリスト検索関数.
+	void ImGuiSearchUI();
+	// 座標調整関数(選択されたUIObect).
+	void ImGuiPosEdit(CUIObject* object);
+	// Z座標を元にソートする関数.
+	void SortBySpritePosZ(CUIObject* object);
+	// 情報調整関数(選択されたUIObect).
+	void ImGuiInfoEdit(CUIObject* object);
+	// パターンお試し関数(選択されたUIObect).
+	void ImGuiPatternTest(CUIObject* object);
+	// その他の情報調整関数(選択されたUIObect).
+	void ImGuiEtcInfoEdit(CUIObject* object);
+
 private:
 	// 画像情報リスト.
 	std::vector<std::string> m_SpriteDataList;	//スプライト情報をまとめる配列.
@@ -48,13 +66,14 @@ private:
 
 	std::string m_ScenePath;	// 現在のシーンパス.
 
-	bool	m_MovedSomething;		// 何か変更があった際に保存確認フラグを立てる.
+	bool	m_MovedSomething;	// 何か変更があった際に保存確認フラグを立てる.
 	int		m_SelectedUIIndex;
 	char	m_SearchBuffer[64] = ""; // 検索用バッファ.
 	
 	// マウス操作用の変数.
 	D3DXVECTOR2 m_OffsetPos;	// マウス座標と画像座標のズレ補正値.
 	bool m_DoDrag;				// ドラッグ中.
+	bool m_MovedSpritePos;		// 画像座標が変更された際のフラグ.
 
 	// パターン確認用の変数.
 	POINTS	m_PatternNo;		// 仮のパターン.
