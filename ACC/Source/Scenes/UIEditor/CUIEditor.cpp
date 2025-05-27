@@ -1,11 +1,11 @@
 #include "CUIEditor.h"
-#include "Time/CTime.h"
-#include "nlohmann/json.hpp"
-#include "FileManager/FileManager.h"
 #include "DirectInput/CDirectInput.h"
 #include "DirectSound/CSoundManager.h"
+#include "FileManager/FileManager.h"
 #include "FileManager/LoadImage/LoadImage.h"
+#include "nlohmann/json.hpp"
 #include "Sprite/2D/SpriteManager/SpriteManager.h"
+#include "Time/CTime.h"
 
 #ifdef _DEBUG
 #include "ImGui/CImGui.h"
@@ -16,14 +16,35 @@
 using Json = nlohmann::json;
 
 namespace {
+	// シェーダーのパス.
+	const TCHAR ShaderPath[]		= _T("Data\\Shader\\UIEditorLineShader.hlsl");
 	// TitleUIのパス.
-	constexpr char TitleImagePath[] = "Data\\Texture\\Title";
+	constexpr char TitleImagePath[]	= "Data\\Texture\\Title";
 	// GameUIのパス.
-	constexpr char GameImagePath[] = "Data\\Texture\\Game";
+	constexpr char GameImagePath[]	= "Data\\Texture\\Game";
 	// WinUIのパス.
-	constexpr char WinImagePath[] = "Data\\Texture\\Win";
+	constexpr char WinImagePath[]	= "Data\\Texture\\Win";
 	// LoseUIのパス.
-	constexpr char LoseImagePath[] = "Data\\Texture\\Lose";
+	constexpr char LoseImagePath[]	= "Data\\Texture\\Lose";
+
+	struct Vertex
+	{
+		D3DXVECTOR3 pos;
+		D3DXVECTOR4 color;
+	};
+
+	Vertex lineVertices[] =
+	{
+		// ortho行列なのでZはいらない.
+		{ { -50.0f, 360.0f, 0.0f }, { 1, 0, 0, 1 } },  // 始点（赤）
+		{ { 50.0f, -360.0f, 0.0f }, { 1, 0, 0, 1 } },  // 終点（赤）
+	};
+
+	struct CBUFFER_MATRIX {
+		D3DXMATRIX mWorld;
+		D3DXMATRIX mView;
+		D3DXMATRIX mProj;
+	};
 }
 
 
@@ -47,6 +68,156 @@ void CUIEditor::Create()
 	CSoundManager::GetInstance()->AllStop();
 	SelectSceneLoad(UISceneList::Title);
 	SelectInit();
+	LoadLineShader();
+}
+
+
+//-----------------------------------------------------------------------------------
+//		シェーダ読込関数（一回のみ）.
+//-----------------------------------------------------------------------------------
+HRESULT CUIEditor::LoadLineShader()
+{
+	auto directx11 = CDirectX11::GetInstance();
+	ID3D11Device* device = directx11->GetDevice();
+
+	// シェーダ読み込み.
+	ID3D10Blob* vsBlob = nullptr;
+	ID3D10Blob* psBlob = nullptr;
+	ID3D10Blob* gsBlob = nullptr;
+
+	D3DX11CompileFromFile(ShaderPath, nullptr, nullptr, "VS_Main", "vs_5_0", 0, 0, nullptr, &vsBlob, nullptr, nullptr);
+	D3DX11CompileFromFile(ShaderPath, nullptr, nullptr, "PS_Main", "ps_5_0", 0, 0, nullptr, &psBlob, nullptr, nullptr);
+	D3DX11CompileFromFile(ShaderPath, nullptr, nullptr, "GS_Main", "gs_5_0", 0, 0, nullptr, &gsBlob, nullptr, nullptr);
+
+	// シェーダ作成.
+	device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &m_pVertexShader);
+	device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &m_pPixelShader);
+	device->CreateGeometryShader(gsBlob->GetBufferPointer(), gsBlob->GetBufferSize(), nullptr, &m_pGeometryShader);
+
+	// 入力レイアウト.
+	D3D11_INPUT_ELEMENT_DESC layout[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,   0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT,0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+
+	device->CreateInputLayout(layout, 2, vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &m_pInputLayout);
+
+	// 頂点バッファ.
+	D3D11_BUFFER_DESC bd = {};
+	bd.Usage = D3D11_USAGE_DYNAMIC;
+	bd.ByteWidth = sizeof(Vertex) * 2; // ← 2頂点分に合わせる
+	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+	device->CreateBuffer(&bd, nullptr, &m_pVertexBuffer);
+
+	// 定数バッファ.
+	D3D11_BUFFER_DESC cbDesc = {};
+	cbDesc.Usage = D3D11_USAGE_DYNAMIC;
+	cbDesc.ByteWidth = sizeof(CBUFFER_MATRIX);
+	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+	if (FAILED(device->CreateBuffer(&cbDesc, nullptr, &m_pCBufferMatrix)))
+	{
+		MessageBoxA(nullptr, "定数バッファ作成失敗", "Error", MB_OK);
+		return E_FAIL;
+	}
+
+
+	return S_OK;
+}
+
+
+//=============================================================================
+//		シェーダ更新関数.
+//=============================================================================
+void CUIEditor::UpdateShader()
+{
+	auto directx11 = CDirectX11::GetInstance();
+	ID3D11DeviceContext* context = directx11->GetContext();
+
+	// ---- 定数バッファ更新 ----
+	D3D11_VIEWPORT vp;
+	UINT vpCount = 1;
+	context->RSGetViewports(&vpCount, &vp);
+
+	D3DXMATRIX mProj;
+	D3DXMatrixOrthoLH(&mProj, vp.Width, vp.Height, 0.0f, 1.0f);
+
+	D3D11_MAPPED_SUBRESOURCE mappedMatrix = {};
+	if (SUCCEEDED(context->Map(m_pCBufferMatrix, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMatrix)))
+	{
+		CBUFFER_MATRIX cbMatrix = {};
+		D3DXMatrixIdentity(&cbMatrix.mWorld);
+		D3DXMatrixIdentity(&cbMatrix.mView);
+		cbMatrix.mProj = mProj;
+		memcpy(mappedMatrix.pData, &cbMatrix, sizeof(cbMatrix));
+		context->Unmap(m_pCBufferMatrix, 0);
+	}
+
+	context->VSSetConstantBuffers(0, 1, &m_pCBufferMatrix);
+	context->GSSetConstantBuffers(0, 1, &m_pCBufferMatrix);
+	context->PSSetConstantBuffers(0, 1, &m_pCBufferMatrix);
+
+	// ---- 頂点バッファ更新 ----
+	if (lineVertices) {
+		D3D11_MAPPED_SUBRESOURCE mappedResource;
+		if (SUCCEEDED(context->Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
+		{
+			memcpy(mappedResource.pData, lineVertices, sizeof(Vertex) * 2);
+			context->Unmap(m_pVertexBuffer, 0);
+		}
+	}
+
+	// ---- パイプライン設定 ----
+	UINT stride = sizeof(Vertex);
+	UINT offset = 0;
+	context->IASetInputLayout(m_pInputLayout); // ★ここを追加！
+	context->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
+	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+
+	context->VSSetShader(m_pVertexShader, nullptr, 0);
+	context->GSSetShader(m_pGeometryShader, nullptr, 0);
+	context->PSSetShader(m_pPixelShader, nullptr, 0);
+
+	// ---- 描画 ----
+	context->Draw(2, 0);
+}
+
+
+//-----------------------------------------------------------------------------------
+//		ImGuiでの線いじり.
+//-----------------------------------------------------------------------------------
+void CUIEditor::DrawDebugUI()
+{
+	ImGui::Begin("UIEditorShader");
+
+	// 座標編集（開始点・終了点）
+	ImGui::Text("Start Point");
+	ImGui::DragFloat3("Start Pos", (float*)&lineVertices[0].pos, 0.1f);
+
+	ImGui::Text("End Point");
+	ImGui::DragFloat3("End Pos", (float*)&lineVertices[1].pos, 0.1f);
+
+	// 色編集（RGBA）
+	ImGui::Text("Start Color");
+	ImGui::ColorEdit4("Start Color", (float*)&lineVertices[0].color);
+
+	ImGui::Text("End Color");
+	ImGui::ColorEdit4("End Color", (float*)&lineVertices[1].color);
+
+	ImGui::End();
+
+	// 頂点バッファ更新
+	auto deviceContext = CDirectX11::GetInstance()->GetContext();
+	D3D11_MAPPED_SUBRESOURCE mapped;
+	if (SUCCEEDED(deviceContext->Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped)))
+	{
+		memcpy(mapped.pData, lineVertices, sizeof(Vertex) * 2);
+		deviceContext->Unmap(m_pVertexBuffer, 0);
+	}
 }
 
 
@@ -143,6 +314,8 @@ void CUIEditor::Update()
 void CUIEditor::Draw()
 {
 	for (size_t i = 0; i < m_pUIs.size(); ++i) { m_pUIs[i]->Draw(); }
+	DrawDebugUI();
+	UpdateShader();
 }
 
 
@@ -151,6 +324,12 @@ void CUIEditor::Draw()
 //=============================================================================
 void CUIEditor::Release()
 {
+	SAFE_RELEASE(m_pCBufferMatrix);
+	SAFE_RELEASE(m_pVertexBuffer);
+	SAFE_RELEASE(m_pInputLayout);
+	SAFE_RELEASE(m_pVertexShader);
+	SAFE_RELEASE(m_pPixelShader);
+	SAFE_RELEASE(m_pGeometryShader);
 }
 
 

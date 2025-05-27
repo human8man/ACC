@@ -24,6 +24,7 @@ public:
 
 	// ゲーム開始フラグの取得.
 	bool GetStart() const { return m_Start; }
+
 private:
 	bool m_Start;	// ゲーム開始フラグ.
 };

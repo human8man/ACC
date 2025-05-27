@@ -43,19 +43,13 @@ HRESULT CSceneManager::Create(HWND hWnd)
 	This->m_hWnd = hWnd;
 
 	//初めて呼び出されたときにインスタンス生成
-	This->m_pScene = This->CreateScene(SceneList::Title);
+	This->m_pScene = This->CreateScene(SceneList::UIEditor);
 	This->m_pScene->Create();
 	This->m_pScene->Init();
 	This->m_pScene->LoadData();
 
 	This->m_pFade = std::make_unique<CUIFade>();
 	This->m_pFade->Create();
-
-
-	// サウンドデータの読み込み.
-	if (CSoundManager::GetInstance()->Load(hWnd) == false) {
-		return E_FAIL;
-	}
 
 	return S_OK;
 }

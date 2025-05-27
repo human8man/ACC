@@ -171,6 +171,8 @@
     <FxCompile Include="Data\Shader\Ray.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
+    <FxCompile Include="Data\Shader\TestShader.hlsl" />
+    <FxCompile Include="Data\Shader\UIEditorLineShader.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Collision\Ray\CRay.cpp">

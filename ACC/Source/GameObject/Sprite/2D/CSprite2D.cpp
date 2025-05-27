@@ -348,6 +348,9 @@ HRESULT CSprite2D::CreateSampler()
 //=============================================================================
 void CSprite2D::Render()
 {
+	// ジオメトリシェーダーが走らないようにする.
+	m_pContext11->GSSetShader(nullptr, nullptr, 0);
+
 	// ワールド行列.
 	D3DXMATRIX	mWorld;
 	D3DXMATRIX	mTrans, mRot, mScale;

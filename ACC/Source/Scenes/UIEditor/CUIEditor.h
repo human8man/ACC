@@ -31,12 +31,19 @@ public:
 
 
 private:
+	// シェーダー読込.
+	HRESULT LoadLineShader();
+	void UpdateShader();
+	void DrawDebugUI();
+
+
 	// 選択したシーンのUIを読み込み.
 	void SelectSceneLoad(UISceneList scene);
 	// UI選択時に仮変数等を初期化する.
 	void SelectInit();
 	// 現在シーンのUI情報を保存.
 	HRESULT SaveScene();
+
 
 	//-------------------------------------------
 	//	ImGuiを用いている関数.
@@ -57,6 +64,14 @@ private:
 	void ImGuiEtcInfoEdit(CUIObject* object);
 
 private:
+	// シェーダー関連.
+	ID3D11VertexShader*		m_pVertexShader;	// 頂点シェーダ.
+	ID3D11InputLayout*		m_pInputLayout;		// 頂点レイアウト.
+	ID3D11PixelShader*		m_pPixelShader;		// ピクセルシェーダ.
+	ID3D11GeometryShader*	m_pGeometryShader;	// ピクセルシェーダ.
+	ID3D11Buffer* m_pVertexBuffer;
+	ID3D11Buffer* m_pCBufferMatrix;		//フレーム毎のバッファ.
+
 	// 画像情報リスト.
 	std::vector<std::string> m_SpriteDataList;	//スプライト情報をまとめる配列.
 	std::vector<D3DXVECTOR3> m_SpritePosList;	//スプライト座標をまとめる配列.
