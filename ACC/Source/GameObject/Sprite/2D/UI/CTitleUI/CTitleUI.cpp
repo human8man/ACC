@@ -28,7 +28,7 @@ namespace {
 //		LoseUIƒNƒ‰ƒX.
 //=================================================================================================
 CTitleUI::CTitleUI()
-	:m_Start ( false )
+	: m_Start			( false )
 {
 }
 CTitleUI::~CTitleUI()
