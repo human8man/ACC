@@ -435,6 +435,7 @@ void CUIEditor::SortBySpritePosZ(CUIObject* object)
 //-----------------------------------------------------------------------------
 void CUIEditor::ImGuiSelectScene()
 {
+#ifdef _DEBUG
 	ImGui::Begin(IMGUI_JP("UIエディター用シーン選択"));
 	UISceneList scene;
 	bool click = false;
@@ -453,6 +454,7 @@ void CUIEditor::ImGuiSelectScene()
 	}
 
 	ImGui::End();
+#endif
 }
 
 
@@ -461,6 +463,7 @@ void CUIEditor::ImGuiSelectScene()
 //-----------------------------------------------------------------------------
 void CUIEditor::ImGuiSearchUI()
 {
+#ifdef _DEBUG
 	if (ImGui::TreeNodeEx(IMGUI_JP("UIリスト"), ImGuiTreeNodeFlags_DefaultOpen)) {
 		// 検索バー.
 		ImGui::InputText(IMGUI_JP("検索"), m_SearchBuffer, IM_ARRAYSIZE(m_SearchBuffer));
@@ -483,6 +486,7 @@ void CUIEditor::ImGuiSearchUI()
 		ImGui::EndChild();
 		ImGui::TreePop();
 	}
+#endif
 }
 
 
@@ -491,6 +495,7 @@ void CUIEditor::ImGuiSearchUI()
 //-----------------------------------------------------------------------------
 void CUIEditor::ImGuiSetShader(CUIObject* object)
 {
+#ifdef _DEBUG
 	auto deviceContext = CDirectX11::GetInstance()->GetContext();
 
 	// 角調整用の倍数.
@@ -582,6 +587,7 @@ void CUIEditor::ImGuiSetShader(CUIObject* object)
 
 		deviceContext->Unmap(m_pCBufferMatrix, 0);
 	}
+#endif
 }
 
 
@@ -590,6 +596,7 @@ void CUIEditor::ImGuiSetShader(CUIObject* object)
 //-----------------------------------------------------------------------------
 void CUIEditor::ImGuiPosEdit(CUIObject* object)
 {
+#ifdef _DEBUG
 	if (ImGui::TreeNode(IMGUI_JP("座標"))) 
 	{
 		// ドラッグ用にマウス操作のDirectInpuを用意.
@@ -624,6 +631,7 @@ void CUIEditor::ImGuiPosEdit(CUIObject* object)
 		}
 		ImGui::TreePop();
 	}
+#endif
 }
 
 
@@ -632,7 +640,8 @@ void CUIEditor::ImGuiPosEdit(CUIObject* object)
 //-----------------------------------------------------------------------------
 void CUIEditor::ImGuiInfoEdit(CUIObject* object)
 {
-	if (ImGui::TreeNode(IMGUI_JP("画像情報"))) 
+#ifdef _DEBUG
+	if (ImGui::TreeNode(IMGUI_JP("画像情報")))
 	{
 		// 元、表示、分割それぞれのサイズを代入.
 		D3DXVECTOR2 base = D3DXVECTOR2(
@@ -669,6 +678,7 @@ void CUIEditor::ImGuiInfoEdit(CUIObject* object)
 		}
 		ImGui::TreePop();
 	}
+#endif
 }
 
 
@@ -677,6 +687,7 @@ void CUIEditor::ImGuiInfoEdit(CUIObject* object)
 //-----------------------------------------------------------------------------
 void CUIEditor::ImGuiPatternTest(CUIObject* object)
 {
+#ifdef _DEBUG
 	if (ImGui::TreeNode(IMGUI_JP("画像パターンを試す"))) 
 	{
 		m_PatternNo = object->GetPatternNo();
@@ -763,6 +774,7 @@ void CUIEditor::ImGuiPatternTest(CUIObject* object)
 		object->SetPatternNo(m_PatternNo.x, m_PatternNo.y);
 		ImGui::TreePop();
 	}
+#endif
 }
 
 
@@ -771,6 +783,7 @@ void CUIEditor::ImGuiPatternTest(CUIObject* object)
 //-----------------------------------------------------------------------------
 void CUIEditor::ImGuiEtcInfoEdit(CUIObject* object)
 {
+#ifdef _DEBUG
 	if (ImGui::TreeNode(IMGUI_JP("その他")))
 	{
 		float alpha = object->GetAlpha();
@@ -801,4 +814,5 @@ void CUIEditor::ImGuiEtcInfoEdit(CUIObject* object)
 		}
 		ImGui::TreePop();
 	}
+#endif
 }
