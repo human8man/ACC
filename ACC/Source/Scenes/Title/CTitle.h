@@ -26,25 +26,10 @@ public:
 	void Update() override;			// 更新処理.
 	void Draw() override;			// 描画処理.
 	void Release() override;		// 解放処理.
-
-private:
-	HRESULT ShaderTestFunction();
-
-	void CameraDrawShader(D3DXMATRIX& mView, D3DXMATRIX& mProj );
-	void UIDrawShader();
-	void EditLineImGui();
-
 private:
 	LIGHT		m_Light;
 	D3DXMATRIX	m_mView;
 	D3DXMATRIX	m_mProj;
-
-	ID3D11VertexShader* m_pVertexShader;	// 頂点シェーダ.
-	ID3D11InputLayout* m_pVertexLayout;		// 頂点レイアウト.
-	ID3D11PixelShader* m_pPixelShader;		// ピクセルシェーダ.
-	ID3D11Buffer* m_pVertexBuffer;
-	ID3D11Buffer* m_pCBufferPerFrame;	//フレーム毎のバッファ.
-	ID3D11Buffer* m_pCBufferMatrix;		//フレーム毎のバッファ.
 
 	std::unique_ptr<CTitleUI>	m_pTitleUI;	// UIクラス.
 	CStaticMesh* m_pEgg;	// 卵.

@@ -35,15 +35,25 @@ namespace {
 
 	Vertex lineVertices[] =
 	{
-		// ortho行列なのでZはいらない.
-		{ { -50.0f, 360.0f, 0.0f }, { 1, 0, 0, 1 } },  // 始点（赤）
-		{ { 50.0f, -360.0f, 0.0f }, { 1, 0, 0, 1 } },  // 終点（赤）
+		{ { -50.0f, 360.0f, 0.0f }, { 1, 0, 0, 1 } },  // 左上
+		{ {  50.0f, 360.0f, 0.0f }, { 1, 0, 0, 1 } },  // 右上
+
+		{ {  50.0f, 360.0f, 0.0f }, { 1, 0, 0, 1 } },  // 右上
+		{ {  50.0f, -360.0f, 0.0f }, { 1, 0, 0, 1 } }, // 右下
+
+		{ {  50.0f, -360.0f, 0.0f }, { 1, 0, 0, 1 } }, // 右下
+		{ { -50.0f, -360.0f, 0.0f }, { 1, 0, 0, 1 } }, // 左下
+
+		{ { -50.0f, -360.0f, 0.0f }, { 1, 0, 0, 1 } }, // 左下
+		{ { -50.0f, 360.0f, 0.0f }, { 1, 0, 0, 1 } },  // 左上
 	};
 
 	struct CBUFFER_MATRIX {
 		D3DXMATRIX mWorld;
 		D3DXMATRIX mView;
 		D3DXMATRIX mProj;
+		float LineThickness; // 太さ（ピクセル単位）
+		D3DXVECTOR3 padding; // サイズ調整 (16バイト境界)
 	};
 }
 
@@ -106,7 +116,7 @@ HRESULT CUIEditor::LoadLineShader()
 	// 頂点バッファ.
 	D3D11_BUFFER_DESC bd = {};
 	bd.Usage = D3D11_USAGE_DYNAMIC;
-	bd.ByteWidth = sizeof(Vertex) * 2; // ← 2頂点分に合わせる
+	bd.ByteWidth = sizeof(Vertex) * 8;
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
@@ -130,9 +140,9 @@ HRESULT CUIEditor::LoadLineShader()
 }
 
 
-//=============================================================================
+//-----------------------------------------------------------------------------------
 //		シェーダ更新関数.
-//=============================================================================
+//-----------------------------------------------------------------------------------
 void CUIEditor::UpdateShader()
 {
 	auto directx11 = CDirectX11::GetInstance();
@@ -153,6 +163,7 @@ void CUIEditor::UpdateShader()
 		D3DXMatrixIdentity(&cbMatrix.mWorld);
 		D3DXMatrixIdentity(&cbMatrix.mView);
 		cbMatrix.mProj = mProj;
+		cbMatrix.LineThickness = m_LineThickness;
 		memcpy(mappedMatrix.pData, &cbMatrix, sizeof(cbMatrix));
 		context->Unmap(m_pCBufferMatrix, 0);
 	}
@@ -166,7 +177,7 @@ void CUIEditor::UpdateShader()
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 		if (SUCCEEDED(context->Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
 		{
-			memcpy(mappedResource.pData, lineVertices, sizeof(Vertex) * 2);
+			memcpy(mappedResource.pData, lineVertices, sizeof(Vertex) * 8);
 			context->Unmap(m_pVertexBuffer, 0);
 		}
 	}
@@ -183,41 +194,7 @@ void CUIEditor::UpdateShader()
 	context->PSSetShader(m_pPixelShader, nullptr, 0);
 
 	// ---- 描画 ----
-	context->Draw(2, 0);
-}
-
-
-//-----------------------------------------------------------------------------------
-//		ImGuiでの線いじり.
-//-----------------------------------------------------------------------------------
-void CUIEditor::DrawDebugUI()
-{
-	ImGui::Begin("UIEditorShader");
-
-	// 座標編集（開始点・終了点）
-	ImGui::Text("Start Point");
-	ImGui::DragFloat3("Start Pos", (float*)&lineVertices[0].pos, 0.1f);
-
-	ImGui::Text("End Point");
-	ImGui::DragFloat3("End Pos", (float*)&lineVertices[1].pos, 0.1f);
-
-	// 色編集（RGBA）
-	ImGui::Text("Start Color");
-	ImGui::ColorEdit4("Start Color", (float*)&lineVertices[0].color);
-
-	ImGui::Text("End Color");
-	ImGui::ColorEdit4("End Color", (float*)&lineVertices[1].color);
-
-	ImGui::End();
-
-	// 頂点バッファ更新
-	auto deviceContext = CDirectX11::GetInstance()->GetContext();
-	D3D11_MAPPED_SUBRESOURCE mapped;
-	if (SUCCEEDED(deviceContext->Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped)))
-	{
-		memcpy(mapped.pData, lineVertices, sizeof(Vertex) * 2);
-		deviceContext->Unmap(m_pVertexBuffer, 0);
-	}
+	context->Draw(8, 0);
 }
 
 
@@ -275,6 +252,9 @@ void CUIEditor::Update()
 		// 選択されているUIを表示.
 		ImGui::Text(IMGUI_JP("選択されているUI: %s"), selectedUI->GetSpriteData().Name.c_str());
 
+		// 選択されたUIをハイライトする.
+		ImGuiSetShader(selectedUI);
+
 		// 座標の調整.
 		ImGuiPosEdit(selectedUI);
 		// Z座標を基準にソート.
@@ -314,7 +294,6 @@ void CUIEditor::Update()
 void CUIEditor::Draw()
 {
 	for (size_t i = 0; i < m_pUIs.size(); ++i) { m_pUIs[i]->Draw(); }
-	DrawDebugUI();
 	UpdateShader();
 }
 
@@ -503,6 +482,105 @@ void CUIEditor::ImGuiSearchUI()
 		}
 		ImGui::EndChild();
 		ImGui::TreePop();
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+//		選択されたUIをハイライトする.
+//-----------------------------------------------------------------------------
+void CUIEditor::ImGuiSetShader(CUIObject* object)
+{
+	auto deviceContext = CDirectX11::GetInstance()->GetContext();
+
+	// 角調整用の倍数.
+	int offsetcorner = 180;
+
+	ImGui::Begin(IMGUI_JP("ハイライト線"));
+	ImGui::DragFloat("Thickness", &m_LineThickness, 0.001f, 0.001f, 50.0f);
+	ImGui::ColorEdit4("Line Color##", (float*)&m_LineColor);
+	ImGui::End();
+
+	float centerOffsetX = NOWFWND_W * 0.5f;
+	float centerOffsetY = NOWFWND_H * 0.5f;
+	// 基準となる頂点座標（中央）.
+	D3DXVECTOR3 basePos = {
+		object->GetPos().x - centerOffsetX,
+		(NOWFWND_H - object->GetPos().y) - centerOffsetY,  // Y座標を反転
+		object->GetPos().z
+	};
+	// 上辺の右頂点座標.
+	D3DXVECTOR3 toplineright = {
+		basePos.x + object->GetSpriteData().Disp.w,
+		basePos.y,
+		basePos.z
+	};
+
+	// 右辺の上下座標.
+	D3DXVECTOR3 rightlinetop = {
+		basePos.x + object->GetSpriteData().Disp.w,
+		basePos.y + m_LineThickness * offsetcorner,
+		basePos.z
+	};
+	D3DXVECTOR3 rightlinebottom = {
+		basePos.x + object->GetSpriteData().Disp.w,
+		basePos.y - object->GetSpriteData().Disp.h - m_LineThickness * offsetcorner,
+		basePos.z
+	};
+
+	// 下辺の左右座標.
+	D3DXVECTOR3 bottomlineright= {
+		basePos.x + object->GetSpriteData().Disp.w,
+		basePos.y - object->GetSpriteData().Disp.h,
+		basePos.z
+	};
+	D3DXVECTOR3 bottomlineleft = {
+		basePos.x,
+		basePos.y - object->GetSpriteData().Disp.h,
+		basePos.z
+	};
+	// 左辺の上下座標.
+	D3DXVECTOR3 leftlinebottom = {
+		basePos.x,
+		basePos.y - object->GetSpriteData().Disp.h - m_LineThickness * offsetcorner,
+		basePos.z
+	};
+	D3DXVECTOR3 leftlinetop= {
+		basePos.x,
+		basePos.y + m_LineThickness * offsetcorner,
+		basePos.z
+	};
+
+	// 上辺.
+	lineVertices[0] = { basePos,		m_LineColor };
+	lineVertices[1] = { toplineright,	m_LineColor };
+	// 右辺.
+	lineVertices[2] = { rightlinetop,	m_LineColor };
+	lineVertices[3] = { rightlinebottom,m_LineColor };
+	// 下辺.
+	lineVertices[4] = { bottomlineright,m_LineColor };
+	lineVertices[5] = { bottomlineleft,	m_LineColor };
+	// 左辺.
+	lineVertices[6] = { leftlinebottom,	m_LineColor };
+	lineVertices[7] = { leftlinetop,	m_LineColor };
+
+
+	// シェーダーのバッファに頂点情報をセットする.
+	D3D11_MAPPED_SUBRESOURCE mapped;
+	if (SUCCEEDED(deviceContext->Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped)))
+	{
+		memcpy(mapped.pData, lineVertices, sizeof(Vertex) * 8); // 8頂点分
+		deviceContext->Unmap(m_pVertexBuffer, 0);
+	}
+
+	// コンスタントバッファ更新（LineThickness用）
+	D3D11_MAPPED_SUBRESOURCE mappedCB;
+	if (SUCCEEDED(deviceContext->Map(m_pCBufferMatrix, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedCB)))
+	{
+		CBUFFER_MATRIX* cbData = (CBUFFER_MATRIX*)mappedCB.pData;
+		cbData->LineThickness = m_LineThickness;
+
+		deviceContext->Unmap(m_pCBufferMatrix, 0);
 	}
 }
 

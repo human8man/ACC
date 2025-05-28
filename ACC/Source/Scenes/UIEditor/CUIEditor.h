@@ -33,9 +33,8 @@ public:
 private:
 	// シェーダー読込.
 	HRESULT LoadLineShader();
+	// シェーダー更新.
 	void UpdateShader();
-	void DrawDebugUI();
-
 
 	// 選択したシーンのUIを読み込み.
 	void SelectSceneLoad(UISceneList scene);
@@ -52,6 +51,8 @@ private:
 	void ImGuiSelectScene();
 	// UIリスト検索関数.
 	void ImGuiSearchUI();
+	// 選択されたUIをハイライトする.
+	void ImGuiSetShader(CUIObject* object);
 	// 座標調整関数(選択されたUIObect).
 	void ImGuiPosEdit(CUIObject* object);
 	// Z座標を元にソートする関数.
@@ -71,6 +72,9 @@ private:
 	ID3D11GeometryShader*	m_pGeometryShader;	// ピクセルシェーダ.
 	ID3D11Buffer* m_pVertexBuffer;
 	ID3D11Buffer* m_pCBufferMatrix;		//フレーム毎のバッファ.
+
+	float m_LineThickness;	// ハイライト線の太さ.
+	D3DXVECTOR4 m_LineColor;// ハイライト線の色.
 
 	// 画像情報リスト.
 	std::vector<std::string> m_SpriteDataList;	//スプライト情報をまとめる配列.
