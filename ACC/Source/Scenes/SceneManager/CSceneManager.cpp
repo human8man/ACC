@@ -43,7 +43,7 @@ HRESULT CSceneManager::Create(HWND hWnd)
 	This->m_hWnd = hWnd;
 
 	//初めて呼び出されたときにインスタンス生成
-	This->m_pScene = This->CreateScene(SceneList::UIEditor);
+	This->m_pScene = This->CreateScene(SceneList::Title);
 	This->m_pScene->Create();
 	This->m_pScene->Init();
 	This->m_pScene->LoadData();
