@@ -53,6 +53,8 @@ HRESULT CMain::Create() const
 	// DirectX11構築.
 	if (FAILED(CDirectX11::GetInstance()	->Create(m_hWnd)))	{ return E_FAIL; }
 
+	// サウンドデータの読み込み.
+	if (FAILED(CSoundManager::GetInstance()	->Load(m_hWnd)))	{ return E_FAIL; }
 	// SpriteManagerの読み込み.
 	if (FAILED(CSpriteManager::GetInstance()->SpriteLoad()))	{ return E_FAIL; }
 	// シーンマネージャー構築.

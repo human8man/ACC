@@ -51,12 +51,6 @@ HRESULT CSceneManager::Create(HWND hWnd)
 	This->m_pFade = std::make_unique<CUIFade>();
 	This->m_pFade->Create();
 
-
-	// サウンドデータの読み込み.
-	if (CSoundManager::GetInstance()->Load(hWnd) == false) {
-		return E_FAIL;
-	}
-
 	return S_OK;
 }
 

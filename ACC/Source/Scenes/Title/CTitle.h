@@ -26,7 +26,6 @@ public:
 	void Update() override;			// XVˆ—.
 	void Draw() override;			// •`‰æˆ—.
 	void Release() override;		// ‰ğ•úˆ—.
-
 private:
 	LIGHT		m_Light;
 	D3DXMATRIX	m_mView;

@@ -1,11 +1,11 @@
 #include "CUIEditor.h"
-#include "Time/CTime.h"
-#include "nlohmann/json.hpp"
-#include "FileManager/FileManager.h"
 #include "DirectInput/CDirectInput.h"
 #include "DirectSound/CSoundManager.h"
+#include "FileManager/FileManager.h"
 #include "FileManager/LoadImage/LoadImage.h"
+#include "nlohmann/json.hpp"
 #include "Sprite/2D/SpriteManager/SpriteManager.h"
+#include "Time/CTime.h"
 
 #ifdef _DEBUG
 #include "ImGui/CImGui.h"
@@ -16,14 +16,45 @@
 using Json = nlohmann::json;
 
 namespace {
+	// シェーダーのパス.
+	const TCHAR ShaderPath[]		= _T("Data\\Shader\\UIEditorLineShader.hlsl");
 	// TitleUIのパス.
-	constexpr char TitleImagePath[] = "Data\\Texture\\Title";
+	constexpr char TitleImagePath[]	= "Data\\Texture\\Title";
 	// GameUIのパス.
-	constexpr char GameImagePath[] = "Data\\Texture\\Game";
+	constexpr char GameImagePath[]	= "Data\\Texture\\Game";
 	// WinUIのパス.
-	constexpr char WinImagePath[] = "Data\\Texture\\Win";
+	constexpr char WinImagePath[]	= "Data\\Texture\\Win";
 	// LoseUIのパス.
-	constexpr char LoseImagePath[] = "Data\\Texture\\Lose";
+	constexpr char LoseImagePath[]	= "Data\\Texture\\Lose";
+
+	struct Vertex
+	{
+		D3DXVECTOR3 pos;
+		D3DXVECTOR4 color;
+	};
+
+	Vertex lineVertices[] =
+	{
+		{ { -50.0f, 360.0f, 0.0f }, { 1, 0, 0, 1 } },  // 左上
+		{ {  50.0f, 360.0f, 0.0f }, { 1, 0, 0, 1 } },  // 右上
+
+		{ {  50.0f, 360.0f, 0.0f }, { 1, 0, 0, 1 } },  // 右上
+		{ {  50.0f, -360.0f, 0.0f }, { 1, 0, 0, 1 } }, // 右下
+
+		{ {  50.0f, -360.0f, 0.0f }, { 1, 0, 0, 1 } }, // 右下
+		{ { -50.0f, -360.0f, 0.0f }, { 1, 0, 0, 1 } }, // 左下
+
+		{ { -50.0f, -360.0f, 0.0f }, { 1, 0, 0, 1 } }, // 左下
+		{ { -50.0f, 360.0f, 0.0f }, { 1, 0, 0, 1 } },  // 左上
+	};
+
+	struct CBUFFER_MATRIX {
+		D3DXMATRIX mWorld;
+		D3DXMATRIX mView;
+		D3DXMATRIX mProj;
+		float LineThickness; // 太さ（ピクセル単位）
+		D3DXVECTOR3 padding; // サイズ調整 (16バイト境界)
+	};
 }
 
 
@@ -47,6 +78,123 @@ void CUIEditor::Create()
 	CSoundManager::GetInstance()->AllStop();
 	SelectSceneLoad(UISceneList::Title);
 	SelectInit();
+	LoadLineShader();
+}
+
+
+//-----------------------------------------------------------------------------------
+//		シェーダ読込関数（一回のみ）.
+//-----------------------------------------------------------------------------------
+HRESULT CUIEditor::LoadLineShader()
+{
+	auto directx11 = CDirectX11::GetInstance();
+	ID3D11Device* device = directx11->GetDevice();
+
+	// シェーダ読み込み.
+	ID3D10Blob* vsBlob = nullptr;
+	ID3D10Blob* psBlob = nullptr;
+	ID3D10Blob* gsBlob = nullptr;
+
+	D3DX11CompileFromFile(ShaderPath, nullptr, nullptr, "VS_Main", "vs_5_0", 0, 0, nullptr, &vsBlob, nullptr, nullptr);
+	D3DX11CompileFromFile(ShaderPath, nullptr, nullptr, "PS_Main", "ps_5_0", 0, 0, nullptr, &psBlob, nullptr, nullptr);
+	D3DX11CompileFromFile(ShaderPath, nullptr, nullptr, "GS_Main", "gs_5_0", 0, 0, nullptr, &gsBlob, nullptr, nullptr);
+
+	// シェーダ作成.
+	device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &m_pVertexShader);
+	device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &m_pPixelShader);
+	device->CreateGeometryShader(gsBlob->GetBufferPointer(), gsBlob->GetBufferSize(), nullptr, &m_pGeometryShader);
+
+	// 入力レイアウト.
+	D3D11_INPUT_ELEMENT_DESC layout[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,   0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT,0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+
+	device->CreateInputLayout(layout, 2, vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &m_pInputLayout);
+
+	// 頂点バッファ.
+	D3D11_BUFFER_DESC bd = {};
+	bd.Usage = D3D11_USAGE_DYNAMIC;
+	bd.ByteWidth = sizeof(Vertex) * 8;
+	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+	device->CreateBuffer(&bd, nullptr, &m_pVertexBuffer);
+
+	// 定数バッファ.
+	D3D11_BUFFER_DESC cbDesc = {};
+	cbDesc.Usage = D3D11_USAGE_DYNAMIC;
+	cbDesc.ByteWidth = sizeof(CBUFFER_MATRIX);
+	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+	if (FAILED(device->CreateBuffer(&cbDesc, nullptr, &m_pCBufferMatrix)))
+	{
+		MessageBoxA(nullptr, "定数バッファ作成失敗", "Error", MB_OK);
+		return E_FAIL;
+	}
+
+
+	return S_OK;
+}
+
+
+//-----------------------------------------------------------------------------------
+//		シェーダ更新関数.
+//-----------------------------------------------------------------------------------
+void CUIEditor::UpdateShader()
+{
+	auto directx11 = CDirectX11::GetInstance();
+	ID3D11DeviceContext* context = directx11->GetContext();
+
+	// ---- 定数バッファ更新 ----
+	D3D11_VIEWPORT vp;
+	UINT vpCount = 1;
+	context->RSGetViewports(&vpCount, &vp);
+
+	D3DXMATRIX mProj;
+	D3DXMatrixOrthoLH(&mProj, vp.Width, vp.Height, 0.0f, 1.0f);
+
+	D3D11_MAPPED_SUBRESOURCE mappedMatrix = {};
+	if (SUCCEEDED(context->Map(m_pCBufferMatrix, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedMatrix)))
+	{
+		CBUFFER_MATRIX cbMatrix = {};
+		D3DXMatrixIdentity(&cbMatrix.mWorld);
+		D3DXMatrixIdentity(&cbMatrix.mView);
+		cbMatrix.mProj = mProj;
+		cbMatrix.LineThickness = m_LineThickness;
+		memcpy(mappedMatrix.pData, &cbMatrix, sizeof(cbMatrix));
+		context->Unmap(m_pCBufferMatrix, 0);
+	}
+
+	context->VSSetConstantBuffers(0, 1, &m_pCBufferMatrix);
+	context->GSSetConstantBuffers(0, 1, &m_pCBufferMatrix);
+	context->PSSetConstantBuffers(0, 1, &m_pCBufferMatrix);
+
+	// ---- 頂点バッファ更新 ----
+	if (lineVertices) {
+		D3D11_MAPPED_SUBRESOURCE mappedResource;
+		if (SUCCEEDED(context->Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
+		{
+			memcpy(mappedResource.pData, lineVertices, sizeof(Vertex) * 8);
+			context->Unmap(m_pVertexBuffer, 0);
+		}
+	}
+
+	// ---- パイプライン設定 ----
+	UINT stride = sizeof(Vertex);
+	UINT offset = 0;
+	context->IASetInputLayout(m_pInputLayout); // ★ここを追加！
+	context->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
+	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+
+	context->VSSetShader(m_pVertexShader, nullptr, 0);
+	context->GSSetShader(m_pGeometryShader, nullptr, 0);
+	context->PSSetShader(m_pPixelShader, nullptr, 0);
+
+	// ---- 描画 ----
+	context->Draw(8, 0);
 }
 
 
@@ -104,6 +252,9 @@ void CUIEditor::Update()
 		// 選択されているUIを表示.
 		ImGui::Text(IMGUI_JP("選択されているUI: %s"), selectedUI->GetSpriteData().Name.c_str());
 
+		// 選択されたUIをハイライトする.
+		ImGuiSetShader(selectedUI);
+
 		// 座標の調整.
 		ImGuiPosEdit(selectedUI);
 		// Z座標を基準にソート.
@@ -138,6 +289,7 @@ void CUIEditor::Update()
 void CUIEditor::Draw()
 {
 	for (size_t i = 0; i < m_pUIs.size(); ++i) { m_pUIs[i]->Draw(); }
+	UpdateShader();
 }
 
 
@@ -146,6 +298,12 @@ void CUIEditor::Draw()
 //=============================================================================
 void CUIEditor::Release()
 {
+	SAFE_RELEASE(m_pCBufferMatrix);
+	SAFE_RELEASE(m_pVertexBuffer);
+	SAFE_RELEASE(m_pInputLayout);
+	SAFE_RELEASE(m_pVertexShader);
+	SAFE_RELEASE(m_pPixelShader);
+	SAFE_RELEASE(m_pGeometryShader);
 }
 
 
@@ -272,6 +430,7 @@ void CUIEditor::SortBySpritePosZ(CUIObject* object)
 //-----------------------------------------------------------------------------
 void CUIEditor::ImGuiSelectScene()
 {
+#ifdef _DEBUG
 	ImGui::Begin(IMGUI_JP("UIエディター用シーン選択"));
 	UISceneList scene;
 	bool click = false;
@@ -290,6 +449,7 @@ void CUIEditor::ImGuiSelectScene()
 	}
 
 	ImGui::End();
+#endif
 }
 
 
@@ -298,6 +458,7 @@ void CUIEditor::ImGuiSelectScene()
 //-----------------------------------------------------------------------------
 void CUIEditor::ImGuiSearchUI()
 {
+#ifdef _DEBUG
 	if (ImGui::TreeNodeEx(IMGUI_JP("UIリスト"), ImGuiTreeNodeFlags_DefaultOpen)) {
 		// 検索バー.
 		ImGui::InputText(IMGUI_JP("検索"), m_SearchBuffer, IM_ARRAYSIZE(m_SearchBuffer));
@@ -320,6 +481,108 @@ void CUIEditor::ImGuiSearchUI()
 		ImGui::EndChild();
 		ImGui::TreePop();
 	}
+#endif
+}
+
+
+//-----------------------------------------------------------------------------
+//		選択されたUIをハイライトする.
+//-----------------------------------------------------------------------------
+void CUIEditor::ImGuiSetShader(CUIObject* object)
+{
+#ifdef _DEBUG
+	auto deviceContext = CDirectX11::GetInstance()->GetContext();
+
+	// 角調整用の倍数.
+	int offsetcorner = 180;
+
+	ImGui::Begin(IMGUI_JP("ハイライト線"));
+	ImGui::DragFloat("Thickness", &m_LineThickness, 0.001f, 0.001f, 50.0f);
+	ImGui::ColorEdit4("Line Color##", (float*)&m_LineColor);
+	ImGui::End();
+
+	float centerOffsetX = NOWFWND_W * 0.5f;
+	float centerOffsetY = NOWFWND_H * 0.5f;
+	// 基準となる頂点座標（中央）.
+	D3DXVECTOR3 basePos = {
+		object->GetPos().x - centerOffsetX,
+		(NOWFWND_H - object->GetPos().y) - centerOffsetY,  // Y座標を反転
+		object->GetPos().z
+	};
+	// 上辺の右頂点座標.
+	D3DXVECTOR3 toplineright = {
+		basePos.x + object->GetSpriteData().Disp.w,
+		basePos.y,
+		basePos.z
+	};
+
+	// 右辺の上下座標.
+	D3DXVECTOR3 rightlinetop = {
+		basePos.x + object->GetSpriteData().Disp.w,
+		basePos.y + m_LineThickness * offsetcorner,
+		basePos.z
+	};
+	D3DXVECTOR3 rightlinebottom = {
+		basePos.x + object->GetSpriteData().Disp.w,
+		basePos.y - object->GetSpriteData().Disp.h - m_LineThickness * offsetcorner,
+		basePos.z
+	};
+
+	// 下辺の左右座標.
+	D3DXVECTOR3 bottomlineright= {
+		basePos.x + object->GetSpriteData().Disp.w,
+		basePos.y - object->GetSpriteData().Disp.h,
+		basePos.z
+	};
+	D3DXVECTOR3 bottomlineleft = {
+		basePos.x,
+		basePos.y - object->GetSpriteData().Disp.h,
+		basePos.z
+	};
+	// 左辺の上下座標.
+	D3DXVECTOR3 leftlinebottom = {
+		basePos.x,
+		basePos.y - object->GetSpriteData().Disp.h - m_LineThickness * offsetcorner,
+		basePos.z
+	};
+	D3DXVECTOR3 leftlinetop= {
+		basePos.x,
+		basePos.y + m_LineThickness * offsetcorner,
+		basePos.z
+	};
+
+	// 上辺.
+	lineVertices[0] = { basePos,		m_LineColor };
+	lineVertices[1] = { toplineright,	m_LineColor };
+	// 右辺.
+	lineVertices[2] = { rightlinetop,	m_LineColor };
+	lineVertices[3] = { rightlinebottom,m_LineColor };
+	// 下辺.
+	lineVertices[4] = { bottomlineright,m_LineColor };
+	lineVertices[5] = { bottomlineleft,	m_LineColor };
+	// 左辺.
+	lineVertices[6] = { leftlinebottom,	m_LineColor };
+	lineVertices[7] = { leftlinetop,	m_LineColor };
+
+
+	// シェーダーのバッファに頂点情報をセットする.
+	D3D11_MAPPED_SUBRESOURCE mapped;
+	if (SUCCEEDED(deviceContext->Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped)))
+	{
+		memcpy(mapped.pData, lineVertices, sizeof(Vertex) * 8); // 8頂点分
+		deviceContext->Unmap(m_pVertexBuffer, 0);
+	}
+
+	// コンスタントバッファ更新（LineThickness用）
+	D3D11_MAPPED_SUBRESOURCE mappedCB;
+	if (SUCCEEDED(deviceContext->Map(m_pCBufferMatrix, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedCB)))
+	{
+		CBUFFER_MATRIX* cbData = (CBUFFER_MATRIX*)mappedCB.pData;
+		cbData->LineThickness = m_LineThickness;
+
+		deviceContext->Unmap(m_pCBufferMatrix, 0);
+	}
+#endif
 }
 
 
@@ -328,6 +591,7 @@ void CUIEditor::ImGuiSearchUI()
 //-----------------------------------------------------------------------------
 void CUIEditor::ImGuiPosEdit(CUIObject* object)
 {
+#ifdef _DEBUG
 	if (ImGui::TreeNode(IMGUI_JP("座標"))) 
 	{
 		// ドラッグ用にマウス操作のDirectInpuを用意.
@@ -362,6 +626,7 @@ void CUIEditor::ImGuiPosEdit(CUIObject* object)
 		}
 		ImGui::TreePop();
 	}
+#endif
 }
 
 
@@ -370,7 +635,8 @@ void CUIEditor::ImGuiPosEdit(CUIObject* object)
 //-----------------------------------------------------------------------------
 void CUIEditor::ImGuiInfoEdit(CUIObject* object)
 {
-	if (ImGui::TreeNode(IMGUI_JP("画像情報"))) 
+#ifdef _DEBUG
+	if (ImGui::TreeNode(IMGUI_JP("画像情報")))
 	{
 		// 元、表示、分割それぞれのサイズを代入.
 		D3DXVECTOR2 base = D3DXVECTOR2(
@@ -407,6 +673,7 @@ void CUIEditor::ImGuiInfoEdit(CUIObject* object)
 		}
 		ImGui::TreePop();
 	}
+#endif
 }
 
 
@@ -415,6 +682,7 @@ void CUIEditor::ImGuiInfoEdit(CUIObject* object)
 //-----------------------------------------------------------------------------
 void CUIEditor::ImGuiPatternTest(CUIObject* object)
 {
+#ifdef _DEBUG
 	if (ImGui::TreeNode(IMGUI_JP("画像パターンを試す"))) 
 	{
 		m_PatternNo = object->GetPatternNo();
@@ -501,6 +769,7 @@ void CUIEditor::ImGuiPatternTest(CUIObject* object)
 		object->SetPatternNo(m_PatternNo.x, m_PatternNo.y);
 		ImGui::TreePop();
 	}
+#endif
 }
 
 
@@ -509,6 +778,7 @@ void CUIEditor::ImGuiPatternTest(CUIObject* object)
 //-----------------------------------------------------------------------------
 void CUIEditor::ImGuiEtcInfoEdit(CUIObject* object)
 {
+#ifdef _DEBUG
 	if (ImGui::TreeNode(IMGUI_JP("その他")))
 	{
 		float alpha = object->GetAlpha();
@@ -539,4 +809,5 @@ void CUIEditor::ImGuiEtcInfoEdit(CUIObject* object)
 		}
 		ImGui::TreePop();
 	}
+#endif
 }
