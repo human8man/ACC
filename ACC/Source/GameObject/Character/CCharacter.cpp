@@ -29,31 +29,32 @@ CCharacter::CCharacter()
 	, m_GunRadius			( 1.f )
 	, m_GunRotRevision		( -1.5f )
 	, m_GunPosRevision		( -30.f )
-	, m_Gravity				( 0.0098f )
-	, m_GravityValue		( 0.0098f )
+	, m_Gravity				( 0.5f )
 
 	, m_ReloadTime			( 0.f )
-	, m_ReloadTimeMax		( CTime::GetInstance()->GetDeltaTime() * 120.f )
+	, m_ReloadTimeMax		( CTime::GetDeltaTime() * 120.f )
 	, m_BulletCoolTime		( 0.f )
-	, m_BulletCoolTimeMax	( CTime::GetInstance()->GetDeltaTime() * 20.f )
-	, m_BulletSpeed			( 2.3f )
+	, m_BulletCoolTimeMax	( CTime::GetDeltaTime() * 20.f )
+	, m_BulletSpeed			( 60.f )
 	, m_CanShot				( true )
 
 	, m_JumpPower			( 0.f )
-	, m_JumpPowerMax		( 0.784f )
+	, m_JumpPowerMax		( 50.f )
 	, m_CanJump				( false )
+	, m_Landing				( false )
 
 	, m_DashCoolTime		( 0.f )
-	, m_DashCoolTimeMax		( CTime::GetInstance()->GetDeltaTime() * 60.f )
+	, m_DashCoolTimeMax		( CTime::GetDeltaTime() * 60.f )
 	, m_DashTime			( 0.f )
-	, m_DashTimeMax			( CTime::GetInstance()->GetDeltaTime() * 30.f )
-	, m_DashSpeed			( 2.6f )
+	, m_DashTimeMax			( CTime::GetDeltaTime() * 30.f )
+	, m_DashSpeed			( 1.8f )
 	, m_CanDash				( true )
-	, DashVec				( ZEROVEC3 )
+	, m_DashVec				( ZEROVEC3 )
 
 	, m_EggAirRoomY			( 1.f )
 
 	, m_CharaInfo			()
+	, m_SumVec				(ZEROVEC3)
 {
 	// レイの設定.
 	m_pRayY			= std::make_unique<RAY>();
@@ -88,22 +89,22 @@ CCharacter::CCharacter()
 	// 空でない場合は、外部で調整するべき変数の値を入れていく.
 	if (!m_StateList.empty())
 	{
-		m_BodyDamage		= StrToInt(m_StateList["BodyDamage"]);
-		m_CritDamage		= StrToInt(m_StateList["CritDamage"]);
-		m_GunRadius			= StrToFloat(m_StateList["GunRadius"]);
-		m_GunRotRevision	= StrToFloat(m_StateList["GunRotRevision"]);
-		m_GunPosRevision	= StrToFloat(m_StateList["GunPosRevision"]);
-		m_GravityValue		= StrToFloat(m_StateList["GravityValue"]);
-		m_ReloadTimeMax		= StrToFloat( m_StateList["ReloadTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
-		m_BulletCoolTimeMax	= StrToFloat(m_StateList["BulletCoolTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
-		m_BulletSpeed		= StrToFloat(m_StateList["BulletSpeed"]);
-		m_JumpPowerMax		= StrToFloat(m_StateList["JumpPowerMax"]);
-		m_DashCoolTimeMax	= StrToFloat(m_StateList["DashCoolTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
-		m_DashTimeMax		= StrToFloat(m_StateList["DashTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
-		m_DashSpeed			= StrToFloat(m_StateList["DashSpeed"]);
-		m_EggAirRoomY		= StrToFloat(m_StateList["EggAirRoomY"]);
-		m_CharaInfo.MaxHP	= StrToInt(m_StateList["CharaHPMax"]);
-		m_CharaInfo.MaxAmmo	= StrToInt(m_StateList["CharaAmmoMax"]);
+		//m_BodyDamage		= StrToInt(m_StateList["BodyDamage"]);
+		//m_CritDamage		= StrToInt(m_StateList["CritDamage"]);
+		//m_GunRadius			= StrToFloat(m_StateList["GunRadius"]);
+		//m_GunRotRevision	= StrToFloat(m_StateList["GunRotRevision"]);
+		//m_GunPosRevision	= StrToFloat(m_StateList["GunPosRevision"]);
+		//m_GravityValue		= StrToFloat(m_StateList["GravityValue"]);
+		//m_ReloadTimeMax		= StrToFloat( m_StateList["ReloadTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
+		//m_BulletCoolTimeMax	= StrToFloat(m_StateList["BulletCoolTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
+		//m_BulletSpeed		= StrToFloat(m_StateList["BulletSpeed"]);
+		//m_JumpPowerMax		= StrToFloat(m_StateList["JumpPowerMax"]);
+		//m_DashCoolTimeMax	= StrToFloat(m_StateList["DashCoolTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
+		//m_DashTimeMax		= StrToFloat(m_StateList["DashTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
+		//m_DashSpeed			= StrToFloat(m_StateList["DashSpeed"]);
+		//m_EggAirRoomY		= StrToFloat(m_StateList["EggAirRoomY"]);
+		//m_CharaInfo.MaxHP	= StrToInt(m_StateList["CharaHPMax"]);
+		//m_CharaInfo.MaxAmmo	= StrToInt(m_StateList["CharaAmmoMax"]);
 	}
 }
 CCharacter::~CCharacter()
@@ -153,4 +154,24 @@ void CCharacter::Update()
 void CCharacter::Draw(D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 {
 	CStaticMeshObject::Draw( View, Proj, Light );
+}
+
+
+//============================================================================
+//		ジャンプ関係の計算.
+//============================================================================
+void CCharacter::JumpMath()
+{
+	// ジャンプ力を重力で減算し、Yに加算.
+	m_JumpPower = m_JumpPower - m_Gravity;
+	m_vPosition.y += m_JumpPower * CTime::GetDeltaTime();
+}
+
+
+//============================================================================
+//		最終移動ベクトルを渡す.
+//============================================================================
+const D3DXVECTOR3& CCharacter::GetMoveVec()
+{
+	return m_SumVec * CTime::GetDeltaTime();
 }

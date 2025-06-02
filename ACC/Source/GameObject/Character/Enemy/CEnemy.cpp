@@ -7,6 +7,10 @@
 #include "DirectInput/CDirectInput.h"
 #include "DirectSound/CSoundManager.h"
 
+#if _DEBUG
+#include "ImGui/CImGui.h"
+#endif
+
 namespace {
 	// キャラクターCSVのパス.
 	constexpr char CharaCSVPath[] = "Data\\CSV\\CharaStatus.csv";
@@ -18,17 +22,16 @@ namespace {
 //=============================================================================
 CEnemy::CEnemy()
 	: m_pGJK				( nullptr )
-	, m_MoveSpeed			( 0.2f )
+	, m_MoveSpeed			( CTime::GetDeltaTime() * 1000.f )
 	
 	, m_WallHack			( false )
 	, m_Hit					( false )
 	, m_HitKind				( false )
 	, m_SelectMoveTime		( 0.f )
-	, m_SelectMoveTimeMax	( CTime::GetInstance()->GetDeltaTime() * 10.f )
+	, m_SelectMoveTimeMax	( CTime::GetDeltaTime() * 10.f )
 	
 	, m_MoveKind			( MoveKind::Wait )
 	, m_MoveToPlayer		( 10 )
-	, m_SumVec				( ZEROVEC3 )
 {
 	m_CharaInfo.HP = m_CharaInfo.MaxHP;
 	m_CharaInfo.Ammo = m_CharaInfo.MaxAmmo;
@@ -65,11 +68,11 @@ void CEnemy::Update(std::unique_ptr<CPlayer>& chara)
 	m_vRotation.y = targetAngleRad1;
 	
 	// クールタイム処理.
-	if ( m_DashTime			>= 0.f) { m_DashTime		-= CTime::GetInstance()->GetDeltaTime(); }
-	if ( m_ReloadTime		>= 0.f) { m_ReloadTime		-= CTime::GetInstance()->GetDeltaTime(); }
-	if ( m_DashCoolTime		>= 0.f) { m_DashCoolTime	-= CTime::GetInstance()->GetDeltaTime(); }
-	if ( m_BulletCoolTime	>= 0.f) { m_BulletCoolTime	-= CTime::GetInstance()->GetDeltaTime(); }
-	if ( m_SelectMoveTime	>= 0.f) { m_SelectMoveTime	-= CTime::GetInstance()->GetDeltaTime(); }
+	if ( m_DashTime			>= 0.f) { m_DashTime		-= CTime::GetDeltaTime(); }
+	if ( m_ReloadTime		>= 0.f) { m_ReloadTime		-= CTime::GetDeltaTime(); }
+	if ( m_DashCoolTime		>= 0.f) { m_DashCoolTime	-= CTime::GetDeltaTime(); }
+	if ( m_BulletCoolTime	>= 0.f) { m_BulletCoolTime	-= CTime::GetDeltaTime(); }
+	if ( m_SelectMoveTime	>= 0.f) { m_SelectMoveTime	-= CTime::GetDeltaTime(); }
 
 	// 行動をまとめた関数.
 	Act(chara);
@@ -205,7 +208,7 @@ void CEnemy::Act(std::unique_ptr<CPlayer>& chara)
 	// ダッシュ中は操作できないようにする.
 	if (m_DashTime <= 0.f) {
 		// 操作が可能な間は初期化する.
-		DashVec = ZEROVEC3;
+		m_DashVec = ZEROVEC3;
 
 		// 敵の向きベクトルを計算(プレイヤーが正面).
 		D3DXVECTOR3 camDir = chara->GetPos() - m_vPosition;
@@ -261,11 +264,11 @@ void CEnemy::Act(std::unique_ptr<CPlayer>& chara)
 			// カメラの向きベクトルを取得.
 			camDir.y = 0.f;	// Y情報があると飛び始めるのでYの要素を抜く.
 			D3DXVec3Normalize(&camDir, &camDir); // 正規化.
-			DashVec = camDir * m_MoveSpeed * m_DashSpeed;
+			m_DashVec = camDir * m_MoveSpeed * m_DashSpeed;
 			m_CanDash = false;
 		}
 		else {
-			DashVec = m_SumVec * m_DashSpeed;
+			m_DashVec = m_SumVec * m_DashSpeed;
 			m_CanDash = false;
 		}
 	}
@@ -281,23 +284,26 @@ void CEnemy::Act(std::unique_ptr<CPlayer>& chara)
 	bool jump = (random.GetRandomInt(0, 120) == 0);
 
 	// ランダムにジャンプのタイミングを決める.
+	if (m_Landing) { m_JumpPower = 0; }
 	if (jump && m_CanJump) {
 		m_JumpPower = m_JumpPowerMax;
-		m_CanJump = false;
+		m_CanJump = m_Landing = false;
+		// 処理順により着地判定が出てしまうため、ジャンプ時に少し上げる.
+		m_vPosition.y += m_JumpPower * CTime::GetDeltaTime();
 	}
-	// ジャンプ力をY値に加算.
-	m_vPosition.y += m_JumpPower;
-
-	// カメラのレイHit座標から発射地点のベクトルを計算.
-	D3DXVECTOR3 shootdir = chara->GetPos() - m_pGun->GetShootPos();
-	shootdir.y += 0.2f; // 補正値を入れる.
-	D3DXVec3Normalize(&shootdir, &shootdir);	// 正規化.
 #pragma endregion
+
 
 	//-------------------------------------------------------------------------
 	//		射撃処理.
 	//-------------------------------------------------------------------------
 #pragma region 射撃処理
+
+	// カメラのレイHit座標から発射地点のベクトルを計算.
+	D3DXVECTOR3 shootdir = chara->GetPos() - m_pGun->GetShootPos();
+	shootdir.y += 0.5f; // 補正値を入れる.
+	D3DXVec3Normalize(&shootdir, &shootdir);	// 正規化.
+
 	// クールタイムが終了していたら射撃可能.
 	if (m_BulletCoolTime <= 0.f) { m_CanShot = true; }
 
@@ -331,6 +337,6 @@ void CEnemy::Act(std::unique_ptr<CPlayer>& chara)
 	}
 
 	// 合計のベクトル量分位置を更新.
-	m_vPosition += m_SumVec + DashVec;
+	m_vPosition += (m_SumVec + m_DashVec) * CTime::GetDeltaTime();
 #pragma endregion
 }

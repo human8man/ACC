@@ -11,7 +11,7 @@ class CUIEditor
 	: public CSceneBase
 {
 private:
-	// 変更可能なUIのリスト.
+	// 変更可能なシーンのリスト.
 	enum UISceneList {
 		Title,
 		Game,
@@ -22,12 +22,12 @@ public:
 	CUIEditor(HWND hWnd);
 	~CUIEditor();
 
-	void Create()	override;	// 作成処理.
-	HRESULT LoadData()override;	// データ読込.
-	void Init()		override;	// 初期化処理.
-	void Update()	override;	// 更新処理.
-	void Draw()		override;	// 描画処理.
-	void Release()	override;	// 解放処理.
+	void Create()		override;	// 作成処理.
+	HRESULT LoadData()	override;	// データ読込.
+	void Init()			override;	// 初期化処理.
+	void Update()		override;	// 更新処理.
+	void Draw()			override;	// 描画処理.
+	void Release()		override;	// 解放処理.
 
 
 private:
@@ -47,7 +47,7 @@ private:
 	void ImGuiSearchUI();
 	// 座標調整関数(選択されたUIObect).
 	void ImGuiPosEdit(CUIObject* object);
-	// Z座標を元にソートする関数.
+	// Z座標を元にソートする関数(選択されたUIObect).
 	void SortBySpritePosZ(CUIObject* object);
 	// 情報調整関数(選択されたUIObect).
 	void ImGuiInfoEdit(CUIObject* object);
@@ -58,8 +58,8 @@ private:
 
 private:
 	// 画像情報リスト.
-	std::vector<std::string> m_SpriteDataList;	//スプライト情報をまとめる配列.
-	std::vector<D3DXVECTOR3> m_SpritePosList;	//スプライト座標をまとめる配列.
+	std::vector<std::string> m_SpriteDataList;	// スプライト情報をまとめる配列.
+	std::vector<D3DXVECTOR3> m_SpritePosList;	// スプライト座標をまとめる配列.
 
 	std::vector<CUIObject*> m_pUIs;				// UIクラス.
 	std::vector<CSprite2D*> m_pSprite2Ds;		// Sprite2Dクラス.
@@ -68,7 +68,7 @@ private:
 
 	bool	m_MovedSomething;	// 何か変更があった際に保存確認フラグを立てる.
 	int		m_SelectedUIIndex;
-	char	m_SearchBuffer[64] = ""; // 検索用バッファ.
+	char	m_SearchBuffer[64] = "";	// 検索用バッファ.
 	
 	// マウス操作用の変数.
 	D3DXVECTOR2 m_OffsetPos;	// マウス座標と画像座標のズレ補正値.

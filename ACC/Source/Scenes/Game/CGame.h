@@ -89,4 +89,7 @@ private:
 
 	int	m_HitKind;		// Hitの種類.
 	int	m_CylinderMax;	// 柱の最大数.
+
+	bool m_PlayerAnyLanding;	// プレイヤーが何かに着地している場合.
+	bool m_EnemyAnyLanding;		// 敵が何かに着地している場合.
 };
