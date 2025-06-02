@@ -260,15 +260,10 @@ void CUIEditor::Update()
 		// Z座標を基準にソート.
 		SortBySpritePosZ(selectedUI);
 
-
 		// 画像情報の調整.
 		ImGuiInfoEdit(selectedUI);
-
-
 		// 画像パターンを試す.
 		ImGuiPatternTest(selectedUI);
-
-
 		// その他の情報の調整.
 		ImGuiEtcInfoEdit(selectedUI);
 	}

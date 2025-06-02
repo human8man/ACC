@@ -7,6 +7,10 @@
 #include "DirectInput/CDirectInput.h"
 #include "DirectSound/CSoundManager.h"
 
+#if _DEBUG
+#include "ImGui/CImGui.h"
+#endif
+
 namespace {
 	// キャラクターCSVのパス.
 	constexpr char CharaCSVPath[] = "Data\\CSV\\CharaStatus.csv";
@@ -18,12 +22,13 @@ namespace {
 //============================================================================
 CPlayer::CPlayer()
 	: m_pGJK		( nullptr )
-	, m_MoveSpeed	( 0.2f )
+	, m_MoveSpeed	( CTime::GetDeltaTime() * 1000.f )
 	, m_CamRevision	( 4.f )
-	, m_SumVec		( ZEROVEC3 )
+
 	, m_AutoAim		( false )
 	, m_Homing		( false )
 	, m_WallHack	( false )
+	, m_TriggerHappy( false )
 {
 	// 初期化.
 	m_CharaInfo.HP = m_CharaInfo.MaxHP;
@@ -33,12 +38,12 @@ CPlayer::CPlayer()
 	std::unordered_map<std::string, std::string> m_StateList;
 	// キャラクターCSVの情報取得.
 	m_StateList = FileManager::CSVLoad(CharaCSVPath);
-
+	
 	// 空でない場合は、外部で調整するべき変数の値を入れていく.
 	if (!m_StateList.empty())
 	{
-		m_MoveSpeed		= StrToFloat(m_StateList["PlayerMoveSpeed"]);
-		m_CamRevision	= StrToFloat(m_StateList["CameraRevision"]);
+		//m_MoveSpeed		= StrToFloat(m_StateList["PlayerMoveSpeed"]);
+		//m_CamRevision	= StrToFloat(m_StateList["CameraRevision"]);
 	}
 }
 CPlayer::~CPlayer()
@@ -59,16 +64,16 @@ void CPlayer::Update(std::unique_ptr<CEnemy>& chara)
 	m_vRotation.y = CCamera::GetInstance()->GetRot().y;
 	
 	// 0以上のものがある場合カウントをする.
-	if ( m_DashTime >= 0.f )	{ m_DashTime -= CTime::GetInstance()->GetDeltaTime(); }
+	if ( m_DashTime >= 0.f )	{ m_DashTime -= CTime::GetDeltaTime(); }
 	if ( m_ReloadTime >= 0.f )	{
-		m_ReloadTime -= CTime::GetInstance()->GetDeltaTime(); 
+		m_ReloadTime -= CTime::GetDeltaTime(); 
 		// リロード終了時にSEを鳴らす.
 		if (m_ReloadTime < 0.f) {
 			CSoundManager::GetInstance()->Play(CSoundManager::enList::SE_ReloadEnd);
 		}
 	}
-	if ( m_DashCoolTime >= 0.f )	{ m_DashCoolTime	-= CTime::GetInstance()->GetDeltaTime(); }
-	if ( m_BulletCoolTime >= 0.f )	{ m_BulletCoolTime	-= CTime::GetInstance()->GetDeltaTime(); }
+	if ( m_DashCoolTime >= 0.f )	{ m_DashCoolTime	-= CTime::GetDeltaTime(); }
+	if ( m_BulletCoolTime >= 0.f )	{ m_BulletCoolTime	-= CTime::GetDeltaTime(); }
 
 	// 入力処理.
 	KeyInput(chara);
@@ -102,6 +107,11 @@ void CPlayer::Update(std::unique_ptr<CEnemy>& chara)
 
 	// キャラクターの更新処理.
 	CCharacter::Update();
+
+#if _DEBUG
+	// ImGuiを用いたデバッグ関数.
+	PlayerImGui();
+#endif
 }
 
 
@@ -230,7 +240,7 @@ void CPlayer::KeyInput(std::unique_ptr<CEnemy>& chara)
 	// ダッシュ中は操作できないようにする.
 	if (m_DashTime <= 0.f) {
 		// 操作が可能な間は初期化する.
-		DashVec = ZEROVEC3;
+		m_DashVec = ZEROVEC3;
 
 		D3DXVECTOR3 camDir;
 		// カメラの向きベクトルを取得.
@@ -285,12 +295,12 @@ void CPlayer::KeyInput(std::unique_ptr<CEnemy>& chara)
 			D3DXVec3Normalize(&camDir, &camDir); // 正規化.
 
 			// カメラ方向 × 移動速度 × ダッシュ倍率のベクトルを出す.
-			DashVec = camDir * m_MoveSpeed * m_DashSpeed;
+			m_DashVec = camDir * m_MoveSpeed * m_DashSpeed;
 			m_CanDash = false;
 		}
 		else {
 			// 合計ベクトルにダッシュ倍率を変えた値を出す.
-			DashVec = m_SumVec * m_DashSpeed;
+			m_DashVec = m_SumVec * m_DashSpeed;
 			m_CanDash = false;
 		}
 		CSoundManager::GetInstance()->Play(CSoundManager::enList::SE_Dash);
@@ -299,14 +309,14 @@ void CPlayer::KeyInput(std::unique_ptr<CEnemy>& chara)
 	//----------------------------------------------------------------------
 	//		ジャンプ処理.
 	//----------------------------------------------------------------------
+	if (m_Landing) { m_JumpPower = 0; }
 	if (Key->IsKeyAction(DIK_SPACE) && m_CanJump) {
 		m_JumpPower = m_JumpPowerMax;
-		m_CanJump = false;
+		m_CanJump = m_Landing = false;
+		// 処理順により着地判定が出てしまうため、押下時に少し上げる.
+		m_vPosition.y += m_JumpPower * CTime::GetDeltaTime();
 		CSoundManager::GetInstance()->Play(CSoundManager::enList::SE_Jump);
 	}
-	// ジャンプ力をY値に加算.
-	m_vPosition.y += m_JumpPower;
-
 
 	// カメラのレイHit座標から発射地点のベクトルを計算.
 	D3DXVECTOR3 shootdir = CCamera::GetInstance()->GetRayHit() - m_pGun->GetShootPos();
@@ -375,5 +385,21 @@ void CPlayer::KeyInput(std::unique_ptr<CEnemy>& chara)
 
 
 	// 合計のベクトル量分位置を更新.
-	m_vPosition += m_SumVec + DashVec;
+	m_vPosition += (m_SumVec + m_DashVec) * CTime::GetDeltaTime();
+}
+
+
+//-----------------------------------------------------------------------------
+//		デバッグ時に使用する関数.
+//-----------------------------------------------------------------------------
+void CPlayer::PlayerImGui()
+{
+#if _DEBUG
+	ImGui::Begin(IMGUI_JP("プレイヤー情報"));
+	ImGui::Text("Dash%f", m_DashTime);
+	ImGui::Text("Reload%f", m_ReloadTime);
+	ImGui::Text("DashCool%f", m_DashCoolTime);
+	ImGui::Text("BulletCool%f", m_BulletCoolTime);
+	ImGui::End();
+#endif
 }

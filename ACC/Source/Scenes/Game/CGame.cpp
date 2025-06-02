@@ -20,27 +20,28 @@
 //		ゲームクラス.
 //============================================================================
 CGame::CGame(HWND hWnd)
-	: m_hWnd		( hWnd )
-	, m_mView		()
-	, m_mProj		()
-	, m_Light		()
+	: m_hWnd			( hWnd )
+	, m_mView			()
+	, m_mProj			()
+	, m_Light			()
 
-	, m_pEgg		( nullptr )
-	, m_pFloor		( nullptr )
-	, m_pCylinders	()
+	, m_pEgg			( nullptr )
+	, m_pFloor			( nullptr )
+	, m_pCylinders		()
 	
-	, m_pPlayer		( nullptr )
-	, m_pEnemy		( nullptr )
+	, m_pPlayer			( nullptr )
+	, m_pEnemy			( nullptr )
 
-	, m_pGJK		( nullptr )
-	, m_pCamRay		( nullptr )
-	, m_pMeshLine	( nullptr )
+	, m_pGJK			( nullptr )
+	, m_pCamRay			( nullptr )
+	, m_pMeshLine		( nullptr )
 
-	, m_pWinUI		( nullptr )
-	, m_pLoseUI		( nullptr )
+	, m_pWinUI			( nullptr )
+	, m_pLoseUI			( nullptr )
 
-	, m_HitKind		( 0 )
-	, m_CylinderMax	( 9 )
+	, m_HitKind			( 0 )
+	, m_CylinderMax		( 9 )
+	, m_PlayerAnyLanding( false )
 {
 	// ライト情報.
 	m_Light.vDirection	= D3DXVECTOR3( 1.5f, 1.f, -1.f );
@@ -208,7 +209,7 @@ void CGame::Update()
 	{
 		// その他とカメラレイの判定(弾の到着地点に使用する).
 		RaytoObjeCol();
-
+		
 		m_pPlayer->Update(m_pEnemy);		// プレイヤーの更新.
 		m_pEnemy->Update(m_pPlayer);		// エネミーの更新.
 		CCamera::GetInstance()->Update();	// カメラの更新.
@@ -291,14 +292,14 @@ void CGame::CollisionJudge()
 	// プレイヤーと敵の柱判定を取得用の変数を用意.
 	CollisionPoints pointsPC, pointsEC;
 
-	// プレイヤーと円柱の判定を返す.
+	// プレイヤーと柱の判定を返す.
 	std::vector<CollisionPoints> pointspecs;
 	for (int i = 0; i < m_CylinderMax; ++i) {
 		pointsPC = m_pGJK->GJK(Cylinders[i], PlayerEgg);
 		pointspecs.push_back(pointsPC);
 	}
 
-	// 敵と円柱の判定を返す.
+	// 敵と柱の判定を返す.
 	std::vector<CollisionPoints> pointseecs;
 	for (int i = 0; i < m_CylinderMax; ++i) {
 		pointsEC = m_pGJK->GJK(Cylinders[i], EnemyEgg);
@@ -308,17 +309,34 @@ void CGame::CollisionJudge()
 	// プレイヤーと敵の床の判定を取得.
 	CollisionPoints pointsPF = m_pGJK->GJK(PlayerEgg, Floor), pointsEF = m_pGJK->GJK(EnemyEgg, Floor);
 
+	// 毎フレーム初期化.
+	m_PlayerAnyLanding = false;
+
 	// プレイヤーと敵の床の衝突判定処理.
 	PlayertoFloorCol(pointsPF);
 	EnemytoFloorCol(pointsEF);
 
-	// プレイヤーと敵に重力を加える.
-	m_pPlayer->UseGravity();
-	m_pEnemy->UseGravity();
-
 	// プレイヤーと敵の柱の衝突判定処理.
 	for (int i = 0; i < m_CylinderMax; ++i) { PlayertoCylinderCol(pointspecs[i]); }
 	for (int i = 0; i < m_CylinderMax; ++i) { EnemytoCylinderCol(pointseecs[i]); }
+
+	// プレイヤーの着地状況ごとの処理.
+	if (m_PlayerAnyLanding) {
+		m_pPlayer->CanJump();	// ジャンプ可能に.
+		m_pPlayer->SetLanding(m_PlayerAnyLanding);
+	}
+	else {
+		m_pPlayer->JumpMath();	// ジャンプ計算.
+	}
+
+	// 敵の着地状況ごとの処理.
+	if (m_EnemyAnyLanding) {
+		m_pEnemy->CanJump();	// ジャンプ可能に.
+		m_pEnemy->SetLanding(m_EnemyAnyLanding);
+	}
+	else {
+		m_pEnemy->JumpMath();	// ジャンプ計算.
+	}
 
 	// プレイヤーと敵の当たり判定処理をする.
 	for (int i = 0; i < m_CylinderMax; ++i) {
@@ -356,8 +374,8 @@ void CGame::PlayertoFloorCol(CollisionPoints points)
 	// 当たっていた場合.
 	if (points.Col)
 	{
-		m_pPlayer->ResetGravity();	// プレイヤーにかかる重力のリセット.
-		m_pPlayer->CanJump();		// ジャンプを可能に.
+		// 着地している.
+		m_PlayerAnyLanding = true;
 
 		// 地面に衝突している場合.
 		if (points.Normal.y < 0.f)
@@ -382,11 +400,7 @@ void CGame::PlayertoFloorCol(CollisionPoints points)
 			// 修正した移動ベクトルをプレイヤーに加算.
 			m_pPlayer->AddVec(PlayerMove);
 		}
-	}
-	else {
-		m_pPlayer->AddGravity();	// プレイヤーにかかる重力を増やす.
-		m_pPlayer->JumpPowerDec();	// ジャンプで加算される値を減らす.
-	}
+	} 
 }
 
 
@@ -395,7 +409,17 @@ void CGame::PlayertoFloorCol(CollisionPoints points)
 //-----------------------------------------------------------------------------
 void CGame::PlayertoCylinderCol(CollisionPoints points)
 {
-	if (points.Col) {
+	if (points.Col) 
+	{
+		// 地面に衝突している場合.
+		if (points.Normal.y > 0.f)
+		{
+			m_PlayerAnyLanding = true;
+
+			D3DXVECTOR3 SetPos = m_pPlayer->GetPos() - points.Normal * points.Depth;
+			m_pPlayer->SetPos(SetPos);
+		}
+
 		D3DXVec3Normalize(&points.Normal, &points.Normal);	// 法線を正規化.
 		D3DXVECTOR3 PlayerMove = m_pPlayer->GetMoveVec();	// プレイヤーの移動ベクトルを取得.
 
@@ -425,8 +449,7 @@ void CGame::EnemytoFloorCol(CollisionPoints points)
 	// 当たっていた場合.
 	if (points.Col)
 	{
-		m_pEnemy->ResetGravity();	// 敵にかかる重力のリセット.
-		m_pEnemy->CanJump();		// ジャンプを可能に.
+		m_EnemyAnyLanding = true;
 
 		// 地面に衝突している場合.
 		if (points.Normal.y < 0.f)
@@ -453,8 +476,7 @@ void CGame::EnemytoFloorCol(CollisionPoints points)
 		}
 	}
 	else {
-		m_pEnemy->AddGravity();	 // 敵にかかる重力を増やす.
-		m_pEnemy->JumpPowerDec();// ジャンプで加算される値を減らす.
+		m_pEnemy->JumpMath();
 	}
 }
 
@@ -465,7 +487,16 @@ void CGame::EnemytoFloorCol(CollisionPoints points)
 void CGame::EnemytoCylinderCol(CollisionPoints points)
 {
 	// 当たっている場合.
-	if (points.Col) {
+	if (points.Col) 
+	{
+		// 地面に衝突している場合.
+		if (points.Normal.y > 0.f)
+		{
+			m_EnemyAnyLanding = true;
+
+			D3DXVECTOR3 SetPos = m_pEnemy->GetPos() - points.Normal * points.Depth;
+			m_pEnemy->SetPos(SetPos);
+		}
 		D3DXVec3Normalize(&points.Normal, &points.Normal);	// 法線を正規化.
 		D3DXVECTOR3 EnemyMove = m_pEnemy->GetMoveVec();		// プレイヤーの移動ベクトルを取得.
 
@@ -482,6 +513,17 @@ void CGame::EnemytoCylinderCol(CollisionPoints points)
 		// 深度が設定値以下の場合.
 		if (points.Depth < 0.05f) {
 			m_pEnemy->AddVec(-m_pEnemy->GetMoveVec());
+		}
+		// 地面に衝突している場合.
+		if (points.Normal.y < 0.f)
+		{
+			m_pEnemy->CanJump();	// ジャンプを可能に.
+
+			// プレイヤーを押し戻したときの座標を算出.
+			D3DXVECTOR3 SetPos = m_pEnemy->GetPos() - points.Normal * points.Depth;
+
+			// プレイヤーの位置の更新.
+			m_pEnemy->SetPos(SetPos);
 		}
 	}
 }

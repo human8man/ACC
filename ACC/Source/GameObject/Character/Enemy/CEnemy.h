@@ -34,13 +34,8 @@ public:
 	// 当たり判定処理(プレイヤー、床、柱).
 	void Collision(std::unique_ptr<CPlayer>& egg, Collider floor, Collider cylinder);
 
-
-	// 移動量の取得.
-	const D3DXVECTOR3& GetMoveVec() { return m_SumVec; }
 	// 外的なベクトルの追加.
 	void AddVec(D3DXVECTOR3 vec) { m_vPosition += vec; }
-	// ジャンプ力の減少.
-	void JumpPowerDec() { if (m_JumpPower > 0) { m_JumpPower -= m_Gravity; } }
 
 private:
 	// 行動をまとめる.
@@ -66,6 +61,4 @@ private:
 	int m_DashProbability;	// ダッシュを使う確率.
 	int m_JumpProbability;	// ジャンプを使う確率.
 	int m_ShootProbability;	// 射撃する確率.
-
-	D3DXVECTOR3 m_SumVec;	// 合計のベクトル量.
 };
