@@ -65,14 +65,21 @@ void CUIFade::Update()
 	if ( m_BeforePeak && m_BeforePeak == m_Peak ) { m_FirstPeak = false; }
 
 	// ピーク時間中.
-	if ( m_Peaking ) {
-		// カウントが0以上の間.
+	if (m_Peaking) {
 		if (m_PeakCnt > 0.f) {
-			m_FadeAlpha = 1.f;	// アルファを1で固定.
+			m_FadeAlpha = 1.f; // ピーク中はアルファ固定
 			m_PeakCnt -= CTime::GetInstance()->GetDeltaTime();
 		}
-		else{
+		else {
 			m_FadeAlpha -= m_OutAddAlpha;
+
+			// ここ追加: アルファが0以下になったらフェード終了
+			if (m_FadeAlpha <= 0.f) {
+				m_FadeAlpha = 0.f;
+				m_Fading = false;
+				m_Peaking = false;
+				m_End = true;
+			}
 		}
 	}
 	// ピークに対していない場合.

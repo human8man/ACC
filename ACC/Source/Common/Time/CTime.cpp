@@ -24,6 +24,7 @@ void CTime::Update()
 	auto currentTime = std::chrono::steady_clock::now();
 	std::chrono::duration<float> elapsedTime = currentTime - m_LastTime;
 
+	m_UnscaledDeltaTime = elapsedTime.count();
 	m_DeltaTime = elapsedTime.count() * m_TimeScale;
 	m_TotalTime += m_DeltaTime;
 	m_LastTime = currentTime;

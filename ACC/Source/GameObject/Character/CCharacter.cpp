@@ -35,7 +35,7 @@ CCharacter::CCharacter()
 	, m_ReloadTimeMax		( CTime::GetDeltaTime() * 120.f )
 	, m_BulletCoolTime		( 0.f )
 	, m_BulletCoolTimeMax	( CTime::GetDeltaTime() * 20.f )
-	, m_BulletSpeed			( 60.f )
+	, m_BulletSpeed			( 180.f )
 	, m_CanShot				( true )
 
 	, m_JumpPower			( 0.f )
@@ -163,7 +163,7 @@ void CCharacter::Draw(D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 void CCharacter::JumpMath()
 {
 	// ジャンプ力を重力で減算し、Yに加算.
-	m_JumpPower = m_JumpPower - m_Gravity;
+	m_JumpPower = m_JumpPower - m_Gravity * CTime::GetTimeScale();
 	m_vPosition.y += m_JumpPower * CTime::GetDeltaTime();
 }
 

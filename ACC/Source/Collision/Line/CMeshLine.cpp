@@ -319,7 +319,7 @@ void CMeshLine::Render(D3DXMATRIX& mView, D3DXMATRIX& mProj)
 
 
 //=============================================================================
-//		
+//		メッシュからワイヤーフレーム.
 //=============================================================================
 void CMeshLine::DrawMeshWireframeFromVertices(
 	const CStaticMesh&	mesh,
@@ -329,6 +329,27 @@ void CMeshLine::DrawMeshWireframeFromVertices(
 	const D3DXVECTOR4&	color,
 	const float&		scale)
 {
+	// ワイヤーフレーム用ラスタライザーステート作成
+	ID3D11RasterizerState* pWireRasterState = nullptr;
+	ID3D11RasterizerState* pOldRasterState = nullptr;
+
+	D3D11_RASTERIZER_DESC rasterDesc = {};
+	rasterDesc.FillMode = D3D11_FILL_WIREFRAME;   // ← これが重要
+	rasterDesc.CullMode = D3D11_CULL_BACK;        // 裏面カリング（必要ならD3D11_CULL_NONEでもOK）
+	rasterDesc.DepthClipEnable = true;
+
+	CDirectX11* directx11 = CDirectX11::GetInstance();
+	auto* context = directx11->GetContext();
+	auto* device = directx11->GetDevice();
+
+	device->CreateRasterizerState(&rasterDesc, &pWireRasterState);
+
+	// 現在の状態を取得して退避
+	context->RSGetState(&pOldRasterState);
+
+	// ワイヤーフレーム状態に切り替え
+	context->RSSetState(pWireRasterState);
+
 	//-----------------------------------------------------
 	//		ワールド行列計算.
 	//-----------------------------------------------------
@@ -360,7 +381,6 @@ void CMeshLine::DrawMeshWireframeFromVertices(
 	//-----------------------------------------------------
 	//		メッシュの頂点を線分のリスト形式に変換.
 	//-----------------------------------------------------
-	CDirectX11* directx11 = CDirectX11::GetInstance();
 	m_pVertexBuffer = mesh.GetVertexBuffer();
 	m_pIndexBuffer = mesh.GetIndexBuffer();
 	m_Indices = mesh.GetIndex();
@@ -396,7 +416,7 @@ void CMeshLine::DrawMeshWireframeFromVertices(
 	directx11->GetContext()->IASetInputLayout(mesh.GetVertexLayout());
 
 	// プリミティブ・トポロジーをセット (LINELIST).
-	directx11->GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	directx11->GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// プリミティブをレンダリング.
 	for (size_t i = 0; i < m_pIndexBuffer.size();i++)
@@ -404,4 +424,6 @@ void CMeshLine::DrawMeshWireframeFromVertices(
 		directx11->GetContext()->IASetIndexBuffer(m_pIndexBuffer[i], DXGI_FORMAT_R32_UINT, 0);
 		directx11->GetContext()->DrawIndexed(m_Indices[i] * 3, 0, 0);
 	}
+	// 元のラスタライザーステートに戻す
+	context->RSSetState(pOldRasterState);
 }
