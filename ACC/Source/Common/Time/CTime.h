@@ -20,17 +20,16 @@ public:
 	// 更新処理.
 	void Update();
 
-	// デルタタイム（前フレームとの差）を取得.
 	static float GetDeltaTime() { return GetInstance()->m_DeltaTime; }
-
-	// 累積時間（起動からの経過）を取得.
+	static float GetUnscaledDeltaTime() { return GetInstance()->m_UnscaledDeltaTime; }
+	static float GetTimeScale() { return GetInstance()->m_TimeScale; }
 	static float GetTotalTime() { return GetInstance()->m_TotalTime; }
 
 	// スローモーション倍率の設定.
 	void SetTimeScale(float scale) { m_TimeScale = scale; }
-	float GetTimeScale() const { return m_TimeScale; }
 private:
 	float m_DeltaTime;	// 1フレームの経過時間（秒）.
+	float m_UnscaledDeltaTime;	// 1フレームの経過時間（秒）.
 	float m_TotalTime;	// 起動からの累積時間（秒）.
 
 	float m_TimeScale;	// スローモーション倍率（1.0が通常）.

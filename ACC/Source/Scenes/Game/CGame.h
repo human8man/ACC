@@ -92,4 +92,9 @@ private:
 
 	bool m_PlayerAnyLanding;	// プレイヤーが何かに着地している場合.
 	bool m_EnemyAnyLanding;		// 敵が何かに着地している場合.
+
+	bool m_SlowMode;			// スローモーション.
+	float m_SlowScalingTime;	// スローモーション経過時間.
+	float m_SlowScalingTimeMax;	// スローモーション最大時間.
+	float m_SlowScale;			// スローモーション比率.
 };

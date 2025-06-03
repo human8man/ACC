@@ -14,34 +14,38 @@
 #include "Sprite/2D/UI/CLoseUI/CLoseUI.h"
 #include "Sprite/2D/UI/CWinUI/CWinUI.h"
 #include "Random/CRandom.h"
-
+#include "Easing/Easing.h"
 
 //============================================================================
 //		ゲームクラス.
 //============================================================================
 CGame::CGame(HWND hWnd)
-	: m_hWnd			( hWnd )
-	, m_mView			()
-	, m_mProj			()
-	, m_Light			()
+	: m_hWnd				( hWnd )
+	, m_mView				()
+	, m_mProj				()
+	, m_Light				()
 
-	, m_pEgg			( nullptr )
-	, m_pFloor			( nullptr )
-	, m_pCylinders		()
+	, m_pEgg				( nullptr )
+	, m_pFloor				( nullptr )
+	, m_pCylinders			()
 	
-	, m_pPlayer			( nullptr )
-	, m_pEnemy			( nullptr )
+	, m_pPlayer				( nullptr )
+	, m_pEnemy				( nullptr )
 
-	, m_pGJK			( nullptr )
-	, m_pCamRay			( nullptr )
-	, m_pMeshLine		( nullptr )
+	, m_pGJK				( nullptr )
+	, m_pCamRay				( nullptr )
+	, m_pMeshLine			( nullptr )
 
-	, m_pWinUI			( nullptr )
-	, m_pLoseUI			( nullptr )
+	, m_pWinUI				( nullptr )
+	, m_pLoseUI				( nullptr )
 
-	, m_HitKind			( 0 )
-	, m_CylinderMax		( 9 )
-	, m_PlayerAnyLanding( false )
+	, m_HitKind				( 0 )
+	, m_CylinderMax			( 9 )
+	, m_PlayerAnyLanding	( false )
+	, m_SlowMode			( false )
+	, m_SlowScalingTime		( 0.f )
+	, m_SlowScalingTimeMax	( CTime::GetDeltaTime() * 60.f )
+	, m_SlowScale			( 1.f )
 {
 	// ライト情報.
 	m_Light.vDirection	= D3DXVECTOR3( 1.5f, 1.f, -1.f );
@@ -233,6 +237,19 @@ void CGame::Update()
 
 	// カメラ側のキー操作を無効にする.
 	if (Key->IsKeyAction(DIK_F3)) { CCamera::GetInstance()->ChangeUseMouse(); }
+	if (Key->IsKeyAction(DIK_5)) { 
+		m_SlowMode = !m_SlowMode;
+		m_SlowScalingTime = 0;
+	}
+	if (m_SlowScalingTime < m_SlowScalingTimeMax) { m_SlowScalingTime += CTime::GetDeltaTime(); }
+	if (m_SlowMode) {
+		m_SlowScale = MyEasing::OutCirc(m_SlowScalingTime, m_SlowScalingTimeMax, m_SlowScale, 0.1f);
+	}
+	else {
+		m_SlowScale = MyEasing::OutCirc(m_SlowScalingTime, m_SlowScalingTimeMax, m_SlowScale, 1.f);
+	}
+
+	CTime::GetInstance()->SetTimeScale(m_SlowScale);
 }
 
 
@@ -246,12 +263,9 @@ void CGame::Draw()
 
 	D3DXVECTOR4 color = { 0.f,1.f,0.f,1.f };
 
-	m_pFloor	->Render(	m_mView, m_mProj, m_Light );	// 地面の描画.
-
 	// 柱の描画.
 	for (auto& cylinder : m_pCylinders) { cylinder->Render(m_mView, m_mProj, m_Light); }
-
-
+	m_pFloor->Render(m_mView, m_mProj, m_Light);	// 地面の描画.
 	m_pEnemy->Draw(m_mView, m_mProj, m_Light);	// 敵の描画.
 
 	// ウォールハック起動中は敵のフレームを描画.
@@ -353,7 +367,7 @@ void CGame::CollisionJudge()
 
 
 //-----------------------------------------------------------------------------
-//		敵とプレイヤーをンダムでスポーン.
+//		敵とプレイヤーをランダムでスポーン.
 //-----------------------------------------------------------------------------
 void CGame::InitEPPos(CRandom& random, std::unique_ptr<CPlayer>& player, std::unique_ptr<CEnemy>& enemy)
 {

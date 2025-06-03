@@ -8,7 +8,7 @@
 CBullet::CBullet()
 	: m_MoveDirection	()
 	, m_MoveSpeed		()
-	, m_DeleteTime		( CTime::GetDeltaTime() * 600000.f )
+	, m_DeleteTime		( CTime::GetDeltaTime() * 300.f )
 {
 }
 CBullet::~CBullet()
