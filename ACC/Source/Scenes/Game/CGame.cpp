@@ -78,7 +78,12 @@ void CGame::Create()
 	// 柱の生成.
 	for (int i = 0; i < m_CylinderMax; ++i) {
 		auto cylinder = std::make_unique<CStaticMesh>();
-		cylinder->Init(_T("Data\\Mesh\\Static\\Stage\\Rectangular.x"));
+		if (i < 4) {
+			cylinder->Init(_T("Data\\Mesh\\Static\\Stage\\Rectangular.x"));
+		}
+		else {
+			cylinder->Init(_T("Data\\Mesh\\Static\\Stage\\Rectangular2.x"));
+		}
 		m_pCylinders.push_back(std::move(cylinder));
 	}
 }
@@ -311,6 +316,7 @@ void CGame::CollisionJudge()
 
 	// 毎フレーム初期化.
 	m_PlayerAnyLanding = false;
+	m_EnemyAnyLanding = false;
 
 	// プレイヤーと敵の床の衝突判定処理.
 	PlayertoFloorCol(pointsPF);

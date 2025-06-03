@@ -29,7 +29,7 @@ CCharacter::CCharacter()
 	, m_GunRadius			( 1.f )
 	, m_GunRotRevision		( -1.5f )
 	, m_GunPosRevision		( -30.f )
-	, m_Gravity				( 0.5f )
+	, m_Gravity				( 1.3f )
 
 	, m_ReloadTime			( 0.f )
 	, m_ReloadTimeMax		( CTime::GetDeltaTime() * 120.f )
@@ -39,7 +39,7 @@ CCharacter::CCharacter()
 	, m_CanShot				( true )
 
 	, m_JumpPower			( 0.f )
-	, m_JumpPowerMax		( 50.f )
+	, m_JumpPowerMax		( 25.f )
 	, m_CanJump				( false )
 	, m_Landing				( false )
 

@@ -43,9 +43,9 @@ CEnemy::CEnemy()
 
 	// 空でない場合は、外部で調整するべき変数の値を入れていく.
 	if (!m_StateList.empty()) {
-		m_MoveSpeed			= StrToFloat(m_StateList["EnemyMoveSpeed"]);
-		m_SelectMoveTimeMax = StrToFloat(m_StateList["SelectMoveTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
-		m_MoveToPlayer		= StrToInt(m_StateList["MoveToPlayer"]);
+		//m_MoveSpeed			= StrToFloat(m_StateList["EnemyMoveSpeed"]);
+		//m_SelectMoveTimeMax = StrToFloat(m_StateList["SelectMoveTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
+		//m_MoveToPlayer		= StrToInt(m_StateList["MoveToPlayer"]);
 	}
 }
 CEnemy::~CEnemy()
@@ -247,7 +247,7 @@ void CEnemy::Act(std::unique_ptr<CPlayer>& chara)
 	bool dash = (random.GetRandomInt(0, 120) == 0);
 
 	// 条件が整っている場合.
-	if (dash && m_CanDash) {
+	if (dash && m_CanDash && m_Landing) {
 		// ダッシュ時間の設定.
 		m_DashTime = m_DashTimeMax;
 		// ダッシュクールタイムの設定.
@@ -285,7 +285,7 @@ void CEnemy::Act(std::unique_ptr<CPlayer>& chara)
 
 	// ランダムにジャンプのタイミングを決める.
 	if (m_Landing) { m_JumpPower = 0; }
-	if (jump && m_CanJump) {
+	if (jump && m_CanJump && m_Landing) {
 		m_JumpPower = m_JumpPowerMax;
 		m_CanJump = m_Landing = false;
 		// 処理順により着地判定が出てしまうため、ジャンプ時に少し上げる.
