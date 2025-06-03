@@ -281,7 +281,7 @@ void CPlayer::KeyInput(std::unique_ptr<CEnemy>& chara)
 	if (m_DashCoolTime <= 0.f) { m_CanDash = true; }
 
 	// SHIFTでダッシュ.
-	if (Key->IsKeyAction(DIK_LSHIFT) && m_CanDash) {
+	if (Key->IsKeyAction(DIK_LSHIFT) && m_CanDash && m_Landing) {
 		// ダッシュ時間の設定.
 		m_DashTime = m_DashTimeMax;
 		// ダッシュクールタイムの設定.
@@ -310,7 +310,7 @@ void CPlayer::KeyInput(std::unique_ptr<CEnemy>& chara)
 	//		ジャンプ処理.
 	//----------------------------------------------------------------------
 	if (m_Landing) { m_JumpPower = 0; }
-	if (Key->IsKeyAction(DIK_SPACE) && m_CanJump) {
+	if (Key->IsKeyAction(DIK_SPACE) && m_CanJump && m_Landing) {
 		m_JumpPower = m_JumpPowerMax;
 		m_CanJump = m_Landing = false;
 		// 処理順により着地判定が出てしまうため、押下時に少し上げる.
