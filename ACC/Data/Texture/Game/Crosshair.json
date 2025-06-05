@@ -14,6 +14,11 @@
     "w": 16.0
   },
   "FilePath": "Data\\Texture\\Game\\Crosshair.json",
+  "Pivot": {
+    "x": 8.0,
+    "y": 8.0,
+    "z": 0.0
+  },
   "Pos": {
     "x": 632.0,
     "y": 352.0,

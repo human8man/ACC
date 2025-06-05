@@ -14,6 +14,11 @@
     "w": 512.0
   },
   "FilePath": "Data\\Texture\\Title\\StartButton.json",
+  "Pivot": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 0.0
+  },
   "Pos": {
     "x": 640.0,
     "y": 224.0,

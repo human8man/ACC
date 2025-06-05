@@ -14,6 +14,11 @@
     "w": 640.0
   },
   "FilePath": "Data\\Texture\\Win\\Victory.json",
+  "Pivot": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 0.0
+  },
   "Pos": {
     "x": 320.0,
     "y": 294.0,

@@ -75,6 +75,7 @@ CUIEditor::~CUIEditor()
 //=============================================================================
 void CUIEditor::Create()
 {
+	CDirectX11::GetInstance()->SetChangeDebugBuffer(true);
 	CSoundManager::GetInstance()->AllStop();
 	SelectSceneLoad(UISceneList::Title);
 	SelectInit();
@@ -398,6 +399,9 @@ HRESULT CUIEditor::SaveScene()
 		SpriteState["Scale"]["x"]	= m_pUIs[i]->GetScale().x;
 		SpriteState["Scale"]["y"]	= m_pUIs[i]->GetScale().y;
 		SpriteState["Scale"]["z"]	= m_pUIs[i]->GetScale().z;
+		SpriteState["Pivot"]["x"]	= m_pUIs[i]->GetRotPivot().x;
+		SpriteState["Pivot"]["y"]	= m_pUIs[i]->GetRotPivot().y;
+		SpriteState["Pivot"]["z"]	= m_pUIs[i]->GetRotPivot().z;
 		SpriteState["Rotate"]["x"]	= m_pUIs[i]->GetRot().x;
 		SpriteState["Rotate"]["y"]	= m_pUIs[i]->GetRot().y;
 		SpriteState["Rotate"]["z"]	= m_pUIs[i]->GetRot().z;
@@ -803,6 +807,7 @@ void CUIEditor::ImGuiEtcInfoEdit(CUIObject* object)
 		float alpha = object->GetAlpha();
 		D3DXVECTOR3 scale = object->GetScale();
 		D3DXVECTOR3 rot = object->GetRot();
+		D3DXVECTOR3 pivot = object->GetRotPivot();
 
 		ImGui::Text(IMGUI_JP("カラー"));
 		bool colorslider = ImGui::SliderFloat3("##ColorSlider", color, 0.f, 1.f);
@@ -813,18 +818,22 @@ void CUIEditor::ImGuiEtcInfoEdit(CUIObject* object)
 		ImGui::Text(IMGUI_JP("スケール"));
 		bool scaledrag = ImGui::DragFloat3("##ScaleDrag", scale, m_DragValue);
 
+		ImGui::Text(IMGUI_JP("回転軸"));
+		bool rotpivotdrag = ImGui::DragFloat3("##RotPivotDrag", pivot, m_DragValue);
 		ImGui::Text(IMGUI_JP("回転"));
 		bool rotdrag = ImGui::DragFloat3("##RotDrag", rot, m_DragValue);
 
 		// 変更があった場合保存する.
 		if (alphaslider
 		||	scaledrag
+		||	rotpivotdrag
 		||	rotdrag
 		||	colorslider)
 		{
 			object->SetColor(color);
 			object->SetAlpha(alpha);
 			object->SetScale(scale);
+			object->SetRotPivot(pivot);
 			object->SetRot(rot);
 			UIEDIOR_MOVEANY = true;
 		}

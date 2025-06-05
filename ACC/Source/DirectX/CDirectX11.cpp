@@ -18,6 +18,7 @@ CDirectX11::CDirectX11()
 
 	, m_pAlphaBlendOn			( nullptr )
 	, m_pAlphaBlendOff			( nullptr )
+	, m_IsDebug					( false )
 {
 }
 
@@ -293,7 +294,14 @@ void CDirectX11::SetDepth(bool flag)
 void CDirectX11::ClearBackBuffer()
 {
 	// 画面のクリア.
-	float ClearColor[4] = { 0.52f, 0.8f, 0.98f, 1.f };	//クリア色（RGBAの順）.
+	D3DXVECTOR3 Color;
+	float alpha = 1.f;
+	if (!m_IsDebug) {
+		Color = { 0.52f, 0.8f, 0.98f };	//クリア色（RGBAの順）.
+	} 
+	else { Color = { 0.f, 0.f, 0.f }; }
+	float ClearColor[4] = { Color.x,Color.y,Color.z,alpha };
+
 	// カラーバックバッファ.
 	m_pContext11->ClearRenderTargetView(
 		m_pBackBuffer_TexRTV, ClearColor );

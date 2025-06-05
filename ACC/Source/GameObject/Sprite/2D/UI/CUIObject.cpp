@@ -34,6 +34,7 @@ void CUIObject::Draw()
 
 	// •`‰æ’¼‘O‚ÅÀ•W‚â‰ñ“]î•ñ‚È‚Ç‚ðXV.
 	m_pSprite->SetPosition( m_vPosition );
+	m_pSprite->SetRotPivot( m_vRotPivot );
 	m_pSprite->SetRotation( m_vRotation );
 	m_pSprite->SetScale( m_vScale );
 	m_pSprite->SetColor( m_vColor );

@@ -14,6 +14,11 @@
     "w": 192.0
   },
   "FilePath": "Data\\Texture\\End\\SelectNo.json",
+  "Pivot": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 0.0
+  },
   "Pos": {
     "x": 673.0,
     "y": 352.0,

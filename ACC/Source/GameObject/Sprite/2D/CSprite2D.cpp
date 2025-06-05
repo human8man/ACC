@@ -353,10 +353,14 @@ void CSprite2D::Render()
 
 	// ワールド行列.
 	D3DXMATRIX	mWorld;
-	D3DXMATRIX	mTrans, mRot, mScale;
+	D3DXMATRIX	mTrans, mRot, mScale, mPivot, mUnpivot;
 
 	// 拡大縮小行列.
 	D3DXMatrixScaling( &mScale, m_vScale.x, m_vScale.y, m_vScale.z );
+
+	// 回転軸行列.
+	D3DXMatrixTranslation(&mPivot, -m_vRotPivot.x, -m_vRotPivot.y, -m_vRotPivot.z);
+	D3DXMatrixTranslation(&mUnpivot, m_vRotPivot.x, m_vRotPivot.y, m_vRotPivot.z);
 
 	// 回転行列.
 	D3DXMATRIX mYaw, mPitch, mRoll;
@@ -371,8 +375,7 @@ void CSprite2D::Render()
 
 	// ワールド座標変換.
 	// 重要: 拡縮行列 * 回転行列 * 平行行列.
-	mWorld = mScale * mRot * mTrans;
-
+	mWorld = mPivot * mScale * mRot * mUnpivot * mTrans;
 
 	m_pContext11 = CDirectX11::GetInstance()->GetContext();
 
@@ -488,33 +491,22 @@ HRESULT CSprite2D::SpriteStateDataLoad(const std::string& FilePath)
 	m_SpriteState.Stride.w	= m_SpriteStateData["Stride"]["w"];
 	m_SpriteState.Stride.h	= m_SpriteStateData["Stride"]["h"];
 
-	if (m_SpriteStateData.contains("Color"))
-	{
-		m_vColor.x = m_SpriteStateData["Color"].value("x", 1.0f);
-		m_vColor.y = m_SpriteStateData["Color"].value("y", 1.0f);
-		m_vColor.z = m_SpriteStateData["Color"].value("z", 1.0f);
-	}
-	else
-	{
-		// Colorが無ければデフォルト値を設定しておく
-		m_vColor.x = 1.0f;
-		m_vColor.y = 1.0f;
-		m_vColor.z = 1.0f;
-
-		// JSONにも補完しておくとデバッグしやすい
-		m_SpriteStateData["Color"]["x"] = 1.0;
-		m_SpriteStateData["Color"]["y"] = 1.0;
-		m_SpriteStateData["Color"]["z"] = 1.0;
-	}
+	m_vColor.x		= m_SpriteStateData["Color"]["x"].get<float>();
+	m_vColor.y		= m_SpriteStateData["Color"]["y"].get<float>();
+	m_vColor.z		= m_SpriteStateData["Color"]["z"].get<float>();
 	m_Alpha			= m_SpriteStateData["Alpha"];
 
 	m_vScale.x		= m_SpriteStateData["Scale"]["x"].get<float>();
 	m_vScale.y		= m_SpriteStateData["Scale"]["y"].get<float>();
 	m_vScale.z		= m_SpriteStateData["Scale"]["z"].get<float>();
+
+	m_vRotPivot.x	= m_SpriteStateData["Pivot"]["x"].get<float>();
+	m_vRotPivot.y	= m_SpriteStateData["Pivot"]["y"].get<float>();
+	m_vRotPivot.z	= m_SpriteStateData["Pivot"]["z"].get<float>();
+
 	m_vRotation.x	= m_SpriteStateData["Rotate"]["x"].get<float>();
 	m_vRotation.y	= m_SpriteStateData["Rotate"]["y"].get<float>();
 	m_vRotation.z	= m_SpriteStateData["Rotate"]["z"].get<float>();
-
 #if _DEBUG
 	// ファイルパスを更新する.
 	m_SpriteStateData["FilePath"] = TextPath;
@@ -557,6 +549,9 @@ HRESULT CSprite2D::CreateSpriteState(const std::string& FilePath)
 	SpriteState["Scale"]["x"] = 1.0;
 	SpriteState["Scale"]["y"] = 1.0;
 	SpriteState["Scale"]["z"] = 1.0;
+	SpriteState["Pivot"]["x"] = 0.0;
+	SpriteState["Pivot"]["y"] = 0.0;
+	SpriteState["Pivot"]["z"] = 0.0;
 	SpriteState["Rotate"]["x"] = 0.0;
 	SpriteState["Rotate"]["y"] = 0.0;
 	SpriteState["Rotate"]["z"] = 0.0;

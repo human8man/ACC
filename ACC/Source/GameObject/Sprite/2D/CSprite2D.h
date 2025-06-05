@@ -96,16 +96,14 @@ public:
 
 	// 座標情報を設定.
 	void SetPosition(const D3DXVECTOR3& pos) {	m_vPosition = pos;	}
-
+	// 回転情報を設定.
+	void SetRotPivot(const D3DXVECTOR3& pivot){	m_vRotPivot = pivot;}
 	// 回転情報を設定.
 	void SetRotation(const D3DXVECTOR3& rot){	m_vRotation = rot;	}
-
 	// 拡縮情報を設定.
 	void SetScale(const D3DXVECTOR3& scale) { m_vScale = scale; }
-
 	// カラーを設定.
 	void SetColor(const D3DXVECTOR3& color) { m_vColor = color; }
-
 	// α値を設定.
 	void SetAlpha(float alpha) { m_Alpha = alpha; }
 
@@ -152,6 +150,7 @@ public:
 	// スケール値を取得.
 	D3DXVECTOR3 GetScale()		const{ return m_vScale;}
 	// 回転情報を取得.
+	D3DXVECTOR3 GetRotPivot()	const{ return m_vRotPivot;}
 	D3DXVECTOR3 GetRotation()	const{ return m_vRotation;}
 	// 最大パターン数(マス目)を取得.
 	POINTS		GetPatternMax()	const { return m_PatternMax; }
@@ -173,6 +172,7 @@ private:
 	ID3D11SamplerState*			m_pSampleLinear;// サンプラ:テクスチャに各種フィルタをかける.
 
 	D3DXVECTOR3		m_vPosition;	// 座標.
+	D3DXVECTOR3		m_vRotPivot;	// 回転軸座標.
 	D3DXVECTOR3		m_vRotation;	// 回転
 	D3DXVECTOR3		m_vScale;		// 拡縮.
 
