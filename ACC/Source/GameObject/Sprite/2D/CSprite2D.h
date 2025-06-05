@@ -96,18 +96,15 @@ public:
 
 	// 座標情報を設定.
 	void SetPosition(const D3DXVECTOR3& pos) {	m_vPosition = pos;	}
-	void SetPositionX( float x ){ m_vPosition.x = x; }
-	void SetPositionY( float y ){ m_vPosition.y = y; }
-	void SetPositionZ( float z ){ m_vPosition.z = z; }
 
 	// 回転情報を設定.
 	void SetRotation(const D3DXVECTOR3& rot){	m_vRotation = rot;	}
-	void SetRotationY( float y ){ m_vRotation.y = y; }
-	void SetRotationX( float x ){ m_vRotation.x = x; }
-	void SetRotationZ( float z ){ m_vRotation.z = z; }
 
 	// 拡縮情報を設定.
 	void SetScale(const D3DXVECTOR3& scale) { m_vScale = scale; }
+
+	// カラーを設定.
+	void SetColor(const D3DXVECTOR3& color) { m_vColor = color; }
 
 	// α値を設定.
 	void SetAlpha(float alpha) { m_Alpha = alpha; }
@@ -148,6 +145,8 @@ public:
 	// スプライト情報をまとめたjsonファイルの作成.
 	HRESULT CreateSpriteState	(const std::string& FilePath);
 
+	// カラーを取得.
+	D3DXVECTOR3 GetColor()		const { return m_vColor; }	
 	// 透過度を取得.
 	float		GetAlpha()		const { return m_Alpha; }
 	// スケール値を取得.
@@ -179,6 +178,7 @@ private:
 
 	D3DXVECTOR2		m_UV;		// テクスチャUV座標.
 
+	D3DXVECTOR3		m_vColor;	// カラー.
 	float			m_Alpha;	// α値(0:透明、1:完全不透明).
 
 	SPRITE_STATE	m_SpriteState;		// スプライト情報.

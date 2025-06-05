@@ -37,6 +37,8 @@ public:
 		m_vScale.z = z;
 	}
 
+	// カラー設定関数.
+	void SetColor(const D3DXVECTOR3& color) { m_vColor = color; }
 	// 透過度設定関数.
 	void SetAlpha( float alpha ) { m_Alpha = alpha; }
 
@@ -45,6 +47,7 @@ public:
 	const D3DXVECTOR3& GetPos()		const { return m_vPosition; }	// 座標情報を取得.
 	const D3DXVECTOR3& GetRot()		const { return m_vRotation; }	// 回転情報をを取得.
 	const D3DXVECTOR3& GetScale()	const { return m_vScale;	 }	// サイズを取得.
+	const D3DXVECTOR3& GetColor()	const { return m_vColor;	 }	// カラーを取得.
 	// オブジェクト情報(座標情報,回転情報,サイズ)を取得.
 	const ObjectInfo& GetObjeInfo()	const { return m_ObjectInfo = ObjectInfo{ m_vPosition, m_vRotation, m_vScale }; }
 
@@ -53,5 +56,6 @@ protected:
 	D3DXVECTOR3	m_vPosition;	// 座標情報.
 	D3DXVECTOR3	m_vRotation;	// 回転情報.
 	D3DXVECTOR3	m_vScale;		// サイズ.
+	D3DXVECTOR3	m_vColor;		// カラー.
 	float		m_Alpha;		// 透過度.
 };

@@ -42,7 +42,8 @@ private:
 	void SelectInit();
 	// 現在シーンのUI情報を保存.
 	HRESULT SaveScene();
-
+	// キー入力処理.
+	void KeyInput();
 
 	//-------------------------------------------
 	//	ImGuiを用いている関数.
@@ -85,8 +86,8 @@ private:
 
 	std::string m_ScenePath;	// 現在のシーンパス.
 
-	bool	m_MovedSomething;	// 何か変更があった際に保存確認フラグを立てる.
-	int		m_SelectedUIIndex;
+	float	m_DragValue;				// 調整値.
+	int		m_SelectedUIIndex;			// 選択中UIのインデックス.
 	char	m_SearchBuffer[64] = "";	// 検索用バッファ.
 	
 	// マウス操作用の変数.

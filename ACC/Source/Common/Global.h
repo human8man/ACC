@@ -69,6 +69,8 @@ constexpr float ZEROFLOAT2[2] = { 0.f,0.f };
 const D3DXVECTOR3 ZEROVEC3( 0.f,0.f,0.f );
 const D3DXVECTOR2 ZEROVEC2( 0.f,0.f );
 
+// UIeditorSceneÇ≈ï“èWÇ™Ç†Ç¡ÇΩç€Ç…égÇ§.
+extern bool UIEDIOR_MOVEANY;
 
 //=============================================================================
 //		ç\ë¢ëÃ.

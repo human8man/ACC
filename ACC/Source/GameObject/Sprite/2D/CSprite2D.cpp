@@ -28,6 +28,7 @@ CSprite2D::CSprite2D()
 	, m_vRotation		()
 	, m_vScale			( 1.f, 1.f, 1.f )
 	, m_UV				( ZEROVEC2 )
+	, m_vColor			( 1.f, 1.f, 1.f )
 	, m_Alpha			( 1.f )
 	, m_SpriteState		()
 	, m_PatternNo		()
@@ -332,8 +333,7 @@ HRESULT CSprite2D::CreateSampler()
 	// BORDER: 別途境界色を決める.
 
 	// サンプラ作成.
-	if( FAILED( m_pDevice11->CreateSamplerState(
-		&samDesc, &m_pSampleLinear ) ) )// (out)サンプラ.
+	if( FAILED( m_pDevice11->CreateSamplerState(&samDesc, &m_pSampleLinear ) ) )// (out)サンプラ.
 	{
 		_ASSERT_EXPR( false, _T( "サンプラ作成失敗" ) );
 		return E_FAIL;
@@ -393,7 +393,7 @@ void CSprite2D::Render()
 		cb.mWorld = m;
 
 		// カラー.
-		cb.vColor = D3DXVECTOR4( 1.f, 1.f, 1.f, m_Alpha );
+		cb.vColor = D3DXVECTOR4( m_vColor, m_Alpha );
 
 		// テクスチャ座標.
 		//	１マスあたりの割合にパターン番号（マス目）をかけて座標を設定する.
@@ -434,7 +434,7 @@ void CSprite2D::Render()
 
 	// プリミティブをレンダリング.
 	m_pContext11->Draw(4, 0); // 板ポリ（頂点4つ分）.
-
+	
 	// アルファブレンド無効にする.
 	m_pDx11->SetAlphaBlend( false );
 }
@@ -488,7 +488,26 @@ HRESULT CSprite2D::SpriteStateDataLoad(const std::string& FilePath)
 	m_SpriteState.Stride.w	= m_SpriteStateData["Stride"]["w"];
 	m_SpriteState.Stride.h	= m_SpriteStateData["Stride"]["h"];
 
+	if (m_SpriteStateData.contains("Color"))
+	{
+		m_vColor.x = m_SpriteStateData["Color"].value("x", 1.0f);
+		m_vColor.y = m_SpriteStateData["Color"].value("y", 1.0f);
+		m_vColor.z = m_SpriteStateData["Color"].value("z", 1.0f);
+	}
+	else
+	{
+		// Colorが無ければデフォルト値を設定しておく
+		m_vColor.x = 1.0f;
+		m_vColor.y = 1.0f;
+		m_vColor.z = 1.0f;
+
+		// JSONにも補完しておくとデバッグしやすい
+		m_SpriteStateData["Color"]["x"] = 1.0;
+		m_SpriteStateData["Color"]["y"] = 1.0;
+		m_SpriteStateData["Color"]["z"] = 1.0;
+	}
 	m_Alpha			= m_SpriteStateData["Alpha"];
+
 	m_vScale.x		= m_SpriteStateData["Scale"]["x"].get<float>();
 	m_vScale.y		= m_SpriteStateData["Scale"]["y"].get<float>();
 	m_vScale.z		= m_SpriteStateData["Scale"]["z"].get<float>();
@@ -530,7 +549,11 @@ HRESULT CSprite2D::CreateSpriteState(const std::string& FilePath)
 	SpriteState["Stride"]["w"] = BaseSize.x;
 	SpriteState["Stride"]["h"] = BaseSize.y;
 
+	SpriteState["Color"]["x"] = 1.0;
+	SpriteState["Color"]["y"] = 1.0;
+	SpriteState["Color"]["z"] = 1.0;
 	SpriteState["Alpha"] = 1.0;
+
 	SpriteState["Scale"]["x"] = 1.0;
 	SpriteState["Scale"]["y"] = 1.0;
 	SpriteState["Scale"]["z"] = 1.0;

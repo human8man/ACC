@@ -42,8 +42,8 @@ CPlayer::CPlayer()
 	// ‹ó‚Å‚È‚¢ê‡‚ÍAŠO•”‚Å’²®‚·‚é‚×‚«•Ï”‚Ì’l‚ğ“ü‚ê‚Ä‚¢‚­.
 	if (!m_StateList.empty())
 	{
-		//m_MoveSpeed		= StrToFloat(m_StateList["PlayerMoveSpeed"]);
-		//m_CamRevision	= StrToFloat(m_StateList["CameraRevision"]);
+		m_MoveSpeed		= StrToFloat(m_StateList["PlayerMoveSpeed"]) * CTime::GetDeltaTime();
+		m_CamRevision	= StrToFloat(m_StateList["CameraRevision"]);
 	}
 }
 CPlayer::~CPlayer()

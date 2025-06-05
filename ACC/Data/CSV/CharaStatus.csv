@@ -17,8 +17,8 @@ BodyDamage,1
 CritDamage,2
 // キャラの気室(ヘッドショット)判定になる範囲{1.0}
 EggAirRoomY,1.0
-// 重力{0.0098}
-GravityValue,0.0098
+// 重力{1.3}
+GravityValue,1.3
 
 // 銃とキャラクターの距離{1.0}
 GunRadius,1.0
@@ -30,26 +30,26 @@ GunPosRevision,-30.0
 ReloadTimeMax,120.0
 // コッキング時間{20.0}
 BulletCoolTimeMax,20.0
-// 弾速{2.3}
-BulletSpeed,2.3
+// 弾速{180.0}
+BulletSpeed,180.0
 
-// キャラのジャンプ力{0.784}
-JumpPowerMax,0.784
+// キャラのジャンプ力{25.0}
+JumpPowerMax,25.0
 // キャラのダッシュのクールタイム{60.0}
 DashCoolTimeMax,60.0
 // キャラのダッシュ効果時間{30.0}
 DashTimeMax,30.0
-// キャラのダッシュスピード{2.6}
-DashSpeed,2.6
+// キャラのダッシュスピード{1.8}
+DashSpeed,1.8
 
-// プレイヤーの移動速度{0.2}
-PlayerMoveSpeed,0.2
+// プレイヤーの移動速度{1000.0}
+PlayerMoveSpeed,1000.0
 // カメラの高さ{4.0}
 CameraRevision,4.0
 
-// プレイヤーの移動速度{0.2}
-EnemyMoveSpeed,0.2
+// エネミーの移動速度{1000.0}
+EnemyMoveSpeed,1000.0
 // 次の行動決定までの時間{60.0}
 SelectMoveTimeMax,60.0
-// プレイヤー方向への移動確立(最大100%){10}
+// プレイヤー方向への移動確立(最大100){10}
 MoveToPlayer,10

@@ -36,6 +36,7 @@ void CUIObject::Draw()
 	m_pSprite->SetPosition( m_vPosition );
 	m_pSprite->SetRotation( m_vRotation );
 	m_pSprite->SetScale( m_vScale );
+	m_pSprite->SetColor( m_vColor );
 	m_pSprite->SetAlpha( m_Alpha );
 
 	// ƒpƒ^[ƒ“”Ô†‚ðÝ’è.
@@ -57,6 +58,7 @@ void CUIObject::AttachSprite(CSprite2D* pSprite)
 	m_pSprite = new CSprite2D(*pSprite);
 	m_vRotation = m_pSprite->GetRotation();
 	m_vScale = m_pSprite->GetScale();
+	m_vColor = m_pSprite->GetColor();
 	m_Alpha = m_pSprite->GetAlpha();
 }
 
