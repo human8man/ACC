@@ -232,6 +232,9 @@ void CUIEditor::SelectInit()
 void CUIEditor::Update()
 {
 #ifdef _DEBUG
+	// キー入力.
+	KeyInput();
+
 	// シーンを選択する.
 	ImGuiSelectScene();
 
@@ -276,10 +279,25 @@ void CUIEditor::Update()
 	ImGui::Begin(IMGUI_JP("UI保存ウィンドウ"));
 	if (ImGui::Button(IMGUI_JP("UIを保存"))) {
 		SaveScene(); 
-		m_MovedSomething = false;
+		UIEDIOR_MOVEANY = false;
 	}
 	ImGui::End();
 #endif
+}
+
+
+//-----------------------------------------------------------------------------
+//		キー入力処理.
+//-----------------------------------------------------------------------------
+void CUIEditor::KeyInput()
+{
+	m_DragValue = 1.f;
+	if (GetAsyncKeyState(VK_SHIFT) && 0x8000) { 
+		m_DragValue *= 0.01f;
+	}
+	if (GetAsyncKeyState(VK_SPACE) && 0x8000) { 
+		m_DragValue *= 0.001f; 
+	}
 }
 
 
@@ -372,7 +390,11 @@ HRESULT CUIEditor::SaveScene()
 		SpriteState["Stride"]["w"]	= m_pUIs[i]->GetSpriteData().Stride.w;
 		SpriteState["Stride"]["h"]	= m_pUIs[i]->GetSpriteData().Stride.h;
 
+		SpriteState["Color"]["x"]	= m_pUIs[i]->GetColor().x;
+		SpriteState["Color"]["y"]	= m_pUIs[i]->GetColor().y;
+		SpriteState["Color"]["z"]	= m_pUIs[i]->GetColor().z;
 		SpriteState["Alpha"]		= m_pUIs[i]->GetAlpha();
+
 		SpriteState["Scale"]["x"]	= m_pUIs[i]->GetScale().x;
 		SpriteState["Scale"]["y"]	= m_pUIs[i]->GetScale().y;
 		SpriteState["Scale"]["z"]	= m_pUIs[i]->GetScale().z;
@@ -434,17 +456,17 @@ void CUIEditor::ImGuiSelectScene()
 	ImGui::Begin(IMGUI_JP("UIエディター用シーン選択"));
 	UISceneList scene;
 	bool click = false;
-	if (ImGui::Button("Title")) { scene = UISceneList::Title;	click = true; }
-	if (ImGui::Button("Game")) { scene = UISceneList::Game;	click = true; }
-	if (ImGui::Button("Lose")) { scene = UISceneList::Lose;	click = true; }
-	if (ImGui::Button("Win")) { scene = UISceneList::Win;		click = true; }
-	if (m_MovedSomething && click && (MessageBox(NULL,
-		L"本当に切り替えますか？\n(保存していない場合リセットされます)", L"確認",
+	if (ImGui::Button("Title"))	{ scene = UISceneList::Title;	click = true; }
+	if (ImGui::Button("Game"))	{ scene = UISceneList::Game;	click = true; }
+	if (ImGui::Button("Lose"))	{ scene = UISceneList::Lose;	click = true; }
+	if (ImGui::Button("Win"))	{ scene = UISceneList::Win;		click = true; }
+	if (UIEDIOR_MOVEANY && click && (MessageBox(NULL,
+		L"本当に切り替えますか？\n(保存していない場合、編集前にリセットされます)", L"確認",
 		MB_YESNO | MB_ICONQUESTION)) == IDYES) {
 		SelectSceneLoad(scene);
-		m_MovedSomething = false;
+		UIEDIOR_MOVEANY = false;
 	}
-	else if (!m_MovedSomething && click) {
+	else if (!UIEDIOR_MOVEANY && click) {
 		SelectSceneLoad(scene);
 	}
 
@@ -597,8 +619,7 @@ void CUIEditor::ImGuiPosEdit(CUIObject* object)
 		// ドラッグ用にマウス操作のDirectInpuを用意.
 		CMouse* Mouse = CInput::GetInstance()->CDMouse();
 		D3DXVECTOR3 pos = object->GetPos();
-		bool posdrag = ImGui::DragFloat3("##Position", pos, 1.f);
-		bool posinput = ImGui::InputFloat3("##InputPos", pos);
+		bool posdrag = ImGui::DragFloat3("##Position", pos, m_DragValue);
 
 		// マウス位置を取得.
 		POINT MousePos;
@@ -619,9 +640,9 @@ void CUIEditor::ImGuiPosEdit(CUIObject* object)
 		}
 
 		// 変更があった場合保存する.
-		if (posdrag || posinput) {
+		if (posdrag) {
 			object->SetPos(pos);
-			m_MovedSomething = true;
+			UIEDIOR_MOVEANY = true;
 			m_MovedSpritePos = true;
 		}
 		ImGui::TreePop();
@@ -650,26 +671,23 @@ void CUIEditor::ImGuiInfoEdit(CUIObject* object)
 			object->GetSpriteData().Stride.h);
 
 		ImGui::Text(IMGUI_JP("元のサイズ(x,y)"));
-		bool basedrag	= ImGui::DragFloat2("##BaseDrag", base, 1.f);
-		bool baseinput	= ImGui::InputFloat2("##BaseInput", base);
+		bool basedrag	= ImGui::DragFloat2("##BaseDrag", base, m_DragValue);
 
 		ImGui::Text(IMGUI_JP("表示サイズ(x,y)"));
-		bool dispdrag	= ImGui::DragFloat2("##DispDrag", disp, 1.f);
-		bool dispinput	= ImGui::InputFloat2("##DispInput", disp);
+		bool dispdrag	= ImGui::DragFloat2("##DispDrag", disp, m_DragValue);
 
 		ImGui::Text(IMGUI_JP("分割サイズ(x,y)"));
-		bool stridedrag	= ImGui::DragFloat2("##StrideDrag", stride, 1.f);
-		bool strideinput= ImGui::InputFloat2("##StrideInput", stride);
+		bool stridedrag	= ImGui::DragFloat2("##StrideDrag", stride, m_DragValue);
 
 		// 変更があった場合保存する.
-		if (basedrag	|| baseinput
-		||	dispdrag	|| dispinput
-		||	stridedrag	|| strideinput)
+		if (basedrag
+		||	dispdrag
+		||	stridedrag)
 		{
 			object->SetBase(base);
 			object->SetDisp(disp);
 			object->SetStride(stride);
-			m_MovedSomething = true;
+			UIEDIOR_MOVEANY = true;
 		}
 		ImGui::TreePop();
 	}
@@ -733,7 +751,7 @@ void CUIEditor::ImGuiPatternTest(CUIObject* object)
 			// 実行の切り替え.
 			if (ImGui::Button(IMGUI_JP("切替"))) { m_PatternAuto = !m_PatternAuto; }
 			// 送り速度の設定.
-			ImGui::InputFloat(IMGUI_JP("送り速度設定(フレーム)"), &m_AnimationSpeedMax);
+			ImGui::DragFloat(IMGUI_JP("送り速度設定(フレーム)"), &m_AnimationSpeedMax, m_DragValue);
 			ImGui::PopItemWidth();
 
 			ImGui::TreePop();
@@ -781,31 +799,34 @@ void CUIEditor::ImGuiEtcInfoEdit(CUIObject* object)
 #ifdef _DEBUG
 	if (ImGui::TreeNode(IMGUI_JP("その他")))
 	{
+		D3DXVECTOR3 color = object->GetColor();
 		float alpha = object->GetAlpha();
 		D3DXVECTOR3 scale = object->GetScale();
 		D3DXVECTOR3 rot = object->GetRot();
 
+		ImGui::Text(IMGUI_JP("カラー"));
+		bool colorslider = ImGui::SliderFloat3("##ColorSlider", color, 0.f, 1.f);
+
 		ImGui::Text(IMGUI_JP("アルファ"));
 		bool alphaslider = ImGui::SliderFloat("##AlphaSlider", &alpha, 0.f, 1.f);
-		bool alphainput = ImGui::InputFloat("##AlphaInput", &alpha);
 
 		ImGui::Text(IMGUI_JP("スケール"));
-		bool scaledrag = ImGui::DragFloat3("##ScaleDrag", scale, 0.1f);
-		bool scaleinput = ImGui::InputFloat3("##ScaleInput", scale);
+		bool scaledrag = ImGui::DragFloat3("##ScaleDrag", scale, m_DragValue);
 
 		ImGui::Text(IMGUI_JP("回転"));
-		bool rotdrag = ImGui::DragFloat3("##RotDrag", rot, 0.1f);
-		bool rotinput = ImGui::InputFloat3("##RotInput", rot);
+		bool rotdrag = ImGui::DragFloat3("##RotDrag", rot, m_DragValue);
 
 		// 変更があった場合保存する.
-		if (alphaslider	|| alphainput
-		||	scaledrag	|| scaleinput
-		||	rotdrag		|| rotinput)
+		if (alphaslider
+		||	scaledrag
+		||	rotdrag
+		||	colorslider)
 		{
+			object->SetColor(color);
 			object->SetAlpha(alpha);
 			object->SetScale(scale);
 			object->SetRot(rot);
-			m_MovedSomething = true;
+			UIEDIOR_MOVEANY = true;
 		}
 		ImGui::TreePop();
 	}

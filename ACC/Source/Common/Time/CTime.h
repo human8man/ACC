@@ -28,9 +28,9 @@ public:
 	// スローモーション倍率の設定.
 	void SetTimeScale(float scale) { m_TimeScale = scale; }
 private:
-	float m_DeltaTime;	// 1フレームの経過時間（秒）.
-	float m_UnscaledDeltaTime;	// 1フレームの経過時間（秒）.
-	float m_TotalTime;	// 起動からの累積時間（秒）.
+	float m_DeltaTime;			// 1フレームの経過時間（秒）.
+	float m_UnscaledDeltaTime;	// 1フレームの経過時間（秒.スケール無し）.
+	float m_TotalTime;			// 起動からの累積時間（秒）.
 
 	float m_TimeScale;	// スローモーション倍率（1.0が通常）.
 

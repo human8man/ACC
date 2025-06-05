@@ -43,9 +43,9 @@ CEnemy::CEnemy()
 
 	// ‹ó‚Å‚È‚¢ê‡‚ÍAŠO•”‚Å’²®‚·‚é‚×‚«•Ï”‚Ì’l‚ð“ü‚ê‚Ä‚¢‚­.
 	if (!m_StateList.empty()) {
-		//m_MoveSpeed			= StrToFloat(m_StateList["EnemyMoveSpeed"]);
-		//m_SelectMoveTimeMax = StrToFloat(m_StateList["SelectMoveTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
-		//m_MoveToPlayer		= StrToInt(m_StateList["MoveToPlayer"]);
+		m_MoveSpeed			= StrToFloat(m_StateList["EnemyMoveSpeed"]) * CTime::GetDeltaTime();
+		m_SelectMoveTimeMax = StrToFloat(m_StateList["SelectMoveTimeMax"]) * CTime::GetDeltaTime();
+		m_MoveToPlayer		= StrToInt(m_StateList["MoveToPlayer"]);
 	}
 }
 CEnemy::~CEnemy()

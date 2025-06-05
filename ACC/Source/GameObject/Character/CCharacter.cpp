@@ -89,22 +89,21 @@ CCharacter::CCharacter()
 	// ‹ó‚Å‚È‚¢ê‡‚ÍAŠO•”‚Å’²®‚·‚é‚×‚«•Ï”‚Ì’l‚ð“ü‚ê‚Ä‚¢‚­.
 	if (!m_StateList.empty())
 	{
-		//m_BodyDamage		= StrToInt(m_StateList["BodyDamage"]);
-		//m_CritDamage		= StrToInt(m_StateList["CritDamage"]);
-		//m_GunRadius			= StrToFloat(m_StateList["GunRadius"]);
-		//m_GunRotRevision	= StrToFloat(m_StateList["GunRotRevision"]);
-		//m_GunPosRevision	= StrToFloat(m_StateList["GunPosRevision"]);
-		//m_GravityValue		= StrToFloat(m_StateList["GravityValue"]);
-		//m_ReloadTimeMax		= StrToFloat( m_StateList["ReloadTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
-		//m_BulletCoolTimeMax	= StrToFloat(m_StateList["BulletCoolTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
-		//m_BulletSpeed		= StrToFloat(m_StateList["BulletSpeed"]);
-		//m_JumpPowerMax		= StrToFloat(m_StateList["JumpPowerMax"]);
-		//m_DashCoolTimeMax	= StrToFloat(m_StateList["DashCoolTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
-		//m_DashTimeMax		= StrToFloat(m_StateList["DashTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
-		//m_DashSpeed			= StrToFloat(m_StateList["DashSpeed"]);
-		//m_EggAirRoomY		= StrToFloat(m_StateList["EggAirRoomY"]);
-		//m_CharaInfo.MaxHP	= StrToInt(m_StateList["CharaHPMax"]);
-		//m_CharaInfo.MaxAmmo	= StrToInt(m_StateList["CharaAmmoMax"]);
+		m_BodyDamage		= StrToInt(m_StateList["BodyDamage"]);
+		m_CritDamage		= StrToInt(m_StateList["CritDamage"]);
+		m_GunRadius			= StrToFloat(m_StateList["GunRadius"]);
+		m_GunRotRevision	= StrToFloat(m_StateList["GunRotRevision"]);
+		m_GunPosRevision	= StrToFloat(m_StateList["GunPosRevision"]);
+		m_ReloadTimeMax		= StrToFloat( m_StateList["ReloadTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
+		m_BulletCoolTimeMax	= StrToFloat(m_StateList["BulletCoolTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
+		m_BulletSpeed		= StrToFloat(m_StateList["BulletSpeed"]);
+		m_JumpPowerMax		= StrToFloat(m_StateList["JumpPowerMax"]);
+		m_DashCoolTimeMax	= StrToFloat(m_StateList["DashCoolTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
+		m_DashTimeMax		= StrToFloat(m_StateList["DashTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
+		m_DashSpeed			= StrToFloat(m_StateList["DashSpeed"]);
+		m_EggAirRoomY		= StrToFloat(m_StateList["EggAirRoomY"]);
+		m_CharaInfo.MaxHP	= StrToInt(m_StateList["CharaHPMax"]);
+		m_CharaInfo.MaxAmmo	= StrToInt(m_StateList["CharaAmmoMax"]);
 	}
 }
 CCharacter::~CCharacter()
