@@ -25,6 +25,7 @@ CCharacter::CCharacter()
 
 	, m_BodyDamage			( 1 )
 	, m_CritDamage			( 2 )
+	, m_Damage				( false )
 
 	, m_GunRadius			( 1.f )
 	, m_GunRotRevision		( -1.5f )
@@ -124,6 +125,9 @@ CCharacter::~CCharacter()
 //============================================================================
 void CCharacter::Update()
 {
+	// ダメージフラグを毎フレーム初期化.
+	m_Damage = false;
+
 	// 銃をキャラの周りで回す処理.
 	m_pGun->UpdateGunPos(
 		m_vPosition,
@@ -164,6 +168,26 @@ void CCharacter::JumpMath()
 	// ジャンプ力を重力で減算し、Yに加算.
 	m_JumpPower = m_JumpPower - m_Gravity * CTime::GetTimeScale();
 	m_vPosition.y += m_JumpPower * CTime::GetDeltaTime();
+}
+
+
+//============================================================================
+//		HPを胴体ダメージ分減らす.
+//============================================================================
+void CCharacter::BodyDamage()
+{
+	m_CharaInfo.HP -= m_BodyDamage;
+	m_Damage = true;
+}
+
+
+//============================================================================
+//		HPをクリティカルダメージ分減らす.
+//============================================================================
+void CCharacter::CritDamage()
+{
+	m_CharaInfo.HP -= m_CritDamage;
+	m_Damage = true;
 }
 
 

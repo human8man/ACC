@@ -43,6 +43,8 @@ public:
 	ID3D11DeviceContext* GetContext()	const { return m_pContext11; }
 	// レンダーターゲットビューを取得.
 	ID3D11RenderTargetView* GetTexRTV()	const { return m_pBackBuffer_TexRTV; }
+	// デバッグモード切替.
+	void SetChangeDebugBuffer(bool flag) { m_IsDebug = flag; }
 
 private:
 	// デバイスとスワップチェイン作成.
@@ -78,4 +80,6 @@ private:
 	// アルファブレンド.
 	ID3D11BlendState*		m_pAlphaBlendOn;	// 有効設定.
 	ID3D11BlendState*		m_pAlphaBlendOff;	// 無効設定.
+
+	bool m_IsDebug;
 };

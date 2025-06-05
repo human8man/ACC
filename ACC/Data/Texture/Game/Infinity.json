@@ -14,8 +14,13 @@
     "w": 128.0
   },
   "FilePath": "Data\\Texture\\Game\\Infinity.json",
-  "Pos": {
+  "Pivot": {
     "x": 0.0,
+    "y": 0.0,
+    "z": 0.0
+  },
+  "Pos": {
+    "x": 576.0,
     "y": 592.0,
     "z": 0.0
   },

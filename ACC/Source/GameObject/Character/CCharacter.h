@@ -36,8 +36,10 @@ public:
 
 	void JumpMath();		// ジャンプ関係の計算.
 	void CanJump()		{ m_CanJump = true;}	// ジャンプを可能にする.
-	void BodyDamage()	{ m_CharaInfo.HP -= m_BodyDamage;	}	// HPを胴体ダメージ分減らす.
-	void CritDamage()	{ m_CharaInfo.HP -= m_CritDamage;	}	// HPをクリティカルダメージ分減らす.
+	// HPを胴体ダメージ分減らす.
+	void BodyDamage();
+	// HPをクリティカルダメージ分減らす.
+	void CritDamage();
 
 
 	const D3DXVECTOR3& GetMoveVec();	// 最終移動ベクトルを渡す.
@@ -45,6 +47,7 @@ public:
 	float GetReloadTime()	const { return m_ReloadTime; }	// リロード時間を返す.
 	CROSSRAY GetCrossRay()	const { return *m_pCrossRay; }	// 十字レイを取得.
 	CharaInfo GetCharaInfo()const { return m_CharaInfo; }	// キャラの情報を取得.
+	bool GetDamage()		const{ return m_Damage; }		// ダメージを受けたかを取得.
 	bool GetCanJump()		const{ return m_CanJump; }		// ジャンプ可能かを取得.
 	bool GetLanding()		const{ return m_Landing; }		// 着地中かを取得.
 	void SetLanding(bool flag)	{ m_Landing = flag; }		// 着地中かを設定.
@@ -62,6 +65,7 @@ protected:
 	// ヒット時に使うダメージ変数.
 	int m_BodyDamage;	// 胴体に命中していた場合.
 	int m_CritDamage;	// 気室に命中(ヘッドショット)していた場合.
+	bool m_Damage;		// ダメージフラグ(次フレームで初期化).
 
 	// 銃関連.
 	float m_GunRadius;		// 銃の半径.

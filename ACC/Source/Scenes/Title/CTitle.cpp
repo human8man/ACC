@@ -34,6 +34,7 @@ CTitle::~CTitle()
 //=================================================================================================
 void CTitle::Create()
 {
+	CDirectX11::GetInstance()->SetChangeDebugBuffer(false);
 	m_pTitleUI = std::make_unique<CTitleUI>();
 	m_pTitleUI->Create();
 	m_pEgg = new CStaticMesh();

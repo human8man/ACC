@@ -20,6 +20,11 @@ public:
 	void Release(); 
 
 private:
+	// 被ダメエフェクト処理.
+	void InitHiteffect();
+	void Hiteffect(CUIObject* object);
+
+private:
 	int		m_HP;				// HP.
 	int		m_HPMax;			// 最大HP.
 	int		m_Ammo;				// 残弾数.
@@ -32,4 +37,15 @@ private:
 	bool	m_Homing;		// ホーミング.
 	bool	m_WallHack;		// ウォールハック.
 	bool	m_TriggerHappy;	// 連射モード.
+	
+	bool	m_PlayerDamage;				// 被ダメフラグ.
+	bool	m_ChangedRed;				// 色相変化後.
+	float	m_HitEffectColor;			// 色相変化用.
+	float	m_HitEffectAlpha;			// 被ダメ透過値.
+	float	m_HitEffectTime;			// 被ダメ経過時間.
+	float	m_HitEffectTimeMax;			// 被ダメ最大時間.
+	float	m_HitEffectChangeTime;		// 被ダメ変色経過時間.
+	float	m_HitEffectChangeTimeMax;	// 被ダメ変色最大時間.
+	float	m_HitEffectDeleteTime;		// 被ダメ削除経過時間.
+	float	m_HitEffectDeleteTimeMax;	// 被ダメ削除最大時間.
 };
