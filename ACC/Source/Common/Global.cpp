@@ -13,4 +13,5 @@ float	NOWFWND_H = FWND_H;// フルウィンドウの高さ(float).
 D3DXVECTOR2	WINDOWRECT = { 0.f,0.f }; // ウィンドウ位置.
 D3DXVECTOR2	CLIENTRECT = { 0.f,0.f }; // ウィンドウの描画開始位置.
 
+bool	ISDEBUG = false;
 bool	UIEDIOR_MOVEANY = false;

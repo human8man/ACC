@@ -152,6 +152,10 @@ void CPlayer::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 //============================================================================
 void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, Collider floor, Collider cylinder)
 {
+	// 距離チェック用変数.
+	float DistanceToFloorY		= 5.f;		// 床とのY座標距離.
+	float DistanceToCylinder	= 100.f;	// 柱.
+	float DistanceToEnemy		= 10.f;		// 敵.
 	Collider Bullet,enemyegg;
 
 	// エフェクト事に必要なハンドルを用意.
@@ -162,15 +166,35 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, Collider floor, Collider c
 
 	// 弾の判定.
 	for (size_t i = 0; i < m_pBullets.size(); ++i) {
+		// 各中心点の取得.
+		D3DXVECTOR3 bulletCenter   = Bullet.GetCenter();
+		D3DXVECTOR3 floorCenter    = floor.GetCenter();
+		D3DXVECTOR3 cylinderCenter = cylinder.GetCenter();
+		D3DXVECTOR3 enemyCenter    = enemyegg.GetCenter();
+		
+		// 距離計算.
+		D3DXVECTOR3 diffCylinder = bulletCenter - cylinderCenter;
+		D3DXVECTOR3 diffEnemy    = bulletCenter - enemyCenter;
+		
+		float diffY				= fabsf(bulletCenter.y - floorCenter.y);
+		float distToCylinder	= D3DXVec3Length(&diffCylinder);
+		float distToEnemy		= D3DXVec3Length(&diffEnemy);
 
 		// 弾データを取得.
 		Bullet.SetVertex( m_pBullets[i]->GetObjeInfo(), m_pMeshBullet->GetVertices());
-
+		
 		// 当たり判定情報用の変数を宣言.
 		CollisionPoints pointsbc, pointsbf, pointsbe;
-		pointsbc = m_pGJK->GJK(Bullet, cylinder);
-		pointsbf = m_pGJK->GJK(Bullet, floor);
-		pointsbe = m_pGJK->GJK(Bullet, enemyegg);
+
+		// 距離が近いときだけ判定.
+		if (diffY < DistanceToFloorY)
+			pointsbf = m_pGJK->GJK(Bullet, floor);
+
+		if (distToCylinder < DistanceToCylinder)
+			pointsbc = m_pGJK->GJK(Bullet, cylinder);
+
+		if (distToEnemy < DistanceToEnemy)
+			pointsbe = m_pGJK->GJK(Bullet, enemyegg);
 
 		// 柱や床にあたった場合削除.
 		if (pointsbc.Col || pointsbf.Col)
@@ -331,7 +355,8 @@ void CPlayer::KeyInput(std::unique_ptr<CEnemy>& chara)
 	if (m_BulletCoolTime <= 0.f) { m_CanShot = true; }
 
 	// 左クリックが押された場合.
-	if (Mouse->IsLAction()){
+	if (Mouse->IsLAction()
+	||	m_TriggerHappy && Mouse->IsLDown()){
 		// 射撃条件が整っている場合.
 		if (m_CanShot && m_CharaInfo.Ammo != 0 && m_ReloadTime <= 0 || m_TriggerHappy) 
 		{

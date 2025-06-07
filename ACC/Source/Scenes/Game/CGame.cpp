@@ -241,6 +241,7 @@ void CGame::Update()
 		m_SlowMode = !m_SlowMode;
 		m_SlowScalingTime = 0;
 	}
+	m_pGameUI->SetSlowUI(m_SlowMode);
 	if (m_SlowScalingTime < m_SlowScalingTimeMax) { m_SlowScalingTime += CTime::GetDeltaTime(); }
 	if (m_SlowMode) {
 		m_SlowScale = MyEasing::OutCirc(m_SlowScalingTime, m_SlowScalingTimeMax, m_SlowScale, 0.1f);
@@ -352,7 +353,7 @@ void CGame::CollisionJudge()
 	// 敵の着地状況ごとの処理.
 	if (m_EnemyAnyLanding) {
 		m_pEnemy->CanJump();	// ジャンプ可能に.
-		m_pEnemy->SetLanding(m_EnemyAnyLanding);
+		m_pEnemy->SetLanding( m_EnemyAnyLanding );
 	}
 	else {
 		m_pEnemy->JumpMath();	// ジャンプ計算.

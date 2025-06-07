@@ -19,17 +19,26 @@ public:
 	// 解放処理.
 	void Release(); 
 
+	// スローUI設定関数.
+	void SetSlowUI(bool flag) { m_Slow = flag; }
 private:
 	// 被ダメエフェクト処理.
 	void InitHiteffect();
 	void Hiteffect(CUIObject* object);
+
+	// クロスヘア処理.
+	void Crosshair(CUIObject* object);
 
 private:
 	int		m_HP;				// HP.
 	int		m_HPMax;			// 最大HP.
 	int		m_Ammo;				// 残弾数.
 	int		m_HitKind;			// Hitの種類.
+
+	float	m_ReloadRot;		// リロード回転.
 	float	m_ReloadTime;		// リロード時間.
+	float	m_ReloadTimeMax;	// リロード最大時間.
+
 	float	m_ViewHitTime;		// ヒット表示時間.
 	float	m_ViewHitTimeMax;	// ヒット最大表示時間.
 
@@ -37,7 +46,18 @@ private:
 	bool	m_Homing;		// ホーミング.
 	bool	m_WallHack;		// ウォールハック.
 	bool	m_TriggerHappy;	// 連射モード.
-	
+	bool	m_Slow;			// スローモード.
+
+	// クロスヘアのイージングに使用.
+	float	m_CrosshairEase;
+	float	m_CrosshairEaseMax;
+	float	m_CrosshairRot;
+
+	// ダメージ時のHP減少に使用.
+	float	m_HPRate;
+	float	m_DamageEase;
+	float	m_DamageEaseMax;
+
 	bool	m_PlayerDamage;				// 被ダメフラグ.
 	bool	m_ChangedRed;				// 色相変化後.
 	float	m_HitEffectColor;			// 色相変化用.

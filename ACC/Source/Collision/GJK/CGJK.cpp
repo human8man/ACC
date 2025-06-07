@@ -62,6 +62,23 @@ void Collider::SetVertex(const ObjectInfo& object, const std::vector<D3DXVECTOR3
 
 
 //======================================================================================
+//		コライダーの頂点の重心（中心）を取得する関数.
+//======================================================================================
+D3DXVECTOR3 Collider::GetCenter() const
+{
+	if (m_Vertices.empty()) return D3DXVECTOR3(0, 0, 0);
+
+	D3DXVECTOR3 center = D3DXVECTOR3(0, 0, 0);
+	for (const auto& v : m_Vertices) {
+		center += v;
+	}
+
+	center /= static_cast<float>(m_Vertices.size());
+	return center;
+}
+
+
+//======================================================================================
 //		二つのコライダーと方向からミンコフスキー差のサポート点を計算する.
 //======================================================================================
 D3DXVECTOR3 CGJK::Support(const Collider& ColliderA, const Collider& ColliderB, D3DXVECTOR3 Direction)

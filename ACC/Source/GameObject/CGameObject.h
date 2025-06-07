@@ -22,7 +22,9 @@ public:
 	};
 
 	// âÒì]ê›íËä÷êî.
-	void SetRotPivot(const D3DXVECTOR3& pivot) { m_vRotPivot = pivot; }
+	void SetRotPivot(const D3DXVECTOR3& pivot) { 
+		m_vRotPivot = pivot;
+	}
 	void SetRot(const D3DXVECTOR3& rot) { m_vRotation = rot; }
 	void SetRot( float x, float y, float z ){
 		m_vRotation.x = x;

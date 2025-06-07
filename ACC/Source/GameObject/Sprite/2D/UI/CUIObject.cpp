@@ -57,6 +57,7 @@ void CUIObject::Draw()
 void CUIObject::AttachSprite(CSprite2D* pSprite)
 {
 	m_pSprite = new CSprite2D(*pSprite);
+	m_vRotPivot = m_pSprite->GetRotPivot();
 	m_vRotation = m_pSprite->GetRotation();
 	m_vScale = m_pSprite->GetScale();
 	m_vColor = m_pSprite->GetColor();
