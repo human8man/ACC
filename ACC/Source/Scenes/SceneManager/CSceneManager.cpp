@@ -9,11 +9,18 @@
 #include "Sprite/2D/UI/CUIFade/CUIFade.h"
 #include "Sprite/2D/UI/CEndUI/CEndUI.h"
 #include "DirectSound/CSoundManager.h"
+#include "FileManager/FileManager.h"
 
 
 #ifdef _DEBUG
 	#include "ImGui/CImGui.h"
 #endif
+
+
+namespace {
+	// Sceneのパス.
+	constexpr char ScenePath[] = "Data\\Scene.json";
+}
 
 
 //=============================================================================
@@ -42,8 +49,20 @@ HRESULT CSceneManager::Create(HWND hWnd)
 
 	This->m_hWnd = hWnd;
 
-	//初めて呼び出されたときにインスタンス生成
-	This->m_pScene = This->CreateScene(SceneList::Title);
+	// 初めて呼び出されたときにインスタンス生成.
+	Json m_SceneData = nullptr;	// 画像情報.
+	m_SceneData = FileManager::JsonLoad(ScenePath);
+
+	std::string SceneName = m_SceneData["Scene"].get<std::string>();
+	if (SceneName == "Game") {
+		This->m_pScene = This->CreateScene(SceneList::Game);
+	}
+	else if (SceneName == "UIEditor") {
+		This->m_pScene = This->CreateScene(SceneList::UIEditor);
+	}
+	else {
+		This->m_pScene = This->CreateScene(SceneList::Title);
+	}
 	This->m_pScene->Create();
 	This->m_pScene->Init();
 	This->m_pScene->LoadData();
@@ -195,6 +214,8 @@ std::unique_ptr<CSceneBase> CSceneManager::CreateScene(SceneList No)
 {
 	m_SceneNo = No;
 	RAINBOW_WINDOW = false;
+	// コンストラクタでDeltaTimeを使用している変数用に初期化.
+	CTime::GetInstance()->SetTimeScale(1.f);
 
 	switch (No)
 	{

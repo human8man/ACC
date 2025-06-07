@@ -3,6 +3,12 @@
 #include <crtdbg.h>	//_ASSERT_EXPR()で必要.
 #include "MyMacro.h"
 
+#include "FileManager/FileManager.h"
+
+namespace {
+	// Sceneのパス.
+	constexpr char ScenePath[] = "Data\\Scene.json";
+}
 
 //=============================================================================
 //		メイン関数.
@@ -15,6 +21,11 @@ INT WINAPI WinMain(
 {
 	CMain* pCMain = new CMain();	// 初期化＆クラス宣言.
 
+	// UIEditorの場合はDEBUGモードに切り替え.
+	Json m_SceneData = nullptr;
+	m_SceneData = FileManager::JsonLoad(ScenePath);
+	if (m_SceneData["Scene"].get<std::string>() == "UIEditor") { ISDEBUG = true; }
+	
 	if (pCMain != nullptr)
 	{
 		// ウィンドウ作成成功したら.

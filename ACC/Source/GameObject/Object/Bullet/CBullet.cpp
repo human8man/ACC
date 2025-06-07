@@ -8,7 +8,7 @@
 CBullet::CBullet()
 	: m_MoveDirection	()
 	, m_MoveSpeed		()
-	, m_DeleteTime		( CTime::GetDeltaTime() * 300.f )
+	, m_DeleteTime		( CTime::GetDeltaTime() * 70.f )
 {
 }
 CBullet::~CBullet()
@@ -21,7 +21,7 @@ CBullet::~CBullet()
 //============================================================================
 void CBullet::Update()
 {
-	m_DeleteTime -= CTime::GetDeltaTime();
+	m_DeleteTime -= CTime::GetDeltaTime() * CTime::GetTimeScale();
 	m_vPosition += m_MoveDirection * m_MoveSpeed * CTime::GetDeltaTime();
 }
 

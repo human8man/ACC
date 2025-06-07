@@ -45,6 +45,7 @@ public:
 	const D3DXVECTOR3& GetMoveVec();	// 最終移動ベクトルを渡す.
 	RAY GetRayY()			const { return *m_pRayY; }		// Y軸方向へ伸ばしたレイを取得.
 	float GetReloadTime()	const { return m_ReloadTime; }	// リロード時間を返す.
+	float GetReloadTimeMax()const { return m_ReloadTimeMax; }// リロード最大時間を返す.
 	CROSSRAY GetCrossRay()	const { return *m_pCrossRay; }	// 十字レイを取得.
 	CharaInfo GetCharaInfo()const { return m_CharaInfo; }	// キャラの情報を取得.
 	bool GetDamage()		const{ return m_Damage; }		// ダメージを受けたかを取得.

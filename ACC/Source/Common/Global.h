@@ -69,6 +69,8 @@ constexpr float ZEROFLOAT2[2] = { 0.f,0.f };
 const D3DXVECTOR3 ZEROVEC3( 0.f,0.f,0.f );
 const D3DXVECTOR2 ZEROVEC2( 0.f,0.f );
 
+// デバッグ切り替え.
+extern bool ISDEBUG;
 // UIeditorSceneで編集があった際に使う.
 extern bool UIEDIOR_MOVEANY;
 
