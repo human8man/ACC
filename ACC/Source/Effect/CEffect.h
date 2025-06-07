@@ -12,11 +12,11 @@
 #include "Singleton/CSingleton.h"
 
 #ifdef _DEBUG
-	#pragma comment( lib, "Effekseerd.lib" )
-	#pragma comment( lib, "EffekseerRendererDX11d.lib" )
+#pragma comment( lib, "Effekseerd.lib" )
+#pragma comment( lib, "EffekseerRendererDX11d.lib" )
 #else// #ifdef _DEBUG
-	#pragma comment( lib, "Effekseer.lib" )
-	#pragma comment( lib, "EffekseerRendererDX11.lib" )
+#pragma comment( lib, "Effekseer.lib" )
+#pragma comment( lib, "EffekseerRendererDX11.lib" )
 #endif// #ifdef _DEBUG
 
 // エイリアスを用意.

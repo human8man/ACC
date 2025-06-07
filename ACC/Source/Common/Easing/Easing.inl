@@ -158,7 +158,7 @@ namespace MyEasing {
 	template<typename T>
 	T InOutCirc(float Time, float MaxTime, T Start, T End)
 	{
-		float t = Time / MaxTime;
+		float t = std::clamp(Time / MaxTime, 0.0f, 1.0f);
 		if (t < 0.5f) return Start + (End - Start) / 2 * (1 - std::sqrt(1 - 4 * t * t));
 		t = t * 2 - 1;
 		return Start + (End - Start) / 2 * (std::sqrt(1 - t * t) + 1);

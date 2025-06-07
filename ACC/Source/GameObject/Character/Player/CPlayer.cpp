@@ -155,7 +155,7 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, Collider floor, Collider c
 	// 距離チェック用変数.
 	float DistanceToFloorY		= 5.f;		// 床とのY座標距離.
 	float DistanceToCylinder	= 100.f;	// 柱.
-	float DistanceToEnemy		= 10.f;		// 敵.
+	float DistanceToEnemy		= 30.f;		// 敵.
 	Collider Bullet,enemyegg;
 
 	// エフェクト事に必要なハンドルを用意.
@@ -167,7 +167,7 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, Collider floor, Collider c
 	// 弾の判定.
 	for (size_t i = 0; i < m_pBullets.size(); ++i) {
 		// 各中心点の取得.
-		D3DXVECTOR3 bulletCenter   = Bullet.GetCenter();
+		D3DXVECTOR3 bulletCenter   = m_pBullets[i]->GetPos();
 		D3DXVECTOR3 floorCenter    = floor.GetCenter();
 		D3DXVECTOR3 cylinderCenter = cylinder.GetCenter();
 		D3DXVECTOR3 enemyCenter    = enemyegg.GetCenter();

@@ -10,11 +10,7 @@
 #include "Sprite/2D/UI/CEndUI/CEndUI.h"
 #include "DirectSound/CSoundManager.h"
 #include "FileManager/FileManager.h"
-
-
-#ifdef _DEBUG
-	#include "ImGui/CImGui.h"
-#endif
+#include "ImGui/CImGui.h"
 
 
 namespace {
@@ -128,25 +124,25 @@ void CSceneManager::Update()
 		m_EndDeleteFlag = m_pEndUI->GetDeleteFlag();
 	}
 
-#ifdef _DEBUG
-	// ここでのみImGuiのUpdateを回す.
-	CImGui::GetInstance()->Update();
+	if (ISDEBUG) {
+		// ここでのみImGuiのUpdateを回す.
+		CImGui::GetInstance()->Update();
 
-	// シーン選択のIMGUIを作成.
-	ImGui::Begin("SceneSelect");
-	if (ImGui::Button("Game")) { GetInstance()->LoadScene(SceneList::Game); }
-	if (ImGui::Button("Title")) { GetInstance()->LoadScene(SceneList::Title); }
+		// シーン選択のIMGUIを作成.
+		ImGui::Begin("SceneSelect");
+		if (ImGui::Button("Game")) { GetInstance()->LoadScene(SceneList::Game); }
+		if (ImGui::Button("Title")) { GetInstance()->LoadScene(SceneList::Title); }
 
-	ImGui::Text("\n");
-	ImGui::Text(IMGUI_JP("-----デバッグ用シーン------------------------------------"));
-	if (ImGui::Button("UIEditor")) { GetInstance()->LoadScene(SceneList::UIEditor); }
-	ImGui::End();
+		ImGui::Text("\n");
+		ImGui::Text(IMGUI_JP("-----デバッグ用シーン------------------------------------"));
+		if (ImGui::Button("UIEditor")) { GetInstance()->LoadScene(SceneList::UIEditor); }
+		ImGui::End();
 
-	ImGui::Begin("MousePos");
-	POINT pos;
-	if (GetCursorPos(&pos)) { ImGui::Text("%d,%d", pos.x, pos.y); }
-	ImGui::End();
-#endif
+		ImGui::Begin("MousePos");
+		POINT pos;
+		if (GetCursorPos(&pos)) { ImGui::Text("%d,%d", pos.x, pos.y); }
+		ImGui::End();
+	}
 
 	if (m_pEndUI == nullptr) {
 		// フェードのピーク時にシーンを切り替える.
@@ -181,10 +177,10 @@ void CSceneManager::Draw()
 	// 存在する場合描画処理.
 	if (m_pEndUI != nullptr) { m_pEndUI->Draw(); }
 
-#ifdef _DEBUG
-	// ここでのみImGuiのDrawを回す.
-	CImGui::GetInstance()->Draw();
-#endif
+	if (ISDEBUG) {
+		// ここでのみImGuiのDrawを回す.
+		CImGui::GetInstance()->Draw();
+	}
 }
 
 
