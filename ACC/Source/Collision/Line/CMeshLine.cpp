@@ -79,9 +79,9 @@ HRESULT CMeshLine::CreateShader()
 	ID3DBlob* pErrors = nullptr;
 	UINT uCompileFlag = 0;
 
-#ifdef _DEBUG
-	uCompileFlag = D3D10_SHADER_DEBUG | D3D10_SHADER_SKIP_OPTIMIZATION;
-#endif
+	if (ISDEBUG) {
+		uCompileFlag = D3D10_SHADER_DEBUG | D3D10_SHADER_SKIP_OPTIMIZATION;
+	}
 
 	//---------------------------------------------------------------
 	//	HLSLからバーテックスシェーダのブロブを作成.

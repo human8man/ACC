@@ -1,4 +1,4 @@
 {
-	"Scene": "Game",
-	"Comment" : "初回起動時のシーンを選択できます{Scenelist:Title,Game,UIEditor}"
+	"Scene": "Title",
+	"Comment": "初回起動時のシーンを選択できます{Scenelist:Title,Game,UIEditor}"
 }

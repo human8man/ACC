@@ -315,10 +315,10 @@ HRESULT CStaticMesh::CreateShader()
 	ID3DBlob* pCompiledShader = nullptr;
 	ID3DBlob* pErrors = nullptr;
 	UINT uCompileFlag = 0;
-#ifdef _DEBUG
+if(ISDEBUG){
 	uCompileFlag =
 		D3D10_SHADER_DEBUG | D3D10_SHADER_SKIP_OPTIMIZATION;
-#endif// #ifdef _DEBUG
+}
 
 	// HLSLからバーテックスシェーダのブロブを作成.
 	if( m_EnableTexture == true ){

@@ -168,8 +168,10 @@ void CGameUI::Draw()
 		// リロードUIの描画設定.
 		if ( spritename == "Reload" ) {
 			if ( 0 < m_Ammo && m_ReloadTime < 0.f || m_TriggerHappy ) { m_ReloadRot = 0; continue; }
-			m_ReloadRot = MyEasing::InOutCirc( m_ReloadTimeMax - m_ReloadTime, m_ReloadTimeMax, m_ReloadRot, 12.56f );
-			m_pUIs[i]->SetRot( 0.f, 0.f, m_ReloadRot );
+			if (m_ReloadTime >= 0.f) {
+				m_ReloadRot = MyEasing::InOutCirc(m_ReloadTimeMax - m_ReloadTime, m_ReloadTimeMax, m_ReloadRot, 12.56f);
+			}
+			m_pUIs[i]->SetRot(0.f, 0.f, m_ReloadRot);
 		}
 
 		// リロードUI中央のRの描画設定.

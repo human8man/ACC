@@ -8,12 +8,7 @@
 #include "DirectSound/CSoundManager.h"
 #include "Scenes/SceneManager/CSceneManager.h"
 #include "Sprite/2D/SpriteManager/SpriteManager.h"
-
-
-// ImGuiはデバッグ時のみ使用する.
-#ifdef _DEBUG
 #include "ImGui/CImGui.h"
-#endif
 
 
 #include <iostream>
@@ -73,10 +68,10 @@ HRESULT CMain::Create() const
 	// EffectManagerのデータ読み込み.
 	if (FAILED(CEffect::GetInstance()->LoadData())) { return E_FAIL; }
 
-#ifdef _DEBUG
-	// ImGuiの構築.
-	CImGui::GetInstance()->Create(m_hWnd);
-#endif
+	if (ISDEBUG) {
+		// ImGuiの構築.
+		CImGui::GetInstance()->Create(m_hWnd);
+	}
 
 	return S_OK;
 }
@@ -287,9 +282,9 @@ LRESULT CALLBACK CMain::MsgProc(
 	HWND hWnd, UINT uMsg,
 	WPARAM wParam, LPARAM lParam)
 {
-#ifdef _DEBUG
+if(ISDEBUG){
 	if (CImGui::SetWin(hWnd, uMsg, wParam, lParam)) { return true; }
-#endif
+}
 
 	switch (uMsg)
 	{
@@ -360,30 +355,30 @@ LRESULT CALLBACK CMain::MsgProc(
 	//		ウィンドウのDPI(Dot Per Inch)が変更されたとき.
 	//---------------------------------------------------------------
 	case WM_DPICHANGED:
-#ifdef _DEBUG
-		// ImGuiの設定フラグでDPIスケーリングが有効か確認.
-		if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_DpiEnableScaleViewports)
-		{
-			// 新しいDPIの値を取得
-			// const int dpi = HIWORD(wParam);
+		if (ISDEBUG) {
+			// ImGuiの設定フラグでDPIスケーリングが有効か確認.
+			if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_DpiEnableScaleViewports)
+			{
+				// 新しいDPIの値を取得
+				// const int dpi = HIWORD(wParam);
 
-			// DPI変更をログに出力
-			// printf("WM_DPICHANGED to %d (%.0f%%)\n", dpi, (float)dpi / 96.0f * 100.0f);
+				// DPI変更をログに出力
+				// printf("WM_DPICHANGED to %d (%.0f%%)\n", dpi, (float)dpi / 96.0f * 100.0f);
 
-			// lParamから新しいウィンドウの位置とサイズを示すRECT構造体を取得
-			const RECT* suggested_rect = (RECT*)lParam;
+				// lParamから新しいウィンドウの位置とサイズを示すRECT構造体を取得
+				const RECT* suggested_rect = (RECT*)lParam;
 
-			// SetWindowPos関数を使ってウィンドウの位置とサイズを更新
-			::SetWindowPos(
-				hWnd,											//ウィンドウハンドル.
-				nullptr,										//ウィンドウのレイヤーは変更しないためnull.
-				suggested_rect->left,							//新規の左座標を設定.
-				suggested_rect->top,							//新規の上座標を設定.
-				suggested_rect->right - suggested_rect->left,	//新規の幅を設定.
-				suggested_rect->bottom - suggested_rect->top,	//新規の高さを設定.
-				SWP_NOZORDER | SWP_NOACTIVATE);					//レイヤーを変更せず、ウィンドウをアクティブにしない.
+				// SetWindowPos関数を使ってウィンドウの位置とサイズを更新
+				::SetWindowPos(
+					hWnd,											//ウィンドウハンドル.
+					nullptr,										//ウィンドウのレイヤーは変更しないためnull.
+					suggested_rect->left,							//新規の左座標を設定.
+					suggested_rect->top,							//新規の上座標を設定.
+					suggested_rect->right - suggested_rect->left,	//新規の幅を設定.
+					suggested_rect->bottom - suggested_rect->top,	//新規の高さを設定.
+					SWP_NOZORDER | SWP_NOACTIVATE);					//レイヤーを変更せず、ウィンドウをアクティブにしない.
+			}
 		}
-#endif
 		break;
 	}
 

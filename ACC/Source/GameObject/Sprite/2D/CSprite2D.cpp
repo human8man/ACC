@@ -107,9 +107,9 @@ HRESULT CSprite2D::CreateShader()
 	ID3DBlob* pErrors = nullptr;
 	UINT uCompileFlag = 0;
 
-#ifdef _DEBUG
+if(ISDEBUG){
 	uCompileFlag = D3D10_SHADER_DEBUG | D3D10_SHADER_SKIP_OPTIMIZATION;
-#endif
+}
 
 	// HLSLからバーテックスシェーダのブロブを作成.
 	if (FAILED(

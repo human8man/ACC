@@ -158,9 +158,9 @@ HRESULT	CSkinMesh::CreateShader()
 	ID3DBlob *pErrors = nullptr;
 	UINT	uCompileFlag = 0;
 
-#ifdef _DEBUG
+if(ISDEBUG){
 	uCompileFlag = D3D10_SHADER_DEBUG | D3D10_SHADER_SKIP_OPTIMIZATION;
-#endif
+}
 
 	// HLSLからバーテックスシェーダのブロブを作成.
 	if( FAILED(
@@ -604,14 +604,14 @@ HRESULT CSkinMesh::CreateAppMeshFromD3DXMesh( LPD3DXFRAME p )
 
 	// スキン情報ある？
 	if( pContainer->pSkinInfo == nullptr ){
-#ifdef _DEBUG
-		// 不明なスキンあればここで教える.不要ならコメントアウトしてください.
-		TCHAR strDbg[128];
-		WCHAR str[64] = L"";
-		ConvertCharaMultiByteToUnicode( str, 64, pContainer->Name );
-		_stprintf_s( strDbg, _T( "ContainerName:[%s]" ), str );
-		MessageBox( nullptr, strDbg, _T( "Not SkinInfo" ), MB_OK );
-#endif// #ifdef _DEBUG
+		if (ISDEBUG) {
+			// 不明なスキンあればここで教える.不要ならコメントアウトしてください.
+			TCHAR strDbg[128];
+			WCHAR str[64] = L"";
+			ConvertCharaMultiByteToUnicode(str, 64, pContainer->Name);
+			_stprintf_s(strDbg, _T("ContainerName:[%s]"), str);
+			MessageBox(nullptr, strDbg, _T("Not SkinInfo"), MB_OK);
+		}
 		pAppMesh->EnableBones = false;
 	}
 	else{
