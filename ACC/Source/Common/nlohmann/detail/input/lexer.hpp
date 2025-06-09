@@ -864,6 +864,7 @@ class lexer : public lexer_base<BasicJsonType>
                     }
                 }
             }
+            break;
 
             // multi-line comments skip input until */ is read
             case '*':
@@ -893,6 +894,7 @@ class lexer : public lexer_base<BasicJsonType>
                                 }
                             }
                         }
+                        break;
 
                         default:
                             continue;

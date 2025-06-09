@@ -38,9 +38,16 @@ public:
 	//	※シェーダ内のコンスタントバッファと一致している必要あり.
 	struct SHADER_CONSTANT_BUFFER
 	{
-		D3DXMATRIX	mWVP;	// ワールド,ビュー,プロジェクションの合成変換行列.	
-		D3DXVECTOR4	vColor;	// カラー（RGBAの型に合わせる）.
-		D3DXVECTOR4	vUV;	// UV座標（x,yのみ使用）.
+		// ワールド,ビュー,プロジェクションの合成変換行列.	
+		D3DXMATRIX	mWVP = D3DXMATRIX(
+			1.0f, 0.0f, 0.0f, 0.0f,
+			0.0f, 1.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 1.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, 1.0f);
+		// カラー（RGBAの型に合わせる）.
+		D3DXVECTOR4	vColor = D3DXVECTOR4(1.0f, 1.0f, 1.0f, 1.0f);
+		// UV座標（x,yのみ使用）.
+		D3DXVECTOR4	vUV = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 0.0f);
 	};
 	// 頂点の構造体.
 	struct VERTEX

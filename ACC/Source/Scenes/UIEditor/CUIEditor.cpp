@@ -32,25 +32,25 @@ namespace {
 
 	Vertex lineVertices[] =
 	{
-		{ { -50.0f, 360.0f, 0.0f }, { 1, 0, 0, 1 } },  // 左上
-		{ {  50.0f, 360.0f, 0.0f }, { 1, 0, 0, 1 } },  // 右上
+		{ { -50.0f, 360.0f, 0.0f }, { 1, 0, 0, 1 } },  // 左上.
+		{ {  50.0f, 360.0f, 0.0f }, { 1, 0, 0, 1 } },  // 右上.
 
-		{ {  50.0f, 360.0f, 0.0f }, { 1, 0, 0, 1 } },  // 右上
-		{ {  50.0f, -360.0f, 0.0f }, { 1, 0, 0, 1 } }, // 右下
+		{ {  50.0f, 360.0f, 0.0f }, { 1, 0, 0, 1 } },  // 右上.
+		{ {  50.0f, -360.0f, 0.0f }, { 1, 0, 0, 1 } }, // 右下.
 
-		{ {  50.0f, -360.0f, 0.0f }, { 1, 0, 0, 1 } }, // 右下
-		{ { -50.0f, -360.0f, 0.0f }, { 1, 0, 0, 1 } }, // 左下
+		{ {  50.0f, -360.0f, 0.0f }, { 1, 0, 0, 1 } }, // 右下.
+		{ { -50.0f, -360.0f, 0.0f }, { 1, 0, 0, 1 } }, // 左下.
 
-		{ { -50.0f, -360.0f, 0.0f }, { 1, 0, 0, 1 } }, // 左下
-		{ { -50.0f, 360.0f, 0.0f }, { 1, 0, 0, 1 } },  // 左上
+		{ { -50.0f, -360.0f, 0.0f }, { 1, 0, 0, 1 } }, // 左下.
+		{ { -50.0f, 360.0f, 0.0f }, { 1, 0, 0, 1 } },  // 左上.
 	};
 
 	struct CBUFFER_MATRIX {
 		D3DXMATRIX mWorld;
 		D3DXMATRIX mView;
 		D3DXMATRIX mProj;
-		float LineThickness; // 太さ（ピクセル単位）
-		D3DXVECTOR3 padding; // サイズ調整 (16バイト境界)
+		float LineThickness; // 太さ（ピクセル単位）.
+		D3DXVECTOR3 padding; // サイズ調整 (16バイト境界).
 	};
 }
 
@@ -146,7 +146,7 @@ void CUIEditor::UpdateShader()
 	auto directx11 = CDirectX11::GetInstance();
 	ID3D11DeviceContext* context = directx11->GetContext();
 
-	// ---- 定数バッファ更新 ----
+	// 定数バッファ更新.
 	D3D11_VIEWPORT vp;
 	UINT vpCount = 1;
 	context->RSGetViewports(&vpCount, &vp);
@@ -170,7 +170,7 @@ void CUIEditor::UpdateShader()
 	context->GSSetConstantBuffers(0, 1, &m_pCBufferMatrix);
 	context->PSSetConstantBuffers(0, 1, &m_pCBufferMatrix);
 
-	// ---- 頂点バッファ更新 ----
+	// 頂点バッファ更新.
 	if (lineVertices) {
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 		if (SUCCEEDED(context->Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
@@ -180,10 +180,10 @@ void CUIEditor::UpdateShader()
 		}
 	}
 
-	// ---- パイプライン設定 ----
+	// パイプライン設定.
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
-	context->IASetInputLayout(m_pInputLayout); // ★ここを追加！
+	context->IASetInputLayout(m_pInputLayout);
 	context->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
@@ -191,7 +191,7 @@ void CUIEditor::UpdateShader()
 	context->GSSetShader(m_pGeometryShader, nullptr, 0);
 	context->PSSetShader(m_pPixelShader, nullptr, 0);
 
-	// ---- 描画 ----
+	// 描画.
 	context->Draw(8, 0);
 }
 
@@ -434,7 +434,7 @@ void CUIEditor::SortBySpritePosZ(CUIObject* object)
 		auto it = std::find(m_pUIs.begin(), m_pUIs.end(), pPreviousSelectedUI);
 		if (it != m_pUIs.end()) {
 			// 再選択.
-			m_SelectedUIIndex = std::distance(m_pUIs.begin(), it);
+			m_SelectedUIIndex = static_cast<int>(std::distance(m_pUIs.begin(), it));
 		}
 		else {
 			// 以前選択されていたUIがリストにない場合.

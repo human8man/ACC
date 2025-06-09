@@ -127,7 +127,7 @@ namespace MyEasing {
 	T OutExpo(float Time, float MaxTime, T Start, T End)
 	{
 		float t = Time / MaxTime;
-		return Start + (End - Start) * (t == 1 ? 1 : 1 - std::pow(2, -10 * t));
+		return Start + (End - Start) * (t == 1 ? 1 : 1 - std::powf(2, -10 * t));
 	}
 
 	template<typename T>

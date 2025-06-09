@@ -369,21 +369,21 @@ LPD3DXMESHCONTAINER D3DXPARSER::GetMeshContainer(LPD3DXFRAME pFrame)
 //=============================================================================
 void D3DXPARSER::ChangeAnimSet(int Index, LPD3DXANIMATIONCONTROLLER pAC)
 {
-	D3DXTRACK_DESC TrackDesc;		//アニメーショントラック構造体.
+	D3DXTRACK_DESC TrackDesc = {};	// アニメーショントラック構造体.
 
-	//※以下3つは、ほぼ固定でOK.
-	TrackDesc.Weight = 1.0f;	//重み.
-	TrackDesc.Speed = 1.0f;	//速さ.
-	TrackDesc.Enable = TRUE;	//有効.
+	// ※以下3つは、ほぼ固定でOK.
+	TrackDesc.Weight = 1.0f;	// 重み.
+	TrackDesc.Speed = 1.0f;		// 速さ.
+	TrackDesc.Enable = TRUE;	// 有効.
 
 	TrackDesc.Priority = D3DXPRIORITY_LOW;
 
-	TrackDesc.Position = 0.0;		//フレーム位置(開始位置を指定できる)
+	TrackDesc.Position = 0.0;		// フレーム位置(開始位置を指定できる)
 
 	LPD3DXANIMATIONCONTROLLER pTmpAC;
 	pTmpAC = pAC ? pAC : m_pAnimController;
 
-	//指定(Index）のアニメーショントラックに変更.
+	// 指定(Index）のアニメーショントラックに変更.
 	pTmpAC->SetTrackDesc(0, &TrackDesc);
 	pTmpAC->SetTrackAnimationSet(0, m_pAnimSet[Index]);
 	pTmpAC->SetTrackEnable(Index, TRUE);
@@ -395,7 +395,7 @@ void D3DXPARSER::ChangeAnimSet(int Index, LPD3DXANIMATIONCONTROLLER pAC)
 //=============================================================================
 void D3DXPARSER::ChangeAnimSet_StartPos(int Index, double StartFramePos, LPD3DXANIMATIONCONTROLLER pAC)
 {
-	D3DXTRACK_DESC TrackDesc;	// アニメーショントラック構造体.
+	D3DXTRACK_DESC TrackDesc = {};	// アニメーショントラック構造体.
 
 	// ※以下3つは、ほぼ固定でOK.
 	TrackDesc.Weight = 1.f;	// 重み.

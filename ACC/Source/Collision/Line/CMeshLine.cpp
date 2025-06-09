@@ -199,7 +199,7 @@ HRESULT CMeshLine::CreateShader()
 	// コンスタント（定数）バッファ作成.
 	// シェーダに特定の数値を送るバッファ.
 	//---------------------------------------------------------------
-	D3D11_BUFFER_DESC cb;
+	D3D11_BUFFER_DESC cb = {};
 	cb.BindFlags = D3D11_BIND_CONSTANT_BUFFER;		// コンスタントバッファを指定.
 	cb.ByteWidth = sizeof(SHADER_CONSTANT_BUFFER);	// コンスタントバッファのサイズ.
 	cb.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;		// 書き込みでアクセス.

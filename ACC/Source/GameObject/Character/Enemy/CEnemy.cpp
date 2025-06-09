@@ -6,10 +6,7 @@
 #include "FileManager/FileManager.h"
 #include "DirectInput/CDirectInput.h"
 #include "DirectSound/CSoundManager.h"
-
-#if _DEBUG
 #include "ImGui/CImGui.h"
-#endif
 
 namespace {
 	// キャラクターCSVのパス.

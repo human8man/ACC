@@ -212,7 +212,7 @@ if(ISDEBUG){
 
 	// コンスタント（定数）バッファ作成.
 	//	シェーダに特定の数値を送るバッファ.
-	D3D11_BUFFER_DESC cb;
+	D3D11_BUFFER_DESC cb = {};
 	cb.BindFlags = D3D11_BIND_CONSTANT_BUFFER;		// コンスタントバッファを指定.
 	cb.ByteWidth = sizeof(SHADER_CONSTANT_BUFFER);	// コンスタントバッファのサイズ.
 	cb.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;		// 書き込みでアクセス.
@@ -264,7 +264,7 @@ HRESULT CSprite3D::CreateModel()
 	UINT uVerMax = sizeof( vertices ) / sizeof( vertices[0] );
 
 	// バッファ構造体.
-	D3D11_BUFFER_DESC bd;
+	D3D11_BUFFER_DESC bd = {};
 	bd.Usage			= D3D11_USAGE_DEFAULT;		// 使用方法（デフォルト）.
 	bd.ByteWidth		= sizeof(VERTEX) * uVerMax;	// 頂点のサイズ.
 	bd.BindFlags		= D3D11_BIND_VERTEX_BUFFER;	// 頂点バッファとして扱う.
@@ -273,7 +273,7 @@ HRESULT CSprite3D::CreateModel()
 	bd.StructureByteStride = 0;						// 構造体のサイズ（未使用）.
 
 	// サブリソースデータ構造体.
-	D3D11_SUBRESOURCE_DATA InitData;
+	D3D11_SUBRESOURCE_DATA InitData = {};
 	InitData.pSysMem = vertices;	// 板ポリの頂点をセット.
 
 	// 頂点バッファの作成.
@@ -489,11 +489,9 @@ HRESULT CSprite3D::SpriteStateDataLoad(const std::string& FilePath)
 	m_vRotation.y = m_SpriteStateData["Rotate"]["y"].get<float>();
 	m_vRotation.z = m_SpriteStateData["Rotate"]["z"].get<float>();
 
-#if _DEBUG
 	// ファイルパスを更新する.
 	m_SpriteStateData["FilePath"] = TextPath;
 	if (FAILED(FileManager::JsonSave(TextPath, m_SpriteStateData))) return E_FAIL;
-#endif
 
 	return S_OK;
 }

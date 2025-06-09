@@ -53,9 +53,9 @@ public:
 		GunFire,	// 発射時の銃口のエフェクト.
 		Dust,		// ダスト.
 
-		BulletSmoke,
+		BulletSmoke,// 弾の軌道.
 
-		Max,		// 最大数.	
+		Max,		// 最大数.
 	};
 
 public:

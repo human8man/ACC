@@ -47,7 +47,7 @@ HRESULT CSpriteManager::SpriteLoad()
 		std::filesystem::recursive_directory_iterator Dir_itr(FILE_PATH), End_itr;
 		std::for_each(Dir_itr, End_itr, SpriteLoad);
 	}
-	catch (const std::filesystem::filesystem_error& e) { 
+	catch (const std::filesystem::filesystem_error&) { 
 		return E_FAIL;
 	}
 
