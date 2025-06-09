@@ -201,7 +201,7 @@ HRESULT CRay::CreateShader()
 	// コンスタント（定数）バッファ作成.
 	// シェーダに特定の数値を送るバッファ.
 	//---------------------------------------------------------------
-	D3D11_BUFFER_DESC cb;
+	D3D11_BUFFER_DESC cb = {};
 	cb.BindFlags = D3D11_BIND_CONSTANT_BUFFER;		// コンスタントバッファを指定.
 	cb.ByteWidth = sizeof(SHADER_CONSTANT_BUFFER);	// コンスタントバッファのサイズ.
 	cb.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;		// 書き込みでアクセス.
@@ -238,7 +238,7 @@ HRESULT CRay::CreateModel()
 	vertices[1] = m_Ray.Axis * m_Ray.Length;		// レイの終点.
 
 	// バッファ構造体.
-	D3D11_BUFFER_DESC bd;
+	D3D11_BUFFER_DESC bd = {};
 	bd.Usage			= D3D11_USAGE_DEFAULT;		// 使用方法（デフォルト）.
 	bd.ByteWidth		= sizeof(VERTEX) * 2;		// 頂点のサイズ（線分なので始点と終点の２点分）.
 	bd.BindFlags		= D3D11_BIND_VERTEX_BUFFER;	// 頂点バッファとして扱う.
@@ -247,7 +247,7 @@ HRESULT CRay::CreateModel()
 	bd.StructureByteStride = 0;						// 構造体のサイズ（未使用）.
 
 	// サブリソースデータ構造体.
-	D3D11_SUBRESOURCE_DATA InitData;
+	D3D11_SUBRESOURCE_DATA InitData = {};
 	InitData.pSysMem = vertices;	// 線分の頂点をセット.
 
 	//---------------------------------------------------------------

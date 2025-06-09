@@ -194,7 +194,7 @@ void CCharacter::CritDamage()
 //============================================================================
 //		最終移動ベクトルを渡す.
 //============================================================================
-const D3DXVECTOR3& CCharacter::GetMoveVec()
+D3DXVECTOR3 CCharacter::GetMoveVec()
 {
 	return m_SumVec * CTime::GetDeltaTime();
 }

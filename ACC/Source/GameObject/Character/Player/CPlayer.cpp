@@ -6,10 +6,7 @@
 #include "FileManager/FileManager.h"
 #include "DirectInput/CDirectInput.h"
 #include "DirectSound/CSoundManager.h"
-
-#if _DEBUG
 #include "ImGui/CImGui.h"
-#endif
 
 namespace {
 	// キャラクターCSVのパス.
@@ -108,10 +105,10 @@ void CPlayer::Update(std::unique_ptr<CEnemy>& chara)
 	// キャラクターの更新処理.
 	CCharacter::Update();
 
-#if _DEBUG
 	// ImGuiを用いたデバッグ関数.
-	PlayerImGui();
-#endif
+	if (ISDEBUG) {
+		PlayerImGui();
+	}
 }
 
 
@@ -126,7 +123,7 @@ void CPlayer::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 	// エフェクト事に必要なハンドルを用意.
 	static ::EsHandle hEffect = -1;
 
-	D3DXVECTOR4 color = { 0.f,0.f,1.f,1.f };
+	D3DXVECTOR4 color = { 0.f, 0.f, 1.f, 1.f };
 
 	// 弾とそのエフェクトの描画.
 	for (size_t i = 0; i < m_pBullets.size(); ++i) { 
@@ -420,12 +417,10 @@ void CPlayer::KeyInput(std::unique_ptr<CEnemy>& chara)
 //-----------------------------------------------------------------------------
 void CPlayer::PlayerImGui()
 {
-#if _DEBUG
 	ImGui::Begin(IMGUI_JP("プレイヤー情報"));
 	ImGui::Text("Dash%f", m_DashTime);
 	ImGui::Text("Reload%f", m_ReloadTime);
 	ImGui::Text("DashCool%f", m_DashCoolTime);
 	ImGui::Text("BulletCool%f", m_BulletCoolTime);
 	ImGui::End();
-#endif
 }

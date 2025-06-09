@@ -412,10 +412,12 @@ void CMain::WindowPosMath(HWND hwnd)
 	int borderLeft	= topLeft.x - WindowRect.left;
 	int borderTop	= topLeft.y - WindowRect.top;
 	
-	WINDOWRECT = D3DXVECTOR2(WindowRect.left, WindowRect.right);
+	WINDOWRECT = D3DXVECTOR2(
+		static_cast<float>(WindowRect.left),
+		static_cast<float>(WindowRect.right));
 	CLIENTRECT = D3DXVECTOR2(
-		borderLeft + WindowRect.left,
-		borderTop + WindowRect.top);
+		static_cast<float>(borderLeft + WindowRect.left),
+		static_cast<float>(borderTop + WindowRect.top));
 }
 
 
