@@ -61,7 +61,7 @@ HRESULT CSoundManager::Create(CSound** ppSound, std::string filePath, HWND hWnd)
 //==============================================================================
 //		ƒf[ƒ^“Çžˆ—.
 //==============================================================================
-bool CSoundManager::Load( HWND hWnd )
+HRESULT CSoundManager::Load( HWND hWnd )
 {
 	m_SoundList.assign(std::begin(s_SoundList), std::end(s_SoundList));
 
@@ -71,13 +71,13 @@ bool CSoundManager::Load( HWND hWnd )
 		if (FAILED(CSoundManager::GetInstance()->Create(&pSound, sound.path.c_str(), hWnd)))
 		{
 			Release();
-			return false;
+			return E_FAIL;
 		}
 		m_pSound.push_back(pSound);
 	}
 
 	ApplyVolumeSetting();
-	return true;
+	return S_OK;
 }
 
 

@@ -1,6 +1,9 @@
 #pragma once
 #include "Character/CCharacter.h"
 
+#pragma warning(push)
+#pragma warning(disable: 4834)
+
 class CEnemy;
 
 // Hit情報.
@@ -25,12 +28,12 @@ public:
 	// 描画処理.
 	void Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light );
 	
-	const int& GetHitKind()			{ return m_HitKind;		}	// 命中の種類を渡す.
-	const bool& GetHit()			{ return m_Hit;			}	// 命中フラグを渡す.
-	const bool& GetHoming()			{ return m_Homing;		}	// ホーミングフラグを渡す.
-	const bool& GetAutoAim()		{ return m_AutoAim;		}	// オートエイムフラグを渡す.
-	const bool& GetWallHack()		{ return m_WallHack;	}	// ウォールハックフラグを渡す.
-	const bool& GetTriggerHappy()	{ return m_TriggerHappy;}	// 連射モードフラグを渡す.
+	const int& GetHitKind()			const { return m_HitKind;		}	// 命中の種類を渡す.
+	const bool& GetHit()			const { return m_Hit;			}	// 命中フラグを渡す.
+	const bool& GetHoming()			const { return m_Homing;		}	// ホーミングフラグを渡す.
+	const bool& GetAutoAim()		const { return m_AutoAim;		}	// オートエイムフラグを渡す.
+	const bool& GetWallHack()		const { return m_WallHack;	}	// ウォールハックフラグを渡す.
+	const bool& GetTriggerHappy()	const { return m_TriggerHappy;}	// 連射モードフラグを渡す.
 
 	// 移動量の追加.
 	void AddVec(D3DXVECTOR3 vec) { m_vPosition += vec; }

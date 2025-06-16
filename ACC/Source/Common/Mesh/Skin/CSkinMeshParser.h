@@ -175,7 +175,7 @@ public:
 	~D3DXPARSER();
 
 	HRESULT LoadMeshFromX( LPDIRECT3DDEVICE9, LPCTSTR fileName );
-	HRESULT AllocateBoneMatrix( LPD3DXMESHCONTAINER );
+	HRESULT AllocateBoneMatrix( LPD3DXMESHCONTAINER ) const;
 	HRESULT AllocateAllBoneMatrices( LPD3DXFRAME );
 	VOID UpdateFrameMatrices( LPD3DXFRAME, LPD3DXMATRIX );
 
@@ -185,10 +185,10 @@ public:
 
 	/****************************************************************
 	//	@brief アニメーションセットの切り替え.
-	//	@param Index			: アニメーション番号
-	//	@param pAC				: AnimationController
+	//	@param Index	: アニメーション番号
+	//	@param pAC		: AnimationController
 	****************************************************************/
-	void ChangeAnimSet( int Index, LPD3DXANIMATIONCONTROLLER pAC );
+	void ChangeAnimSet( int Index, LPD3DXANIMATIONCONTROLLER pAC ) const;
 
 	/****************************************************************
 	// @brief アニメーションセットの切り替え(開始フレーム指定可能版).
@@ -196,7 +196,7 @@ public:
 	// @param StartFramePos	: 開始フレーム
 	// @param pAC			: AnimationController
 	****************************************************************/
-	void ChangeAnimSet_StartPos( int Index, double StartFramePos, LPD3DXANIMATIONCONTROLLER pAC );
+	void ChangeAnimSet_StartPos( int Index, double StartFramePos, LPD3DXANIMATIONCONTROLLER pAC ) const;
 
 	// 一括解放処理.
 	HRESULT Release();
@@ -204,33 +204,33 @@ public:
 	//------------------------------------------------------------------------
 	//		取得関数.
 	//------------------------------------------------------------------------
-	bool GetMatrixFromBone			(LPCSTR BoneName, D3DXMATRIX* pOutMat);
-	bool GetPosFromBone				(LPCSTR BoneName, D3DXVECTOR3* pOutPos);
-	int GetAnimMax					(LPD3DXANIMATIONCONTROLLER pAC);
-	int GetNumUVs					(MYMESHCONTAINER* pContainer);
-	int GetNumBones					(MYMESHCONTAINER* pContainer);
-	int GetNumFaces					(MYMESHCONTAINER* pContainer);
-	int GetNumVertices				(MYMESHCONTAINER* pContainer);
-	int GetNumMaterials				(MYMESHCONTAINER* pContainer);
-	int GetIndex					(MYMESHCONTAINER* pContainer, DWORD Index);
-	int GetNumBoneVertices			(MYMESHCONTAINER* pContainer, int BoneIndex);
-	int GeFaceMaterialIndex			(MYMESHCONTAINER* pContainer, int FaceIndex);
-	int GetFaceVertexIndex			(MYMESHCONTAINER* pContainer, int FaceIndex, int IndexInFace);
-	double GetAnimPeriod			(int Index);
-	double GetBoneVerticesWeights	(MYMESHCONTAINER* pContainer, int BoneIndex, int IndexInGroup);
-	float GetSpecularPower			(MYMESHCONTAINER* pContainer, int Index);
-	DWORD GetBoneVerticesIndices	(MYMESHCONTAINER* pContainer, int BoneIndex, int IndexInGroup);
-	LPSTR GetTexturePath			(MYMESHCONTAINER* pContainer, int Index);
-	LPCSTR GetBoneName				(MYMESHCONTAINER* pContainer, int BoneIndex);
-	D3DXVECTOR2 GetUV				(MYMESHCONTAINER* pContainer, DWORD Index);
-	D3DXVECTOR3 GetNormal			(MYMESHCONTAINER* pContainer, DWORD Index);
-	D3DXVECTOR3 GetVertexCoord		(MYMESHCONTAINER* pContainer, DWORD Index);
-	D3DXVECTOR4 GetAmbient			(MYMESHCONTAINER* pContainer, int Index);
-	D3DXVECTOR4 GetDiffuse			(MYMESHCONTAINER* pContainer, int Index);
-	D3DXVECTOR4 GetSpecular			(MYMESHCONTAINER* pContainer, int Index);
-	D3DXVECTOR4 GetEmissive			(MYMESHCONTAINER* pContainer, int Index);
-	D3DXMATRIX GetNewPose			(MYMESHCONTAINER* pContainer, int BoneIndex);
-	D3DXMATRIX GetBindPose			(MYMESHCONTAINER* pContainer, int BoneIndex);
+	bool GetMatrixFromBone			(LPCSTR BoneName, D3DXMATRIX* pOutMat) const;
+	bool GetPosFromBone				(LPCSTR BoneName, D3DXVECTOR3* pOutPos) const;
+	int GetAnimMax					(LPD3DXANIMATIONCONTROLLER pAC) const;
+	int GetNumUVs					(MYMESHCONTAINER* pContainer) const;
+	int GetNumBones					(MYMESHCONTAINER* pContainer) const;
+	int GetNumFaces					(MYMESHCONTAINER* pContainer) const;
+	int GetNumVertices				(MYMESHCONTAINER* pContainer) const;
+	int GetNumMaterials				(MYMESHCONTAINER* pContainer) const;
+	int GetIndex					(MYMESHCONTAINER* pContainer, DWORD Index) const;
+	int GetNumBoneVertices			(MYMESHCONTAINER* pContainer, int BoneIndex) const;
+	int GeFaceMaterialIndex			(MYMESHCONTAINER* pContainer, int FaceIndex) const;
+	int GetFaceVertexIndex			(MYMESHCONTAINER* pContainer, int FaceIndex, int IndexInFace) const;
+	double GetAnimPeriod			(int Index) const;
+	double GetBoneVerticesWeights	(MYMESHCONTAINER* pContainer, int BoneIndex, int IndexInGroup) const;
+	float GetSpecularPower			(MYMESHCONTAINER* pContainer, int Index) const;
+	DWORD GetBoneVerticesIndices	(MYMESHCONTAINER* pContainer, int BoneIndex, int IndexInGroup) const;
+	LPSTR GetTexturePath			(MYMESHCONTAINER* pContainer, int Index) const;
+	LPCSTR GetBoneName				(MYMESHCONTAINER* pContainer, int BoneIndex) const;
+	D3DXVECTOR2 GetUV				(MYMESHCONTAINER* pContainer, DWORD Index) const;
+	D3DXVECTOR3 GetNormal			(MYMESHCONTAINER* pContainer, DWORD Index) const;
+	D3DXVECTOR3 GetVertexCoord		(MYMESHCONTAINER* pContainer, DWORD Index) const;
+	D3DXVECTOR4 GetAmbient			(MYMESHCONTAINER* pContainer, int Index) const;
+	D3DXVECTOR4 GetDiffuse			(MYMESHCONTAINER* pContainer, int Index) const;
+	D3DXVECTOR4 GetSpecular			(MYMESHCONTAINER* pContainer, int Index) const;
+	D3DXVECTOR4 GetEmissive			(MYMESHCONTAINER* pContainer, int Index) const;
+	D3DXMATRIX GetNewPose			(MYMESHCONTAINER* pContainer, int BoneIndex) const;
+	D3DXMATRIX GetBindPose			(MYMESHCONTAINER* pContainer, int BoneIndex) const;
 
 public:
 	MY_HIERARCHY	cHierarchy;

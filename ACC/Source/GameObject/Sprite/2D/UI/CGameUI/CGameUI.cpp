@@ -50,6 +50,7 @@ CGameUI::CGameUI()
 	
 	, m_CrosshairEase		( 0.f )
 	, m_CrosshairEaseMax	( CTime::GetDeltaTime() * 150.f )
+	, m_CrosshairRot		( 0.f )
 
 	, m_HPRate				( 1.f )
 	, m_DamageEase			( 0.f )

@@ -245,7 +245,7 @@ HRESULT D3DXPARSER::LoadMeshFromX(LPDIRECT3DDEVICE9 pDevice9, LPCTSTR fileName)
 //=============================================================================
 //		ボーン行列の領域確保.
 //=============================================================================
-HRESULT D3DXPARSER::AllocateBoneMatrix(LPD3DXMESHCONTAINER pMeshContainerBase)
+HRESULT D3DXPARSER::AllocateBoneMatrix(LPD3DXMESHCONTAINER pMeshContainerBase)const
 {
 	MYFRAME* pFrame = nullptr;
 	DWORD dwBoneNum = 0;
@@ -367,7 +367,7 @@ LPD3DXMESHCONTAINER D3DXPARSER::GetMeshContainer(LPD3DXFRAME pFrame)
 //=============================================================================
 //		アニメーションセットの切り替え.
 //=============================================================================
-void D3DXPARSER::ChangeAnimSet(int Index, LPD3DXANIMATIONCONTROLLER pAC)
+void D3DXPARSER::ChangeAnimSet(int Index, LPD3DXANIMATIONCONTROLLER pAC) const
 {
 	D3DXTRACK_DESC TrackDesc = {};	// アニメーショントラック構造体.
 
@@ -393,7 +393,7 @@ void D3DXPARSER::ChangeAnimSet(int Index, LPD3DXANIMATIONCONTROLLER pAC)
 //=============================================================================
 //		アニメーションセットの切り替え(開始フレーム指定可能版).
 //=============================================================================
-void D3DXPARSER::ChangeAnimSet_StartPos(int Index, double StartFramePos, LPD3DXANIMATIONCONTROLLER pAC)
+void D3DXPARSER::ChangeAnimSet_StartPos(int Index, double StartFramePos, LPD3DXANIMATIONCONTROLLER pAC) const
 {
 	D3DXTRACK_DESC TrackDesc = {};	// アニメーショントラック構造体.
 
@@ -450,19 +450,21 @@ HRESULT D3DXPARSER::Release()
 	return S_OK;
 }
 
-
 //=============================================================================
 //		指定したボーン情報(行列)を取得する関数.
 //=============================================================================
-bool D3DXPARSER::GetMatrixFromBone(LPCSTR BoneName, D3DXMATRIX* pOutMat)
+bool D3DXPARSER::GetMatrixFromBone(LPCSTR BoneName, D3DXMATRIX* pOutMat) const
 {
 	LPD3DXFRAME pFrame;
-	pFrame = reinterpret_cast<MYFRAME*>(D3DXFrameFind(m_pFrameRoot, BoneName));
+	// m_pFrameRoot は const メンバーなので、const ではない D3DXFrameFind に渡すには const_cast が必要になることがあります。
+	// ただし、D3DXFrameFind が内部で pFrameRoot の状態を変更しないのであれば、D3DXFrameFind の const 版を
+	// 使うか、D3DXFrameFind が const 引数を受け取るように変更するのが理想です。
+	// ここでは、D3DXFrameFind が実際には pFrameRoot の状態を変更しないという前提で const_cast を使用しています。
+	pFrame = reinterpret_cast<MYFRAME*>(D3DXFrameFind(const_cast<LPD3DXFRAME>(m_pFrameRoot), BoneName));
 
 	if (pFrame == nullptr) { return false; }
 
 	MYFRAME* pMyFrame = reinterpret_cast<MYFRAME*>(pFrame);
-	// 位置情報を取得.
 	*pOutMat = pMyFrame->CombinedTransformationMatrix;
 
 	return true;
@@ -472,9 +474,10 @@ bool D3DXPARSER::GetMatrixFromBone(LPCSTR BoneName, D3DXMATRIX* pOutMat)
 //=============================================================================
 //		指定したボーン情報(座標)を取得する関数.
 //=============================================================================
-bool D3DXPARSER::GetPosFromBone(LPCSTR BoneName, D3DXVECTOR3* pOutPos)
+bool D3DXPARSER::GetPosFromBone(LPCSTR BoneName, D3DXVECTOR3* pOutPos) const
 {
 	D3DXMATRIX mBone;
+	// GetMatrixFromBone は const なので、ここも const にできる
 	if (GetMatrixFromBone(BoneName, &mBone) == false) { return false; }
 	pOutPos->x = mBone._41;
 	pOutPos->y = mBone._42;
@@ -487,19 +490,21 @@ bool D3DXPARSER::GetPosFromBone(LPCSTR BoneName, D3DXVECTOR3* pOutPos)
 //=============================================================================
 //		最大アニメーション数を取得.
 //=============================================================================
-int D3DXPARSER::GetAnimMax(LPD3DXANIMATIONCONTROLLER pAC)
+int D3DXPARSER::GetAnimMax(LPD3DXANIMATIONCONTROLLER pAC) const
 {
 	if (pAC != nullptr) {
 		return pAC->GetNumAnimationSets();
 	}
-	return m_pAnimController->GetNumAnimationSets();
+	// m_pAnimController も const メンバーなので、const ではない GetNumAnimationSets に渡すには const_cast が必要になることがあります。
+	// ただし、GetNumAnimationSets が内部で m_pAnimController の状態を変更しないのであれば、const_cast を使用します。
+	return const_cast<LPD3DXANIMATIONCONTROLLER>(m_pAnimController)->GetNumAnimationSets();
 }
 
 
 //=============================================================================
 //		UVの取得.
 //=============================================================================
-int D3DXPARSER::GetNumUVs(MYMESHCONTAINER* pContainer)
+int D3DXPARSER::GetNumUVs(MYMESHCONTAINER* pContainer) const
 {
 	// 頂点数と同じ数だけ設定されてるはず.
 	return pContainer->MeshData.pMesh->GetNumVertices();
@@ -509,7 +514,7 @@ int D3DXPARSER::GetNumUVs(MYMESHCONTAINER* pContainer)
 //=============================================================================
 //		スキンメッシュ内のボーンの総数を取得する。
 //=============================================================================
-int D3DXPARSER::GetNumBones( MYMESHCONTAINER* pContainer )
+int D3DXPARSER::GetNumBones(MYMESHCONTAINER* pContainer ) const
 {
 	return pContainer->pSkinInfo->GetNumBones();
 }
@@ -518,7 +523,7 @@ int D3DXPARSER::GetNumBones( MYMESHCONTAINER* pContainer )
 //=============================================================================
 //		面数の取得.
 //=============================================================================
-int D3DXPARSER::GetNumFaces(MYMESHCONTAINER* pContainer)
+int D3DXPARSER::GetNumFaces(MYMESHCONTAINER* pContainer) const
 {
 	return pContainer->MeshData.pMesh->GetNumFaces();
 }
@@ -527,7 +532,7 @@ int D3DXPARSER::GetNumFaces(MYMESHCONTAINER* pContainer)
 //=============================================================================
 //		頂点数の取得.
 //=============================================================================
-int D3DXPARSER::GetNumVertices(MYMESHCONTAINER* pContainer)
+int D3DXPARSER::GetNumVertices(MYMESHCONTAINER* pContainer) const
 {
 	return pContainer->MeshData.pMesh->GetNumVertices();
 }
@@ -536,7 +541,7 @@ int D3DXPARSER::GetNumVertices(MYMESHCONTAINER* pContainer)
 //=============================================================================
 //		マテリアル数の取得.
 //=============================================================================
-int D3DXPARSER::GetNumMaterials(MYMESHCONTAINER* pContainer)
+int D3DXPARSER::GetNumMaterials( MYMESHCONTAINER* pContainer) const
 {
 	return pContainer->NumMaterials;
 }
@@ -545,15 +550,19 @@ int D3DXPARSER::GetNumMaterials(MYMESHCONTAINER* pContainer)
 //=============================================================================
 //		インデックスバッファ内の指定した位置にある頂点インデックスを返す.
 //=============================================================================
-int D3DXPARSER::GetIndex(MYMESHCONTAINER* pContainer, DWORD Index)
+int D3DXPARSER::GetIndex( MYMESHCONTAINER* pContainer, DWORD Index) const
 {
 	WORD VertIndex = 0;
 	WORD* pIndex = nullptr;
-	pContainer->MeshData.pMesh->LockIndexBuffer(D3DLOCK_READONLY, reinterpret_cast<VOID**>(&pIndex));
-
-	VertIndex = pIndex[Index];
-
-	pContainer->MeshData.pMesh->UnlockIndexBuffer();
+	// pMesh も const メンバーなので、const ではない LockIndexBuffer に渡すには const_cast が必要になることがあります。
+	// ただし、LockIndexBuffer が内部で pMesh の状態を変更しないのであれば、const_cast を使用します。
+	if (SUCCEEDED(const_cast<LPD3DXMESH>(pContainer->MeshData.pMesh)->LockIndexBuffer(D3DLOCK_READONLY, reinterpret_cast<VOID**>(&pIndex))))
+	{
+	    VertIndex = pIndex[Index];
+	    const_cast<LPD3DXMESH>(pContainer->MeshData.pMesh)->UnlockIndexBuffer();
+	} else {
+	    // エラーハンドリングを追加することも検討
+	}
 
 	return VertIndex;
 }
@@ -562,7 +571,7 @@ int D3DXPARSER::GetIndex(MYMESHCONTAINER* pContainer, DWORD Index)
 //=============================================================================
 //		指定されたボーンが影響を及ぼす頂点数を返す.
 //=============================================================================
-int D3DXPARSER::GetNumBoneVertices(MYMESHCONTAINER* pContainer, int BoneIndex)
+int D3DXPARSER::GetNumBoneVertices( MYMESHCONTAINER* pContainer, int BoneIndex) const
 {
 	return pContainer->pSkinInfo->GetNumBoneInfluences(BoneIndex);
 }
@@ -571,13 +580,15 @@ int D3DXPARSER::GetNumBoneVertices(MYMESHCONTAINER* pContainer, int BoneIndex)
 //=============================================================================
 //		そのポリゴンが、どのマテリアルであるかを返す.
 //=============================================================================
-int D3DXPARSER::GeFaceMaterialIndex(MYMESHCONTAINER* pContainer, int FaceIndex)
+int D3DXPARSER::GeFaceMaterialIndex( MYMESHCONTAINER* pContainer, int FaceIndex) const
 {
 	int MaterialIndex = 0;
 	DWORD* pBuf = nullptr;
-	if ( SUCCEEDED( pContainer->MeshData.pMesh->LockAttributeBuffer(D3DLOCK_READONLY, &pBuf)))
+	// LockAttributeBuffer も const ではない可能性があるため const_cast
+	if ( SUCCEEDED( const_cast<LPD3DXMESH>(pContainer->MeshData.pMesh)->LockAttributeBuffer(D3DLOCK_READONLY, &pBuf)))
 	{
 		MaterialIndex = pBuf[FaceIndex];
+		const_cast<LPD3DXMESH>(pContainer->MeshData.pMesh)->UnlockAttributeBuffer(); // Unlock も忘れずに
 	}
 	else
 	{
@@ -590,16 +601,17 @@ int D3DXPARSER::GeFaceMaterialIndex(MYMESHCONTAINER* pContainer, int FaceIndex)
 //=============================================================================
 //		FaceIndex番目のポリゴンを形成する3頂点の中で、IndexInFace番目[0,2]の頂点のインデックスを返す.
 //=============================================================================
-int D3DXPARSER::GetFaceVertexIndex(MYMESHCONTAINER* pContainer, int FaceIndex, int IndexInFace)
+int D3DXPARSER::GetFaceVertexIndex( MYMESHCONTAINER* pContainer, int FaceIndex, int IndexInFace) const
 {
 	// インデックスバッファーを調べれば分かる.
 	WORD VertIndex = 0;
 	WORD* pIndex = nullptr;
-	pContainer->MeshData.pMesh->LockIndexBuffer( D3DLOCK_READONLY, reinterpret_cast<VOID**>(&pIndex));
-
-	VertIndex = pIndex[FaceIndex * 3 + IndexInFace];
-
-	pContainer->MeshData.pMesh->UnlockIndexBuffer();
+	// LockIndexBuffer も const ではない可能性があるため const_cast
+	if (SUCCEEDED(const_cast<LPD3DXMESH>(pContainer->MeshData.pMesh)->LockIndexBuffer( D3DLOCK_READONLY, reinterpret_cast<VOID**>(&pIndex))))
+	{
+	    VertIndex = pIndex[FaceIndex * 3 + IndexInFace];
+	    const_cast<LPD3DXMESH>(pContainer->MeshData.pMesh)->UnlockIndexBuffer();
+	}
 
 	return VertIndex;
 }
@@ -608,33 +620,36 @@ int D3DXPARSER::GetFaceVertexIndex(MYMESHCONTAINER* pContainer, int FaceIndex, i
 //=============================================================================
 //		アニメーション停止時間を取得.
 //=============================================================================
-double D3DXPARSER::GetAnimPeriod(int Index)
+double D3DXPARSER::GetAnimPeriod(int Index) const
 {
 	if (Index < 0 || MAX_ANIM_SET <= Index) {
 		return 0.0;
 	}
-	return m_pAnimSet[Index]->GetPeriod();
+	// m_pAnimSet[Index] も const メンバーなので、const ではない GetPeriod に渡すには const_cast が必要になることがあります。
+	return const_cast<LPD3DXANIMATIONSET>(m_pAnimSet[Index])->GetPeriod();
 }
 
 
 //=============================================================================
 //		指定されたボーンが影響を及ぼす頂点のボーンウェイトを取得する.
 //=============================================================================
-double D3DXPARSER::GetBoneVerticesWeights(MYMESHCONTAINER* pContainer, int BoneIndex, int IndexInGroup)
+double D3DXPARSER::GetBoneVerticesWeights( MYMESHCONTAINER* pContainer, int BoneIndex, int IndexInGroup) const
 {
 	auto Num = pContainer->pSkinInfo->GetNumBoneInfluences(BoneIndex);
-	auto pVerts = std::make_unique<DWORD[]>(Num);
-	auto pWeights = std::make_unique<float[]>(Num); // 修正: 変数名のスペルミス修正（pWights → pWeights）.
+	// new D3DXMATRIX * [dwBoneNum]() のように () をつけることで、要素がゼロ初期化されます。
+	// C++14 以降では std::make_unique<DWORD[]>(Num) でも要素はゼロ初期化されます。
+	// C++11 の場合、() で初期化子を明示する必要があります。
+	std::unique_ptr<DWORD[]> pVerts = std::make_unique<DWORD[]>(Num);
+	std::unique_ptr<float[]> pWeights = std::make_unique<float[]>(Num);
 
-	double dRslt = 0.0; // 初期化（float の 0.0f ではなく double の 0.0 に統一）.
+	double dRslt = 0.0; 
 
-	// ボーンの影響を受ける頂点情報を取得.
-	if (FAILED(pContainer->pSkinInfo->GetBoneInfluence(BoneIndex, pVerts.get(), pWeights.get())))
+	// pSkinInfo も const ではない GetBoneInfluence に渡すには const_cast が必要になることがあります。
+	if (FAILED(const_cast<LPD3DXSKININFO>(pContainer->pSkinInfo)->GetBoneInfluence(BoneIndex, pVerts.get(), pWeights.get())))
 	{
 		MessageBox(nullptr, _T("ボーンの影響を受ける頂点が見つからない"), _T("エラー"), MB_OK);
 	}
 	else {
-		// 指定されたインデックスのウェイトを double 型にキャストして取得.
 		dRslt = static_cast<double>(pWeights[IndexInGroup]);
 	}
 
@@ -645,7 +660,7 @@ double D3DXPARSER::GetBoneVerticesWeights(MYMESHCONTAINER* pContainer, int BoneI
 //=============================================================================
 //		スペキュラパワーの取得.
 //=============================================================================
-float D3DXPARSER::GetSpecularPower(MYMESHCONTAINER* pContainer, int Index)
+float D3DXPARSER::GetSpecularPower( MYMESHCONTAINER* pContainer, int Index) const
 {
 	return pContainer->pMaterials[Index].MatD3D.Power;
 }
@@ -654,22 +669,20 @@ float D3DXPARSER::GetSpecularPower(MYMESHCONTAINER* pContainer, int Index)
 //=============================================================================
 //		指定されたボーンが影響を及ぼす頂点のインデックスを取得する.
 //=============================================================================
-DWORD D3DXPARSER::GetBoneVerticesIndices(MYMESHCONTAINER* pContainer, int BoneIndex, int IndexInGroup)
+DWORD D3DXPARSER::GetBoneVerticesIndices( MYMESHCONTAINER* pContainer, int BoneIndex, int IndexInGroup) const
 {
-	// ボーンが影響を及ぼす頂点数を取得.
 	auto Num = pContainer->pSkinInfo->GetNumBoneInfluences(BoneIndex);
-	auto pVerts = std::make_unique<DWORD[]>(Num);
-	auto pWeights = std::make_unique<float[]>(Num); // 修正: 変数名のスペルミス修正（pWights → pWeights）.
+	std::unique_ptr<DWORD[]> pVerts = std::make_unique<DWORD[]>(Num);
+	std::unique_ptr<float[]> pWeights = std::make_unique<float[]>(Num);
 
 	DWORD dwRslt = 0;
 
-	// ボーンの影響を受ける頂点情報を取得.
-	if (FAILED(pContainer->pSkinInfo->GetBoneInfluence(BoneIndex, pVerts.get(), pWeights.get())))
+	// pSkinInfo も const ではない GetBoneInfluence に渡すには const_cast が必要になることがあります。
+	if (FAILED(const_cast<LPD3DXSKININFO>(pContainer->pSkinInfo)->GetBoneInfluence(BoneIndex, pVerts.get(), pWeights.get())))
 	{
 		MessageBox(nullptr, _T("ボーンの影響を受ける頂点が見つからない"), _T("エラー"), MB_OK);
 	}
 	else {
-		// 指定されたインデックスの頂点インデックスを取得.
 		dwRslt = pVerts[IndexInGroup];
 	}
 
@@ -680,16 +693,18 @@ DWORD D3DXPARSER::GetBoneVerticesIndices(MYMESHCONTAINER* pContainer, int BoneIn
 //=============================================================================
 //		テクスチャのパスの取得.
 //=============================================================================
-LPSTR D3DXPARSER::GetTexturePath(MYMESHCONTAINER* pContainer, int Index)
+LPSTR D3DXPARSER::GetTexturePath( MYMESHCONTAINER* pContainer, int Index) const
 {
-	return pContainer->pMaterials[Index].pTextureFilename;
+	// D3DXMESHCONTAINER::pMaterials は D3DMATERIAL9 と LPSTR の組み合わせなので、
+	// pTextureFilename は const ではない可能性があるため、const_cast
+	return const_cast<LPSTR>(pContainer->pMaterials[Index].pTextureFilename);
 }
 
 
 //=============================================================================
 //		指定したボーンの名前を取得する。
 //=============================================================================
-LPCSTR D3DXPARSER::GetBoneName(MYMESHCONTAINER* pContainer, int BoneIndex)
+LPCSTR D3DXPARSER::GetBoneName( MYMESHCONTAINER* pContainer, int BoneIndex) const
 {
 	return pContainer->pSkinInfo->GetBoneName(BoneIndex);
 }
@@ -698,27 +713,31 @@ LPCSTR D3DXPARSER::GetBoneName(MYMESHCONTAINER* pContainer, int BoneIndex)
 //=============================================================================
 //		テクスチャー座標.
 //=============================================================================
-D3DXVECTOR2 D3DXPARSER::GetUV(MYMESHCONTAINER* pContainer, DWORD Index)
+D3DXVECTOR2 D3DXPARSER::GetUV( MYMESHCONTAINER* pContainer, DWORD Index) const
 {
 	LPDIRECT3DVERTEXBUFFER9 pVB = nullptr;
-	pContainer->MeshData.pMesh->GetVertexBuffer(&pVB);
+	// GetVertexBuffer は const ではない可能性があるため const_cast
+	if (FAILED(const_cast<LPD3DXMESH>(pContainer->MeshData.pMesh)->GetVertexBuffer(&pVB)))
+	{
+        // エラーハンドリング
+        return ZEROVEC2;
+    }
+
 	DWORD Stride = pContainer->MeshData.pMesh->GetNumBytesPerVertex();
 	BYTE* pVertices = nullptr;
-	D3DXVECTOR2 UV = ZEROVEC2; // 初期化.
+	D3DXVECTOR2 UV = ZEROVEC2; 
 
 	if (SUCCEEDED(pVB->Lock(0, 0, reinterpret_cast<VOID**>(&pVertices), 0)))
 	{
-		// 指定インデックスの頂点データの位置を計算.
 		pVertices += Index * Stride;
 		pVertices += sizeof(D3DXVECTOR3); // 座標分進める.
 		pVertices += sizeof(D3DXVECTOR3); // 法線分進める.
 
-		// UVデータを取得.
 		UV = *(reinterpret_cast<D3DXVECTOR2*>(pVertices));
 
-		pVB->Unlock(); // ロック解除.
+		pVB->Unlock();
 	}
-	SAFE_RELEASE(pVB); // 頂点バッファを解放.
+	SAFE_RELEASE(pVB);
 
 	return UV;
 }
@@ -727,26 +746,30 @@ D3DXVECTOR2 D3DXPARSER::GetUV(MYMESHCONTAINER* pContainer, DWORD Index)
 //=============================================================================
 //		法線の取得.
 //=============================================================================
-D3DXVECTOR3 D3DXPARSER::GetNormal(MYMESHCONTAINER* pContainer, DWORD Index)
+D3DXVECTOR3 D3DXPARSER::GetNormal( MYMESHCONTAINER* pContainer, DWORD Index) const
 {
 	LPDIRECT3DVERTEXBUFFER9 pVB = nullptr;
-	pContainer->MeshData.pMesh->GetVertexBuffer(&pVB);
+	// GetVertexBuffer は const ではない可能性があるため const_cast
+	if (FAILED(const_cast<LPD3DXMESH>(pContainer->MeshData.pMesh)->GetVertexBuffer(&pVB)))
+	{
+        // エラーハンドリング
+        return ZEROVEC3;
+    }
+
 	DWORD Stride = pContainer->MeshData.pMesh->GetNumBytesPerVertex();
 	BYTE* pVertices = nullptr;
-	D3DXVECTOR3 Normal = ZEROVEC3; // 初期化.
+	D3DXVECTOR3 Normal = ZEROVEC3; 
 
 	if (SUCCEEDED( pVB->Lock(0, 0, reinterpret_cast<VOID**>(&pVertices), 0)))
 	{
-		// 指定インデックスの頂点データの位置を計算.
 		pVertices += Index * Stride;
 		pVertices += sizeof(D3DXVECTOR3); // 座標分進める.
 
-		// 法線データを取得.
 		Normal = *(reinterpret_cast<D3DXVECTOR3*>(pVertices));
 
-		pVB->Unlock(); // ロック解除.
+		pVB->Unlock();
 	}
-	SAFE_RELEASE(pVB); // 頂点バッファを解放.
+	SAFE_RELEASE(pVB);
 
 	return Normal;
 }
@@ -755,22 +778,27 @@ D3DXVECTOR3 D3DXPARSER::GetNormal(MYMESHCONTAINER* pContainer, DWORD Index)
 //=============================================================================
 //		頂点座標の取得.
 //=============================================================================
-D3DXVECTOR3 D3DXPARSER::GetVertexCoord(MYMESHCONTAINER* pContainer, DWORD Index)
+D3DXVECTOR3 D3DXPARSER::GetVertexCoord( MYMESHCONTAINER* pContainer, DWORD Index) const
 {
 	LPDIRECT3DVERTEXBUFFER9 pVB = nullptr;
-	pContainer->MeshData.pMesh->GetVertexBuffer(&pVB);
+	// GetVertexBuffer は const ではない可能性があるため const_cast
+	if (FAILED(const_cast<LPD3DXMESH>(pContainer->MeshData.pMesh)->GetVertexBuffer(&pVB)))
+	{
+        // エラーハンドリング
+        return ZEROVEC3;
+    }
+
 	DWORD Stride = pContainer->MeshData.pMesh->GetNumBytesPerVertex();
 	BYTE* pVertices = nullptr;
-	D3DXVECTOR3 Coord = ZEROVEC3; // 初期化.
+	D3DXVECTOR3 Coord = ZEROVEC3; 
 
 	if (SUCCEEDED( pVB->Lock( 0, 0, reinterpret_cast<VOID**>(&pVertices), 0)))
 	{
-		// 指定インデックスの頂点データの位置を計算し、座標を取得.
 		pVertices += Index * Stride;
 		Coord = *(reinterpret_cast<D3DXVECTOR3*>(pVertices));
-		pVB->Unlock(); // ロック解除.
+		pVB->Unlock();
 	}
-	SAFE_RELEASE(pVB); // 頂点バッファを解放.
+	SAFE_RELEASE(pVB);
 
 	return Coord;
 }
@@ -779,7 +807,7 @@ D3DXVECTOR3 D3DXPARSER::GetVertexCoord(MYMESHCONTAINER* pContainer, DWORD Index)
 //=============================================================================
 //		アンビエント（環境光）の取得.
 //=============================================================================
-D3DXVECTOR4 D3DXPARSER::GetAmbient(MYMESHCONTAINER* pContainer, int Index)
+D3DXVECTOR4 D3DXPARSER::GetAmbient( MYMESHCONTAINER* pContainer, int Index) const
 {
 	D3DXCOLOR color = pContainer->pMaterials[Index].MatD3D.Ambient;
 	return D3DXVECTOR4(color.r, color.g, color.b, color.a);
@@ -789,7 +817,7 @@ D3DXVECTOR4 D3DXPARSER::GetAmbient(MYMESHCONTAINER* pContainer, int Index)
 //=============================================================================
 //		ディフューズ（拡散反射光）の取得.
 //=============================================================================
-D3DXVECTOR4 D3DXPARSER::GetDiffuse(MYMESHCONTAINER* pContainer, int Index)
+D3DXVECTOR4 D3DXPARSER::GetDiffuse( MYMESHCONTAINER* pContainer, int Index) const
 {
 	D3DXCOLOR color = pContainer->pMaterials[Index].MatD3D.Diffuse;
 	return D3DXVECTOR4(color.r, color.g, color.b, color.a);
@@ -799,7 +827,7 @@ D3DXVECTOR4 D3DXPARSER::GetDiffuse(MYMESHCONTAINER* pContainer, int Index)
 //=============================================================================
 //		スペキュラ（鏡面反射光）の取得.
 //=============================================================================
-D3DXVECTOR4 D3DXPARSER::GetSpecular(MYMESHCONTAINER* pContainer, int Index)
+D3DXVECTOR4 D3DXPARSER::GetSpecular( MYMESHCONTAINER* pContainer, int Index) const
 {
 	D3DXCOLOR color = pContainer->pMaterials[Index].MatD3D.Specular;
 	return D3DXVECTOR4(color.r, color.g, color.b, color.a);
@@ -809,7 +837,7 @@ D3DXVECTOR4 D3DXPARSER::GetSpecular(MYMESHCONTAINER* pContainer, int Index)
 //=============================================================================
 //		エミッシブ（自己発光）の取得.
 //=============================================================================
-D3DXVECTOR4 D3DXPARSER::GetEmissive(MYMESHCONTAINER* pContainer, int Index)
+D3DXVECTOR4 D3DXPARSER::GetEmissive( MYMESHCONTAINER* pContainer, int Index) const
 {
 	D3DXCOLOR color = pContainer->pMaterials[Index].MatD3D.Emissive;
 	return D3DXVECTOR4(color.r, color.g, color.b, color.a);
@@ -819,9 +847,9 @@ D3DXVECTOR4 D3DXPARSER::GetEmissive(MYMESHCONTAINER* pContainer, int Index)
 //=============================================================================
 //		指定したボーンのバインドポーズ（初期姿勢の行列）を取得する.
 //=============================================================================
-D3DXMATRIX D3DXPARSER::GetNewPose(MYMESHCONTAINER* pContainer, int BoneIndex)
+D3DXMATRIX D3DXPARSER::GetNewPose( MYMESHCONTAINER* pContainer, int BoneIndex) const
 {
-	MYMESHCONTAINER* pMyContaiber = reinterpret_cast<MYMESHCONTAINER*>(pContainer);
+	const MYMESHCONTAINER* pMyContaiber = reinterpret_cast<const MYMESHCONTAINER*>(pContainer);
 	return *pMyContaiber->ppBoneMatrix[BoneIndex];
 }
 
@@ -829,7 +857,7 @@ D3DXMATRIX D3DXPARSER::GetNewPose(MYMESHCONTAINER* pContainer, int BoneIndex)
 //=============================================================================
 //		指定したボーンのバインドポーズ（初期姿勢の行列）を取得する.
 //=============================================================================
-D3DXMATRIX D3DXPARSER::GetBindPose(MYMESHCONTAINER* pContainer, int BoneIndex)
+D3DXMATRIX D3DXPARSER::GetBindPose( MYMESHCONTAINER* pContainer, int BoneIndex) const
 {
 	return *pContainer->pSkinInfo->GetBoneOffsetMatrix(BoneIndex);
 }

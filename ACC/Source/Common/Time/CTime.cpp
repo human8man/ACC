@@ -5,10 +5,11 @@
 //		タイムクラス.
 //=============================================================================
 CTime::CTime()
-	: m_DeltaTime	( 0.01667f )
-	, m_TotalTime	( 0.f )
-	, m_LastTime	(std::chrono::steady_clock::now())
-	, m_TimeScale	( 1.f )
+	: m_DeltaTime			( 0.01667f )
+	, m_UnscaledDeltaTime	( 0.01667f )
+	, m_TotalTime			( 0.f )
+	, m_LastTime			(std::chrono::steady_clock::now())
+	, m_TimeScale			( 1.f )
 {
 }
 CTime::~CTime()

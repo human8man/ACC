@@ -53,7 +53,7 @@ public:
 	// ì¬ˆ—.
 	HRESULT Create(CSound** ppSound, std::string filePath, HWND hWnd);
 	// ƒf[ƒ^“Çˆ—.
-	bool Load( HWND hWnd );
+	HRESULT Load( HWND hWnd );
 	// ‰ğ•úˆ—.
 	void Release();
 	
