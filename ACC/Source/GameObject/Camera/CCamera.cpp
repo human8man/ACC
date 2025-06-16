@@ -51,10 +51,6 @@ void CCamera::Init()
 //===================================================================
 void CCamera::Update()
 {
-	m_WindowMid = POINT(
-		static_cast<LONG>(CLIENTRECT.x + (NOWFWND_W / 2.f)),
-		static_cast<LONG>(CLIENTRECT.y + (NOWFWND_H / 2.f)));
-
 	// マウス移動量の初期化.
 	m_MouseMoveDis = ZEROVEC2;
 
@@ -76,9 +72,8 @@ void CCamera::Update()
 			m_MouseMoveDis.x = static_cast<float>(m_NowCurorPos.x - m_BeforCursorPos.x);
 			m_MouseMoveDis.y = static_cast<float>(m_NowCurorPos.y - m_BeforCursorPos.y);
 
-			// マウス位置を画面中央に初期化.
-			SetCursorPos(m_WindowMid.x, m_WindowMid.y);	// 現在のマウス位置リセット.
-			m_BeforCursorPos = m_WindowMid;	// 過去のマウス位置リセット.
+			// カーソル位置の初期化.
+			CursorInit();
 		}
 	}
 
@@ -105,6 +100,21 @@ void CCamera::Camera( D3DXMATRIX& View ) const
 
 	// ビュー（カメラ）変換.
 	D3DXMatrixLookAtLH( &View, &pos, &look, &vec );
+}
+
+
+//===================================================================
+//		カーソル位置の初期化関数.
+//===================================================================
+void CCamera::CursorInit()
+{
+	m_WindowMid = POINT(
+		static_cast<LONG>(CLIENTRECT.x + (NOWFWND_W / 2.f)),
+		static_cast<LONG>(CLIENTRECT.y + (NOWFWND_H / 2.f)));
+
+	// マウス位置を画面中央に初期化.
+	SetCursorPos(m_WindowMid.x, m_WindowMid.y);	// 現在のマウス位置リセット.
+	m_BeforCursorPos = m_WindowMid;	// 過去のマウス位置リセット.
 }
 
 
