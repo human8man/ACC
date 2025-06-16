@@ -15,6 +15,8 @@
 #include "Sprite/2D/UI/CWinUI/CWinUI.h"
 #include "Random/CRandom.h"
 #include "Easing/Easing.h"
+#include "ImGui/CImGui.h"
+
 
 //============================================================================
 //		ゲームクラス.
@@ -224,9 +226,7 @@ void CGame::Update()
 		CCamera::GetInstance()->Update();	// カメラの更新.
 
 		// プレイヤーがオートエイムを使用していた場合.
-		if (m_pPlayer->GetAutoAim()) {
-			CCamera::GetInstance()->SetLook(m_pEnemy->GetPos());
-		}
+		if (m_pPlayer->GetAutoAim()) { AutoAimProcess();}
 
 		// 当たり判定処理.
 		CollisionJudge();
@@ -641,4 +641,42 @@ void CGame::UIUpdate()
 	// 勝利や敗北画面の更新処理.
 	if ( m_pLoseUI != nullptr )	{ m_pLoseUI->Update();	}
 	if ( m_pWinUI  != nullptr )	{ m_pWinUI->Update();	}
+}
+
+
+//-----------------------------------------------------------------------------
+//		オートエイム時のカメラ処理.
+//-----------------------------------------------------------------------------
+void CGame::AutoAimProcess()
+{
+	CCamera::GetInstance()->CursorInit();
+	D3DXVECTOR3 camPos = CCamera::GetInstance()->GetPos();
+	D3DXVECTOR3 enemyPos = m_pEnemy->GetPos();
+	enemyPos.y += 1.f;
+	D3DXVECTOR3 toEnemy = enemyPos - camPos;
+	D3DXVECTOR3 camRot = ZEROVEC3;
+	D3DXVec3Normalize(&toEnemy, &toEnemy);
+
+	float yaw = atan2f(toEnemy.z, toEnemy.x);
+	float pitch = asinf(toEnemy.y);
+
+	camRot.x = D3DXToDegree(pitch);
+	camRot.y = D3DXToDegree(yaw);
+	CCamera::GetInstance()->SetRot(camRot);
+
+	// カメラ向き更新.
+	D3DXVECTOR3 lookDir;
+	lookDir.x = cosf(D3DXToRadian(camRot.y)) * cosf(D3DXToRadian(camRot.x));
+	lookDir.y = sinf(D3DXToRadian(camRot.x));
+	lookDir.z = sinf(D3DXToRadian(camRot.y)) * cosf(D3DXToRadian(camRot.x));
+	D3DXVec3Normalize(&lookDir, &lookDir);
+
+	// 最終的な注視点.
+	CCamera::GetInstance()->SetLook(camPos + lookDir);
+
+	// DEBUG時のみの処理.
+	if (!ISDEBUG) return;
+	ImGui::Begin(IMGUI_JP("カメラ情報"));
+	ImGui::Text("%f,%f,%f", camRot.x, camRot.y, camRot.z);
+	ImGui::End();
 }

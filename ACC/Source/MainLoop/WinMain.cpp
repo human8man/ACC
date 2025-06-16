@@ -25,7 +25,11 @@ INT WINAPI WinMain(
 	Json m_SceneData = nullptr;
 	m_SceneData = FileManager::JsonLoad(ScenePath);
 	if (m_SceneData["Scene"].get<std::string>() == "UIEditor") { ISDEBUG = true; }
-	
+
+#if _DEBUG
+	ISDEBUG = true;
+#endif
+
 	if (pCMain != nullptr)
 	{
 		// ウィンドウ作成成功したら.

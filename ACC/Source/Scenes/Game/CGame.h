@@ -61,6 +61,9 @@ private:
 	// UI処理をまとめる関数.
 	void UIUpdate();
 
+	// オートエイム時のカメラ処理.
+	void AutoAimProcess();
+
 private:
 	HWND	m_hWnd;	 // ウィンドウハンドル.
 	LIGHT	m_Light; // ライト情報.

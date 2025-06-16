@@ -32,6 +32,8 @@ public:
 	// カメラ関数(ビュー行列計算).
 	void Camera(D3DXMATRIX& View) const;
 
+	// カーソル位置の初期化関数.
+	void CursorInit();
 
 	static bool& GetMoveMouse()		{ return GetInstance()->m_CanMoveMouse;	}	// マウスがウィンドウ外に移動可能かを取得.
 	static bool& GetMoveCamera()	{ return GetInstance()->m_CanMoveCamera;}	// カメラのキー操作が可能かを取得.
@@ -56,6 +58,7 @@ public:
 	static void SetPosition	 (const D3DXVECTOR3& Pos) { GetInstance()->m_Camera.Pos = Pos;	}	// カメラ座標の設定.
 	static void SetRayHit	 (const D3DXVECTOR3& Pos) { GetInstance()->m_RayHitPoint = Pos;	}	// レイが当たった座標の設定.
 	static void SetLook		 (const D3DXVECTOR3& Pos) { GetInstance()->m_Camera.Look = Pos;	}	// 注視点の設定.
+	static void SetRot		 (const D3DXVECTOR3& Rot) { GetInstance()->m_CameraRot	 = Rot;	}	// 回転の設定.
 private:
 	// キー入力処理をまとめる関数.
 	void KeyInput();
