@@ -15,7 +15,6 @@
 #include "Sprite/2D/UI/CWinUI/CWinUI.h"
 #include "Random/CRandom.h"
 #include "Easing/Easing.h"
-#include "ImGui/CImGui.h"
 
 
 //============================================================================
@@ -673,10 +672,4 @@ void CGame::AutoAimProcess()
 
 	// 最終的な注視点.
 	CCamera::GetInstance()->SetLook(camPos + lookDir);
-
-	// DEBUG時のみの処理.
-	if (!ISDEBUG) return;
-	ImGui::Begin(IMGUI_JP("カメラ情報"));
-	ImGui::Text("%f,%f,%f", camRot.x, camRot.y, camRot.z);
-	ImGui::End();
 }
