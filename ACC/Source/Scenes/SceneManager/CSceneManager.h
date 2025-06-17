@@ -37,11 +37,20 @@ public:
 	void Release();						// 解放処理.
 
 	static SceneList& GetSceneNo() { return GetInstance()->m_SceneNo; }
+
 private:
 	// 指定されたシーンの生成.
 	std::unique_ptr<CSceneBase> CreateScene(SceneList No);
 	// カーソルの表示切替.
 	void ChangeShowCursor(bool flag);
+	// 終了処理.
+	void EndProcess();
+	// 定数処理.
+	void ConstantProcess();
+	// ImGui処理.
+	void ImGuiUpdate();
+	// シーン更新処理.
+	void SceneUpdate();
 
 private:
 	HWND m_hWnd;
@@ -51,5 +60,7 @@ private:
 	std::unique_ptr<CEndUI>		m_pEndUI;	// エンドクラス.
 	std::unique_ptr<CSceneBase>	m_pScene;	// シーンクラスのポインタ.
 
+	float m_FocusTime;		// ウィンドウにフォーカスする時間.
+	float m_FocusTimeMax;	// ウィンドウにフォーカスする最大時間.
 	bool m_EndDeleteFlag;
 };

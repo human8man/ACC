@@ -106,9 +106,7 @@ void CPlayer::Update(std::unique_ptr<CEnemy>& chara)
 	CCharacter::Update();
 
 	// ImGuiを用いたデバッグ関数.
-	if (ISDEBUG) {
-		PlayerImGui();
-	}
+	if (ISDEBUG) { PlayerImGui(); }
 }
 
 
@@ -249,84 +247,14 @@ void CPlayer::Collision(std::unique_ptr<CEnemy>& egg, Collider floor, Collider c
 //-----------------------------------------------------------------------------
 void CPlayer::KeyInput(std::unique_ptr<CEnemy>& chara)
 {
-	// エフェクト事に必要なハンドルを用意.
-	static ::EsHandle hEffect = -1;
 
 	CKey* Key = CInput::GetInstance()->CDKeyboard();
-	CMouse* Mouse = CInput::GetInstance()->CDMouse();
 
-	//----------------------------------------------------------------------
-	//		WASDで移動.
-	//----------------------------------------------------------------------
+	// 移動.
+	MoveProcess(chara);
 
-	// ダッシュ中は操作できないようにする.
-	if (m_DashTime <= 0.f) {
-		// 操作が可能な間は初期化する.
-		m_DashVec = ZEROVEC3;
-
-		D3DXVECTOR3 camDir;
-		// カメラの向きベクトルを取得.
-		if (m_AutoAim) {
-			camDir = chara->GetPos() - m_vPosition;
-			camDir.y = 0.f;	// Y情報があると飛び始めるのでYの要素を抜く.
-			D3DXVec3Normalize(&camDir, &camDir); // 正規化.
-		}
-		else {
-			camDir = CCamera::GetInstance()->GetCamDir();
-			camDir.y = 0.f;	// Y情報があると飛び始めるのでYの要素を抜く.
-			D3DXVec3Normalize(&camDir, &camDir); // 正規化.
-		}
-
-		// 移動する方向ベクトル.
-		D3DXVECTOR3 forward(ZEROVEC3);
-		D3DXVECTOR3 left(ZEROVEC3);
-		D3DXVECTOR3 upvec(0, 1, 0);
-
-		// 左ベクトルを求める.
-		D3DXVec3Cross(&left, &camDir, &upvec);
-		D3DXVec3Normalize(&left, &left);
-
-		if (Key->IsKeyDown(DIK_W)) { forward += camDir; }
-		if (Key->IsKeyDown(DIK_S)) { forward -= camDir; }
-		if (Key->IsKeyDown(DIK_A)) { forward += left; }
-		if (Key->IsKeyDown(DIK_D)) { forward -= left; }
-
-		// 最終的なベクトル量を速度にかけ合計ベクトルに渡す.
-		m_SumVec += forward * m_MoveSpeed;
-	}
-
-	//----------------------------------------------------------------------
-	//		SHIFTでダッシュ.
-	//----------------------------------------------------------------------
-
-	// クールタイムが終了していたらダッシュ可能に.
-	if (m_DashCoolTime <= 0.f) { m_CanDash = true; }
-
-	// SHIFTでダッシュ.
-	if (Key->IsKeyAction(DIK_LSHIFT) && m_CanDash && m_Landing) {
-		// ダッシュ時間の設定.
-		m_DashTime = m_DashTimeMax;
-		// ダッシュクールタイムの設定.
-		m_DashCoolTime = m_DashCoolTimeMax;
-
-		// 合計ベクトルに情報がない場合.
-		if (m_SumVec == ZEROVEC3) {
-			// カメラの向きベクトルを取得.
-			D3DXVECTOR3 camDir = CCamera::GetInstance()->GetCamDir();
-			camDir.y = 0.f;	// Y情報があると飛び始めるのでYの要素を抜く.
-			D3DXVec3Normalize(&camDir, &camDir); // 正規化.
-
-			// カメラ方向 × 移動速度 × ダッシュ倍率のベクトルを出す.
-			m_DashVec = camDir * m_MoveSpeed * m_DashSpeed;
-			m_CanDash = false;
-		}
-		else {
-			// 合計ベクトルにダッシュ倍率を変えた値を出す.
-			m_DashVec = m_SumVec * m_DashSpeed;
-			m_CanDash = false;
-		}
-		CSoundManager::GetInstance()->Play(CSoundManager::enList::SE_Dash);
-	}
+	// ダッシュ.
+	DashProcess();
 
 	//----------------------------------------------------------------------
 	//		ジャンプ処理.
@@ -340,54 +268,8 @@ void CPlayer::KeyInput(std::unique_ptr<CEnemy>& chara)
 		CSoundManager::GetInstance()->Play(CSoundManager::enList::SE_Jump);
 	}
 
-	// カメラのレイHit座標から発射地点のベクトルを計算.
-	D3DXVECTOR3 shootdir = CCamera::GetInstance()->GetRayHit() - m_pGun->GetShootPos();
-	D3DXVec3Normalize(&shootdir, &shootdir);	// 正規化.
-
-	//----------------------------------------------------------------------
-	//		左クリックで射撃.
-	//----------------------------------------------------------------------
-
-	// クールタイムが終了していたら射撃可能.
-	if (m_BulletCoolTime <= 0.f) { m_CanShot = true; }
-
-	// 左クリックが押された場合.
-	if (Mouse->IsLAction()
-	||	m_TriggerHappy && Mouse->IsLDown()){
-		// 射撃条件が整っている場合.
-		if (m_CanShot && m_CharaInfo.Ammo != 0 && m_ReloadTime <= 0 || m_TriggerHappy) 
-		{
-			// 連射モードでない場合.
-			if (!m_TriggerHappy) {
-				// クールタイムや残弾数の設定.
-				m_CanShot = false;
-				m_CharaInfo.Ammo--;
-				m_BulletCoolTime = m_BulletCoolTimeMax;
-			}
-
-			// 弾を作成する.
-			m_pBullets.push_back(std::make_unique<CBullet>());
-
-			m_pBullets.back()->AttachMesh(*m_pMeshBullet);	// メッシュを設定.
-			m_pBullets.back()->SetPos(0.f, -1000.f, 0.f);	// nullにならないように見えない座標に初期設定.
-			m_pBullets.back()->SetScale(5.f, 5.f, 5.f);		// サイズを設定.
-
-			// 弾の初期位置,移動方向の単位ベクトル,速度を設定.
-			m_pBullets.back()->Init(
-				m_pGun->GetShootPos(),
-				shootdir,
-				m_BulletSpeed);
-			
-			hEffect = CEffect::Play(CEffect::GunFire, m_pGun->GetShootPos());
-
-			// 射撃音を鳴らす.
-			CSoundManager::GetInstance()->Play(CSoundManager::enList::SE_Shot);
-		}
-		else if (m_CanShot && m_CharaInfo.Ammo == 0 && m_ReloadTime <= 0) {
-			// 空打ち音を鳴らす.
-			CSoundManager::GetInstance()->Play(CSoundManager::enList::SE_NoAmmo);
-		}
-	}
+	// 射撃.
+	ShotProcess();
 
 	//----------------------------------------------------------------------
 	//		Rでリロード.
@@ -409,6 +291,148 @@ void CPlayer::KeyInput(std::unique_ptr<CEnemy>& chara)
 
 	// 合計のベクトル量分位置を更新.
 	m_vPosition += (m_SumVec + m_DashVec) * CTime::GetDeltaTime();
+}
+
+
+//-----------------------------------------------------------------------------
+//		移動処理.
+//-----------------------------------------------------------------------------
+void CPlayer::MoveProcess(std::unique_ptr<CEnemy>& chara)
+{
+	// ダッシュ中は操作できないようにする.
+	if (0.f < m_DashTime) { return; }
+
+	CKey* Key = CInput::GetInstance()->CDKeyboard();
+
+	// 操作が可能な間は初期化する.
+	m_DashVec = ZEROVEC3;
+
+	D3DXVECTOR3 camDir;
+	// カメラの向きベクトルを取得.
+	if (m_AutoAim) {
+		camDir = chara->GetPos() - m_vPosition;
+		camDir.y = 0.f;	// Y情報があると飛び始めるのでYの要素を抜く.
+		D3DXVec3Normalize(&camDir, &camDir); // 正規化.
+	}
+	else {
+		camDir = CCamera::GetInstance()->GetCamDir();
+		camDir.y = 0.f;	// Y情報があると飛び始めるのでYの要素を抜く.
+		D3DXVec3Normalize(&camDir, &camDir); // 正規化.
+	}
+
+	// 移動する方向ベクトル.
+	D3DXVECTOR3 forward(ZEROVEC3);
+	D3DXVECTOR3 left(ZEROVEC3);
+	D3DXVECTOR3 upvec(0, 1, 0);
+
+	// 左ベクトルを求める.
+	D3DXVec3Cross(&left, &camDir, &upvec);
+	D3DXVec3Normalize(&left, &left);
+
+	if ( Key->IsKeyDown(DIK_W)) { forward += camDir; }
+	if ( Key->IsKeyDown(DIK_S)) { forward -= camDir; }
+	if ( Key->IsKeyDown(DIK_A)) { forward += left; }
+	if ( Key->IsKeyDown(DIK_D)) { forward -= left; }
+
+	// 最終的なベクトル量を速度にかけ合計ベクトルに渡す.
+	m_SumVec += forward * m_MoveSpeed;
+}
+
+
+//-----------------------------------------------------------------------------
+//		ダッシュ処理.
+//-----------------------------------------------------------------------------
+void CPlayer::DashProcess()
+{
+	CKey* Key = CInput::GetInstance()->CDKeyboard();
+
+	// クールタイムが終了していたらダッシュ可能に.
+	if (m_DashCoolTime <= 0.f) { m_CanDash = true; }
+
+	// SHIFTでダッシュ.
+	if (!(Key->IsKeyAction(DIK_LSHIFT) && m_CanDash && m_Landing)) { return; }
+
+	// ダッシュ時間の設定.
+	m_DashTime = m_DashTimeMax;
+	// ダッシュクールタイムの設定.
+	m_DashCoolTime = m_DashCoolTimeMax;
+
+	// 合計ベクトルに情報がない場合.
+	if (m_SumVec == ZEROVEC3) {
+		// カメラの向きベクトルを取得.
+		D3DXVECTOR3 camDir = CCamera::GetInstance()->GetCamDir();
+		camDir.y = 0.f;	// Y情報があると飛び始めるのでYの要素を抜く.
+		D3DXVec3Normalize(&camDir, &camDir); // 正規化.
+
+		// カメラ方向 × 移動速度 × ダッシュ倍率のベクトルを出す.
+		m_DashVec = camDir * m_MoveSpeed * m_DashSpeed;
+		m_CanDash = false;
+	}
+	else {
+		// 合計ベクトルにダッシュ倍率を変えた値を出す.
+		m_DashVec = m_SumVec * m_DashSpeed;
+		m_CanDash = false;
+	}
+	CSoundManager::GetInstance()->Play(CSoundManager::enList::SE_Dash);
+}
+
+
+//-----------------------------------------------------------------------------
+//		発射処理.
+//-----------------------------------------------------------------------------
+void CPlayer::ShotProcess()
+{
+	CMouse* Mouse = CInput::GetInstance()->CDMouse();
+	
+	// クールタイムが終了していたら射撃可能.
+	if (m_BulletCoolTime <= 0.f) { m_CanShot = true; }
+
+	// 左クリックが押されいない場合.
+	if (!(Mouse->IsLAction() || m_TriggerHappy && Mouse->IsLDown())) { return; }
+
+	// エフェクト事に必要なハンドルを用意.
+	static ::EsHandle hEffect = -1;
+
+	// カメラのレイHit座標から発射地点のベクトルを計算.
+	D3DXVECTOR3 shootdir = CCamera::GetInstance()->GetRayHit() - m_pGun->GetShootPos();
+	D3DXVec3Normalize(&shootdir, &shootdir);	// 正規化.
+	
+	// 射撃条件が整っている場合.
+	if (m_CanShot && m_CharaInfo.Ammo != 0 && m_ReloadTime <= 0 || m_CanShot && m_TriggerHappy)
+	{
+		// 連射モードの場合クールタイムや残弾数の設定..
+		if (m_TriggerHappy) {
+			m_CanShot = false;
+			m_BulletCoolTime = m_BulletCoolTimeMin;
+		}
+		else {
+			m_CanShot = false;
+			m_CharaInfo.Ammo--;
+			m_BulletCoolTime = m_BulletCoolTimeMax;
+		}
+
+		// 弾を作成する.
+		m_pBullets.push_back(std::make_unique<CBullet>());
+
+		m_pBullets.back()->AttachMesh(*m_pMeshBullet);	// メッシュを設定.
+		m_pBullets.back()->SetPos(0.f, -1000.f, 0.f);	// nullにならないように見えない座標に初期設定.
+		m_pBullets.back()->SetScale(5.f, 5.f, 5.f);		// サイズを設定.
+
+		// 弾の初期位置,移動方向の単位ベクトル,速度を設定.
+		m_pBullets.back()->Init(
+			m_pGun->GetShootPos(),
+			shootdir,
+			m_BulletSpeed);
+
+		hEffect = CEffect::Play(CEffect::GunFire, m_pGun->GetShootPos());
+
+		// 射撃音を鳴らす.
+		CSoundManager::GetInstance()->Play(CSoundManager::enList::SE_Shot);
+	}
+	else if (m_CanShot && m_CharaInfo.Ammo == 0 && m_ReloadTime <= 0) {
+		// 空打ち音を鳴らす.
+		CSoundManager::GetInstance()->Play(CSoundManager::enList::SE_NoAmmo);
+	}
 }
 
 

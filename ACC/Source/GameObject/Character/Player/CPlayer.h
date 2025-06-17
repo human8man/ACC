@@ -1,5 +1,6 @@
 #pragma once
 #include "Character/CCharacter.h"
+#include "DirectInput/CDirectInput.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4834)
@@ -42,6 +43,13 @@ public:
 private:
 	// キー入力処理.
 	void KeyInput(std::unique_ptr<CEnemy>& chara);
+	// 移動処理.
+	void MoveProcess(std::unique_ptr<CEnemy>& chara);
+	// ダッシュ処理.
+	void DashProcess();
+	// 発射処理.
+	void ShotProcess();
+
 	// デバッグ時に使用する関数.
 	void PlayerImGui();
 
