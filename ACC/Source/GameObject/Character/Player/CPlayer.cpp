@@ -429,7 +429,7 @@ void CPlayer::ShotProcess()
 		// ŽËŒ‚‰¹‚ð–Â‚ç‚·.
 		CSoundManager::GetInstance()->Play(CSoundManager::enList::SE_Shot);
 	}
-	else if (m_CanShot && m_CharaInfo.Ammo == 0 && m_ReloadTime <= 0) {
+	else {
 		// ‹ó‘Å‚¿‰¹‚ð–Â‚ç‚·.
 		CSoundManager::GetInstance()->Play(CSoundManager::enList::SE_NoAmmo);
 	}
