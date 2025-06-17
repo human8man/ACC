@@ -24,11 +24,12 @@ public:
 	****************************************************************/
 	void DoFade(int in,int peak,int out);
 
-	// 値を返す関数.
-	bool GetFading()	const { return m_Fading; }		// フェード中かを知らせる.
-	bool GetFirstPeak()	const { return m_FirstPeak; }	// フェードの初回ピークを知らせる.
-	bool GetFadePeak()	const { return m_Peaking; }		// フェードのピーク中を知らせる.
-	bool GetFadeEnd()	const { return m_End; }			// フェードの終了を知らせる.
+
+	bool GetFading()		const { return m_Fading; }		// フェード中かを知らせる.
+	bool GetFirstPeak()		const { return m_FirstPeak; }	// フェードの初回ピークを知らせる.
+	bool GetFadePeak()		const { return m_Peaking; }		// フェードのピーク中を知らせる.
+	bool GetFadeEnd()		const { return m_End; }			// フェードの終了を知らせる.
+	bool GetFadeEndFrame()	const { return m_EndFrame; }	// フェードの終了フレームを知らせる.
 
 private:
 	std::unique_ptr<CUIObject>	m_pUI;	// UIクラス.
@@ -39,6 +40,7 @@ private:
 	bool	m_Peak;			// ピークログ.
 	bool	m_BeforePeak;	// 前フレームにピークだったか.
 	bool	m_End;			// 終了.
+	bool	m_EndFrame;		// 終了フレーム.
 	bool	m_Peaking;		// ピーク時間中.
 
 	float	m_FadeAlpha;	// アルファ.

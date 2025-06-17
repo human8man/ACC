@@ -78,6 +78,7 @@ protected:
 	float m_ReloadTimeMax;		// リロード最大タイム.
 	float m_BulletCoolTime;		// 銃の発射クールタイム.
 	float m_BulletCoolTimeMax;	// 銃の発射最大クールタイム.
+	float m_BulletCoolTimeMin;	// 銃の発射最小クールタイム.
 	float m_BulletSpeed;		// 弾速度.
 	bool  m_CanShot;			// 発射可能か.
 

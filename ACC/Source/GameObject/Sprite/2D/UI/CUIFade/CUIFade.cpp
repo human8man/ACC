@@ -58,6 +58,8 @@ void CUIFade::Create()
 //=================================================================================================
 void CUIFade::Update()
 {
+	m_EndFrame = false;
+
 	// フェード中でない場合切る.
 	if (!m_Fading) { return; }
 
@@ -68,7 +70,7 @@ void CUIFade::Update()
 	if (m_Peaking) {
 		if (m_PeakCnt > 0.f) {
 			m_FadeAlpha = 1.f; // ピーク中はアルファ固定
-			m_PeakCnt -= CTime::GetInstance()->GetDeltaTime();
+			m_PeakCnt -= CTime::GetDeltaTime();
 		}
 		else {
 			m_FadeAlpha -= m_OutAddAlpha;
@@ -78,6 +80,7 @@ void CUIFade::Update()
 				m_FadeAlpha = 0.f;
 				m_Fading = false;
 				m_Peaking = false;
+				if (!m_End) { m_EndFrame = true; }
 				m_End = true;
 			}
 		}
@@ -92,7 +95,7 @@ void CUIFade::Update()
 	}
 
 	// フェード終了.
-	if (m_FadeAlpha <= 0) {
+	if (m_FadeAlpha <= 0.f) {
 		m_FadeAlpha = 0.f;
 		m_Fading = false;
 		m_End = true;
@@ -125,9 +128,9 @@ void CUIFade::DoFade(int in, int peak, int out)
 {
 	m_Peak = m_Peaking = m_End = m_FirstPeak = m_BeforePeak = false;
 	m_Fading = true;
+	m_FadeAlpha = 0.f;
 
-	float deltatime = CTime::GetInstance()->GetDeltaTime();
-	m_PeakCnt	= peak	* deltatime;
+	m_PeakCnt = peak * CTime::GetDeltaTime();
 	
 	// イン/アウト時に加算する値を算出.
 	m_InAddAlpha = 1.f / in;

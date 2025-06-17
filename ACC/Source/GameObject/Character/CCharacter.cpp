@@ -36,6 +36,7 @@ CCharacter::CCharacter()
 	, m_ReloadTimeMax		( CTime::GetDeltaTime() * 120.f )
 	, m_BulletCoolTime		( 0.f )
 	, m_BulletCoolTimeMax	( CTime::GetDeltaTime() * 20.f )
+	, m_BulletCoolTimeMin	( CTime::GetDeltaTime() * 1.f )
 	, m_BulletSpeed			( 180.f )
 	, m_CanShot				( true )
 
@@ -95,12 +96,12 @@ CCharacter::CCharacter()
 		m_GunRadius			= StrToFloat(m_StateList["GunRadius"]);
 		m_GunRotRevision	= StrToFloat(m_StateList["GunRotRevision"]);
 		m_GunPosRevision	= StrToFloat(m_StateList["GunPosRevision"]);
-		m_ReloadTimeMax		= StrToFloat( m_StateList["ReloadTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
-		m_BulletCoolTimeMax	= StrToFloat(m_StateList["BulletCoolTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
+		m_ReloadTimeMax		= StrToFloat( m_StateList["ReloadTimeMax"]) * CTime::GetDeltaTime();
+		m_BulletCoolTimeMax	= StrToFloat(m_StateList["BulletCoolTimeMax"]) * CTime::GetDeltaTime();
 		m_BulletSpeed		= StrToFloat(m_StateList["BulletSpeed"]);
 		m_JumpPowerMax		= StrToFloat(m_StateList["JumpPowerMax"]);
-		m_DashCoolTimeMax	= StrToFloat(m_StateList["DashCoolTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
-		m_DashTimeMax		= StrToFloat(m_StateList["DashTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
+		m_DashCoolTimeMax	= StrToFloat(m_StateList["DashCoolTimeMax"]) * CTime::GetDeltaTime();
+		m_DashTimeMax		= StrToFloat(m_StateList["DashTimeMax"]) * CTime::GetDeltaTime();
 		m_DashSpeed			= StrToFloat(m_StateList["DashSpeed"]);
 		m_EggAirRoomY		= StrToFloat(m_StateList["EggAirRoomY"]);
 		m_CharaInfo.MaxHP	= StrToInt(m_StateList["CharaHPMax"]);
