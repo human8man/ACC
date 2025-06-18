@@ -178,16 +178,24 @@ HRESULT CMain::InitWindow(
 	// ウィンドウの定義.
 	WNDCLASSEX wc;
 	ZeroMemory( &wc, sizeof( wc ) ); // 初期化(0を設定).
-
 	wc.cbSize			= sizeof( wc );
 	wc.style			= CS_HREDRAW | CS_VREDRAW;
 	wc.lpfnWndProc		= MsgProc;//WndProc;
 	wc.hInstance		= hInstance;
-	wc.hIcon			= LoadIcon( nullptr, IDI_APPLICATION );
+	
+	HICON hIcon = (HICON)LoadImage(
+		nullptr,
+		_T("Data\\ACC.ico"),
+		IMAGE_ICON,
+		0, 0,
+		LR_LOADFROMFILE | LR_DEFAULTSIZE);
+
+	wc.hIcon = hIcon;
+	wc.hIconSm = hIcon;
+	
 	wc.hCursor			= LoadCursor( nullptr, IDC_ARROW );
 	wc.hbrBackground	= (HBRUSH)GetStockObject( LTGRAY_BRUSH );
 	wc.lpszClassName	= APP_NAME;
-	wc.hIconSm			= LoadIcon( nullptr, IDI_APPLICATION );
 
 	// ウィンドウクラスをWindowsに登録.
 	if( !RegisterClassEx( &wc ) ) {
