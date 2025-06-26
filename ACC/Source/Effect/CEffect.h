@@ -1,6 +1,6 @@
 #pragma once
 
-// 警告についてのコード分析を無効にする.
+// 警告についてのコード分析を無効にする
 #pragma warning( disable : 4005 )
 #pragma warning( disable : 4099 )
 #pragma warning( disable : 26495 )
@@ -19,7 +19,7 @@
 #pragma comment( lib, "EffekseerRendererDX11.lib" )
 #endif// #ifdef _DEBUG
 
-// エイリアスを用意.
+// エイリアスを用意
 namespace {
 	namespace Es		= ::Effekseer;
 	using EsManagerRef	= ::Es::ManagerRef;
@@ -35,82 +35,82 @@ namespace {
 
 
 //=============================================================================
-//		フリーソフト Effekseer のデータを使うためのクラス.
+//		フリーソフト Effekseer のデータを使うためのクラス
 //=============================================================================
 class CEffect
 	: public CSingleton<CEffect>
 {
 public:
-	friend class CSingleton<CEffect>; // シングルトンクラスをフレンド宣言.
+	friend class CSingleton<CEffect>; // シングルトンクラスをフレンド宣言
 
 public:
-	// エフェクト種類列挙型.
+	// エフェクト種類列挙型
 	enum enList
 	{
-		CritHit,	// クリティカル(ヘッドショット).
-		Hit,		// 命中.
+		CritHit,	// クリティカル(ヘッドショット)
+		Hit,		// 命中
 
-		GunFire,	// 発射時の銃口のエフェクト.
-		Dust,		// ダスト.
+		GunFire,	// 発射時の銃口のエフェクト
+		Dust,		// ダスト
 
-		BulletSmoke,// 弾の軌道.
+		BulletSmoke,// 弾の軌道
 
-		Max,		// 最大数.
+		Max,		// 最大数
 	};
 
 public:
 	CEffect();
 	~CEffect();
 
-	// 作成処理.
+	// 作成処理
 	HRESULT Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	// データ読み込み処理.
+	// データ読み込み処理
 	HRESULT LoadData();
-	// 描画処理.
+	// 描画処理
 	void Draw(const D3DXMATRIX& mView, const D3DXMATRIX& mProj, const LIGHT& Light);
 
 	//--------------------------------------------------------------------------
-	//		変換系.
+	//		変換系
 	//--------------------------------------------------------------------------
-	// ベクター.
+	// ベクター
 	::EsVec3 ToEfkVector3( const D3DXVECTOR3* pSrcVec3Dx );
 	D3DXVECTOR3 ToDxVector3( const ::EsVec3* pSrcVec3Efk );
-	// 行列.
+	// 行列
 	::EsMatrix ToEfkMatrix( const D3DXMATRIX* pSrcMatDx );
 	D3DXMATRIX ToDxMatrix( const ::EsMatrix* pSrcMatEfk );
 
 	//--------------------------------------------------------------------------
-	//		制御系.
+	//		制御系
 	//--------------------------------------------------------------------------
-	// 再生.
+	// 再生
 	static ::EsHandle Play( enList list, const D3DXVECTOR3& pos ){
 		CEffect* pE = CEffect::GetInstance();
 		return pE->m_pManager->Play( pE->m_pEffect[list], pos.x, pos.y, pos.z);
 	}
-	// 停止.
+	// 停止
 	static void Stop( ::EsHandle handle ){
 		CEffect::GetInstance()->m_pManager->StopEffect( handle );
 	}
-	// 全て停止.
+	// 全て停止
 	static void StopAll() {
 		CEffect::GetInstance()->m_pManager->StopAllEffects();
 	}
 
 private:
-	// データ解放.
+	// データ解放
 	HRESULT ReleaseData();
 
-	// ビュー行列を設定.
+	// ビュー行列を設定
 	void SetViewMatrix( const D3DXMATRIX& mView );
-	// プロジェクション行列を設定.
+	// プロジェクション行列を設定
 	void SetProjectionMatrix( const D3DXMATRIX& mProj );
 
 private:
-	// エフェクトを動作させるために必要.
+	// エフェクトを動作させるために必要
 	::EsManagerRef		m_pManager;
 	::EsRendererRef		m_pRenderer;
 
-	// エフェクトの種類ごとに必要.
+	// エフェクトの種類ごとに必要
 	::EsEffectRef		m_pEffect[enList::Max];
 };
 

@@ -2,7 +2,7 @@
 
 
 //==============================================================================
-//		キーボードクラス.
+//		キーボードクラス
 //==============================================================================
 CKey::CKey()
 {
@@ -14,35 +14,35 @@ CKey::CKey()
 
 
 //==============================================================================
-//		初期化.
+//		初期化
 //==============================================================================
 bool CKey::Init(CKey& Key, IDirectInput8* pDInput, HWND hWnd)
 {
-	//　キーボードデバイスの作成.
+	//　キーボードデバイスの作成
 	if (!Key.Create(pDInput, hWnd)){ return false; }
 	return true;
 }
 
 
 //------------------------------------------------------------------------------
-//		作成処理.
+//		作成処理
 //------------------------------------------------------------------------------
 bool CKey::Create(IDirectInput8* pDInput, HWND hWnd)
 {
-	// 引数チェック（DirectInput が nullptr の場合は失敗）.
+	// 引数チェック（DirectInput が nullptr の場合は失敗）
 	if (!pDInput) { return false; }
 
 	HRESULT hr;
 
-	// キーボードデバイスを作成.
+	// キーボードデバイスを作成
 	hr = pDInput->CreateDevice( GUID_SysKeyboard, &m_pDIDevKB, NULL );
 	if ( FAILED(hr) ){ return false; }
 	
-	// データフォーマットの設定.
+	// データフォーマットの設定
 	hr = m_pDIDevKB->SetDataFormat( &c_dfDIKeyboard );
 	if ( FAILED(hr) ){ return false; }
 
-	// バッファサイズの設定.
+	// バッファサイズの設定
 	DIPROPDWORD diprop = {};
 	diprop.diph.dwSize = sizeof( diprop );
 	diprop.diph.dwHeaderSize = sizeof(diprop.diph);
@@ -53,11 +53,11 @@ bool CKey::Create(IDirectInput8* pDInput, HWND hWnd)
 	hr = m_pDIDevKB->SetProperty( DIPROP_BUFFERSIZE, &diprop.diph );
 	if ( FAILED(hr) ){ return false; }
 
-	// 協調モードの設定.
+	// 協調モードの設定
 	hr = m_pDIDevKB->SetCooperativeLevel( hWnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND );
 	if ( FAILED(hr) ){ return false; }
 
-	// 入力を許可する.
+	// 入力を許可する
 	m_pDIDevKB->Acquire();
 
 	return true;
@@ -65,11 +65,11 @@ bool CKey::Create(IDirectInput8* pDInput, HWND hWnd)
 
 
 //------------------------------------------------------------------------------
-//		更新処理.
+//		更新処理
 //------------------------------------------------------------------------------
 void CKey::Update()
 {
-	// キー入力状態のリセット.
+	// キー入力状態のリセット
 	ZeroMemory(m_KeyAction, sizeof(m_KeyAction));
 
 	DIDEVICEOBJECTDATA od;
@@ -77,18 +77,18 @@ void CKey::Update()
 	HRESULT hr;
 	while (true)
 	{
-		// デバイスから入力データを取得.
+		// デバイスから入力データを取得
 		hr = m_pDIDevKB->GetDeviceData( sizeof( DIDEVICEOBJECTDATA ), &od, &dwItems, 0 );
 
-		// 入力が失われた場合、デバイスを再取得.
+		// 入力が失われた場合、デバイスを再取得
 		if (hr == DIERR_INPUTLOST)
 		{
 			m_pDIDevKB->Acquire();
 		}
-		// 取得できなかった、またはエラーが発生した場合.
+		// 取得できなかった、またはエラーが発生した場合
 		else if (dwItems == 0 || FAILED(hr))
 		{
-			// まだデバイスが取得されていない場合、再取得を試みる.
+			// まだデバイスが取得されていない場合、再取得を試みる
 			if (hr == DIERR_NOTACQUIRED)
 			{
 				m_pDIDevKB->Acquire();
@@ -97,11 +97,11 @@ void CKey::Update()
 		}
 		else
 		{
-			// キーの状態を更新.
-			//	0x80ビットがセットされていればキーが押されている.
+			// キーの状態を更新
+			//	0x80ビットがセットされていればキーが押されている
 			m_KeyState[od.dwOfs] = ( od.dwData & 0x80 ) ? true : false;
 
-			// キーが押されている場合、アクションフラグをセット.
+			// キーが押されている場合、アクションフラグをセット
 			if (m_KeyState[od.dwOfs])
 			{
 				m_KeyAction[od.dwOfs] = true;
@@ -112,7 +112,7 @@ void CKey::Update()
 
 
 //--------------------------------------------------------------------------------
-//		解放処理.
+//		解放処理
 //--------------------------------------------------------------------------------
 void CKey::Release()
 {

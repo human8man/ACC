@@ -7,7 +7,7 @@
 
 
 //============================================================================
-//		フレームを作成する.
+//		フレームを作成する
 //============================================================================
 HRESULT MY_HIERARCHY::CreateFrame(LPCSTR Name, LPD3DXFRAME* ppNewFrame)
 {
@@ -39,7 +39,7 @@ HRESULT MY_HIERARCHY::CreateFrame(LPCSTR Name, LPD3DXFRAME* ppNewFrame)
 
 
 //============================================================================
-//		メッシュコンテナーを作成する.
+//		メッシュコンテナーを作成する
 //============================================================================
 HRESULT MY_HIERARCHY::CreateMeshContainer(
 	LPCSTR Name, CONST D3DXMESHDATA* pMeshData,
@@ -58,8 +58,8 @@ HRESULT MY_HIERARCHY::CreateMeshContainer(
 	pMeshContainer->MeshData.Type = D3DXMESHTYPE_MESH;
 
 	int NumPoly = pMeshContainer->MeshData.pMesh->GetNumFaces();
-	// メッシュを複製する.
-	//	なぜかスキンメッシュだと、この関数を抜けた直後にD3DX内部でメッシュポインターがおかしくなってしまうので.
+	// メッシュを複製する
+	//	なぜかスキンメッシュだと、この関数を抜けた直後にD3DX内部でメッシュポインターがおかしくなってしまうので
 	LPDIRECT3DDEVICE9 pDevice = nullptr;
 	pMeshContainer->MeshData.pMesh->GetDevice(&pDevice);
 
@@ -68,7 +68,7 @@ HRESULT MY_HIERARCHY::CreateMeshContainer(
 	// SAFE_RELEASE( pMeshContainer->MeshData.pMesh );
 	pMeshContainer->MeshData.pMesh = pMesh;
 
-	// メッシュのマテリアル設定.
+	// メッシュのマテリアル設定
 	pMeshContainer->NumMaterials = max(1, NumMaterials);
 	pMeshContainer->pMaterials = new D3DXMATERIAL[pMeshContainer->NumMaterials]();
 	pMeshContainer->pAdjacency = new DWORD[pMeshContainer->MeshData.pMesh->GetNumFaces() * 3]();
@@ -92,7 +92,7 @@ HRESULT MY_HIERARCHY::CreateMeshContainer(
 			}
 		}
 	}
-	// マテリアルがなかった場合.
+	// マテリアルがなかった場合
 	else
 	{
 		pMeshContainer->pMaterials[0].pTextureFilename = nullptr;
@@ -102,7 +102,7 @@ HRESULT MY_HIERARCHY::CreateMeshContainer(
 		pMeshContainer->pMaterials[0].MatD3D.Diffuse.b = 0.5f;
 		pMeshContainer->pMaterials[0].MatD3D.Specular = pMeshContainer->pMaterials[0].MatD3D.Diffuse;
 	}
-	// 当該メッシュがスキン情報を持っている場合(スキンメッシュ固有の処理).
+	// 当該メッシュがスキン情報を持っている場合(スキンメッシュ固有の処理)
 	if (pSkinInfo != nullptr)
 	{
 		DWORD BoneNum = 0;
@@ -118,7 +118,7 @@ HRESULT MY_HIERARCHY::CreateMeshContainer(
 				pMeshContainer->pSkinInfo->GetBoneOffsetMatrix(i), sizeof(D3DMATRIX));
 		}
 	}
-	// ローカルに生成したメッシュコンテナーを呼び出し側にコピーする.
+	// ローカルに生成したメッシュコンテナーを呼び出し側にコピーする
 	*ppMeshContainer = pMeshContainer;
 
 	return S_OK;
@@ -126,7 +126,7 @@ HRESULT MY_HIERARCHY::CreateMeshContainer(
 
 
 //=============================================================================
-//		フレームを破棄する.
+//		フレームを破棄する
 //=============================================================================
 HRESULT MY_HIERARCHY::DestroyFrame(LPD3DXFRAME pFrameToFree)
 {
@@ -150,7 +150,7 @@ HRESULT MY_HIERARCHY::DestroyFrame(LPD3DXFRAME pFrameToFree)
 
 
 //=============================================================================
-//		メッシュコンテナーを破棄する.
+//		メッシュコンテナーを破棄する
 //=============================================================================
 HRESULT MY_HIERARCHY::DestroyMeshContainer(LPD3DXMESHCONTAINER pMeshContainerBase)
 {
@@ -194,7 +194,7 @@ HRESULT MY_HIERARCHY::DestroyMeshContainer(LPD3DXMESHCONTAINER pMeshContainerBas
 
 
 //=============================================================================
-//		パーサークラス.
+//		パーサークラス
 //=============================================================================
 D3DXPARSER::D3DXPARSER()
 	: cHierarchy		()
@@ -214,11 +214,11 @@ D3DXPARSER::~D3DXPARSER()
 
 
 //=============================================================================
-//		Xファイルからメッシュを読み込む.
+//		Xファイルからメッシュを読み込む
 //=============================================================================
 HRESULT D3DXPARSER::LoadMeshFromX(LPDIRECT3DDEVICE9 pDevice9, LPCTSTR fileName)
 {
-	// Xファイルからアニメーションメッシュを読み込み作成する.
+	// Xファイルからアニメーションメッシュを読み込み作成する
 	m_pHierarchy = new MY_HIERARCHY();
 	if (FAILED(
 		D3DXLoadMeshHierarchyFromX(
@@ -228,11 +228,11 @@ HRESULT D3DXPARSER::LoadMeshFromX(LPDIRECT3DDEVICE9 pDevice9, LPCTSTR fileName)
 		_ASSERT_EXPR(false, L"ファイルの読み込みに失敗しました");
 		return E_FAIL;
 	}
-	// ボーンメモリ割りあて.
+	// ボーンメモリ割りあて
 	AllocateAllBoneMatrices(m_pFrameRoot);
 
 	UINT AnimMax = m_pAnimController->GetNumAnimationSets();
-	// アニメーションセットを得る.
+	// アニメーションセットを得る
 	for (UINT i = 0; i < AnimMax; i++)
 	{
 		m_pAnimController->GetAnimationSet(i, &m_pAnimSet[i]);
@@ -243,7 +243,7 @@ HRESULT D3DXPARSER::LoadMeshFromX(LPDIRECT3DDEVICE9 pDevice9, LPCTSTR fileName)
 
 
 //=============================================================================
-//		ボーン行列の領域確保.
+//		ボーン行列の領域確保
 //=============================================================================
 HRESULT D3DXPARSER::AllocateBoneMatrix(LPD3DXMESHCONTAINER pMeshContainerBase)const
 {
@@ -260,7 +260,7 @@ HRESULT D3DXPARSER::AllocateBoneMatrix(LPD3DXMESHCONTAINER pMeshContainerBase)co
 
 	for (DWORD i = 0; i < dwBoneNum; i++)
 	{
-		// まずはnullptrで初期化.
+		// まずはnullptrで初期化
 		pMeshContainer->ppBoneMatrix[i] = nullptr;
 
 		pFrame = reinterpret_cast<MYFRAME*>(
@@ -277,7 +277,7 @@ HRESULT D3DXPARSER::AllocateBoneMatrix(LPD3DXMESHCONTAINER pMeshContainerBase)co
 
 
 //=============================================================================
-//		全てのボーン行列の領域を確保(再帰関数).
+//		全てのボーン行列の領域を確保(再帰関数)
 //=============================================================================
 HRESULT D3DXPARSER::AllocateAllBoneMatrices(LPD3DXFRAME pFrame)
 {
@@ -307,7 +307,7 @@ HRESULT D3DXPARSER::AllocateAllBoneMatrices(LPD3DXFRAME pFrame)
 
 
 //=============================================================================
-//		フレーム内のメッシュ毎にワールド変換行列を更新する.
+//		フレーム内のメッシュ毎にワールド変換行列を更新する
 //=============================================================================
 VOID D3DXPARSER::UpdateFrameMatrices(LPD3DXFRAME pFrameBase, LPD3DXMATRIX pParentMatrix)
 {
@@ -333,48 +333,48 @@ VOID D3DXPARSER::UpdateFrameMatrices(LPD3DXFRAME pFrameBase, LPD3DXMATRIX pParen
 
 
 //=============================================================================
-//		メッシュコンテナを呼び出す(再帰処理).
+//		メッシュコンテナを呼び出す(再帰処理)
 //=============================================================================
 LPD3DXMESHCONTAINER D3DXPARSER::GetMeshContainer(LPD3DXFRAME pFrame)
 {
 	LPD3DXMESHCONTAINER pCon = nullptr;
 
-	// メッシュコンテナあれば返す.
+	// メッシュコンテナあれば返す
 	if (pFrame->pMeshContainer) {
 		return pFrame->pMeshContainer;
 	}
 
-	// 無かったら、子のフレームをチェック.
+	// 無かったら、子のフレームをチェック
 	if (pFrame->pFrameFirstChild) {
-		// あればチェックする.
+		// あればチェックする
 		pCon = GetMeshContainer(pFrame->pFrameFirstChild);
 	}
 
-	// 子のフレーム最下層までチェックしたが見つからなかった.
+	// 子のフレーム最下層までチェックしたが見つからなかった
 	if (pCon == nullptr) {
-		// 兄弟のフレームも探す.
+		// 兄弟のフレームも探す
 		if (pFrame->pFrameSibling) {
-			// あればチェックする.
+			// あればチェックする
 			pCon = GetMeshContainer(pFrame->pFrameSibling);
 		}
 	}
 
-	// 見つからない場合はnullptrが入る.
+	// 見つからない場合はnullptrが入る
 	return pCon;
 }
 
 
 //=============================================================================
-//		アニメーションセットの切り替え.
+//		アニメーションセットの切り替え
 //=============================================================================
 void D3DXPARSER::ChangeAnimSet(int Index, LPD3DXANIMATIONCONTROLLER pAC) const
 {
-	D3DXTRACK_DESC TrackDesc = {};	// アニメーショントラック構造体.
+	D3DXTRACK_DESC TrackDesc = {};	// アニメーショントラック構造体
 
-	// ※以下3つは、ほぼ固定でOK.
-	TrackDesc.Weight = 1.0f;	// 重み.
-	TrackDesc.Speed = 1.0f;		// 速さ.
-	TrackDesc.Enable = TRUE;	// 有効.
+	// ※以下3つは、ほぼ固定でOK
+	TrackDesc.Weight = 1.0f;	// 重み
+	TrackDesc.Speed = 1.0f;		// 速さ
+	TrackDesc.Enable = TRUE;	// 有効
 
 	TrackDesc.Priority = D3DXPRIORITY_LOW;
 
@@ -383,7 +383,7 @@ void D3DXPARSER::ChangeAnimSet(int Index, LPD3DXANIMATIONCONTROLLER pAC) const
 	LPD3DXANIMATIONCONTROLLER pTmpAC;
 	pTmpAC = pAC ? pAC : m_pAnimController;
 
-	// 指定(Index）のアニメーショントラックに変更.
+	// 指定(Index）のアニメーショントラックに変更
 	pTmpAC->SetTrackDesc(0, &TrackDesc);
 	pTmpAC->SetTrackAnimationSet(0, m_pAnimSet[Index]);
 	pTmpAC->SetTrackEnable(Index, TRUE);
@@ -391,16 +391,16 @@ void D3DXPARSER::ChangeAnimSet(int Index, LPD3DXANIMATIONCONTROLLER pAC) const
 
 
 //=============================================================================
-//		アニメーションセットの切り替え(開始フレーム指定可能版).
+//		アニメーションセットの切り替え(開始フレーム指定可能版)
 //=============================================================================
 void D3DXPARSER::ChangeAnimSet_StartPos(int Index, double StartFramePos, LPD3DXANIMATIONCONTROLLER pAC) const
 {
-	D3DXTRACK_DESC TrackDesc = {};	// アニメーショントラック構造体.
+	D3DXTRACK_DESC TrackDesc = {};	// アニメーショントラック構造体
 
-	// ※以下3つは、ほぼ固定でOK.
-	TrackDesc.Weight = 1.f;	// 重み.
-	TrackDesc.Speed = 1.f;	// 速さ.
-	TrackDesc.Enable = TRUE;// 有効.
+	// ※以下3つは、ほぼ固定でOK
+	TrackDesc.Weight = 1.f;	// 重み
+	TrackDesc.Speed = 1.f;	// 速さ
+	TrackDesc.Enable = TRUE;// 有効
 
 	TrackDesc.Priority = D3DXPRIORITY_LOW;
 	TrackDesc.Position = StartFramePos;
@@ -408,7 +408,7 @@ void D3DXPARSER::ChangeAnimSet_StartPos(int Index, double StartFramePos, LPD3DXA
 	LPD3DXANIMATIONCONTROLLER pTmpAC;
 	pTmpAC = (pAC != nullptr) ? pAC : m_pAnimController;
 
-	// 指定(Index）のアニメーショントラックに変更.
+	// 指定(Index）のアニメーショントラックに変更
 	pTmpAC->SetTrackDesc(0, &TrackDesc);
 	pTmpAC->SetTrackAnimationSet(0, m_pAnimSet[Index]);
 	pTmpAC->SetTrackEnable(Index, TRUE);
@@ -416,24 +416,24 @@ void D3DXPARSER::ChangeAnimSet_StartPos(int Index, double StartFramePos, LPD3DXA
 
 
 //=============================================================================
-//		一括解放処理.
+//		一括解放処理
 //=============================================================================
 HRESULT D3DXPARSER::Release()
 {
-	// 作成したものを最後に作ったものから順解放していく.
-	// 基本的には new したものを delete していく.
+	// 作成したものを最後に作ったものから順解放していく
+	// 基本的には new したものを delete していく
 
-	// アニメーションセットの解放.
+	// アニメーションセットの解放
 	DWORD AnimMax = m_pAnimController->GetNumAnimationSets();
 	for (DWORD i = 0; i < AnimMax; i++)
 	{
 		SAFE_RELEASE(m_pAnimSet[i]);
 	}
 
-	// アニメーションコントローラ削除.
+	// アニメーションコントローラ削除
 	SAFE_RELEASE(m_pAnimController);
 
-	// フレームとメッシュコンテナの削除.
+	// フレームとメッシュコンテナの削除
 	m_pHierarchy->DestroyFrame(m_pFrameRoot);
 
 	// 解放処理いる？
@@ -441,7 +441,7 @@ HRESULT D3DXPARSER::Release()
 		m_pFrameRoot = nullptr;
 	}
 
-	// Hierarchy削除.
+	// Hierarchy削除
 	if (m_pHierarchy != nullptr) {
 		delete m_pHierarchy;
 		m_pHierarchy = nullptr;
@@ -451,7 +451,7 @@ HRESULT D3DXPARSER::Release()
 }
 
 //=============================================================================
-//		指定したボーン情報(行列)を取得する関数.
+//		指定したボーン情報(行列)を取得する関数
 //=============================================================================
 bool D3DXPARSER::GetMatrixFromBone(LPCSTR BoneName, D3DXMATRIX* pOutMat) const
 {
@@ -472,7 +472,7 @@ bool D3DXPARSER::GetMatrixFromBone(LPCSTR BoneName, D3DXMATRIX* pOutMat) const
 
 
 //=============================================================================
-//		指定したボーン情報(座標)を取得する関数.
+//		指定したボーン情報(座標)を取得する関数
 //=============================================================================
 bool D3DXPARSER::GetPosFromBone(LPCSTR BoneName, D3DXVECTOR3* pOutPos) const
 {
@@ -488,7 +488,7 @@ bool D3DXPARSER::GetPosFromBone(LPCSTR BoneName, D3DXVECTOR3* pOutPos) const
 
 
 //=============================================================================
-//		最大アニメーション数を取得.
+//		最大アニメーション数を取得
 //=============================================================================
 int D3DXPARSER::GetAnimMax(LPD3DXANIMATIONCONTROLLER pAC) const
 {
@@ -502,11 +502,11 @@ int D3DXPARSER::GetAnimMax(LPD3DXANIMATIONCONTROLLER pAC) const
 
 
 //=============================================================================
-//		UVの取得.
+//		UVの取得
 //=============================================================================
 int D3DXPARSER::GetNumUVs(MYMESHCONTAINER* pContainer) const
 {
-	// 頂点数と同じ数だけ設定されてるはず.
+	// 頂点数と同じ数だけ設定されてるはず
 	return pContainer->MeshData.pMesh->GetNumVertices();
 }
 
@@ -521,7 +521,7 @@ int D3DXPARSER::GetNumBones(MYMESHCONTAINER* pContainer ) const
 
 
 //=============================================================================
-//		面数の取得.
+//		面数の取得
 //=============================================================================
 int D3DXPARSER::GetNumFaces(MYMESHCONTAINER* pContainer) const
 {
@@ -530,7 +530,7 @@ int D3DXPARSER::GetNumFaces(MYMESHCONTAINER* pContainer) const
 
 
 //=============================================================================
-//		頂点数の取得.
+//		頂点数の取得
 //=============================================================================
 int D3DXPARSER::GetNumVertices(MYMESHCONTAINER* pContainer) const
 {
@@ -539,7 +539,7 @@ int D3DXPARSER::GetNumVertices(MYMESHCONTAINER* pContainer) const
 
 
 //=============================================================================
-//		マテリアル数の取得.
+//		マテリアル数の取得
 //=============================================================================
 int D3DXPARSER::GetNumMaterials( MYMESHCONTAINER* pContainer) const
 {
@@ -548,7 +548,7 @@ int D3DXPARSER::GetNumMaterials( MYMESHCONTAINER* pContainer) const
 
 
 //=============================================================================
-//		インデックスバッファ内の指定した位置にある頂点インデックスを返す.
+//		インデックスバッファ内の指定した位置にある頂点インデックスを返す
 //=============================================================================
 int D3DXPARSER::GetIndex( MYMESHCONTAINER* pContainer, DWORD Index) const
 {
@@ -569,7 +569,7 @@ int D3DXPARSER::GetIndex( MYMESHCONTAINER* pContainer, DWORD Index) const
 
 
 //=============================================================================
-//		指定されたボーンが影響を及ぼす頂点数を返す.
+//		指定されたボーンが影響を及ぼす頂点数を返す
 //=============================================================================
 int D3DXPARSER::GetNumBoneVertices( MYMESHCONTAINER* pContainer, int BoneIndex) const
 {
@@ -578,7 +578,7 @@ int D3DXPARSER::GetNumBoneVertices( MYMESHCONTAINER* pContainer, int BoneIndex) 
 
 
 //=============================================================================
-//		そのポリゴンが、どのマテリアルであるかを返す.
+//		そのポリゴンが、どのマテリアルであるかを返す
 //=============================================================================
 int D3DXPARSER::GeFaceMaterialIndex( MYMESHCONTAINER* pContainer, int FaceIndex) const
 {
@@ -599,11 +599,11 @@ int D3DXPARSER::GeFaceMaterialIndex( MYMESHCONTAINER* pContainer, int FaceIndex)
 
 
 //=============================================================================
-//		FaceIndex番目のポリゴンを形成する3頂点の中で、IndexInFace番目[0,2]の頂点のインデックスを返す.
+//		FaceIndex番目のポリゴンを形成する3頂点の中で、IndexInFace番目[0,2]の頂点のインデックスを返す
 //=============================================================================
 int D3DXPARSER::GetFaceVertexIndex( MYMESHCONTAINER* pContainer, int FaceIndex, int IndexInFace) const
 {
-	// インデックスバッファーを調べれば分かる.
+	// インデックスバッファーを調べれば分かる
 	WORD VertIndex = 0;
 	WORD* pIndex = nullptr;
 	// LockIndexBuffer も const ではない可能性があるため const_cast
@@ -618,7 +618,7 @@ int D3DXPARSER::GetFaceVertexIndex( MYMESHCONTAINER* pContainer, int FaceIndex, 
 
 
 //=============================================================================
-//		アニメーション停止時間を取得.
+//		アニメーション停止時間を取得
 //=============================================================================
 double D3DXPARSER::GetAnimPeriod(int Index) const
 {
@@ -631,7 +631,7 @@ double D3DXPARSER::GetAnimPeriod(int Index) const
 
 
 //=============================================================================
-//		指定されたボーンが影響を及ぼす頂点のボーンウェイトを取得する.
+//		指定されたボーンが影響を及ぼす頂点のボーンウェイトを取得する
 //=============================================================================
 double D3DXPARSER::GetBoneVerticesWeights( MYMESHCONTAINER* pContainer, int BoneIndex, int IndexInGroup) const
 {
@@ -658,7 +658,7 @@ double D3DXPARSER::GetBoneVerticesWeights( MYMESHCONTAINER* pContainer, int Bone
 
 
 //=============================================================================
-//		スペキュラパワーの取得.
+//		スペキュラパワーの取得
 //=============================================================================
 float D3DXPARSER::GetSpecularPower( MYMESHCONTAINER* pContainer, int Index) const
 {
@@ -667,7 +667,7 @@ float D3DXPARSER::GetSpecularPower( MYMESHCONTAINER* pContainer, int Index) cons
 
 
 //=============================================================================
-//		指定されたボーンが影響を及ぼす頂点のインデックスを取得する.
+//		指定されたボーンが影響を及ぼす頂点のインデックスを取得する
 //=============================================================================
 DWORD D3DXPARSER::GetBoneVerticesIndices( MYMESHCONTAINER* pContainer, int BoneIndex, int IndexInGroup) const
 {
@@ -691,7 +691,7 @@ DWORD D3DXPARSER::GetBoneVerticesIndices( MYMESHCONTAINER* pContainer, int BoneI
 
 
 //=============================================================================
-//		テクスチャのパスの取得.
+//		テクスチャのパスの取得
 //=============================================================================
 LPSTR D3DXPARSER::GetTexturePath( MYMESHCONTAINER* pContainer, int Index) const
 {
@@ -711,7 +711,7 @@ LPCSTR D3DXPARSER::GetBoneName( MYMESHCONTAINER* pContainer, int BoneIndex) cons
 
 
 //=============================================================================
-//		テクスチャー座標.
+//		テクスチャー座標
 //=============================================================================
 D3DXVECTOR2 D3DXPARSER::GetUV( MYMESHCONTAINER* pContainer, DWORD Index) const
 {
@@ -730,8 +730,8 @@ D3DXVECTOR2 D3DXPARSER::GetUV( MYMESHCONTAINER* pContainer, DWORD Index) const
 	if (SUCCEEDED(pVB->Lock(0, 0, reinterpret_cast<VOID**>(&pVertices), 0)))
 	{
 		pVertices += Index * Stride;
-		pVertices += sizeof(D3DXVECTOR3); // 座標分進める.
-		pVertices += sizeof(D3DXVECTOR3); // 法線分進める.
+		pVertices += sizeof(D3DXVECTOR3); // 座標分進める
+		pVertices += sizeof(D3DXVECTOR3); // 法線分進める
 
 		UV = *(reinterpret_cast<D3DXVECTOR2*>(pVertices));
 
@@ -744,7 +744,7 @@ D3DXVECTOR2 D3DXPARSER::GetUV( MYMESHCONTAINER* pContainer, DWORD Index) const
 
 
 //=============================================================================
-//		法線の取得.
+//		法線の取得
 //=============================================================================
 D3DXVECTOR3 D3DXPARSER::GetNormal( MYMESHCONTAINER* pContainer, DWORD Index) const
 {
@@ -763,7 +763,7 @@ D3DXVECTOR3 D3DXPARSER::GetNormal( MYMESHCONTAINER* pContainer, DWORD Index) con
 	if (SUCCEEDED( pVB->Lock(0, 0, reinterpret_cast<VOID**>(&pVertices), 0)))
 	{
 		pVertices += Index * Stride;
-		pVertices += sizeof(D3DXVECTOR3); // 座標分進める.
+		pVertices += sizeof(D3DXVECTOR3); // 座標分進める
 
 		Normal = *(reinterpret_cast<D3DXVECTOR3*>(pVertices));
 
@@ -776,7 +776,7 @@ D3DXVECTOR3 D3DXPARSER::GetNormal( MYMESHCONTAINER* pContainer, DWORD Index) con
 
 
 //=============================================================================
-//		頂点座標の取得.
+//		頂点座標の取得
 //=============================================================================
 D3DXVECTOR3 D3DXPARSER::GetVertexCoord( MYMESHCONTAINER* pContainer, DWORD Index) const
 {
@@ -805,7 +805,7 @@ D3DXVECTOR3 D3DXPARSER::GetVertexCoord( MYMESHCONTAINER* pContainer, DWORD Index
 
 
 //=============================================================================
-//		アンビエント（環境光）の取得.
+//		アンビエント（環境光）の取得
 //=============================================================================
 D3DXVECTOR4 D3DXPARSER::GetAmbient( MYMESHCONTAINER* pContainer, int Index) const
 {
@@ -815,7 +815,7 @@ D3DXVECTOR4 D3DXPARSER::GetAmbient( MYMESHCONTAINER* pContainer, int Index) cons
 
 
 //=============================================================================
-//		ディフューズ（拡散反射光）の取得.
+//		ディフューズ（拡散反射光）の取得
 //=============================================================================
 D3DXVECTOR4 D3DXPARSER::GetDiffuse( MYMESHCONTAINER* pContainer, int Index) const
 {
@@ -825,7 +825,7 @@ D3DXVECTOR4 D3DXPARSER::GetDiffuse( MYMESHCONTAINER* pContainer, int Index) cons
 
 
 //=============================================================================
-//		スペキュラ（鏡面反射光）の取得.
+//		スペキュラ（鏡面反射光）の取得
 //=============================================================================
 D3DXVECTOR4 D3DXPARSER::GetSpecular( MYMESHCONTAINER* pContainer, int Index) const
 {
@@ -835,7 +835,7 @@ D3DXVECTOR4 D3DXPARSER::GetSpecular( MYMESHCONTAINER* pContainer, int Index) con
 
 
 //=============================================================================
-//		エミッシブ（自己発光）の取得.
+//		エミッシブ（自己発光）の取得
 //=============================================================================
 D3DXVECTOR4 D3DXPARSER::GetEmissive( MYMESHCONTAINER* pContainer, int Index) const
 {
@@ -845,7 +845,7 @@ D3DXVECTOR4 D3DXPARSER::GetEmissive( MYMESHCONTAINER* pContainer, int Index) con
 
 
 //=============================================================================
-//		指定したボーンのバインドポーズ（初期姿勢の行列）を取得する.
+//		指定したボーンのバインドポーズ（初期姿勢の行列）を取得する
 //=============================================================================
 D3DXMATRIX D3DXPARSER::GetNewPose( MYMESHCONTAINER* pContainer, int BoneIndex) const
 {
@@ -855,7 +855,7 @@ D3DXMATRIX D3DXPARSER::GetNewPose( MYMESHCONTAINER* pContainer, int BoneIndex) c
 
 
 //=============================================================================
-//		指定したボーンのバインドポーズ（初期姿勢の行列）を取得する.
+//		指定したボーンのバインドポーズ（初期姿勢の行列）を取得する
 //=============================================================================
 D3DXMATRIX D3DXPARSER::GetBindPose( MYMESHCONTAINER* pContainer, int BoneIndex) const
 {

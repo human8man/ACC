@@ -1,11 +1,11 @@
 #include "CSoundManager.h"
 
 
-// サウンド読み込み用のリスト設定.
+// サウンド読み込み用のリスト設定
 static CSoundManager::SoundList s_SoundList[] =
 {
-	// 10000がMAXの音量.
-	// ここで設定する音量の数値はMAX時の音量の数値.
+	// 10000がMAXの音量
+	// ここで設定する音量の数値はMAX時の音量の数値
 	{ CSoundManager::enList::SE_CritHit		,"Data\\Sound\\SE\\CritHit.wav"		, {"SE_CritHit"}	,10000 },
 	{ CSoundManager::enList::SE_Hit			,"Data\\Sound\\SE\\Hit.wav"			, {"SE_Hit"}		,10000 },
 	{ CSoundManager::enList::SE_NoAmmo		,"Data\\Sound\\SE\\NoAmmo.wav"		, {"SE_NoAmmo"}		, 9000 },
@@ -26,7 +26,7 @@ static CSoundManager::SoundList s_SoundList[] =
 
 
 //==============================================================================
-//		サウンドマネージャークラス.
+//		サウンドマネージャークラス
 //==============================================================================
 CSoundManager::CSoundManager()
 	: m_pSound		()
@@ -43,7 +43,7 @@ CSoundManager::~CSoundManager()
 
 
 //==============================================================================
-//		作成処理.
+//		作成処理
 //==============================================================================
 HRESULT CSoundManager::Create(CSound** ppSound, std::string filePath, HWND hWnd)
 {
@@ -51,7 +51,7 @@ HRESULT CSoundManager::Create(CSound** ppSound, std::string filePath, HWND hWnd)
 
 	if (!*ppSound)
 	{
-		return E_FAIL;	// メモリ確保失敗時のエラー処理.
+		return E_FAIL;	// メモリ確保失敗時のエラー処理
 	}
 	(*ppSound)->CreateDevice(hWnd);
 	return (*ppSound)->LoadData(ConvertStringToLPSTR(filePath));
@@ -59,7 +59,7 @@ HRESULT CSoundManager::Create(CSound** ppSound, std::string filePath, HWND hWnd)
 
 
 //==============================================================================
-//		データ読込処理.
+//		データ読込処理
 //==============================================================================
 HRESULT CSoundManager::Load( HWND hWnd )
 {
@@ -82,7 +82,7 @@ HRESULT CSoundManager::Load( HWND hWnd )
 
 
 //==============================================================================
-//		解放処理.
+//		解放処理
 //==============================================================================
 void CSoundManager::Release()
 {
@@ -96,7 +96,7 @@ void CSoundManager::Release()
 
 
 //==============================================================================
-//		音量を適用させる.
+//		音量を適用させる
 //==============================================================================
 void CSoundManager::ApplyVolumeSetting()
 {
@@ -104,7 +104,7 @@ void CSoundManager::ApplyVolumeSetting()
 	{
 		if (i < m_pSound.size())
 		{
-			LONG adjustedVolume;	// 適用させるための変数.
+			LONG adjustedVolume;	// 適用させるための変数
 
 			if (m_MasterVolume <= 0.6f)
 			{
@@ -121,21 +121,21 @@ void CSoundManager::ApplyVolumeSetting()
 
 			if (m_SoundList[i].alias->find("BGM") != std::string::npos)
 			{
-				// エイリアス名にBGMがついている物の音の調整.
+				// エイリアス名にBGMがついている物の音の調整
 				adjustedVolume = static_cast<LONG>(m_SoundList[i].defaultVolume * m_MasterVolume * m_BGMVolume);
 			}
 			else if(m_SoundList[i].alias->find("SE") != std::string::npos)
 			{
-				// エイリアス名にSEがついている物の音の調整.
+				// エイリアス名にSEがついている物の音の調整
 				adjustedVolume = static_cast<LONG>(m_SoundList[i].defaultVolume * m_MasterVolume * m_SEVolume);
 			}
 			else
 			{
-				// それ以外の音の調整.
+				// それ以外の音の調整
 				adjustedVolume = static_cast<LONG>(m_SoundList[i].defaultVolume * m_MasterVolume);
 			}
 
-			//設定した音をSoundに適応.
+			//設定した音をSoundに適応
 			m_pSound[i]->SetVolume(adjustedVolume);
 		}
 	}
@@ -143,7 +143,7 @@ void CSoundManager::ApplyVolumeSetting()
 
 
 //=============================================================================
-//		一度だけ再生する.
+//		一度だけ再生する
 //=============================================================================
 void CSoundManager::Play(enList list)
 {
@@ -152,7 +152,7 @@ void CSoundManager::Play(enList list)
 
 
 //=============================================================================
-//		ループ再生する.
+//		ループ再生する
 //=============================================================================
 void CSoundManager::PlayLoop(enList list)
 {
@@ -161,7 +161,7 @@ void CSoundManager::PlayLoop(enList list)
 
 
 //=============================================================================
-//		停止する.
+//		停止する
 //=============================================================================
 void CSoundManager::Stop(enList list)
 {
@@ -170,7 +170,7 @@ void CSoundManager::Stop(enList list)
 
 
 //=============================================================================
-//		再生位置を戻さずに停止.
+//		再生位置を戻さずに停止
 //=============================================================================
 void CSoundManager::MiniStop(enList list)
 {
@@ -179,7 +179,7 @@ void CSoundManager::MiniStop(enList list)
 
 
 //=============================================================================
-//		すべての音を停止.
+//		すべての音を停止
 //=============================================================================
 void CSoundManager::AllStop()
 {
@@ -190,7 +190,7 @@ void CSoundManager::AllStop()
 
 
 //=============================================================================
-//		再生中かを確認.
+//		再生中かを確認
 //=============================================================================
 bool CSoundManager::IsPlaying(enList list)
 {
@@ -199,7 +199,7 @@ bool CSoundManager::IsPlaying(enList list)
 
 
 //=============================================================================
-//		常に最初から再生する.
+//		常に最初から再生する
 //=============================================================================
 void CSoundManager::PlayEx(enList list, I3DL2_ENV_PRESET preset)
 {
@@ -208,7 +208,7 @@ void CSoundManager::PlayEx(enList list, I3DL2_ENV_PRESET preset)
 
 
 //=============================================================================
-//		ループ再生.
+//		ループ再生
 //=============================================================================
 void CSoundManager::playLoopEx(enList list, I3DL2_ENV_PRESET preset)
 {
@@ -217,7 +217,7 @@ void CSoundManager::playLoopEx(enList list, I3DL2_ENV_PRESET preset)
 
 
 //=============================================================================
-//		パンニングを設定する.
+//		パンニングを設定する
 //=============================================================================
 void CSoundManager::SetPan(enList list, LONG pan)
 {
@@ -226,7 +226,7 @@ void CSoundManager::SetPan(enList list, LONG pan)
 
 
 //=============================================================================
-//		周波数を設定する.
+//		周波数を設定する
 //=============================================================================
 void CSoundManager::SetFrequency(enList list, DWORD freq)
 {
@@ -235,7 +235,7 @@ void CSoundManager::SetFrequency(enList list, DWORD freq)
 
 
 //=============================================================================
-//		音量を設定する.
+//		音量を設定する
 //=============================================================================
 void CSoundManager::SetVolume(enList list, LONG volume)
 {
@@ -244,7 +244,7 @@ void CSoundManager::SetVolume(enList list, LONG volume)
 
 
 //=============================================================================
-//		パンニングを設定する.
+//		パンニングを設定する
 //=============================================================================
 LONG CSoundManager::GetPan(enList list)
 {
@@ -253,7 +253,7 @@ LONG CSoundManager::GetPan(enList list)
 
 
 //=============================================================================
-//		周波数を取得する.
+//		周波数を取得する
 //=============================================================================
 DWORD CSoundManager::GetFrequency(enList list)
 {
@@ -262,7 +262,7 @@ DWORD CSoundManager::GetFrequency(enList list)
 
 
 //=============================================================================
-//		音量を取得する.
+//		音量を取得する
 //=============================================================================
 LONG CSoundManager::GetVolume(enList list)
 {
@@ -271,7 +271,7 @@ LONG CSoundManager::GetVolume(enList list)
 
 
 //=============================================================================
-//		エフェクトパラメータの取得.
+//		エフェクトパラメータの取得
 //=============================================================================
 void CSoundManager::GetPreset(enList list, I3DL2_ENV_PRESET presetNo)
 {
@@ -280,7 +280,7 @@ void CSoundManager::GetPreset(enList list, I3DL2_ENV_PRESET presetNo)
 
 
 //-----------------------------------------------------------------------------
-//		stringからLPSTRへ変換.
+//		stringからLPSTRへ変換
 //-----------------------------------------------------------------------------
 LPSTR CSoundManager::ConvertStringToLPSTR(const std::string& str)
 {

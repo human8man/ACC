@@ -5,13 +5,13 @@
 
 
 namespace {
-	// キャラクターCSVのパス.
+	// キャラクターCSVのパス
 	constexpr char CharaCSVPath[] = "Data\\CSV\\CharaStatus.csv";
 }
 
 
 //============================================================================
-//		キャラクタークラス.
+//		キャラクタークラス
 //============================================================================
 CCharacter::CCharacter()
 	: m_pRayY				( nullptr )
@@ -58,37 +58,37 @@ CCharacter::CCharacter()
 	, m_CharaInfo			()
 	, m_SumVec				(ZEROVEC3)
 {
-	// レイの設定.
+	// レイの設定
 	m_pRayY			= std::make_unique<RAY>();
 	m_pCrossRay		= std::make_unique<CROSSRAY>();
-	m_pRayY->Axis	= D3DXVECTOR3(0.f, -1.f, 0.f);	// 下向きの軸を設定.
-	m_pRayY->Length	= 10.f;							// レイ長さを設定.
+	m_pRayY->Axis	= D3DXVECTOR3(0.f, -1.f, 0.f);	// 下向きの軸を設定
+	m_pRayY->Length	= 10.f;							// レイ長さを設定
 
-	// 弾と銃のメッシュ設定.
+	// 弾と銃のメッシュ設定
 	m_pMeshGun		= std::make_unique<CStaticMesh>();
 	m_pMeshBullet	= std::make_unique<CStaticMesh>();
 	m_pMeshGun		->Init( _T( "Data\\Mesh\\Static\\Gun\\Gun.x" ) );
 	m_pMeshBullet	->Init( _T( "Data\\Mesh\\Static\\Bullet\\bullet.x" ) );
 
-	// メッシュ線の設定.
+	// メッシュ線の設定
 	m_pMeshLine = std::make_unique<CMeshLine>();
 	m_pMeshLine->Init();
 
-	// 銃の設定.
-	m_pGun	= std::make_unique<CGun>();
+	// 銃の設定
+	m_pGun	= std::make_unique<Gun>();
 	m_pGun	->AttachMesh( *m_pMeshGun );
 
-	// キャラの初期情報.
+	// キャラの初期情報
 	m_CharaInfo.MaxHP = 20;
 	m_CharaInfo.MaxAmmo = 6;
 
 
-	// キャラクターCSVの情報保存用.
+	// キャラクターCSVの情報保存用
 	std::unordered_map<std::string, std::string> m_StateList;
-	// キャラクターCSVの情報取得.
+	// キャラクターCSVの情報取得
 	m_StateList = FileManager::CSVLoad(CharaCSVPath);
 	
-	// 空でない場合は、外部で調整するべき変数の値を入れていく.
+	// 空でない場合は、外部で調整するべき変数の値を入れていく
 	if (!m_StateList.empty())
 	{
 		m_BodyDamage		= StrToInt(m_StateList["BodyDamage"]);
@@ -122,27 +122,27 @@ CCharacter::~CCharacter()
 
 
 //============================================================================
-//		更新処理.
+//		更新処理
 //============================================================================
 void CCharacter::Update()
 {
-	// ダメージフラグを毎フレーム初期化.
+	// ダメージフラグを毎フレーム初期化
 	m_Damage = false;
 
-	// 銃をキャラの周りで回す処理.
+	// 銃をキャラの周りで回す処理
 	m_pGun->UpdateGunPos(
 		m_vPosition,
 		m_GunRadius,
 		D3DXToRadian(m_vRotation.y + m_GunPosRevision));
 
-	// 銃の角度をプレイヤーの向き + 補正値に設定.
+	// 銃の角度をプレイヤーの向き + 補正値に設定
 	m_pGun->SetRot( 0.f, -D3DXToRadian(m_vRotation.y) + m_GunRotRevision, 0.f);
 
-	// 弾の更新処理.
+	// 弾の更新処理
 	for (size_t i = 0; i < m_pBullets.size(); ++i) {
-		m_pBullets[i]->Update(); // 各弾の更新処理.
+		m_pBullets[i]->Update(); // 各弾の更新処理
 
-		// 一定時間経過した弾を削除.
+		// 一定時間経過した弾を削除
 		if (m_pBullets[i]->DeleteBullet()) {
 			m_pBullets[i].reset();
 			m_pBullets.erase(m_pBullets.begin() + i);
@@ -153,7 +153,7 @@ void CCharacter::Update()
 
 
 //============================================================================
-//		描画処理.
+//		描画処理
 //============================================================================
 void CCharacter::Draw(D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 {
@@ -162,18 +162,18 @@ void CCharacter::Draw(D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 
 
 //============================================================================
-//		ジャンプ関係の計算.
+//		ジャンプ関係の計算
 //============================================================================
 void CCharacter::JumpMath()
 {
-	// ジャンプ力を重力で減算し、Yに加算.
+	// ジャンプ力を重力で減算し、Yに加算
 	m_JumpPower = m_JumpPower - m_Gravity * CTime::GetTimeScale();
 	m_vPosition.y += m_JumpPower * CTime::GetDeltaTime();
 }
 
 
 //============================================================================
-//		HPを胴体ダメージ分減らす.
+//		HPを胴体ダメージ分減らす
 //============================================================================
 void CCharacter::BodyDamage()
 {
@@ -183,7 +183,7 @@ void CCharacter::BodyDamage()
 
 
 //============================================================================
-//		HPをクリティカルダメージ分減らす.
+//		HPをクリティカルダメージ分減らす
 //============================================================================
 void CCharacter::CritDamage()
 {
@@ -193,7 +193,7 @@ void CCharacter::CritDamage()
 
 
 //============================================================================
-//		最終移動ベクトルを渡す.
+//		最終移動ベクトルを渡す
 //============================================================================
 D3DXVECTOR3 CCharacter::GetMoveVec()
 {

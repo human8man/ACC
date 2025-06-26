@@ -5,13 +5,13 @@
 
 
 //=============================================================================
-//		ランダムクラス.
+//		ランダムクラス
 //=============================================================================
 class CRandom
 	: public CSingleton<CRandom>
 {
 private:
-	friend class CSingleton<CRandom>; // シングルトンクラスをフレンド宣言.
+	friend class CSingleton<CRandom>; // シングルトンクラスをフレンド宣言
 
 public:
 	CRandom();
@@ -33,7 +33,7 @@ public:
 	****************************************************************/
 	float GetRandomFloat(float min, float max);
 
-	// 50%の確率で true または false を返す.
+	// 50%の確率で true または false を返す
 	bool GetRandomBool();
 
 private:

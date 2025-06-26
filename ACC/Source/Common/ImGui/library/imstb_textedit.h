@@ -1,9 +1,9 @@
 // [DEAR IMGUI]
-// This is a slightly modified version of stb_textedit.h 1.14.
+// This is a slightly modified version of stb_textedit.h 1.14
 // Those changes would need to be pushed into nothings/stb:
 // - Fix in stb_textedit_discard_redo (see https://github.com/nothings/stb/issues/321)
 // - Fix in stb_textedit_find_charpos to handle last line (see https://github.com/ocornut/imgui/issues/6000 + #6783)
-// Grep for [DEAR IMGUI] to find the changes.
+// Grep for [DEAR IMGUI] to find the changes
 // - Also renamed macros used or defined outside of IMSTB_TEXTEDIT_IMPLEMENTATION block from STB_TEXTEDIT_* to IMSTB_TEXTEDIT_*
 
 // stb_textedit.h - v1.14  - public domain - Sean Barrett
@@ -13,26 +13,26 @@
 // widget; you implement display, word-wrapping, and low-level string
 // insertion/deletion, and stb_textedit will map user inputs into
 // insertions & deletions, plus updates to the cursor position,
-// selection state, and undo state.
+// selection state, and undo state
 //
 // It is intended for use in games and other systems that need to build
 // their own custom widgets and which do not have heavy text-editing
 // requirements (this library is not recommended for use for editing large
-// texts, as its performance does not scale and it has limited undo).
+// texts, as its performance does not scale and it has limited undo)
 //
-// Non-trivial behaviors are modelled after Windows text controls.
+// Non-trivial behaviors are modelled after Windows text controls
 //
 //
 // LICENSE
 //
-// See end of file for license information.
+// See end of file for license information
 //
 //
 // DEPENDENCIES
 //
 // Uses the C runtime function 'memmove', which you can override
-// by defining IMSTB_TEXTEDIT_memmove before the implementation.
-// Uses no other functions. Performs no runtime allocations.
+// by defining IMSTB_TEXTEDIT_memmove before the implementation
+// Uses no other functions. Performs no runtime allocations
 //
 //
 // VERSION HISTORY
@@ -72,7 +72,7 @@
 // USAGE
 //
 // This file behaves differently depending on what symbols you define
-// before including it.
+// before including it
 //
 //
 // Header-file mode:
@@ -81,10 +81,10 @@
 //   it will operate in "header file" mode. In this mode, it declares a
 //   single public symbol, STB_TexteditState, which encapsulates the current
 //   state of a text widget (except for the string, which you will store
-//   separately).
+//   separately)
 //
 //   To compile in this mode, you must define STB_TEXTEDIT_CHARTYPE to a
-//   primitive type that defines a single character (e.g. char, wchar_t, etc).
+//   primitive type that defines a single character (e.g. char, wchar_t, etc)
 //
 //   To save space or increase undo-ability, you can optionally define the
 //   following things that are used by the undo system:
@@ -105,18 +105,18 @@
 //
 //   If you define STB_TEXTEDIT_IMPLEMENTATION before including this, it
 //   will compile the implementation of the text edit widget, depending
-//   on a large number of symbols which must be defined before the include.
+//   on a large number of symbols which must be defined before the include
 //
 //   The implementation is defined only as static functions. You will then
 //   need to provide your own APIs in the same file which will access the
-//   static functions.
+//   static functions
 //
 //   The basic concept is that you provide a "string" object which
 //   behaves like an array of characters. stb_textedit uses indices to
 //   refer to positions in the string, implicitly representing positions
 //   in the displayed textedit. This is true for both plain text and
 //   rich text; even with rich text stb_truetype interacts with your
-//   code as if there was an array of all the displayed characters.
+//   code as if there was an array of all the displayed characters
 //
 // Symbols that must be the same in header-file and implementation mode:
 //
@@ -179,7 +179,7 @@
 // Keyboard input must be encoded as a single integer value; e.g. a character code
 // and some bitflags that represent shift states. to simplify the interface, SHIFT must
 // be a bitflag, so we can test the shifted state of cursor movements to allow selection,
-// i.e. (STB_TEXTEDIT_K_RIGHT|STB_TEXTEDIT_K_SHIFT) should be shifted right-arrow.
+// i.e. (STB_TEXTEDIT_K_RIGHT|STB_TEXTEDIT_K_SHIFT) should be shifted right-arrow
 //
 // You can encode other things, such as CONTROL or ALT, in additional bits, and
 // then test for their presence in e.g. STB_TEXTEDIT_K_WORDLEFT. For example,
@@ -188,17 +188,17 @@
 // and I pass both WM_KEYDOWN and WM_CHAR events to the "key" function in the
 // API below. The control keys will only match WM_KEYDOWN events because of the
 // keydown bit I add, and STB_TEXTEDIT_KEYTOTEXT only tests for the KEYDOWN
-// bit so it only decodes WM_CHAR events.
+// bit so it only decodes WM_CHAR events
 //
 // STB_TEXTEDIT_LAYOUTROW returns information about the shape of one displayed
 // row of characters assuming they start on the i'th character--the width and
 // the height and the number of characters consumed. This allows this library
 // to traverse the entire layout incrementally. You need to compute word-wrapping
-// here.
+// here
 //
 // Each textfield keeps its own insert mode state, which is not how normal
 // applications work. To keep an app-wide insert mode, update/copy the
-// "insert_mode" field of STB_TexteditState before/after calling API functions.
+// "insert_mode" field of STB_TexteditState before/after calling API functions
 //
 // API
 //
@@ -211,16 +211,16 @@
 //    void stb_textedit_key(STB_TEXTEDIT_STRING *str, STB_TexteditState *state, STB_TEXEDIT_KEYTYPE key)
 //
 //    Each of these functions potentially updates the string and updates the
-//    state.
+//    state
 //
 //      initialize_state:
 //          set the textedit state to a known good default state when initially
-//          constructing the textedit.
+//          constructing the textedit
 //
 //      click:
 //          call this with the mouse x,y on a mouse down; it will update the cursor
 //          and reset the selection start/end to the cursor point. the x,y must
-//          be relative to the text widget, with (0,0) being the top left.
+//          be relative to the text widget, with (0,0) being the top left
 //
 //      drag:
 //          call this with the mouse x,y on a mouse drag/up; it will update the
@@ -228,12 +228,12 @@
 //
 //      cut:
 //          call this to delete the current selection; returns true if there was
-//          one. you should FIRST copy the current selection to the system paste buffer.
+//          one. you should FIRST copy the current selection to the system paste buffer
 //          (To copy, just copy the current selection out of the string yourself.)
 //
 //      paste:
 //          call this to paste text at the current cursor point or over the current
-//          selection if there is one.
+//          selection if there is one
 //
 //      key:
 //          call this for keyboard inputs sent to the textfield. you can use it
@@ -243,11 +243,11 @@
 //          various definitions like STB_TEXTEDIT_K_LEFT have the is-key-event bit
 //          set, and make STB_TEXTEDIT_KEYTOCHAR check that the is-key-event bit is
 //          clear. STB_TEXTEDIT_KEYTYPE defaults to int, but you can #define it to
-//          anything other type you wante before including.
+//          anything other type you wante before including
 //
 //
 //   When rendering, you can read the cursor position and selection state from
-//   the STB_TexteditState.
+//   the STB_TexteditState
 //
 //
 // Notes:
@@ -265,7 +265,7 @@
 //
 // If it's run in a widget that *has* cached the layout, then this is less
 // efficient, but it's not horrible on modern computers. But you wouldn't
-// want to edit million-line files with it.
+// want to edit million-line files with it
 
 
 ////////////////////////////////////////////////////////////////////////////
@@ -284,7 +284,7 @@
 //
 // Definition of STB_TexteditState which you should store
 // per-textfield; it includes cursor position, selection state,
-// and undo state.
+// and undo state
 //
 
 #ifndef IMSTB_TEXTEDIT_UNDOSTATECOUNT
@@ -330,7 +330,7 @@ typedef struct
 
    int select_start;          // selection start point
    int select_end;
-   // selection start and end point in characters; if equal, no selection.
+   // selection start and end point in characters; if equal, no selection
    // note that start may be less than or greater than end (e.g. when
    // dragging the mouse, start is where the initial click was, and you
    // can drag in either direction)
@@ -340,8 +340,8 @@ typedef struct
    // insert mode, copy this value in/out of the app state
 
    int row_count_per_page;
-   // page size in number of row.
-   // this value MUST be set to >0 for pageup or pagedown in multilines documents.
+   // page size in number of row
+   // this value MUST be set to >0 for pageup or pagedown in multilines documents
 
    /////////////////////
    //
@@ -362,7 +362,7 @@ typedef struct
 //     StbTexteditRow
 //
 // Result of layout query, used by stb_textedit to determine where
-// the text in each row is.
+// the text in each row is
 
 // result of layout query
 typedef struct
@@ -1233,7 +1233,7 @@ static void stb_text_undo(IMSTB_TEXTEDIT_STRING *str, STB_TexteditState *state)
    if (u.delete_length) {
       // if the undo record says to delete characters, then the redo record will
       // need to re-insert the characters that get deleted, so we need to store
-      // them.
+      // them
 
       // there are three cases:
       //    there's enough room to store the characters
