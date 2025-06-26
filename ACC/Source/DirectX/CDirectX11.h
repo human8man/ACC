@@ -81,5 +81,8 @@ private:
 	ID3D11BlendState*		m_pAlphaBlendOn;	// 有効設定.
 	ID3D11BlendState*		m_pAlphaBlendOff;	// 無効設定.
 
+	// バックバッファのカラー.
+	D3DXVECTOR4 m_BufferColor;
+
 	bool m_IsDebug;
 };

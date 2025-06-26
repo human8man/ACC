@@ -22,8 +22,8 @@ public:
 	};
 
 	// 回転設定関数.
-	void SetRotPivot(const D3DXVECTOR3& pivot) { 
-		m_vRotPivot = pivot;
+	void SetPivot(const D3DXVECTOR3& pivot) { 
+		m_vPivot = pivot;
 	}
 	void SetRot(const D3DXVECTOR3& rot) { m_vRotation = rot; }
 	void SetRot( float x, float y, float z ){
@@ -49,7 +49,7 @@ public:
 	const float& GetAlpha()			const { return m_Alpha; }		// 透過度を取得.
 	const D3DXVECTOR3& GetPos()		const { return m_vPosition; }	// 座標情報を取得.
 	const D3DXVECTOR3& GetRot()		const { return m_vRotation; }	// 回転情報を取得.
-	const D3DXVECTOR3& GetRotPivot()const { return m_vRotPivot; }	// 回転基準軸情報を取得.
+	const D3DXVECTOR3& GetPivot()	const { return m_vPivot; }	// 回転基準軸情報を取得.
 	const D3DXVECTOR3& GetScale()	const { return m_vScale;	 }	// サイズを取得.
 	const D3DXVECTOR3& GetColor()	const { return m_vColor;	 }	// カラーを取得.
 	// オブジェクト情報(座標情報,回転情報,サイズ)を取得.
@@ -58,7 +58,7 @@ public:
 protected:
 	mutable ObjectInfo m_ObjectInfo;	// オブジェクト情報.
 	D3DXVECTOR3	m_vPosition;	// 座標情報.
-	D3DXVECTOR3	m_vRotPivot;	// 回転軸座標.
+	D3DXVECTOR3	m_vPivot;		// 回転軸座標.
 	D3DXVECTOR3	m_vRotation;	// 回転情報.
 	D3DXVECTOR3	m_vScale;		// サイズ.
 	D3DXVECTOR3	m_vColor;		// カラー.

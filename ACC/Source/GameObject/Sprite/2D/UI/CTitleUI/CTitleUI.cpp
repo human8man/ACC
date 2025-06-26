@@ -9,12 +9,7 @@
 
 
 namespace {
-	// UIリスト.
-	std::vector<std::string> ImageList = {
-		"Black",
-		"StartButton",
-		"Title"
-	};
+	std::string TitleJson = "Data\\Texture\\UIData\\Title.json";
 
 	// 非処理のUIリスト.
 	std::vector<std::string> ignoreList = {
@@ -42,7 +37,7 @@ CTitleUI::~CTitleUI()
 //=================================================================================================
 void CTitleUI::Create()
 {
-	LoadSpriteList(ImageList, m_pUIs, m_pSprite2Ds);
+	LoadFromJson(TitleJson, m_pUIs);
 }
 
 

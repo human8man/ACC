@@ -4,14 +4,11 @@
 #include <chrono>
 
 
-//=============================================================================
-//		タイムクラス.
-//=============================================================================
 class CTime
 	: public CSingleton<CTime>
 {
 private:
-	friend class CSingleton<CTime>; // シングルトンクラスをフレンド宣言.
+	friend class CSingleton<CTime>;
 
 public:
 	CTime();
@@ -21,6 +18,7 @@ public:
 	void Update();
 
 	static float GetDeltaTime() { return GetInstance()->m_DeltaTime; }
+	static float GetNormalDeltaTime() { return GetInstance()->m_NormalDeltaTime; }
 	static float GetUnscaledDeltaTime() { return GetInstance()->m_UnscaledDeltaTime; }
 	static float GetTimeScale() { return GetInstance()->m_TimeScale; }
 	static float GetTotalTime() { return GetInstance()->m_TotalTime; }
@@ -29,6 +27,7 @@ public:
 	void SetTimeScale(float scale) { m_TimeScale = scale; }
 private:
 	float m_DeltaTime;			// 1フレームの経過時間（秒）.
+	float m_NormalDeltaTime;	// 平均的な１フレーム経過時間.
 	float m_UnscaledDeltaTime;	// 1フレームの経過時間（秒.スケール無し）.
 	float m_TotalTime;			// 起動からの累積時間（秒）.
 

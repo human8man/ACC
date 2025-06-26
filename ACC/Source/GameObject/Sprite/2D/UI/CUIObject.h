@@ -4,9 +4,6 @@
 #include "Sprite/2D/CSprite2D.h"
 
 
-//=============================================================================
-//		UIオブジェクトクラス.
-//=============================================================================
 class CUIObject
 	: public CGameObject
 {
@@ -49,15 +46,14 @@ protected:
 	void Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light ) override final;
 
 	/****************************************************************
-	// @brief SpiteManagerから画像名のリストと同じ名前のデータを読込.
-	// @param name 画像名リスト("Data/Texture"内のSprite名参照).
-	// @param uis 受取のUIObject配列.
-	// @param sprites 受取のCSprite2D配列.
+	// @brief SceneごとのJsonから情報を取得.
+	// @param name	Jsonのパス.
+	// @param uis	std::vector<CUIObject*>.
 	****************************************************************/
-	void LoadSpriteList(
-		const std::vector<std::string>& name,
-		std::vector<CUIObject*> &uis,
-		std::vector<CSprite2D*> &sprites);
+	void LoadFromJson(
+		const std::string& scenepath,
+		std::vector<CUIObject*>& uis);
+
 protected:
 	CSprite2D*	m_pSprite;
 	POINTS		m_PatternNo;	// パターン番号(マス目).

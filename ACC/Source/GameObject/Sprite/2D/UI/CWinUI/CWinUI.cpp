@@ -11,11 +11,7 @@
 namespace {
 	// UICSVのパス.
 	constexpr char UICSVPath[] = "Data\\CSV\\UIStatus.csv";
-	// UIリスト.
-	std::vector<std::string> ImageList = {
-		"Black",
-		"Victory"
-	};
+	std::string WinJson = "Data\\Texture\\UIData\\Win.json";
 }
 
 
@@ -48,7 +44,7 @@ CWinUI::~CWinUI()
 //=============================================================================
 void CWinUI::Create()
 {
-	LoadSpriteList(ImageList, m_pUIs, m_pSprite2Ds);
+	LoadFromJson(WinJson, m_pUIs);
 }
 
 

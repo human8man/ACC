@@ -10,14 +10,6 @@
 class CUIEditor
 	: public CSceneBase
 {
-private:
-	// 変更可能なシーンのリスト.
-	enum UISceneList {
-		Title,
-		Game,
-		Lose,
-		Win,
-	};
 public:
 	CUIEditor(HWND hWnd);
 	~CUIEditor();
@@ -37,7 +29,7 @@ private:
 	void UpdateShader();
 
 	// 選択したシーンのUIを読み込み.
-	void SelectSceneLoad(UISceneList scene);
+	void SelectSceneLoad(const std::string& sceneName);
 	// UI選択時に仮変数等を初期化する.
 	void SelectInit();
 	// 現在シーンのUI情報を保存.
@@ -52,6 +44,11 @@ private:
 	void ImGuiSelectScene();
 	// UIリスト検索関数.
 	void ImGuiSearchUI();
+	// SpriteManagerからUIを追加.
+	void AddDeleteSprite();
+	// 名前変更を行う.
+	void RenameUIObjects();
+
 	// 選択されたUIをハイライトする.
 	void ImGuiSetShader(CUIObject* object);
 	// 座標調整関数(選択されたUIObect).
@@ -74,6 +71,8 @@ private:
 	ID3D11Buffer* m_pVertexBuffer;
 	ID3D11Buffer* m_pCBufferMatrix;		//フレーム毎のバッファ.
 
+	std::string m_CurrentSceneName;
+
 	float m_LineThickness;	// ハイライト線の太さ.
 	D3DXVECTOR4 m_LineColor;// ハイライト線の色.
 
@@ -89,7 +88,11 @@ private:
 	float	m_DragValue;				// 調整値.
 	int		m_SelectedUIIndex;			// 選択中UIのインデックス.
 	char	m_SearchBuffer[64] = "";	// 検索用バッファ.
-	
+
+	int		m_SpriteSelectedUIIndex;	// 選択中追加可能UIのインデックス.
+	char	m_SpriteSearchBuffer[64] = "";	// 検索用バッファ.
+	std::string m_SelectedSpriteName;	// 選択されたUI名.
+
 	// マウス操作用の変数.
 	D3DXVECTOR2 m_OffsetPos;	// マウス座標と画像座標のズレ補正値.
 	bool m_DoDrag;				// ドラッグ中.

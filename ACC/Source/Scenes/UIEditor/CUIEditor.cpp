@@ -14,15 +14,7 @@ using Json = nlohmann::json;
 
 namespace {
 	// シェーダーのパス.
-	const TCHAR ShaderPath[]		= _T("Data\\Shader\\UIEditorLineShader.hlsl");
-	// TitleUIのパス.
-	constexpr char TitleImagePath[]	= "Data\\Texture\\Title";
-	// GameUIのパス.
-	constexpr char GameImagePath[]	= "Data\\Texture\\Game";
-	// WinUIのパス.
-	constexpr char WinImagePath[]	= "Data\\Texture\\Win";
-	// LoseUIのパス.
-	constexpr char LoseImagePath[]	= "Data\\Texture\\Lose";
+	const TCHAR ShaderPath[] = _T("Data\\Shader\\UIEditorLineShader.hlsl");
 
 	struct Vertex
 	{
@@ -52,6 +44,8 @@ namespace {
 		float LineThickness; // 太さ（ピクセル単位）.
 		D3DXVECTOR3 padding; // サイズ調整 (16バイト境界).
 	};
+
+	char m_NewSceneName[64] = ""; // 新規作成用バッファをメンバ変数に追加.
 }
 
 
@@ -74,9 +68,141 @@ void CUIEditor::Create()
 {
 	CDirectX11::GetInstance()->SetChangeDebugBuffer(true);
 	CSoundManager::GetInstance()->AllStop();
-	SelectSceneLoad(UISceneList::Title);
+	SelectSceneLoad("Title");
 	SelectInit();
 	LoadLineShader();
+}
+
+
+//=============================================================================
+//		データ読込.
+//=============================================================================
+HRESULT CUIEditor::LoadData()
+{
+	return E_NOTIMPL;
+}
+
+
+//=============================================================================
+//		初期化処理.
+//=============================================================================
+void CUIEditor::Init()
+{
+}
+
+
+//-----------------------------------------------------------------------------
+//		UI選択時に仮変数等を初期化する.
+//-----------------------------------------------------------------------------
+void CUIEditor::SelectInit()
+{
+	m_PatternNo		= POINTS(0, 0);
+	m_PatternMax	= POINTS(1, 1);
+	m_PatternAuto	= false;
+}
+
+
+//=============================================================================
+//		更新処理.
+//=============================================================================
+void CUIEditor::Update()
+{
+	if (!ISDEBUG) { return; }
+	// キー入力.
+	KeyInput();
+
+	// シーンを選択する.
+	ImGuiSelectScene();
+
+	//--------------------------------------------------------------
+	//		UIの追加と削除.
+	//--------------------------------------------------------------
+	ImGui::Begin(IMGUI_JP("UIの追加・削除"));
+	// シーンにUIを追加.
+	AddDeleteSprite();
+	// 画像名を変更し名前被りに対処.
+	RenameUIObjects();
+	ImGui::End();
+
+	//--------------------------------------------------------------
+	//		UI調整.
+	//--------------------------------------------------------------
+	ImGui::Begin(IMGUI_JP("UIエディターウィンドウ"));
+	// UIリストの検索関数.
+	ImGuiSearchUI();
+
+	//-----------------------------------------------------------
+	//		選択中のオブジェクトの編集.
+	//-----------------------------------------------------------
+	if (m_SelectedUIIndex >= 0 && m_SelectedUIIndex < m_pUIs.size()) {
+		// 選択されたUIを呼びやすくする.
+		CUIObject* selectedUI = m_pUIs[m_SelectedUIIndex];
+		// 選択されているUIを表示.
+		ImGui::Text(IMGUI_JP("選択されているUI: %s"), selectedUI->GetSpriteData().Name.c_str());
+
+		// 選択されたUIをハイライトする.
+		ImGuiSetShader(selectedUI);
+
+		// 座標の調整.
+		ImGuiPosEdit(selectedUI);
+		// Z座標を基準にソート.
+		SortBySpritePosZ(selectedUI);
+
+		// 画像情報の調整.
+		ImGuiInfoEdit(selectedUI);
+		// 画像パターンを試す.
+		ImGuiPatternTest(selectedUI);
+		// その他の情報の調整.
+		ImGuiEtcInfoEdit(selectedUI);
+	}
+
+	ImGui::End();
+
+	//--------------------------------------------------------------
+	//		保存する.
+	//--------------------------------------------------------------
+	ImGui::Begin(IMGUI_JP("UI保存ウィンドウ"));
+	if (ImGui::Button(IMGUI_JP("UIを保存"))) {
+		SaveScene(); 
+		UIEDIOR_MOVEANY = false;
+	}
+	ImGui::End();
+}
+
+
+//-----------------------------------------------------------------------------
+//		キー入力処理.
+//-----------------------------------------------------------------------------
+void CUIEditor::KeyInput()
+{
+	m_DragValue = 1.f;
+	if (GetAsyncKeyState(VK_SHIFT) && 0x8000) { m_DragValue *= 0.01f; }
+	if (GetAsyncKeyState(VK_SPACE) && 0x8000) { m_DragValue *= 0.001f; }
+}
+
+
+//=============================================================================
+//		描画処理.
+//=============================================================================
+void CUIEditor::Draw()
+{
+	if (m_pUIs.empty()) { return; }
+	for (size_t i = 0; i < m_pUIs.size(); ++i) { m_pUIs[i]->Draw(); }
+	UpdateShader();
+}
+
+
+//=============================================================================
+//		解放処理.
+//=============================================================================
+void CUIEditor::Release()
+{
+	SAFE_RELEASE(m_pCBufferMatrix);
+	SAFE_RELEASE(m_pVertexBuffer);
+	SAFE_RELEASE(m_pInputLayout);
+	SAFE_RELEASE(m_pVertexShader);
+	SAFE_RELEASE(m_pPixelShader);
+	SAFE_RELEASE(m_pGeometryShader);
 }
 
 
@@ -196,172 +322,84 @@ void CUIEditor::UpdateShader()
 }
 
 
-//=============================================================================
-//		データ読込.
-//=============================================================================
-HRESULT CUIEditor::LoadData()
-{
-	return E_NOTIMPL;
-}
-
-
-//=============================================================================
-//		初期化処理.
-//=============================================================================
-void CUIEditor::Init()
-{
-}
-
-
-//-----------------------------------------------------------------------------
-//		UI選択時に仮変数等を初期化する.
-//-----------------------------------------------------------------------------
-void CUIEditor::SelectInit()
-{
-	m_PatternNo		= POINTS(0, 0);
-	m_PatternMax	= POINTS(1, 1);
-	m_PatternAuto	= false;
-}
-
-
-//=============================================================================
-//		更新処理.
-//=============================================================================
-void CUIEditor::Update()
-{
-	if (!ISDEBUG) { return; }
-	// キー入力.
-	KeyInput();
-
-	// シーンを選択する.
-	ImGuiSelectScene();
-
-	//--------------------------------------------------------------
-	//		UI調整する.
-	//--------------------------------------------------------------
-	ImGui::Begin(IMGUI_JP("UIエディターウィンドウ"));
-
-	// UIリストの検索関数.
-	ImGuiSearchUI();
-
-	//-----------------------------------------------------------
-	//		選択中のオブジェクトの編集.
-	//-----------------------------------------------------------
-	if (m_SelectedUIIndex >= 0 && m_SelectedUIIndex < m_pUIs.size()) {
-		// 選択されたUIを呼びやすくする.
-		CUIObject* selectedUI = m_pUIs[m_SelectedUIIndex];
-		// 選択されているUIを表示.
-		ImGui::Text(IMGUI_JP("選択されているUI: %s"), selectedUI->GetSpriteData().Name.c_str());
-
-		// 選択されたUIをハイライトする.
-		ImGuiSetShader(selectedUI);
-
-		// 座標の調整.
-		ImGuiPosEdit(selectedUI);
-		// Z座標を基準にソート.
-		SortBySpritePosZ(selectedUI);
-
-		// 画像情報の調整.
-		ImGuiInfoEdit(selectedUI);
-		// 画像パターンを試す.
-		ImGuiPatternTest(selectedUI);
-		// その他の情報の調整.
-		ImGuiEtcInfoEdit(selectedUI);
-	}
-
-	ImGui::End();
-
-	//--------------------------------------------------------------
-	//		保存する.
-	//--------------------------------------------------------------
-	ImGui::Begin(IMGUI_JP("UI保存ウィンドウ"));
-	if (ImGui::Button(IMGUI_JP("UIを保存"))) {
-		SaveScene(); 
-		UIEDIOR_MOVEANY = false;
-	}
-	ImGui::End();
-}
-
-
-//-----------------------------------------------------------------------------
-//		キー入力処理.
-//-----------------------------------------------------------------------------
-void CUIEditor::KeyInput()
-{
-	m_DragValue = 1.f;
-	if (GetAsyncKeyState(VK_SHIFT) && 0x8000) { 
-		m_DragValue *= 0.01f;
-	}
-	if (GetAsyncKeyState(VK_SPACE) && 0x8000) { 
-		m_DragValue *= 0.001f; 
-	}
-}
-
-
-//=============================================================================
-//		描画処理.
-//=============================================================================
-void CUIEditor::Draw()
-{
-	for (size_t i = 0; i < m_pUIs.size(); ++i) { m_pUIs[i]->Draw(); }
-	UpdateShader();
-}
-
-
-//=============================================================================
-//		解放処理.
-//=============================================================================
-void CUIEditor::Release()
-{
-	SAFE_RELEASE(m_pCBufferMatrix);
-	SAFE_RELEASE(m_pVertexBuffer);
-	SAFE_RELEASE(m_pInputLayout);
-	SAFE_RELEASE(m_pVertexShader);
-	SAFE_RELEASE(m_pPixelShader);
-	SAFE_RELEASE(m_pGeometryShader);
-}
-
-
 //-----------------------------------------------------------------------------
 //		選択したシーンのUIを読み込み.
 //-----------------------------------------------------------------------------
-void CUIEditor::SelectSceneLoad(UISceneList scene)
+void CUIEditor::SelectSceneLoad(const std::string& sceneName)
 {
-	// 現在のUIをクリア.
-	for (auto sprite : m_pSprite2Ds) { SAFE_DELETE(sprite); }
-	m_pSprite2Ds.clear(); 
-	for (auto ui : m_pUIs) { SAFE_DELETE(ui); }
-	m_pUIs.clear(); 
+	m_pSprite2Ds.clear();
+	for (auto sprite : m_pSprite2Ds) SAFE_DELETE(sprite);
+	for (auto ui : m_pUIs) SAFE_DELETE(ui);
+	m_pUIs.clear();
 	m_SpritePosList.clear();
 
-	// シーンごとのパスを設定.
-	switch (scene) {
-	case Title:	m_ScenePath = TitleImagePath;	break;
-	case Game:	m_ScenePath = GameImagePath;	break;
-	case Win:	m_ScenePath = WinImagePath;		break;
-	case Lose:	m_ScenePath = LoseImagePath;	break;
-	default: return;
-	}
+	m_CurrentSceneName = sceneName;
+	m_ScenePath = "Data\\Texture\\UIData\\" + sceneName + ".json";
 
-	// 指定したパスを走査.
-	for (const auto& entry : std::filesystem::directory_iterator(m_ScenePath)) {
-		std::string extension = entry.path().extension().string();
-		if (extension == ".json") continue;
+	// JSON読み込み.
+	Json jsonData = FileManager::JsonLoad(m_ScenePath);
 
-		// インスタンス生成.
+	// 空なら初期UIを1個追加.
+	if (jsonData.is_null() || jsonData.empty()) {
 		auto sprite = new CSprite2D();
 		auto ui = new CUIObject();
 
-		// 画像データの読み込み.
-		sprite->Init(entry.path().string());
+		sprite->Init("Data\\Texture\\Other\\Black.png"); // 黒画像を初期で出す.
 		ui->AttachSprite(sprite);
-		ui->SetPos(sprite->GetSpriteData().Pos);
+		ui->SetPos(D3DXVECTOR3(0.f, 0.f, 0.f));
 
-		// リストに追加.
 		m_pSprite2Ds.push_back(sprite);
 		m_pUIs.push_back(ui);
 		m_SpritePosList.push_back(ui->GetPos());
+
+		// ついでにSaveScene()で書き込んでおく.
+		SaveScene();
 	}
+
+	// 保存されたUIデータを読み込み、展開.
+	for (auto& [imageName, spriteArray] : jsonData.items()) {
+		// 拡張子が .json ならスキップ.
+		std::string::size_type dotPos = imageName.find_last_of('.');
+		if (dotPos != std::string::npos) {
+			std::string ext = imageName.substr(dotPos);
+			if (ext == ".json" || ext == ".JSON") continue;
+		}
+
+		// スプライト取得.
+		CSprite2D* pSprite = CSpriteManager::GetInstance()->Get2DSprite(GetBaseName(imageName));
+		if (!pSprite) {
+			MessageBoxA(NULL, ("スプライトが見つかりません: " + imageName).c_str(), "Error", MB_OK);
+			continue;
+		}
+
+		// 各UIインスタンスを展開.
+		for (auto& value : spriteArray) {
+			auto ui = new CUIObject();
+
+			// 各種情報を設定.
+			pSprite->SetPos(D3DXVECTOR3(value["Pos"]["x"], value["Pos"]["y"], value["Pos"]["z"]));
+			pSprite->SetColor(D3DXVECTOR3(value["Color"]["x"], value["Color"]["y"], value["Color"]["z"]));
+			pSprite->SetAlpha(value["Alpha"]);
+			pSprite->SetScale(D3DXVECTOR3(value["Scale"]["x"], value["Scale"]["y"], value["Scale"]["z"]));
+			pSprite->SetPivot(D3DXVECTOR3(value["Pivot"]["x"], value["Pivot"]["y"], value["Pivot"]["z"]));
+			pSprite->SetRot(D3DXVECTOR3(value["Rotate"]["x"], value["Rotate"]["y"], value["Rotate"]["z"]));
+
+			// SpriteDataの一部も上書き.
+			pSprite->SetBase(D3DXVECTOR2(value["Base"]["w"], value["Base"]["h"]));
+			pSprite->SetDisp(D3DXVECTOR2(value["Disp"]["w"], value["Disp"]["h"]));
+			pSprite->SetStride(D3DXVECTOR2(value["Stride"]["w"], value["Stride"]["h"]));
+
+			// リストに追加.
+			m_pSprite2Ds.push_back(pSprite);
+			ui->AttachSprite(pSprite);
+			m_pUIs.push_back(ui);
+			m_SpritePosList.push_back(ui->GetPos());
+		}
+	}
+	// Z座標を基準にソートする.
+	std::sort(m_pUIs.begin(), m_pUIs.end(), [](const CUIObject* a, const CUIObject* b) {
+		return a->GetPos().z < b->GetPos().z;
+		});
 }
 
 
@@ -370,41 +408,44 @@ void CUIEditor::SelectSceneLoad(UISceneList scene)
 //-----------------------------------------------------------------------------
 HRESULT CUIEditor::SaveScene()
 {
-	for (size_t i = 0; i < m_pUIs.size(); ++i) 
+	Json jsonData;
+	for (size_t i = 0; i < m_pUIs.size(); ++i)
 	{
-		// 作成するファイルパス.
-		std::string TextPath = m_pUIs[i]->GetSpriteData().Path;
+		std::string imageName = m_pUIs[i]->GetSpriteData().Name;
 
-		// 情報を追加していく.
+		// 画像名ごとのリストにUI情報を追加
 		Json SpriteState;
-		SpriteState["Pos"]["x"]		= m_pUIs[i]->GetPos().x;
-		SpriteState["Pos"]["y"]		= m_pUIs[i]->GetPos().y;
-		SpriteState["Pos"]["z"]		= m_pUIs[i]->GetPos().z;
-		SpriteState["Base"]["w"]	= m_pUIs[i]->GetSpriteData().Base.w;
-		SpriteState["Base"]["h"]	= m_pUIs[i]->GetSpriteData().Base.h;
-		SpriteState["Disp"]["w"]	= m_pUIs[i]->GetSpriteData().Disp.w;
-		SpriteState["Disp"]["h"]	= m_pUIs[i]->GetSpriteData().Disp.h;
-		SpriteState["Stride"]["w"]	= m_pUIs[i]->GetSpriteData().Stride.w;
-		SpriteState["Stride"]["h"]	= m_pUIs[i]->GetSpriteData().Stride.h;
+		SpriteState["Pos"]["x"] = m_pUIs[i]->GetPos().x;
+		SpriteState["Pos"]["y"] = m_pUIs[i]->GetPos().y;
+		SpriteState["Pos"]["z"] = m_pUIs[i]->GetPos().z;
+		SpriteState["Base"]["w"] = m_pUIs[i]->GetSpriteData().Base.w;
+		SpriteState["Base"]["h"] = m_pUIs[i]->GetSpriteData().Base.h;
+		SpriteState["Disp"]["w"] = m_pUIs[i]->GetSpriteData().Disp.w;
+		SpriteState["Disp"]["h"] = m_pUIs[i]->GetSpriteData().Disp.h;
+		SpriteState["Stride"]["w"] = m_pUIs[i]->GetSpriteData().Stride.w;
+		SpriteState["Stride"]["h"] = m_pUIs[i]->GetSpriteData().Stride.h;
 
-		SpriteState["Color"]["x"]	= m_pUIs[i]->GetColor().x;
-		SpriteState["Color"]["y"]	= m_pUIs[i]->GetColor().y;
-		SpriteState["Color"]["z"]	= m_pUIs[i]->GetColor().z;
-		SpriteState["Alpha"]		= m_pUIs[i]->GetAlpha();
+		SpriteState["Color"]["x"] = m_pUIs[i]->GetColor().x;
+		SpriteState["Color"]["y"] = m_pUIs[i]->GetColor().y;
+		SpriteState["Color"]["z"] = m_pUIs[i]->GetColor().z;
+		SpriteState["Alpha"]	 = m_pUIs[i]->GetAlpha();
 
-		SpriteState["Scale"]["x"]	= m_pUIs[i]->GetScale().x;
-		SpriteState["Scale"]["y"]	= m_pUIs[i]->GetScale().y;
-		SpriteState["Scale"]["z"]	= m_pUIs[i]->GetScale().z;
-		SpriteState["Pivot"]["x"]	= m_pUIs[i]->GetRotPivot().x;
-		SpriteState["Pivot"]["y"]	= m_pUIs[i]->GetRotPivot().y;
-		SpriteState["Pivot"]["z"]	= m_pUIs[i]->GetRotPivot().z;
-		SpriteState["Rotate"]["x"]	= m_pUIs[i]->GetRot().x;
-		SpriteState["Rotate"]["y"]	= m_pUIs[i]->GetRot().y;
-		SpriteState["Rotate"]["z"]	= m_pUIs[i]->GetRot().z;
+		SpriteState["Scale"]["x"] = m_pUIs[i]->GetScale().x;
+		SpriteState["Scale"]["y"] = m_pUIs[i]->GetScale().y;
+		SpriteState["Scale"]["z"] = m_pUIs[i]->GetScale().z;
+		SpriteState["Pivot"]["x"] = m_pUIs[i]->GetPivot().x;
+		SpriteState["Pivot"]["y"] = m_pUIs[i]->GetPivot().y;
+		SpriteState["Pivot"]["z"] = m_pUIs[i]->GetPivot().z;
+		SpriteState["Rotate"]["x"] = m_pUIs[i]->GetRot().x;
+		SpriteState["Rotate"]["y"] = m_pUIs[i]->GetRot().y;
+		SpriteState["Rotate"]["z"] = m_pUIs[i]->GetRot().z;
 
-		// スプライト情報の作成.
-		if ( FAILED( FileManager::JsonSave( TextPath, SpriteState ))) return E_FAIL;
+		// jsonData[画像名] に配列として追加
+		jsonData[imageName].push_back(SpriteState);
 	}
+	std::string outPath = "Data\\Texture\\UIData\\" + m_CurrentSceneName + ".json";
+	if (!SUCCEEDED(FileManager::JsonSave(outPath, jsonData))) return E_FAIL;
+
 	return S_OK;
 }
 
@@ -452,22 +493,89 @@ void CUIEditor::SortBySpritePosZ(CUIObject* object)
 //-----------------------------------------------------------------------------
 void CUIEditor::ImGuiSelectScene()
 {
-	if (!ISDEBUG) { return; }
-	ImGui::Begin(IMGUI_JP("UIエディター用シーン選択"));
-	UISceneList scene;
-	bool click = false;
-	if (ImGui::Button("Title"))	{ scene = UISceneList::Title;	click = true; }
-	if (ImGui::Button("Game"))	{ scene = UISceneList::Game;	click = true; }
-	if (ImGui::Button("Lose"))	{ scene = UISceneList::Lose;	click = true; }
-	if (ImGui::Button("Win"))	{ scene = UISceneList::Win;		click = true; }
-	if (UIEDIOR_MOVEANY && click && (MessageBox(NULL,
-		L"本当に切り替えますか？\n(保存していない場合、編集前にリセットされます)", L"確認",
-		MB_YESNO | MB_ICONQUESTION)) == IDYES) {
-		SelectSceneLoad(scene);
+	ImGui::Begin(IMGUI_JP("シーン管理"));
+
+	// 新規シーンの作成.
+	ImGui::InputText(IMGUI_JP("新規シーン名"), m_NewSceneName, IM_ARRAYSIZE(m_NewSceneName));
+	if (ImGui::Button(IMGUI_JP("新規シーン作成"))) {
+		std::string newPath = "Data\\Texture\\UIData\\" + std::string(m_NewSceneName) + ".json";
+		if (!std::filesystem::exists(newPath)) {
+			std::ofstream ofs(newPath);
+			ofs << "{}"; // 空のJSONを書き込む
+			ofs.close();
+		}
+		m_CurrentSceneName = m_NewSceneName;
+		SelectSceneLoad(m_CurrentSceneName);
 		UIEDIOR_MOVEANY = false;
 	}
-	else if (!UIEDIOR_MOVEANY && click) {
-		SelectSceneLoad(scene);
+
+	ImGui::Separator();
+	ImGui::Text(IMGUI_JP("既存のシーン"));
+
+	static std::string sceneToDelete; // 削除候補のシーン名
+	static bool showDeleteConfirm = false; // 削除確認ダイアログ表示フラグ
+
+	for (const auto& entry : std::filesystem::directory_iterator("Data\\Texture\\UIData\\")) {
+		if (entry.path().extension() == ".json") {
+			std::string sceneName = entry.path().stem().string();
+
+			ImGui::PushID(sceneName.c_str());
+
+			if (ImGui::Button(sceneName.c_str())) {
+				m_CurrentSceneName = sceneName;
+				SelectSceneLoad(m_CurrentSceneName);
+				UIEDIOR_MOVEANY = false;
+			}
+			ImGui::SameLine();
+
+			if (ImGui::Button(IMGUI_JP("削除"))) {
+				sceneToDelete = sceneName;
+				showDeleteConfirm = true;
+			}
+
+			ImGui::PopID();
+		}
+	}
+
+	// 削除確認モーダル
+	if (showDeleteConfirm) {
+		ImGui::OpenPopup(IMGUI_JP("削除確認"));
+	}
+	if (ImGui::BeginPopupModal(IMGUI_JP("削除確認"), NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+		ImGui::Text("%s\n%s", sceneToDelete.c_str(), IMGUI_JP("を削除しますか？"));
+		ImGui::Separator();
+
+		if (ImGui::Button(IMGUI_JP("はい"), ImVec2(120, 0))) {
+			std::string deletePath = "Data\\Texture\\UIData\\" + sceneToDelete + ".json";
+			if (std::filesystem::exists(deletePath)) {
+				try {
+					std::filesystem::remove(deletePath);
+				}
+				catch (...) {}
+			}
+
+			if (m_CurrentSceneName == sceneToDelete) {
+				// 削除対象のシーンを現在のシーンから外す
+				m_CurrentSceneName.clear();
+
+				// UIなどのデータをクリア
+				m_pUIs.clear();
+				m_pSprite2Ds.clear();
+				m_SpritePosList.clear();
+				UIEDIOR_MOVEANY = false;
+			}
+
+			sceneToDelete.clear();
+			showDeleteConfirm = false;
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button(IMGUI_JP("いいえ"), ImVec2(120, 0))) {
+			sceneToDelete.clear();
+			showDeleteConfirm = false;
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
 	}
 
 	ImGui::End();
@@ -501,6 +609,95 @@ void CUIEditor::ImGuiSearchUI()
 		}
 		ImGui::EndChild();
 		ImGui::TreePop();
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+//		SpriteManagerからUIを追加.
+//-----------------------------------------------------------------------------
+void CUIEditor::AddDeleteSprite()
+{
+	if (!ISDEBUG) { return; }
+	std::vector<std::string> spriteNames = CSpriteManager::GetInstance()->GetSpriteNames();
+	if (ImGui::TreeNodeEx(IMGUI_JP("追加可能UIリスト"), ImGuiTreeNodeFlags_DefaultOpen)) {
+		// 検索バー.
+		ImGui::InputText(IMGUI_JP("検索"), m_SpriteSearchBuffer,
+			IM_ARRAYSIZE(m_SpriteSearchBuffer));
+		// スクロール可能なリスト.
+		ImGui::BeginChild(IMGUI_JP("リスト"),
+			ImVec2(315, 100), true, ImGuiWindowFlags_HorizontalScrollbar);
+
+		for (int i = 0; i < spriteNames.size(); ++i) {
+			const std::string& name = spriteNames[i];
+
+			// 検索フィルタ
+			if (strlen(m_SpriteSearchBuffer) > 0 &&
+				name.find(m_SpriteSearchBuffer) == std::string::npos) {
+				continue;
+			}
+
+			bool isSelected = (m_SelectedSpriteName == name);
+			if (ImGui::Selectable(name.c_str(), isSelected)) {
+				m_SelectedSpriteName = name; // 選択更新
+			}
+		}
+		ImGui::EndChild();
+
+		// 選択されたスプライトをUIとして追加.
+		if (ImGui::Button(IMGUI_JP("UI追加"))) {
+			if (!m_SelectedSpriteName.empty()) {
+				CSprite2D* pSprite = CSpriteManager::GetInstance()->Get2DSprite(m_SelectedSpriteName);
+				if (!pSprite) return;
+
+				auto ui = new CUIObject();
+				ui->AttachSprite(pSprite);
+				ui->SetPos(pSprite->GetPos());
+
+				m_pSprite2Ds.push_back(pSprite);
+				m_pUIs.push_back(ui);
+				m_SpritePosList.push_back(ui->GetPos());
+			}
+		}
+
+		// 選択されたUIを削除.
+		if (ImGui::Button(IMGUI_JP("UI削除")) && !m_pUIs.empty()) {
+			SAFE_DELETE(m_pUIs[m_SelectedUIIndex]);
+
+			m_pUIs.erase(m_pUIs.begin() + m_SelectedUIIndex);
+			m_pSprite2Ds.erase(m_pSprite2Ds.begin() + m_SelectedUIIndex);
+			m_SpritePosList.erase(m_SpritePosList.begin() + m_SelectedUIIndex);
+
+			// インデックスをリセット.
+			m_SelectedUIIndex = 0;
+		}
+
+		ImGui::TreePop();
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+//		ソートと名前変更を同時に行う.
+//-----------------------------------------------------------------------------
+void CUIEditor::RenameUIObjects()
+{
+	if (m_pUIs.empty()) { return; }
+	std::vector<std::pair<std::string, CUIObject*>> nameUIList;
+
+	// UI名とUIオブジェクトのペアを収集.
+	for (auto* ui : m_pUIs) {
+		std::string baseName = GetBaseName(ui->GetSpriteData().Name);
+		nameUIList.emplace_back(baseName, ui);
+	}
+
+	// ナンバリングして名前を再設定.
+	std::unordered_map<std::string, int> nameCount;
+
+	for (auto& [baseName, ui] : nameUIList) {
+		int index = nameCount[baseName]++;
+		std::string newName = baseName + "_" + std::to_string(index);
+		ui->SetSpriteName(newName);
 	}
 }
 
@@ -793,37 +990,32 @@ void CUIEditor::ImGuiEtcInfoEdit(CUIObject* object)
 	if (!ISDEBUG) { return; }
 	if (ImGui::TreeNode(IMGUI_JP("その他")))
 	{
-		D3DXVECTOR3 color = object->GetColor();
-		float alpha = object->GetAlpha();
+		D3DXVECTOR4 color = D3DXVECTOR4(object->GetColor(), object->GetAlpha());
 		D3DXVECTOR3 scale = object->GetScale();
 		D3DXVECTOR3 rot = object->GetRot();
-		D3DXVECTOR3 pivot = object->GetRotPivot();
+		D3DXVECTOR3 pivot = object->GetPivot();
 
 		ImGui::Text(IMGUI_JP("カラー"));
-		bool colorslider = ImGui::SliderFloat3("##ColorSlider", color, 0.f, 1.f);
-
-		ImGui::Text(IMGUI_JP("アルファ"));
-		bool alphaslider = ImGui::SliderFloat("##AlphaSlider", &alpha, 0.f, 1.f);
+		bool colorslider = ImGui::ColorEdit4("##Color", color);
 
 		ImGui::Text(IMGUI_JP("スケール"));
 		bool scaledrag = ImGui::DragFloat3("##ScaleDrag", scale, m_DragValue);
 
 		ImGui::Text(IMGUI_JP("回転軸"));
-		bool rotpivotdrag = ImGui::DragFloat3("##RotPivotDrag", pivot, m_DragValue);
+		bool Pivotdrag = ImGui::DragFloat3("##PivotDrag", pivot, m_DragValue);
 		ImGui::Text(IMGUI_JP("回転"));
 		bool rotdrag = ImGui::DragFloat3("##RotDrag", rot, m_DragValue);
 
 		// 変更があった場合保存する.
-		if (alphaslider
-		||	scaledrag
-		||	rotpivotdrag
-		||	rotdrag
-		||	colorslider)
+		if (scaledrag
+			|| Pivotdrag
+			|| rotdrag
+			|| colorslider)
 		{
-			object->SetColor(color);
-			object->SetAlpha(alpha);
+			object->SetColor(D3DXVECTOR3(color.x, color.y, color.z));
+			object->SetAlpha(color.w);
 			object->SetScale(scale);
-			object->SetRotPivot(pivot);
+			object->SetPivot(pivot);
 			object->SetRot(rot);
 			UIEDIOR_MOVEANY = true;
 		}

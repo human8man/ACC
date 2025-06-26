@@ -1,10 +1,9 @@
 #include "CUIObject.h"
 #include "DirectX/CDirectX11.h"
 #include "Sprite/2D/SpriteManager/SpriteManager.h"
+#include "FileManager/FileManager.h"
 
-//=============================================================================
-//		UIオブジェクトクラス.
-//=============================================================================
+
 CUIObject::CUIObject()
 	: m_pSprite			( nullptr )
 	, m_PatternNo		()
@@ -33,9 +32,9 @@ void CUIObject::Draw()
 	if( m_pSprite == nullptr ){ return; }
 
 	// 描画直前で座標や回転情報などを更新.
-	m_pSprite->SetPosition( m_vPosition );
-	m_pSprite->SetRotPivot( m_vRotPivot );
-	m_pSprite->SetRotation( m_vRotation );
+	m_pSprite->SetPos( m_vPosition );
+	m_pSprite->SetPivot( m_vPivot );
+	m_pSprite->SetRot( m_vRotation );
 	m_pSprite->SetScale( m_vScale );
 	m_pSprite->SetColor( m_vColor );
 	m_pSprite->SetAlpha( m_Alpha );
@@ -56,12 +55,13 @@ void CUIObject::Draw()
 //=============================================================================
 void CUIObject::AttachSprite(CSprite2D* pSprite)
 {
-	m_pSprite = new CSprite2D(*pSprite);
-	m_vRotPivot = m_pSprite->GetRotPivot();
-	m_vRotation = m_pSprite->GetRotation();
-	m_vScale = m_pSprite->GetScale();
-	m_vColor = m_pSprite->GetColor();
-	m_Alpha = m_pSprite->GetAlpha();
+	m_pSprite	= new CSprite2D(*pSprite);
+	m_vPosition	= m_pSprite->GetPos();
+	m_vPivot	= m_pSprite->GetPivot();
+	m_vRotation	= m_pSprite->GetRot();
+	m_vScale	= m_pSprite->GetScale();
+	m_vColor	= m_pSprite->GetColor();
+	m_Alpha		= m_pSprite->GetAlpha();
 }
 
 
@@ -107,46 +107,54 @@ void CUIObject::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 //=============================================================================
 //		画像名リストのデータ読込.
 //=============================================================================
-void CUIObject::LoadSpriteList(
-	const std::vector<std::string>& name, 
-	std::vector<CUIObject*> &uis, 
-	std::vector<CSprite2D*> &sprites)
+void CUIObject::LoadFromJson(
+	const std::string& scenepath,
+	std::vector<CUIObject*>& uis)
 {
-	std::unordered_map<std::string, int> nameCounts; // 名前ごとの出現回数を記録.
+	// JSON読み込み.
+	Json jsonData = FileManager::JsonLoad(scenepath);
 
-	for (size_t i = 0; i < name.size(); ++i)
-	{
-		// 名前被りがある場合の処理.
-		std::string baseName = name[i];
-		std::string numberedName;
-
-		if (nameCounts.count(baseName) == 0) {
-			numberedName = baseName;	// 1個目はそのまま.
-			nameCounts[baseName] = 1;	// 次からは1スタート.
-		}
-		else {
-			numberedName = baseName + "_" + std::to_string(nameCounts[baseName]);
-			nameCounts[baseName]++;
+	// 保存されたUIデータを読み込み、展開.
+	for (auto& [imageName, spriteArray] : jsonData.items()) {
+		// 拡張子が .json ならスキップ.
+		std::string::size_type dotPos = imageName.find_last_of('.');
+		if (dotPos != std::string::npos) {
+			std::string ext = imageName.substr(dotPos);
+			if (ext == ".json" || ext == ".JSON") continue;
 		}
 
-		// インスタンス生成.
-		sprites.push_back(CSpriteManager::GetInstance()->GetSprite(baseName));
-		uis.push_back(new CUIObject());
-		CSprite2D* pSprite = CSpriteManager::GetInstance()->GetSprite(name[i]);
+		// スプライト取得.
+		CSprite2D* pSprite = CSpriteManager::GetInstance()->Clone2DSprite(GetBaseName(imageName));
+		if (!pSprite) {
+			MessageBoxA(NULL, ("スプライトが見つかりません: " + imageName).c_str(), "Error", MB_OK);
+			continue;
+		}
 
-		// 画像データの読み込み.
-		uis.back()->AttachSprite(pSprite);
-		uis.back()->SetPos(sprites.back()->GetSpriteData().Pos);
+		// 各UIインスタンスを展開.
+		for (auto& value : spriteArray) {
+			auto ui = new CUIObject();
 
-		// 変更後の名前につけなおす.
-		uis.back()->SetSpriteName(numberedName);
+			// 各種情報を設定.
+			pSprite->SetPos(D3DXVECTOR3(value["Pos"]["x"], value["Pos"]["y"], value["Pos"]["z"]));
+			pSprite->SetColor(D3DXVECTOR3(value["Color"]["x"], value["Color"]["y"], value["Color"]["z"]));
+			pSprite->SetAlpha(value["Alpha"]);
+			pSprite->SetScale(D3DXVECTOR3(value["Scale"]["x"], value["Scale"]["y"], value["Scale"]["z"]));
+			pSprite->SetPivot(D3DXVECTOR3(value["Pivot"]["x"], value["Pivot"]["y"], value["Pivot"]["z"]));
+			pSprite->SetRot(D3DXVECTOR3(value["Rotate"]["x"], value["Rotate"]["y"], value["Rotate"]["z"]));
+
+			// SpriteDataの一部も上書き.
+			pSprite->SetBase(D3DXVECTOR2(value["Base"]["w"], value["Base"]["h"]));
+			pSprite->SetDisp(D3DXVECTOR2(value["Disp"]["w"], value["Disp"]["h"]));
+			pSprite->SetStride(D3DXVECTOR2(value["Stride"]["w"], value["Stride"]["h"]));
+
+			// リストに追加.
+			ui->AttachSprite(pSprite);
+			uis.push_back(ui);
+		}
 	}
-
-	std::sort(uis.begin(), uis.end(), [](const CUIObject* a, const CUIObject* b) {
-		if (a && a->GetPos() && b && b->GetPos()) {
-			return a->GetPos().z < b->GetPos().z;
-		}
-		return false;
+	// Z座標を基準にソートする.
+	std::sort(m_pUIs.begin(), m_pUIs.end(), [](const CUIObject* a, const CUIObject* b) {
+		return a->GetPos().z < b->GetPos().z;
 		});
 }
 
