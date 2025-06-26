@@ -1,5 +1,4 @@
-
-#include "Sprite/2D/SpriteManager/SpriteManager.h"
+#include "SpriteManager.h"
 
 
 namespace {
@@ -7,13 +6,10 @@ namespace {
 }
 
 
-//=============================================================================
-//		CSpriteManagerクラス. 
-//=============================================================================
 CSpriteManager::CSpriteManager()
-	: m_SpriteList	()
-	, m_SpriteNames	()
-
+	: m_Sprite2DList()
+	, m_Sprite3DList()
+	, m_SpriteNames()
 {
 }
 CSpriteManager::~CSpriteManager()
@@ -38,8 +34,12 @@ HRESULT CSpriteManager::SpriteLoad()
 				Extension != ".jpg" && Extension != ".JPG") return;
 
 			// スプライトファイルの読み込み.
-			m_SpriteList[FileName] = std::make_unique<CSprite2D>();
-			if (FAILED(m_SpriteList[FileName]->Init(FilePath))) throw E_FAIL;
+			m_Sprite2DList[FileName] = std::make_unique<CSprite2D>();
+			if (FAILED(m_Sprite2DList[FileName]->Init(FilePath))) throw E_FAIL;
+			// スプライトファイルの読み込み.
+			m_Sprite3DList[FileName] = std::make_unique<CSprite3D>();
+			if (FAILED(m_Sprite2DList[FileName]->Init(FilePath))) throw E_FAIL;
+
 			m_SpriteNames.emplace_back(FileName);
 		};
 
@@ -60,7 +60,8 @@ HRESULT CSpriteManager::SpriteLoad()
 //=============================================================================
 void CSpriteManager::Release()
 {
-	m_SpriteList.clear();
+	m_Sprite2DList.clear();
+	m_Sprite3DList.clear();
 	m_SpriteNames.clear();
 }
 
@@ -68,15 +69,44 @@ void CSpriteManager::Release()
 //=============================================================================
 //		スプライト情報を取得.
 //=============================================================================
-CSprite2D* CSpriteManager::GetSprite(const std::string& filename)
+CSprite3D* CSpriteManager::Get3DSprite(const std::string& filename)
 {
 	// 指定したスプライトを取得.
-	for (auto& s : GetInstance()->m_SpriteList) {
+	for (auto& s : GetInstance()->m_Sprite3DList) {
 		if (s.first != filename) continue;
 		return s.second.get();
 	}
 
 	return nullptr;
+}
+CSprite2D* CSpriteManager::Get2DSprite(const std::string& filename)
+{
+	// 指定したスプライトを取得.
+	for (auto& s : GetInstance()->m_Sprite2DList) {
+		if (s.first != filename) continue;
+		return s.second.get();
+	}
+
+	return nullptr;
+}
+//=============================================================================
+//		スプライト情報を取得(クローン).
+//=============================================================================
+CSprite3D* CSpriteManager::Clone3DSprite(const std::string& filename)
+{
+	auto* src = Get3DSprite(filename);
+	if (!src) return nullptr;
+
+	CSprite3D* clone = new CSprite3D(*src);
+	return clone;
+}
+CSprite2D* CSpriteManager::Clone2DSprite(const std::string& filename)
+{
+	auto* src = Get2DSprite(filename);
+	if (!src) return nullptr;
+
+	CSprite2D* clone = new CSprite2D(*src);
+	return clone;
 }
 
 
@@ -86,7 +116,7 @@ CSprite2D* CSpriteManager::GetSprite(const std::string& filename)
 std::string CSpriteManager::GetFilePath(const std::string& filename)
 {
 	// 指定したスプライトを取得.
-	for (auto& s : GetInstance()->m_SpriteList) {
+	for (auto& s : GetInstance()->m_Sprite2DList) {
 		if (s.first != filename) continue;
 		return s.second->GetSpriteData().Path;
 	}

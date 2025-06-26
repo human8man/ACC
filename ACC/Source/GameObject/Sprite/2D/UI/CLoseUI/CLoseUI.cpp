@@ -11,11 +11,7 @@
 namespace {
 	// UICSVのパス.
 	constexpr char UICSVPath[] = "Data\\CSV\\UIStatus.csv";
-	// UIリスト.
-	std::vector<std::string> ImageList = {
-		"Black",
-		"Lose"
-	};
+	std::string LoseJson = "Data\\Texture\\UIData\\Lose.json";
 }
 
 
@@ -48,7 +44,7 @@ CLoseUI::~CLoseUI()
 //=================================================================================================
 void CLoseUI::Create()
 {
-	LoadSpriteList(ImageList, m_pUIs, m_pSprite2Ds);
+	LoadFromJson(LoseJson, m_pUIs);
 }
 
 

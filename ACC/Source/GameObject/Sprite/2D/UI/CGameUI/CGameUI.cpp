@@ -10,22 +10,7 @@
 namespace {
 	// UICSVのパス.
 	constexpr char UICSVPath[] = "Data\\CSV\\UIStatus.csv";
-	// UIリスト.
-	std::vector<std::string> ImageList = {
-		"Bullets",
-		"Crosshair",
-		"HP",
-		"HPFrame",
-		"HitEffect",
-		"Reload",
-		"ReloadR",
-		"Infinity",
-		"AutoAim",
-		"Homing",
-		"WallHack",
-		"TriggerHappy",
-		"Slow"
-	};
+	std::string GameJson = "Data\\Texture\\UIData\\Game.json";
 }
 
 
@@ -89,7 +74,7 @@ CGameUI::~CGameUI()
 //=================================================================================================
 void CGameUI::Create()
 {
-	LoadSpriteList(ImageList, m_pUIs, m_pSprite2Ds);
+	LoadFromJson(GameJson, m_pUIs);
 }
 
 

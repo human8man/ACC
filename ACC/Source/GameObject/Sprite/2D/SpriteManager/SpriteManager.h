@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Sprite/2D/CSprite2D.h"
+#include "Sprite/3D/CSprite3D.h"
 #include "Singleton/CSingleton.h"
 
 
@@ -8,7 +9,8 @@ class CSpriteManager
 	: public CSingleton<CSpriteManager>
 {
 public:
-	using Sprite_map = std::unordered_map<std::string, std::shared_ptr<CSprite2D>>;
+	using Sprite2D_map = std::unordered_map<std::string, std::shared_ptr<CSprite2D>>;
+	using Sprite3D_map = std::unordered_map<std::string, std::shared_ptr<CSprite3D>>;
 	using Sprite_List = std::vector<std::string>;
 
 public:
@@ -23,7 +25,10 @@ public:
 	void Release();
 
 	// スプライト情報を取得.
-	CSprite2D* GetSprite(const std::string& filename);
+	CSprite3D* Get3DSprite(const std::string& filename);
+	CSprite2D* Get2DSprite(const std::string& filename);
+	CSprite3D* Clone3DSprite(const std::string& filename);
+	CSprite2D* Clone2DSprite(const std::string& filename);
 	// スプライトのパスを取得.
 	std::string GetFilePath(const std::string& filename);
 
@@ -31,6 +36,8 @@ public:
 	Sprite_List GetSpriteNames() { return GetInstance()->m_SpriteNames; }
 
 private:
-	Sprite_map	m_SpriteList;	// スプライトリスト.
-	Sprite_List	m_SpriteNames;	// スプライトの名前リスト.
+	Sprite2D_map	m_Sprite2DList;	// スプライト2Dリスト.
+	Sprite3D_map	m_Sprite3DList;	// スプライト3Dリスト.
+
+	Sprite_List		m_SpriteNames;	// スプライトの名前リスト.
 };

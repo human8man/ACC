@@ -252,9 +252,7 @@ void CSceneManager::ImGuiUpdate()
 	ImGui::Begin("SceneSelect");
 	if (ImGui::Button("Game")) { GetInstance()->LoadScene(SceneList::Game); }
 	if (ImGui::Button("Title")) { GetInstance()->LoadScene(SceneList::Title); }
-
-	ImGui::Text("\n");
-	ImGui::Text(IMGUI_JP("-----デバッグ用シーン------------------------------------"));
+	ImGui::Separator();
 	if (ImGui::Button("UIEditor")) { GetInstance()->LoadScene(SceneList::UIEditor); }
 	ImGui::End();
 

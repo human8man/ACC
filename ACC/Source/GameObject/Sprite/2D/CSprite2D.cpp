@@ -25,7 +25,7 @@ CSprite2D::CSprite2D()
 	, m_pSampleLinear	( nullptr )
 	, m_pTexture		( nullptr )
 	, m_vPosition		()
-	, m_vRotPivot		()
+	, m_vPivot		()
 	, m_vRotation		()
 	, m_vScale			( 1.f, 1.f, 1.f )
 	, m_UV				( ZEROVEC2 )
@@ -360,8 +360,8 @@ void CSprite2D::Render()
 	D3DXMatrixScaling( &mScale, m_vScale.x, m_vScale.y, m_vScale.z );
 
 	// âÒì]é≤çsóÒ.
-	D3DXMatrixTranslation(&mPivot, -m_vRotPivot.x, -m_vRotPivot.y, -m_vRotPivot.z);
-	D3DXMatrixTranslation(&mUnpivot, m_vRotPivot.x, m_vRotPivot.y, m_vRotPivot.z);
+	D3DXMatrixTranslation(&mPivot, -m_vPivot.x, -m_vPivot.y, -m_vPivot.z);
+	D3DXMatrixTranslation(&mUnpivot, m_vPivot.x, m_vPivot.y, m_vPivot.z);
 
 	// âÒì]çsóÒ.
 	D3DXMATRIX mYaw, mPitch, mRoll;
@@ -501,9 +501,9 @@ HRESULT CSprite2D::SpriteStateDataLoad(const std::string& FilePath)
 	m_vScale.y		= m_SpriteStateData["Scale"]["y"].get<float>();
 	m_vScale.z		= m_SpriteStateData["Scale"]["z"].get<float>();
 
-	m_vRotPivot.x	= m_SpriteStateData["Pivot"]["x"].get<float>();
-	m_vRotPivot.y	= m_SpriteStateData["Pivot"]["y"].get<float>();
-	m_vRotPivot.z	= m_SpriteStateData["Pivot"]["z"].get<float>();
+	m_vPivot.x	= m_SpriteStateData["Pivot"]["x"].get<float>();
+	m_vPivot.y	= m_SpriteStateData["Pivot"]["y"].get<float>();
+	m_vPivot.z	= m_SpriteStateData["Pivot"]["z"].get<float>();
 
 	m_vRotation.x	= m_SpriteStateData["Rotate"]["x"].get<float>();
 	m_vRotation.y	= m_SpriteStateData["Rotate"]["y"].get<float>();

@@ -3,9 +3,7 @@
 #include "Sprite/2D/UI/CUIObject.h"
 #include "Time/CTime.h"
 
-//=============================================================================
-//		フェードクラス.
-//=============================================================================
+
 class CUIFade
 {
 public:
@@ -32,7 +30,7 @@ public:
 	bool GetFadeEndFrame()	const { return m_EndFrame; }	// フェードの終了フレームを知らせる.
 
 private:
-	std::unique_ptr<CUIObject>	m_pUI;	// UIクラス.
+	std::unique_ptr<CUIObject>	m_pBlack;	// UIクラス.
 	CSprite2D*	m_pSprite2D;			// Sprite2Dクラス.
 
 	bool	m_Fading;		// フェード中.

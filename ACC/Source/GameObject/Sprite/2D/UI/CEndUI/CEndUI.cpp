@@ -7,14 +7,7 @@
 
 namespace {
 	// EndUIのパス.
-	constexpr char OptionImagePath[] = "Data\\Texture\\End";
-	// UIリスト.
-	std::vector<std::string> ImageList = {
-		"EndBack",
-		"Frame",
-		"SelectNo",
-		"SelectYes"
-	};
+	std::string EndJson = "Data\\Texture\\UIData\\End.json";
 
 	// 非処理のUIリスト.
 	std::vector<std::string> ignoreList = {
@@ -46,7 +39,7 @@ CEndUI::~CEndUI()
 //=============================================================================
 void CEndUI::Create()
 {
-	LoadSpriteList(ImageList, m_pUIs, m_pSprite2Ds);
+	LoadFromJson(EndJson, m_pUIs);
 }
 
 //=============================================================================
