@@ -100,26 +100,8 @@
     <Filter Include="Source\GameObject\Sprite\2D\UI">
       <UniqueIdentifier>{8456f0a8-21f4-4b07-82a4-c4952cd3f26c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\GameObject\Sprite\2D\UI\CUIFade">
-      <UniqueIdentifier>{d22dc98d-1be9-44e2-b0ba-c5bf8c2dfd7f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\GameObject\Sprite\2D\UI\CEndUI">
-      <UniqueIdentifier>{f363360b-ec90-434e-9988-654f511789d3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\GameObject\Sprite\2D\UI\CGameUI">
-      <UniqueIdentifier>{c278b0ef-e410-44ac-ac33-3a640b6a05f6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\GameObject\Sprite\2D\UI\CWinUI">
-      <UniqueIdentifier>{95e2a17a-8384-48a7-975c-ff8bad67012d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\GameObject\Sprite\2D\UI\CLoseUI">
-      <UniqueIdentifier>{4869e6b6-927e-45d2-822d-03e24684ff55}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\GameObject\Sprite\3D">
       <UniqueIdentifier>{33990d2a-0c7d-4354-b2ee-a9f67592e023}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\GameObject\Sprite\3D\Explosion">
-      <UniqueIdentifier>{90eb58cb-93d7-4405-8ed9-9fa87f7b43f3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\GameObject\Camera">
       <UniqueIdentifier>{052dee3d-fff4-4775-9042-00d50b4a4a9f}</UniqueIdentifier>
@@ -148,8 +130,23 @@
     <Filter Include="Source\Collision\Line">
       <UniqueIdentifier>{d54d1e13-1b7e-4ee4-91db-b011defee1cb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\GameObject\Sprite\2D\UI\CTitleUI">
+    <Filter Include="Source\GameObject\Sprite\2D\UI\VictoryUI">
+      <UniqueIdentifier>{95e2a17a-8384-48a7-975c-ff8bad67012d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GameObject\Sprite\2D\UI\LoseUI">
+      <UniqueIdentifier>{4869e6b6-927e-45d2-822d-03e24684ff55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GameObject\Sprite\2D\UI\FadeUI">
+      <UniqueIdentifier>{d22dc98d-1be9-44e2-b0ba-c5bf8c2dfd7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GameObject\Sprite\2D\UI\TitleUI">
       <UniqueIdentifier>{bd68dcc4-73de-45eb-80a9-da8a49238688}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GameObject\Sprite\2D\UI\GameUI">
+      <UniqueIdentifier>{c278b0ef-e410-44ac-ac33-3a640b6a05f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GameObject\Sprite\2D\UI\EndUI">
+      <UniqueIdentifier>{f363360b-ec90-434e-9988-654f511789d3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -171,7 +168,9 @@
     <FxCompile Include="Data\Shader\Ray.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="Data\Shader\UIEditorLineShader.hlsl" />
+    <FxCompile Include="Data\Shader\UIEditorLineShader.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Collision\Ray\CRay.cpp">
@@ -204,16 +203,16 @@
     <ClCompile Include="Source\GameObject\Character\Player\CPlayer.cpp">
       <Filter>Source\GameObject\Character\Player</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GameObject\Sprite\CSpriteObject.cpp">
+    <ClCompile Include="Source\GameObject\Sprite\SpriteObject.cpp">
       <Filter>Source\GameObject\Sprite</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GameObject\Sprite\2D\UI\CUIObject.cpp">
+    <ClCompile Include="Source\GameObject\Sprite\2D\UI\UIObject.cpp">
       <Filter>Source\GameObject\Sprite\2D\UI</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GameObject\Sprite\2D\CSprite2D.cpp">
+    <ClCompile Include="Source\GameObject\Sprite\2D\Sprite2D.cpp">
       <Filter>Source\GameObject\Sprite\2D</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GameObject\Sprite\3D\CSprite3D.cpp">
+    <ClCompile Include="Source\GameObject\Sprite\3D\Sprite3D.cpp">
       <Filter>Source\GameObject\Sprite\3D</Filter>
     </ClCompile>
     <ClCompile Include="Source\MainLoop\CMain.cpp">
@@ -225,7 +224,7 @@
     <ClCompile Include="Source\Scenes\Game\CGame.cpp">
       <Filter>Source\Scenes\Game</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GameObject\CGameObject.cpp">
+    <ClCompile Include="Source\GameObject\GameObject.cpp">
       <Filter>Source\GameObject</Filter>
     </ClCompile>
     <ClCompile Include="Source\Common\ImGui\CImGui.cpp">
@@ -261,8 +260,8 @@
     <ClCompile Include="Source\GameObject\Camera\CCamera.cpp">
       <Filter>Source\GameObject\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GameObject\Sprite\2D\UI\CUIFade\CUIFade.cpp">
-      <Filter>Source\GameObject\Sprite\2D\UI\CUIFade</Filter>
+    <ClCompile Include="Source\GameObject\Sprite\2D\UI\FadeUI\FadeUI.cpp">
+      <Filter>Source\GameObject\Sprite\2D\UI\FadeUI</Filter>
     </ClCompile>
     <ClCompile Include="Source\Common\XInput\CXInput.cpp">
       <Filter>Source\Common\XInput</Filter>
@@ -288,10 +287,10 @@
     <ClCompile Include="Source\Collision\GJK\CGJK.cpp">
       <Filter>Source\Collision\GJK</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GameObject\Object\Gun\CGun.cpp">
+    <ClCompile Include="Source\GameObject\Object\Gun\Gun.cpp">
       <Filter>Source\GameObject\Object\Gun</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GameObject\Object\Bullet\CBullet.cpp">
+    <ClCompile Include="Source\GameObject\Object\Bullet\Bullet.cpp">
       <Filter>Source\GameObject\Object\Bullet</Filter>
     </ClCompile>
     <ClCompile Include="Source\Common\Time\CTime.cpp">
@@ -300,17 +299,17 @@
     <ClCompile Include="Source\Common\Random\CRandom.cpp">
       <Filter>Source\Common\Random</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GameObject\Sprite\2D\UI\CLoseUI\CLoseUI.cpp">
-      <Filter>Source\GameObject\Sprite\2D\UI\CLoseUI</Filter>
+    <ClCompile Include="Source\GameObject\Sprite\2D\UI\LoseUI\LoseUI.cpp">
+      <Filter>Source\GameObject\Sprite\2D\UI\LoseUI</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GameObject\Sprite\2D\UI\CWinUI\CWinUI.cpp">
-      <Filter>Source\GameObject\Sprite\2D\UI\CWinUI</Filter>
+    <ClCompile Include="Source\GameObject\Sprite\2D\UI\VictoryUI\VictoryUI.cpp">
+      <Filter>Source\GameObject\Sprite\2D\UI\VictoryUI</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GameObject\Sprite\2D\UI\CGameUI\CGameUI.cpp">
-      <Filter>Source\GameObject\Sprite\2D\UI\CGameUI</Filter>
+    <ClCompile Include="Source\GameObject\Sprite\2D\UI\GameUI\GameUI.cpp">
+      <Filter>Source\GameObject\Sprite\2D\UI\GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GameObject\Sprite\2D\UI\CEndUI\CEndUI.cpp">
-      <Filter>Source\GameObject\Sprite\2D\UI\CEndUI</Filter>
+    <ClCompile Include="Source\GameObject\Sprite\2D\UI\EndUI\EndUI.cpp">
+      <Filter>Source\GameObject\Sprite\2D\UI\EndUI</Filter>
     </ClCompile>
     <ClCompile Include="Source\Common\Mesh\Skin\CSkinMesh.cpp">
       <Filter>Source\Common\Mesh\Skin</Filter>
@@ -339,8 +338,8 @@
     <ClCompile Include="Source\GameObject\Sprite\2D\SpriteManager\SpriteManager.cpp">
       <Filter>Source\GameObject\Sprite</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GameObject\Sprite\2D\UI\CTitleUI\CTitleUI.cpp">
-      <Filter>Source\GameObject\Sprite\2D\UI\CTitleUI</Filter>
+    <ClCompile Include="Source\GameObject\Sprite\2D\UI\TitleUI\TitleUI.cpp">
+      <Filter>Source\GameObject\Sprite\2D\UI\TitleUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -380,16 +379,16 @@
     <ClInclude Include="Source\GameObject\Character\Player\CPlayer.h">
       <Filter>Source\GameObject\Character\Player</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameObject\Sprite\CSpriteObject.h">
+    <ClInclude Include="Source\GameObject\Sprite\SpriteObject.h">
       <Filter>Source\GameObject\Sprite</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameObject\Sprite\2D\UI\CUIObject.h">
+    <ClInclude Include="Source\GameObject\Sprite\2D\UI\UIObject.h">
       <Filter>Source\GameObject\Sprite\2D\UI</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameObject\Sprite\2D\CSprite2D.h">
+    <ClInclude Include="Source\GameObject\Sprite\2D\Sprite2D.h">
       <Filter>Source\GameObject\Sprite\2D</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameObject\Sprite\3D\CSprite3D.h">
+    <ClInclude Include="Source\GameObject\Sprite\3D\Sprite3D.h">
       <Filter>Source\GameObject\Sprite\3D</Filter>
     </ClInclude>
     <ClInclude Include="Source\MainLoop\CMain.h">
@@ -398,7 +397,7 @@
     <ClInclude Include="Source\Scenes\Game\CGame.h">
       <Filter>Source\Scenes\Game</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameObject\CGameObject.h">
+    <ClInclude Include="Source\GameObject\GameObject.h">
       <Filter>Source\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="Source\Common\ImGui\CImGui.h">
@@ -440,8 +439,8 @@
     <ClInclude Include="Source\GameObject\Camera\CCamera.h">
       <Filter>Source\GameObject\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameObject\Sprite\2D\UI\CUIFade\CUIFade.h">
-      <Filter>Source\GameObject\Sprite\2D\UI\CUIFade</Filter>
+    <ClInclude Include="Source\GameObject\Sprite\2D\UI\FadeUI\FadeUI.h">
+      <Filter>Source\GameObject\Sprite\2D\UI\FadeUI</Filter>
     </ClInclude>
     <ClInclude Include="Source\Common\XInput\CXInput.h">
       <Filter>Source\Common\XInput</Filter>
@@ -464,10 +463,10 @@
     <ClInclude Include="Source\Collision\GJK\CGJK.h">
       <Filter>Source\Collision\GJK</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameObject\Object\Gun\CGun.h">
+    <ClInclude Include="Source\GameObject\Object\Gun\Gun.h">
       <Filter>Source\GameObject\Object\Gun</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameObject\Object\Bullet\CBullet.h">
+    <ClInclude Include="Source\GameObject\Object\Bullet\Bullet.h">
       <Filter>Source\GameObject\Object\Bullet</Filter>
     </ClInclude>
     <ClInclude Include="Source\Common\Time\CTime.h">
@@ -476,17 +475,17 @@
     <ClInclude Include="Source\Common\Random\CRandom.h">
       <Filter>Source\Common\Random</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameObject\Sprite\2D\UI\CLoseUI\CLoseUI.h">
-      <Filter>Source\GameObject\Sprite\2D\UI\CLoseUI</Filter>
+    <ClInclude Include="Source\GameObject\Sprite\2D\UI\LoseUI\LoseUI.h">
+      <Filter>Source\GameObject\Sprite\2D\UI\LoseUI</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameObject\Sprite\2D\UI\CWinUI\CWinUI.h">
-      <Filter>Source\GameObject\Sprite\2D\UI\CWinUI</Filter>
+    <ClInclude Include="Source\GameObject\Sprite\2D\UI\VictoryUI\VictoryUI.h">
+      <Filter>Source\GameObject\Sprite\2D\UI\VictoryUI</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameObject\Sprite\2D\UI\CGameUI\CGameUI.h">
-      <Filter>Source\GameObject\Sprite\2D\UI\CGameUI</Filter>
+    <ClInclude Include="Source\GameObject\Sprite\2D\UI\GameUI\GameUI.h">
+      <Filter>Source\GameObject\Sprite\2D\UI\GameUI</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameObject\Sprite\2D\UI\CEndUI\CEndUI.h">
-      <Filter>Source\GameObject\Sprite\2D\UI\CEndUI</Filter>
+    <ClInclude Include="Source\GameObject\Sprite\2D\UI\EndUI\EndUI.h">
+      <Filter>Source\GameObject\Sprite\2D\UI\EndUI</Filter>
     </ClInclude>
     <ClInclude Include="Source\Common\nlohmann\adl_serializer.hpp">
       <Filter>Source\Common\nlohmann</Filter>
@@ -527,8 +526,8 @@
     <ClInclude Include="Source\GameObject\Sprite\2D\SpriteManager\SpriteManager.h">
       <Filter>Source\GameObject\Sprite</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameObject\Sprite\2D\UI\CTitleUI\CTitleUI.h">
-      <Filter>Source\GameObject\Sprite\2D\UI\CTitleUI</Filter>
+    <ClInclude Include="Source\GameObject\Sprite\2D\UI\TitleUI\TitleUI.h">
+      <Filter>Source\GameObject\Sprite\2D\UI\TitleUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

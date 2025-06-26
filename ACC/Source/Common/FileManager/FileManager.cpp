@@ -2,7 +2,7 @@
 
 
 //============================================================================
-//		テキストファイルの読み込み.
+//		テキストファイルの読み込み
 //============================================================================
 std::vector<std::string> FileManager::TextLoad(
 	const std::string&	FilePath,
@@ -11,20 +11,20 @@ std::vector<std::string> FileManager::TextLoad(
 {
 	std::vector<std::string> OutList;
 
-	// ファイルを開く.
+	// ファイルを開く
 	std::fstream i( FilePath );
 	if ( !i ) return OutList;
 
-	// 一行づつ読み込む.
+	// 一行づつ読み込む
 	std::string Line;
 	while ( std::getline( i, Line ) )
 	{
-		// コメントアウト処理.
+		// コメントアウト処理
 		if ( IsCommentOut == true ){
 			if ( Line.substr( 0, 2 ) == "//" ) continue;
 		}
 
-		// 文字を一時的に格納する.
+		// 文字を一時的に格納する
 		std::string Buff = "";
 		std::istringstream stream( Line );
 		if ( IsCommentOut == false ){
@@ -32,96 +32,96 @@ std::vector<std::string> FileManager::TextLoad(
 			continue;
 		}
 
-		// 区切り文字(',')で区切って文字を取得.
+		// 区切り文字(',')で区切って文字を取得
 		while ( std::getline( stream, Buff, Delim ) )
 		{
-			// 一部分のコメントアウト処理.
+			// 一部分のコメントアウト処理
 			if ( IsCommentOut == true ){
 				if ( Buff.find( '#' ) != std::string::npos ) continue;
 			}
 
-			// 読み込みリストに追加.
+			// 読み込みリストに追加
 			OutList.emplace_back( Buff );
 		}
 	}
-	// ファイルを閉じる.
+	// ファイルを閉じる
 	i.close();
 	return OutList;
 }
 
 
 //============================================================================
-//		テキストファイルに書き込む.
+//		テキストファイルに書き込む
 //============================================================================
 HRESULT FileManager::TextSave( const std::string& FilePath, const std::string& Data )
 {
-	// ファイルを開く.
+	// ファイルを開く
 	std::ofstream o( FilePath, std::ios::trunc );
 	if ( !o ) {
-		// 開けないためファイルディレクトリを作成する.
+		// 開けないためファイルディレクトリを作成する
 		FileManager::CreateFileDirectory( FilePath );
 
-		// 書き込みなおす.
+		// 書き込みなおす
 		FileManager::TextSave( FilePath, Data );
 		return S_OK;
 	}
 
-	// 書き込み.
+	// 書き込み
 	o << Data;
 
-	// ファイルを閉じる.
+	// ファイルを閉じる
 	o.close();
 	return S_OK;
 }
 
 
 //============================================================================
-//		jsonファイルを開く.
+//		jsonファイルを開く
 //============================================================================
 Json FileManager::JsonLoad( const std::string& FilePath )
 {
 	Json Out;
 
-	// ファイルを開く.
+	// ファイルを開く
 	std::ifstream i( FilePath );
 	if ( !i ) return Out;
 
-	// json型に変更.
+	// json型に変更
 	i >> Out;
 
-	// ファイルを閉じる.
+	// ファイルを閉じる
 	i.close();
 	return Out;
 }
 
 
 //============================================================================
-//		jsonファイルで書き込む.
+//		jsonファイルで書き込む
 //============================================================================
 HRESULT FileManager::JsonSave( const std::string& FilePath, const Json& Data )
 {
-	// ファイルを開く.
+	// ファイルを開く
 	std::ofstream o( FilePath );
 	if ( !o ) {
-		// 開けないためファイルディレクトリを作成する.
+		// 開けないためファイルディレクトリを作成する
 		FileManager::CreateFileDirectory( FilePath );
 
-		// 書き込みなおす.
+		// 書き込みなおす
 		FileManager::JsonSave( FilePath, Data );
 		return S_OK;
 	}
 
-	// 書き込み.
+	// 書き込み
 	o << std::setw( 2 ) << Data << std::endl;
 
-	// ファイルを閉じる.
+	// ファイルを閉じる
 	o.close();
 	return S_OK;
 }
 
 
 //============================================================================
-//		json を std::unordered_map に変換.
+//		json を std::unordered_map に変換
 //============================================================================
 std::unordered_map<std::string, std::string> FileManager::JsonToMap( const Json& Json )
 {
@@ -132,13 +132,13 @@ std::unordered_map<std::string, std::string> FileManager::JsonToMap( const Json&
 
 
 //============================================================================
-//		std::unordered_map を json に変換.
+//		std::unordered_map を json に変換
 //============================================================================
 Json FileManager::MapToJson( const std::unordered_map<std::string, std::string> Map )
 {
 	Json Out;
 	for ( auto&[Key, Value] : Map ) {
-		// 文字列から型を推測してその型に変換して保存する.
+		// 文字列から型を推測してその型に変換して保存する
 		if (		Value == "nullptr"						) Out[Key] = nullptr;
 		else if (	Value == "true"							) Out[Key] = true;
 		else if (	Value == "false"						) Out[Key] = false;
@@ -154,7 +154,7 @@ Json FileManager::MapToJson( const std::unordered_map<std::string, std::vector<s
 	Json Out;
 	for ( auto&[Key, vValue] : Map ) {
 		for ( auto& Value : vValue ) {
-			// 文字列から型を推測してその型に変換して保存する.
+			// 文字列から型を推測してその型に変換して保存する
 			if (		Value == "nullptr"						) Out[Key].emplace_back( nullptr );
 			else if (	Value == "true"							) Out[Key].emplace_back( true );
 			else if (	Value == "false"						) Out[Key].emplace_back( false );
@@ -169,57 +169,57 @@ Json FileManager::MapToJson( const std::unordered_map<std::string, std::vector<s
 
 
 //============================================================================
-//		CSVファイルを開く.
+//		CSVファイルを開く
 //============================================================================
 std::unordered_map<std::string, std::string> FileManager::CSVLoad( const std::string& FilePath )
 {
-	// 結果を格納する変数.
+	// 結果を格納する変数
 	std::unordered_map<std::string, std::string> m_StateList;
 
-	// ファイルを開く.
+	// ファイルを開く
 	std::ifstream file( FilePath );
-	// ファイルが開けなかった場合は空のマップを返す.
+	// ファイルが開けなかった場合は空のマップを返す
 	if (!file) { return{}; }
 	
-	// ファイルを1行ずつ読み込む.
+	// ファイルを1行ずつ読み込む
 	std::string line;
 	while ( std::getline( file, line ))
 	{
-		// コメントアウト行をスキップ.
+		// コメントアウト行をスキップ
 		if (line.empty() || line.substr(0, 2) == "//") continue;
 
-		// 1行のデータを分解するためのストリーム.
+		// 1行のデータを分解するためのストリーム
 		std::istringstream stream(line);
 		std::string key, value;
 
-		// キーと値を取得（カンマ区切り）.
+		// キーと値を取得（カンマ区切り）
 		if ( std::getline( stream, key, ',' ) && std::getline( stream, value, ',' )) {
 			m_StateList[key] = value;
 		}
 	}
 
-	// 読み込んだデータを返す.
+	// 読み込んだデータを返す
 	return m_StateList;
 }
 
 
 //============================================================================
-//		ファイルディレクトリを作成.
+//		ファイルディレクトリを作成
 //============================================================================
 HRESULT FileManager::CreateFileDirectory( const std::string& FilePath ) 
 {
 	size_t	FindPos = 0;
 	bool	IsEnd	= false;
 
-	// ファイルディレクトリを作成していく.
+	// ファイルディレクトリを作成していく
 	while ( !IsEnd ) {
 		FindPos = FilePath.find( "\\", FindPos + 1 );
 		if ( FindPos == std::string::npos ) {
-			// ファイルディレクトリの作成終了.
+			// ファイルディレクトリの作成終了
 			IsEnd = true;
 			return S_OK;
 		}
-		// ファイルディレクトリを作成.
+		// ファイルディレクトリを作成
 		std::string CreatePath = FilePath.substr( 0, FindPos );
 		std::filesystem::create_directories( CreatePath );
 	}

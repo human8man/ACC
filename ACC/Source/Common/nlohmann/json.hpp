@@ -182,7 +182,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     ////////////////
 
     /// @name exceptions
-    /// Classes to implement user-defined exceptions.
+    /// Classes to implement user-defined exceptions
     /// @{
 
     using exception = detail::exception;
@@ -200,7 +200,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
     /// @name container types
     /// The canonic container types to use @ref basic_json like any other STL
-    /// container.
+    /// container
     /// @{
 
     /// the type of elements in a basic_json container
@@ -313,12 +313,12 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
     /// @name JSON value data types
     /// The data types to store a JSON value. These types are derived from
-    /// the template arguments passed to class @ref basic_json.
+    /// the template arguments passed to class @ref basic_json
     /// @{
 
     /// @brief default object key comparator type
     /// The actual object key comparator type (@ref object_comparator_t) may be
-    /// different.
+    /// different
     /// @sa https://json.nlohmann.me/api/basic_json/default_object_comparator_t/
 #if defined(JSON_HAS_CPP_14)
     // use of transparent comparator avoids unnecessary repeated construction of temporaries
@@ -807,7 +807,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
     /// @name constructors and destructors
     /// Constructors of class @ref basic_json, copy/move constructor, copy
-    /// assignment, static functions creating objects, and the destructor.
+    /// assignment, static functions creating objects, and the destructor
     /// @{
 
     /// @brief create an empty value with a given type
@@ -1264,7 +1264,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     ///////////////////////
 
     /// @name object inspection
-    /// Functions to inspect the type of a JSON value.
+    /// Functions to inspect the type of a JSON value
     /// @{
 
     /// @brief serialization
@@ -1535,7 +1535,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
   public:
     /// @name value access
-    /// Direct access to the stored value of a JSON value.
+    /// Direct access to the stored value of a JSON value
     /// @{
 
     /// @brief get a pointer value (implicit)
@@ -1565,7 +1565,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
     Explicit type conversion between the JSON value and a compatible value
     which is [CopyConstructible](https://en.cppreference.com/w/cpp/named_req/CopyConstructible)
-    and [DefaultConstructible](https://en.cppreference.com/w/cpp/named_req/DefaultConstructible).
+    and [DefaultConstructible](https://en.cppreference.com/w/cpp/named_req/DefaultConstructible)
     The value is converted by calling the @ref json_serializer<ValueType>
     `from_json()` method.
 
@@ -1616,7 +1616,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
     Explicit type conversion between the JSON value and a compatible value
     which is **not** [CopyConstructible](https://en.cppreference.com/w/cpp/named_req/CopyConstructible)
-    and **not** [DefaultConstructible](https://en.cppreference.com/w/cpp/named_req/DefaultConstructible).
+    and **not** [DefaultConstructible](https://en.cppreference.com/w/cpp/named_req/DefaultConstructible)
     The value is converted by calling the @ref json_serializer<ValueType>
     `from_json()` method.
 
@@ -1930,7 +1930,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     ////////////////////
 
     /// @name element access
-    /// Access to the JSON value.
+    /// Access to the JSON value
     /// @{
 
     /// @brief access specified array element with bounds checking
@@ -2860,7 +2860,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @sa https://json.nlohmann.me/api/basic_json/items/
     /// @deprecated This function is deprecated since 3.1.0 and will be removed in
     ///             version 4.0.0 of the library. Please use @ref items() instead;
-    ///             that is, replace `json::iterator_wrapper(j)` with `j.items()`.
+    ///             that is, replace `json::iterator_wrapper(j)` with `j.items()`
     JSON_HEDLEY_DEPRECATED_FOR(3.1.0, items())
     static iteration_proxy<iterator> iterator_wrapper(reference ref) noexcept
     {
@@ -2871,7 +2871,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @sa https://json.nlohmann.me/api/basic_json/items/
     /// @deprecated This function is deprecated since 3.1.0 and will be removed in
     ///         version 4.0.0 of the library. Please use @ref items() instead;
-    ///         that is, replace `json::iterator_wrapper(j)` with `j.items()`.
+    ///         that is, replace `json::iterator_wrapper(j)` with `j.items()`
     JSON_HEDLEY_DEPRECATED_FOR(3.1.0, items())
     static iteration_proxy<const_iterator> iterator_wrapper(const_reference ref) noexcept
     {
@@ -2901,7 +2901,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @name capacity
     /// @{
 
-    /// @brief checks whether the container is empty.
+    /// @brief checks whether the container is empty
     /// @sa https://json.nlohmann.me/api/basic_json/empty/
     bool empty() const noexcept
     {
@@ -3274,7 +3274,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
         // This could have been written as:
         // result.m_it.array_iterator = m_data.m_value.array->insert(pos.m_it.array_iterator, cnt, val);
-        // but the return value of insert is missing in GCC 4.8, so it is written this way instead.
+        // but the return value of insert is missing in GCC 4.8, so it is written this way instead
 
         set_parents();
         return result;
@@ -3718,7 +3718,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     {
         const_reference lhs = *this;
         // default_result is used if we cannot compare values. In that case,
-        // we compare types.
+        // we compare types
         JSON_IMPLEMENT_OPERATOR(<=>, // *NOPAD*
                                 std::partial_ordering::equivalent,
                                 std::partial_ordering::unordered,
@@ -3848,7 +3848,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     {
         // default_result is used if we cannot compare values. In that case,
         // we compare types. Note we have to call the operator explicitly,
-        // because MSVC has problems otherwise.
+        // because MSVC has problems otherwise
         JSON_IMPLEMENT_OPERATOR( <, false, false, operator<(lhs_type, rhs_type))
     }
 
@@ -3992,7 +3992,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @deprecated This function is deprecated since 3.0.0 and will be removed in
     ///             version 4.0.0 of the library. Please use
     ///             operator<<(std::ostream&, const basic_json&) instead; that is,
-    ///             replace calls like `j >> o;` with `o << j;`.
+    ///             replace calls like `j >> o;` with `o << j;`
     JSON_HEDLEY_DEPRECATED_FOR(3.0.0, operator<<(std::ostream&, const basic_json&))
     friend std::ostream& operator>>(const basic_json& j, std::ostream& o)
     {
@@ -4109,7 +4109,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @sa https://json.nlohmann.me/api/basic_json/sax_parse/
     /// @deprecated This function is deprecated since 3.8.0 and will be removed in
     ///             version 4.0.0 of the library. Please use
-    ///             sax_parse(ptr, ptr + len) instead.
+    ///             sax_parse(ptr, ptr + len) instead
     template <typename SAX>
     JSON_HEDLEY_DEPRECATED_FOR(3.8.0, sax_parse(ptr, ptr + len, ...))
     JSON_HEDLEY_NON_NULL(2)
@@ -4131,7 +4131,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @deprecated This stream operator is deprecated since 3.0.0 and will be removed in
     ///             version 4.0.0 of the library. Please use
     ///             operator>>(std::istream&, basic_json&) instead; that is,
-    ///             replace calls like `j << i;` with `i >> j;`.
+    ///             replace calls like `j << i;` with `i >> j;`
     JSON_HEDLEY_DEPRECATED_FOR(3.0.0, operator>>(std::istream&, basic_json&))
     friend std::istream& operator<<(basic_json& j, std::istream& i)
     {
@@ -4910,7 +4910,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
                     // The move operation is functionally identical to a
                     // "remove" operation on the "from" location, followed
                     // immediately by an "add" operation at the target
-                    // location with the value that was just removed.
+                    // location with the value that was just removed
                     operation_remove(from_ptr);
                     operation_add(ptr, v);
                     break;
@@ -4926,7 +4926,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
                     // The copy is functionally identical to an "add"
                     // operation at the target location using the value
-                    // specified in the "from" member.
+                    // specified in the "from" member
                     operation_add(ptr, v);
                     break;
                 }
@@ -5226,7 +5226,7 @@ struct less< ::nlohmann::detail::value_t> // do not remove the space after '<', 
     }
 };
 
-// C++20 prohibit function specialization in the std namespace.
+// C++20 prohibit function specialization in the std namespace
 #ifndef JSON_HAS_CPP_20
 
 /// @brief exchanges the values of two JSON objects

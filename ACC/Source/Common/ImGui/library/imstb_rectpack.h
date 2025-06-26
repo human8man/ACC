@@ -1,35 +1,35 @@
 // [DEAR IMGUI]
-// This is a slightly modified version of stb_rect_pack.h 1.01.
-// Grep for [DEAR IMGUI] to find the changes.
+// This is a slightly modified version of stb_rect_pack.h 1.01
+// Grep for [DEAR IMGUI] to find the changes
 // 
 // stb_rect_pack.h - v1.01 - public domain - rectangle packing
 // Sean Barrett 2014
 //
-// Useful for e.g. packing rectangular textures into an atlas.
-// Does not do rotation.
+// Useful for e.g. packing rectangular textures into an atlas
+// Does not do rotation
 //
 // Before #including,
 //
 //    #define STB_RECT_PACK_IMPLEMENTATION
 //
-// in the file that you want to have the implementation.
+// in the file that you want to have the implementation
 //
 // Not necessarily the awesomest packing method, but better than
 // the totally naive one in stb_truetype (which is primarily what
-// this is meant to replace).
+// this is meant to replace)
 //
-// Has only had a few tests run, may have issues.
+// Has only had a few tests run, may have issues
 //
-// More docs to come.
+// More docs to come
 //
-// No memory allocations; uses qsort() and assert() from stdlib.
-// Can override those by defining STBRP_SORT and STBRP_ASSERT.
+// No memory allocations; uses qsort() and assert() from stdlib
+// Can override those by defining STBRP_SORT and STBRP_ASSERT
 //
-// This library currently uses the Skyline Bottom-Left algorithm.
+// This library currently uses the Skyline Bottom-Left algorithm
 //
 // Please note: better rectangle packers are welcome! Please
 // implement them to the same API, but with a different init
-// function.
+// function
 //
 // Credits
 //
@@ -60,7 +60,7 @@
 //
 // LICENSE
 //
-//   See end of file for license information.
+//   See end of file for license information
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -89,32 +89,32 @@ typedef struct stbrp_rect    stbrp_rect;
 typedef int            stbrp_coord;
 
 #define STBRP__MAXVAL  0x7fffffff
-// Mostly for internal use, but this is the maximum supported coordinate value.
+// Mostly for internal use, but this is the maximum supported coordinate value
 
 STBRP_DEF int stbrp_pack_rects (stbrp_context *context, stbrp_rect *rects, int num_rects);
 // Assign packed locations to rectangles. The rectangles are of type
 // 'stbrp_rect' defined below, stored in the array 'rects', and there
-// are 'num_rects' many of them.
+// are 'num_rects' many of them
 //
 // Rectangles which are successfully packed have the 'was_packed' flag
 // set to a non-zero value and 'x' and 'y' store the minimum location
 // on each axis (i.e. bottom-left in cartesian coordinates, top-left
 // if you imagine y increasing downwards). Rectangles which do not fit
-// have the 'was_packed' flag set to 0.
+// have the 'was_packed' flag set to 0
 //
 // You should not try to access the 'rects' array from another thread
 // while this function is running, as the function temporarily reorders
-// the array while it executes.
+// the array while it executes
 //
 // To pack into another rectangle, you need to call stbrp_init_target
 // again. To continue packing into the same rectangle, you can call
 // this function again. Calling this multiple times with multiple rect
 // arrays will probably produce worse packing results than calling it
 // a single time with the full rectangle array, but the option is
-// available.
+// available
 //
 // The function returns 1 if all of the rectangles were successfully
-// packed and 0 otherwise.
+// packed and 0 otherwise
 
 struct stbrp_rect
 {
@@ -136,32 +136,32 @@ STBRP_DEF void stbrp_init_target (stbrp_context *context, int width, int height,
 //    pack a rectangle that is 'width' by 'height' in dimensions
 //    using temporary storage provided by the array 'nodes', which is 'num_nodes' long
 //
-// You must call this function every time you start packing into a new target.
+// You must call this function every time you start packing into a new target
 //
 // There is no "shutdown" function. The 'nodes' memory must stay valid for
 // the following stbrp_pack_rects() call (or calls), but can be freed after
-// the call (or calls) finish.
+// the call (or calls) finish
 //
 // Note: to guarantee best results, either:
 //       1. make sure 'num_nodes' >= 'width'
 //   or  2. call stbrp_allow_out_of_mem() defined below with 'allow_out_of_mem = 1'
 //
 // If you don't do either of the above things, widths will be quantized to multiples
-// of small integers to guarantee the algorithm doesn't run out of temporary storage.
+// of small integers to guarantee the algorithm doesn't run out of temporary storage
 //
 // If you do #2, then the non-quantized algorithm will be used, but the algorithm
-// may run out of temporary storage and be unable to pack some rectangles.
+// may run out of temporary storage and be unable to pack some rectangles
 
 STBRP_DEF void stbrp_setup_allow_out_of_mem (stbrp_context *context, int allow_out_of_mem);
 // Optionally call this function after init but before doing any packing to
-// change the handling of the out-of-temp-memory scenario, described above.
-// If you call init again, this will be reset to the default (false).
+// change the handling of the out-of-temp-memory scenario, described above
+// If you call init again, this will be reset to the default (false)
 
 
 STBRP_DEF void stbrp_setup_heuristic (stbrp_context *context, int heuristic);
 // Optionally select which packing heuristic the library should use. Different
-// heuristics will produce better/worse results for different data sets.
-// If you call init again, this will be reset to the default.
+// heuristics will produce better/worse results for different data sets
+// If you call init again, this will be reset to the default
 
 enum
 {
@@ -248,11 +248,11 @@ STBRP_DEF void stbrp_setup_allow_out_of_mem(stbrp_context *context, int allow_ou
       // if it's ok to run out of memory, then don't bother aligning them;
       // this gives better packing, but may fail due to OOM (even though
       // the rectangles easily fit). @TODO a smarter approach would be to only
-      // quantize once we've hit OOM, then we could get rid of this parameter.
+      // quantize once we've hit OOM, then we could get rid of this parameter
       context->align = 1;
    else {
       // if it's not ok to run out of memory, then quantize the widths
-      // so that num_nodes is always enough nodes.
+      // so that num_nodes is always enough nodes
       //
       // I.e. num_nodes * align >= width
       //                  align >= width / num_nodes
@@ -313,7 +313,7 @@ static int stbrp__skyline_find_min_y(stbrp_context *c, stbrp_node *first, int x0
    visited_width = 0;
    while (node->x < x1) {
       if (node->y > min_y) {
-         // raise min_y higher.
+         // raise min_y higher
          // we've accounted for all waste up to min_y,
          // but we'll now add more waste for everything we've visted
          waste_area += visited_width * (node->y - min_y);

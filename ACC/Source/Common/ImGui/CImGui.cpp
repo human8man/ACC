@@ -3,11 +3,11 @@
 #include "library/imgui_internal.h"
 #include "DirectX/CDirectX11.h"
 
-// ImGuiを省略.
+// ImGuiを省略
 using namespace ImGui;
 
 //=============================================================================
-//		ImGuiクラス.
+//		ImGuiクラス
 //=============================================================================
 CImGui::CImGui() 
 	:m_hwnd			(nullptr)
@@ -16,7 +16,7 @@ CImGui::CImGui()
 
 CImGui::~CImGui()
 {
-	// ImGuiの破棄.
+	// ImGuiの破棄
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	DestroyContext();
@@ -24,13 +24,13 @@ CImGui::~CImGui()
 
 
 //=============================================================================
-//		作成処理.
+//		作成処理
 //=============================================================================
 void CImGui::Create(HWND hwnd)
 {
 	m_hwnd = hwnd;
 
-	// コンテキストの設定.
+	// コンテキストの設定
 	IMGUI_CHECKVERSION();
 	CreateContext();
 
@@ -44,7 +44,7 @@ void CImGui::Create(HWND hwnd)
 	io.DeltaTime = 1.0f / 60.0f;
 	io.DisplaySize = ImVec2(1200.0f, 720.0f);
 
-	// フォント設定.
+	// フォント設定
 	io.Fonts->AddFontFromFileTTF(
 		"Data\\Font\\YOzRSX_.ttf",
 		15.0f,
@@ -52,11 +52,11 @@ void CImGui::Create(HWND hwnd)
 		io.Fonts->GetGlyphRangesJapanese());
 
 
-	// When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
+	// When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones
 	ImGuiStyle& style = GetStyle();
 	io.FontGlobalScale = 1.0f;
 
-	// ImGuiのスタイル設定(StyelColorDark() or StyleColorLight()).
+	// ImGuiのスタイル設定(StyelColorDark() or StyleColorLight())
 	StyleColorsDark();
 
 	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
@@ -75,7 +75,7 @@ void CImGui::Create(HWND hwnd)
 
 
 //=============================================================================
-//		更新処理.
+//		更新処理
 //=============================================================================
 void CImGui::Update()
 {
@@ -86,19 +86,19 @@ void CImGui::Update()
 
 
 //=============================================================================
-//		描画処理.
+//		描画処理
 //=============================================================================
 void CImGui::Draw()
 {
-	// ImGuiが反映されているかの確認用にテストウィンドウを作成する.
+	// ImGuiが反映されているかの確認用にテストウィンドウを作成する
 	Begin(IMGUI_JP("ImGuiテストウィンドウ"));
 
-	// 画面サイズ表示.
+	// 画面サイズ表示
 	Text(IMGUI_JP("画面サイズ: %.0f * %.0f"),
 		GetIO().DisplaySize.x,
 		GetIO().DisplaySize.y);
 
-	// メモリ使用量取得.
+	// メモリ使用量取得
 	HANDLE hProc = GetCurrentProcess();
 	PROCESS_MEMORY_COUNTERS_EX pmc;
 	if (GetProcessMemoryInfo(hProc, (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc)))
@@ -107,31 +107,31 @@ void CImGui::Draw()
 	}
 	CloseHandle(hProc);
 
-	// FPS表示.
+	// FPS表示
 	Text("FPS: %.1f", GetIO().Framerate);
 
 	End();
 
 
-	// メインのレンダリング処理を実行.
+	// メインのレンダリング処理を実行
 	Render();
 
-	// ImGui の描画データを DirectX へ送信して描画.
+	// ImGui の描画データを DirectX へ送信して描画
 	ImGui_ImplDX11_RenderDrawData(GetDrawData());
 
-	// マルチビューポートが有効なら、追加のウィンドウもレンダリング.
+	// マルチビューポートが有効なら、追加のウィンドウもレンダリング
 	if (GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 	{
-		// 各プラットフォームウィンドウの更新.
+		// 各プラットフォームウィンドウの更新
 		UpdatePlatformWindows();
 
-		// 各プラットフォームウィンドウの描画処理.
+		// 各プラットフォームウィンドウの描画処理
 		RenderPlatformWindowsDefault();
 	}
 }
 
 //=============================================================================
-//		ウィンドウハンドルの設定.
+//		ウィンドウハンドルの設定
 //=============================================================================
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 

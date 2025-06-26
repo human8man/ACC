@@ -6,11 +6,11 @@
 #include "DirectSound/CSoundManager.h"
 #include "Scenes/SceneManager/CSceneManager.h"
 #include "Sprite/2D/SpriteManager/SpriteManager.h"
-#include "Sprite/2D/UI/CTitleUI/CTitleUI.h"
+#include "Sprite/2D/UI/TitleUI/TitleUI.h"
 
 
 //=================================================================================================
-//		タイトルクラス.
+//		タイトルクラス
 //=================================================================================================
 CTitle::CTitle(HWND hWnd)
 	: m_Light			()
@@ -21,7 +21,7 @@ CTitle::CTitle(HWND hWnd)
 	, m_Start			( false )
 {
 	m_hWnd = hWnd;
-	m_Light.vDirection = D3DXVECTOR3(1.f, 5.f, 0.f);	//ライト方向.
+	m_Light.vDirection = D3DXVECTOR3(1.f, 5.f, 0.f);	//ライト方向
 }
 CTitle::~CTitle()
 {
@@ -30,19 +30,19 @@ CTitle::~CTitle()
 
 
 //=================================================================================================
-//		作成処理.
+//		作成処理
 //=================================================================================================
 void CTitle::Create()
 {
 	CDirectX11::GetInstance()->SetChangeDebugBuffer(false);
-	m_pTitleUI = std::make_unique<CTitleUI>();
+	m_pTitleUI = std::make_unique<TitleUI>();
 	m_pTitleUI->Create();
 	m_pEgg = new CStaticMesh();
 }
 
 
 //=================================================================================================
-//		読込処理.
+//		読込処理
 //=================================================================================================
 HRESULT CTitle::LoadData()
 {
@@ -54,27 +54,27 @@ HRESULT CTitle::LoadData()
 
 
 //=================================================================================================
-//		初期化処理.
+//		初期化処理
 //=================================================================================================
 void CTitle::Init()
 {
 	m_Start = false;
-	CCamera::GetInstance()->Init();	// カメラの初期化.
+	CCamera::GetInstance()->Init();	// カメラの初期化
 }
 
 
 //=================================================================================================
-//		更新処理.
+//		更新処理
 //=================================================================================================
 void CTitle::Update()
 {
-	// BGM再生.
+	// BGM再生
 	CSoundManager::GetInstance()->PlayLoop(CSoundManager::enList::BGM_Title);
 	m_pTitleUI->Update();
 	m_pEgg->SetRotY(m_pEgg->GetRot().y + 0.01f);
 
 	if (m_pTitleUI->GetStart()) {
-		// ゲームを開始する.
+		// ゲームを開始する
 		CSceneManager::GetInstance()->LoadScene(SceneList::Game);
 		CSoundManager::GetInstance()->AllStop();
 	}
@@ -82,7 +82,7 @@ void CTitle::Update()
 
 
 //=================================================================================================
-//		描画処理.
+//		描画処理
 //=================================================================================================
 void CTitle::Draw()
 {
@@ -94,7 +94,7 @@ void CTitle::Draw()
 
 
 //=================================================================================================
-//		解放処理.
+//		解放処理
 //=================================================================================================
 void CTitle::Release()
 {
