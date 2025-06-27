@@ -1,6 +1,7 @@
 #include "SkinMesh.h"
 #include "DirectX/DirectX9.h"
 #include "DirectX/DirectX11.h"
+#include "Camera/Camera.h"
 
 #include <stdlib.h>
 #include <locale.h>
@@ -8,21 +9,6 @@
 #include <memory>
 #include <algorithm>
 
-
-// 入れ替え関数
-template <typename T>
-void swap( T& a, T& b )
-{
-	T temp = a;
-	a = b;
-	b = temp;
-}
-// 範囲内に納める関数
-template <typename T>
-const T& clamp( const T& val, const T& low, const T& high )
-{
-	return val > high ? high : val < low ? low : val;
-}
 
 // シェーダ名(ディレクトリも含む)
 const TCHAR SHADER_NAME[] = _T( "Data\\Shader\\SkinMesh.hlsl" );
@@ -55,10 +41,6 @@ SkinMesh::SkinMesh()
 	, m_pCBufferPerFrame	( nullptr )
 	, m_pCBufferPerBone		( nullptr )
 
-	, m_Position			()
-	, m_Rotation			()
-	, m_Scale				( D3DXVECTOR3( 1.f, 1.f, 1.f) )
-
 	, m_mWorld				()
 	, m_mRotation			()
 
@@ -77,7 +59,6 @@ SkinMesh::SkinMesh()
 	, m_Frame				()
 {
 }
-
 SkinMesh::~SkinMesh()
 {
 	// 解放処理
@@ -289,8 +270,8 @@ HRESULT SkinMesh::ReadSkinInfo( MYMESHCONTAINER* pContainer, VERTEX* pVB, SKIN_P
 				{
 					if( pV->BoneWeight[n - 1] < pV->BoneWeight[n] )
 					{
-						swap( pV->BoneWeight[n - 1], pV->BoneWeight[n] );
-						swap( pV->BoneIndex[ n - 1], pV->BoneIndex[ n] );
+						std::swap( pV->BoneWeight[n - 1], pV->BoneWeight[n] );
+						std::swap( pV->BoneIndex[ n - 1], pV->BoneIndex[ n] );
 					}
 				}
 			}
@@ -385,13 +366,12 @@ void SkinMesh::Render(
 	const D3DXMATRIX& mView, 
 	const D3DXMATRIX& mProj, 
 	const LIGHT& Light, 
-	const D3DXVECTOR3& CamPos,
 	LPD3DXANIMATIONCONTROLLER pAC )
 {
 	m_mView		= mView;
 	m_mProj		= mProj;
 	m_Light		= Light;
-	m_CamPos	= CamPos;
+	m_CamPos	= Camera::GetInstance()->GetPos();
 
 	if ( pAC == nullptr )
 	{
@@ -504,9 +484,9 @@ HRESULT SkinMesh::CreateAppMeshFromD3DXMesh( LPD3DXFRAME p )
 		//	真っ暗になるので、最低値と最高値を設定する
 		float low	= 0.3f;	// 適当に0.3くらいにしておく
 		float high	= 1.f;
-		pAppMesh->pMaterial[i].Ambient.x = clamp( pAppMesh->pMaterial[i].Ambient.x, low, high );
-		pAppMesh->pMaterial[i].Ambient.y = clamp( pAppMesh->pMaterial[i].Ambient.y, low, high );
-		pAppMesh->pMaterial[i].Ambient.z = clamp( pAppMesh->pMaterial[i].Ambient.z, low, high );
+		pAppMesh->pMaterial[i].Ambient.x = std::clamp( pAppMesh->pMaterial[i].Ambient.x, low, high );
+		pAppMesh->pMaterial[i].Ambient.y = std::clamp( pAppMesh->pMaterial[i].Ambient.y, low, high );
+		pAppMesh->pMaterial[i].Ambient.z = std::clamp( pAppMesh->pMaterial[i].Ambient.z, low, high );
 		// なお、x,y,z(r,g,b)のみ対処して、w(a)はそのまま使用する
 
 #if 0
@@ -774,16 +754,16 @@ void SkinMesh::CalcWorldMatrix()
 {
 	D3DXMATRIX	mScale, mYaw, mPitch, mRoll, mTran;
 	// 拡縮
-	D3DXMatrixScaling( &mScale, m_Scale.x, m_Scale.y, m_Scale.z );
+	D3DXMatrixScaling( &mScale, m_vScale.x, m_vScale.y, m_vScale.z );
 
 	// 回転
-	D3DXMatrixRotationY( &mYaw, m_Rotation.y );		// Y軸回転
-	D3DXMatrixRotationX( &mPitch, m_Rotation.x );	// X軸回転
-	D3DXMatrixRotationZ( &mRoll, m_Rotation.z );	// Z軸回転
+	D3DXMatrixRotationY( &mYaw, m_vRotation.y );		// Y軸回転
+	D3DXMatrixRotationX( &mPitch, m_vRotation.x );	// X軸回転
+	D3DXMatrixRotationZ( &mRoll, m_vRotation.z );	// Z軸回転
 	m_mRotation = mYaw * mPitch * mRoll;
 
 	// 平行移動
-	D3DXMatrixTranslation( &mTran, m_Position.x, m_Position.y, m_Position.z );
+	D3DXMatrixTranslation( &mTran, m_vPosition.x, m_vPosition.y, m_vPosition.z );
 
 	// ワールド行列
 	m_mWorld = mScale * m_mRotation * mTran;
@@ -928,7 +908,6 @@ HRESULT SkinMesh::Release()
 
 	return S_OK;
 }
-
 
 //-----------------------------------------------------------------------------
 //		全てのメッシュを削除
@@ -1167,18 +1146,18 @@ bool SkinMesh::GetPosFromBone( LPCSTR sBoneName, D3DXVECTOR3* pOutPos )
 		if( m_pD3dxMesh->GetPosFromBone( sBoneName, &tmpPos ) ){
 			D3DXMATRIX mWorld, mScale, mTran;
 			D3DXMATRIX mRot, mYaw, mPitch, mRoll;
-			D3DXMatrixScaling( &mScale, m_Scale.x, m_Scale.y, m_Scale.z );
-			D3DXMatrixRotationY( &mYaw, m_Rotation.y );
-			D3DXMatrixRotationX( &mPitch, m_Rotation.x );
-			D3DXMatrixRotationZ( &mRoll, m_Rotation.z );
+			D3DXMatrixScaling( &mScale, m_vScale.x, m_vScale.y, m_vScale.z );
+			D3DXMatrixRotationY( &mYaw,		m_vRotation.y );
+			D3DXMatrixRotationX( &mPitch,	m_vRotation.x );
+			D3DXMatrixRotationZ( &mRoll,	m_vRotation.z );
 			D3DXMatrixTranslation( &mTran, tmpPos.x, tmpPos.y, tmpPos.z );
 
 			mRot = mYaw * mPitch * mRoll;
 			mWorld = mTran * mScale * mRot;
 
-			pOutPos->x = mWorld._41 + m_Position.x;
-			pOutPos->y = mWorld._42 + m_Position.y;
-			pOutPos->z = mWorld._43 + m_Position.z;
+			pOutPos->x = mWorld._41 + m_vPosition.x;
+			pOutPos->y = mWorld._42 + m_vPosition.y;
+			pOutPos->z = mWorld._43 + m_vPosition.z;
 
 			return true;
 		}
@@ -1206,18 +1185,18 @@ bool SkinMesh::GetDeviaPosFromBone( LPCSTR sBoneName, D3DXVECTOR3* pOutPos, D3DX
 			// 位置のみ取得
 			D3DXVECTOR3 tmpPos = D3DXVECTOR3( mtmp._41, mtmp._42, mtmp._43 );
 
-			D3DXMatrixScaling( &mScale, m_Scale.x, m_Scale.y, m_Scale.z );
-			D3DXMatrixRotationY( &mYaw, m_Rotation.y );
-			D3DXMatrixRotationX( &mPitch, m_Rotation.x );
-			D3DXMatrixRotationZ( &mRoll, m_Rotation.z );
+			D3DXMatrixScaling( &mScale, m_vScale.x, m_vScale.y, m_vScale.z );
+			D3DXMatrixRotationY( &mYaw,		m_vRotation.y );
+			D3DXMatrixRotationX( &mPitch,	m_vRotation.x );
+			D3DXMatrixRotationZ( &mRoll,	m_vRotation.z );
 			D3DXMatrixTranslation( &mTran, tmpPos.x, tmpPos.y, tmpPos.z );
 
 			mRot = mYaw * mPitch * mRoll;
 			mWorld = mTran * mScale * mRot;
 
-			pOutPos->x = mWorld._41 + m_Position.x;
-			pOutPos->y = mWorld._42 + m_Position.y;
-			pOutPos->z = mWorld._43 + m_Position.z;
+			pOutPos->x = mWorld._41 + m_vPosition.x;
+			pOutPos->y = mWorld._42 + m_vPosition.y;
+			pOutPos->z = mWorld._43 + m_vPosition.z;
 
 			return true;
 		}

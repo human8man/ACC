@@ -1,12 +1,12 @@
 #pragma once
 
 #include "Time/Time.h"
-#include "Object/Gun/Gun.h"
 #include "Collision/GJK/GJK.h"
 #include "Collision/Ray/Ray.h"
-#include "Object/Bullet/Bullet.h"
 #include "Collision/Line/MeshLine.h"
 #include "Mesh/Static/StaticMeshObject.h"
+#include "Mesh/Static/Object/Gun/Gun.h"
+#include "Mesh/Static/Object/Bullet/Bullet.h"
 
 
 class Character

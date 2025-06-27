@@ -1,4 +1,5 @@
 #pragma once
+#include "Sprite/SpriteObject.h"
 
 // 警告についてのコード分析を無効にする.4005:再定義
 #pragma warning(disable:4005)
@@ -8,29 +9,9 @@ class DirectX11;
 
 
 class Sprite3D
+	:public SpriteObject
 {
 public:
-	//--------------------------------------------
-	//	構造体
-	//--------------------------------------------
-	// 幅高さ構造体
-	struct WHSIZE
-	{
-		float w;
-		float h;
-	};
-	// スプライト構造体
-	struct SPRITE_STATE
-	{
-		WHSIZE Disp;		// 表示幅高さ
-		WHSIZE Base;		// 元画像幅高さ
-		WHSIZE Stride;		// 1コマあたりの幅高さ
-		D3DXVECTOR3 Pos;	// 画像座標
-		D3DXVECTOR3 Scale;	// 画像倍率
-		std::string Path;	// パス
-		std::string Name;	// 名前
-	};
-
 	// コンスタントバッファのアプリ側の定義
 	//	※シェーダ内のコンスタントバッファと一致している必要あり
 	struct SHADER_CONSTANT_BUFFER
@@ -45,12 +26,6 @@ public:
 		D3DXVECTOR4	vColor = D3DXVECTOR4(1.0f, 1.0f, 1.0f, 1.0f);
 		// UV座標（x,yのみ使用）
 		D3DXVECTOR4	vUV = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 0.0f);
-	};
-	// 頂点の構造体
-	struct VERTEX
-	{
-		D3DXVECTOR3 Pos; // 頂点座標
-		D3DXVECTOR2	Tex; // テクスチャ座標
 	};
 
 public:
@@ -75,40 +50,25 @@ public:
 	// レンダリング用
 	void Render(D3DXMATRIX& mView, D3DXMATRIX& mProj);
 
-	// 座標情報を設定
-	void SetPosition(const D3DXVECTOR3& vPos) {	m_vPosition = vPos;	}
-	void SetPositionX( float x ){ m_vPosition.x = x; }
-	void SetPositionY( float y ){ m_vPosition.y = y; }
-	void SetPositionZ( float z ){ m_vPosition.z = z; }
-
-	// 回転情報を設定
-	void SetRotation(const D3DXVECTOR3& vRot){	m_vRotation = vRot;	}
-	void SetRotationY(float y){	m_vRotation.y = y;	}
-	void SetRotationX(float x){	m_vRotation.x = x;	}
-	void SetRotationZ(float z){	m_vRotation.z = z;	}
-
-	// 拡縮情報を設定
-	void SetScale(const D3DXVECTOR3& vScale) { m_vScale = vScale; }
-
-	// α値を設定
-	void SetAlpha(float alpha) { m_Alpha = alpha; }
-
-	// パターン番号(マス目)を設定
-	void SetPatternNo(SHORT x, SHORT y)
-	{
-		m_PatternNo.x = x;
-		m_PatternNo.y = y;
+	// 画像の元サイズを設定
+	void SetBase(D3DXVECTOR2 base) {
+		m_SpriteState.Base = WHSIZE(base.x, base.y);
+		CreateModel();
 	}
-	// 最大パターン数(マス目)を取得
-	POINTS GetPatternMax() const { return m_PatternMax; }
+	// 画像の表示範囲を設定
+	void SetDisp(D3DXVECTOR2 disp) {
+		m_SpriteState.Disp = WHSIZE(disp.x, disp.y);
+		CreateModel();
+	}
+	// パターン番号を設定した際に乗算される幅、高さの設定
+	void SetStride(D3DXVECTOR2 stride) {
+		m_SpriteState.Stride = WHSIZE(stride.x, stride.y);
+		CreateModel();
+	}
 
 	// ビルボードのON/OFF切り替え
 	void SetBillboard( bool flag ) { m_Billboard = flag; }
 
-	// jsonファイルのスプライト情報を取得
-	HRESULT SpriteStateDataLoad(const std::string& FilePath);
-	// スプライト情報をまとめたjsonファイルの作成
-	HRESULT CreateSpriteState(const std::string& FilePath);
 private:
 	DirectX11*				m_pDx11;
 	ID3D11Device*			m_pDevice11;
@@ -124,17 +84,7 @@ private:
 	ID3D11ShaderResourceView*	m_pTexture;		// テクスチャ
 	ID3D11SamplerState*			m_pSampleLinear;// サンプラ:テクスチャに各種フィルタをかける
 
-	D3DXVECTOR3		m_vPosition; // 座標
-	D3DXVECTOR3		m_vRotation; // 回転
-	D3DXVECTOR3		m_vScale;	 // 拡縮
-
 	D3DXVECTOR2		m_UV;		// テクスチャUV座標
-
-	float			m_Alpha;	// α値(0:透明、1:完全不透明)
-
-	SPRITE_STATE	m_SpriteState;	// スプライト情報
-	POINTS			m_PatternNo;	// パターン番号(マス目)
-	POINTS			m_PatternMax;	// 最大パターン(マスの最大値)
 
 	bool			m_Billboard;	// ビルボードON/OFF
 };

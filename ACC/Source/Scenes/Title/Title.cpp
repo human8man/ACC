@@ -68,7 +68,6 @@ void Title::Update()
 	// BGMÄ¶
 	SoundManager::GetInstance()->PlayLoop(SoundManager::enList::BGM_Title);
 	m_pTitleUI->Update();
-	m_pEgg->SetRotY(m_pEgg->GetRot().y + 0.01f);
 
 	if (m_pTitleUI->GetStart()) {
 		// ƒQ[ƒ€‚ðŠJŽn‚·‚é
@@ -86,7 +85,7 @@ void Title::Draw()
 	Camera::GetInstance()->CameraView(m_mView);
 	SceneBase::Projection(m_mProj);
 	m_pTitleUI->Draw();
-	m_pEgg->Render(m_mView, m_mProj, m_Light);
+	m_pEgg->Draw(m_mView, m_mProj, m_Light);
 }
 
 

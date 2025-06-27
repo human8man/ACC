@@ -5,12 +5,12 @@
 #include "DirectInput/DirectInput.h"
 
 
-class LoseUI
+class DefeatUI
 	:public UIObject
 {
 public:
-	LoseUI();
-	~LoseUI();
+	DefeatUI();
+	~DefeatUI();
 
 	void Create();		// ì¬ˆ—
 	HRESULT LoadData();	// “Çˆ—

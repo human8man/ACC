@@ -4,6 +4,7 @@
 #pragma warning( disable : 4005 )
 
 #include "SkinMeshParser.h"
+#include "GameObject.h"
 
 // 前方宣言
 class DirectX9;
@@ -11,6 +12,7 @@ class DirectX11;
 
 
 class SkinMesh
+	:GameObject
 {
 public:
 	//======================================
@@ -83,7 +85,6 @@ public:
 	void Render( const D3DXMATRIX& mView, 
 		const D3DXMATRIX& mProj, 
 		const LIGHT& Light,
-		const D3DXVECTOR3& CamPos,
 		const LPD3DXANIMATIONCONTROLLER pAC );	// nullptrでデフォルト使用する
 
 	double GetAnimSpeed()				{ return m_AnimSpeed;		}
@@ -110,23 +111,6 @@ public:
 	bool GetPosFromBone( LPCSTR BoneName, D3DXVECTOR3* pOutPos);
 	bool GetDeviaPosFromBone( LPCSTR BoneName, D3DXVECTOR3* pOutPos, D3DXVECTOR3 SpecifiedPos = ZEROVEC3 );
 
-	// 座標情報を設定
-	void SetPosition( const D3DXVECTOR3& vPos ) { m_Position = vPos;	}
-	void SetPositionX( float x )				{ m_Position.x = x;		}
-	void SetPositionY( float y )				{ m_Position.y = y;		}
-	void SetPositionZ( float z )				{ m_Position.z = z;		}
-
-	// 回転情報を設定
-	void SetRotation( const D3DXVECTOR3& vRot ) { m_Rotation = vRot;	}
-	void SetRotationY( float y )				{ m_Rotation.y = y;		}
-	void SetRotationX( float x )				{ m_Rotation.x = x;		}
-	void SetRotationZ( float z )				{ m_Rotation.z = z;		}
-
-	// 拡縮情報を設定
-	void SetScale( const D3DXVECTOR3& Scale )	{ m_Scale = Scale;		}
-	void SetScaleX( const float x )				{ m_Scale.x = x;		}
-	void SetScaleY( const float y )				{ m_Scale.x = y;		}
-	void SetScaleZ( const float z )				{ m_Scale.x = z;		}
 
 private:
 	// Xファイルからスキンメッシュを作成する
@@ -197,10 +181,6 @@ private:
 	ID3D11Buffer*			m_pCBufferPerFrame;		// コンスタントバッファ(フレーム毎)
 	ID3D11Buffer*			m_pCBufferPerBone;		// コンスタントバッファ(ボーン毎)
 
-	D3DXVECTOR3		m_Position;		// 位置(x,y,z)
-	D3DXVECTOR3		m_Rotation;		// 回転値(x,y,z)
-	D3DXVECTOR3		m_Scale;		// 拡大縮小値(x,y,z)
-
 	D3DXMATRIX		m_mWorld;
 	D3DXMATRIX		m_mRotation;
 
@@ -221,5 +201,6 @@ private:
 	TCHAR	m_FilePath[256];
 
 	// アニメーションフレーム
+	LPD3DXANIMATIONCONTROLLER	m_pAnimCtrl;	// アニメーションコントローラ
 	int		m_Frame;
 };

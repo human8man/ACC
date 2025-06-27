@@ -5,9 +5,9 @@
 //		ダイレクトインプットクラス
 //==============================================================================
 DirectInput::DirectInput()
-	: m_hWnd		(NULL)
+	: m_hWnd			(NULL)
 	, m_pDDirectInput	(NULL)
-	, m_UseDevice	(0)
+	, m_UseDevice		(0)
 {	
 }
 
@@ -72,6 +72,17 @@ void DirectInput::Release()
 //-----------------------------------------------------------------------------
 void DirectInput::InputUpdate()
 {
+	// ウィンドウがアクティブでない場合は入力状態をクリアして抜ける.
+	if (GetForegroundWindow() != m_hWnd)
+	{
+		ZeroMemory(m_Key.m_KeyState, sizeof(m_Key.m_KeyState));
+		ZeroMemory(m_Key.m_KeyAction, sizeof(m_Key.m_KeyAction));
+		m_Mouse.m_LDown = m_Mouse.m_LAction = false;
+		m_Mouse.m_RDown = m_Mouse.m_RAction = false;
+		m_Mouse.m_MDown = m_Mouse.m_MAction = false;
+		return;
+	}
+
 	// キーとマウスの更新
 	m_Key.Update();
 	m_Mouse.Update();

@@ -37,10 +37,6 @@ StaticMesh::StaticMesh()
 	, m_NumAttr				()
 	, m_AttrID				()
 	, m_EnableTexture		( false )
-
-	, m_Position			()
-	, m_Rotation			()
-	, m_Scale				( 1.f, 1.f, 1.f )
 {
 }
 StaticMesh::~StaticMesh()
@@ -107,25 +103,29 @@ void StaticMesh::Release()
 	m_pDx9 = nullptr;
 }
 
+void StaticMesh::Update()
+{
+}
+
 
 //=============================================================================
 //		レンダリング用
 //=============================================================================
-void StaticMesh::Render( D3DXMATRIX& mView, D3DXMATRIX& mProj, LIGHT& Light )
+void StaticMesh::Draw(D3DXMATRIX& mView, D3DXMATRIX& mProj, LIGHT& Light)
 {
 	// ワールド行列、スケール行列、回転行列、平行移動行列
 	D3DXMATRIX mWorld, mScale, mRot, mTran;
 	D3DXMATRIX mYaw, mPitch, mRoll;
 
 	//拡大縮小行列作成
-	D3DXMatrixScaling(&mScale,m_Scale.x, m_Scale.y, m_Scale.z);
+	D3DXMatrixScaling(&mScale, m_vScale.x, m_vScale.y, m_vScale.z);
 
-	D3DXMatrixRotationY( &mYaw, m_Rotation.y);	// Y軸回転行列作成
-	D3DXMatrixRotationX( &mPitch, m_Rotation.x);// X軸回転行列作成
-	D3DXMatrixRotationZ( &mRoll, m_Rotation.z);	// Z軸回転行列作成
+	D3DXMatrixRotationY(&mYaw, m_vRotation.y);	// Y軸回転行列作成
+	D3DXMatrixRotationX(&mPitch, m_vRotation.x);// X軸回転行列作成
+	D3DXMatrixRotationZ(&mRoll, m_vRotation.z);	// Z軸回転行列作成
 
 	// 平行移動行列作成
-	D3DXMatrixTranslation(&mTran,m_Position.x, m_Position.y, m_Position.z);
+	D3DXMatrixTranslation(&mTran, m_vPosition.x, m_vPosition.y, m_vPosition.z);
 
 	// 回転行列を作成
 	mRot = mYaw * mPitch * mRoll;
@@ -134,8 +134,8 @@ void StaticMesh::Render( D3DXMATRIX& mView, D3DXMATRIX& mProj, LIGHT& Light )
 	mWorld = mScale * mRot * mTran;
 
 	// 使用するシェーダのセット
-	m_pContext11->VSSetShader( m_pVertexShader, nullptr, 0 );	// 頂点シェーダ
-	m_pContext11->PSSetShader( m_pPixelShader, nullptr, 0 );	// ピクセルシェーダ
+	m_pContext11->VSSetShader(m_pVertexShader, nullptr, 0);	// 頂点シェーダ
+	m_pContext11->PSSetShader(m_pPixelShader, nullptr, 0);	// ピクセルシェーダ
 
 	// シェーダのコンスタントバッファに各種データを渡す
 	D3D11_MAPPED_SUBRESOURCE pData;
@@ -151,32 +151,32 @@ void StaticMesh::Render( D3DXMATRIX& mView, D3DXMATRIX& mProj, LIGHT& Light )
 		D3DXVECTOR3 CamPos = Camera::GetInstance()->GetPos();
 
 		// カメラ位置
-		cb.CameraPos = D3DXVECTOR4( CamPos.x, CamPos.y, CamPos.z, 0.f );
+		cb.CameraPos = D3DXVECTOR4(CamPos.x, CamPos.y, CamPos.z, 0.f);
 
 		// ライト方向
-		cb.vLightDir = D3DXVECTOR4( Light.vDirection.x, Light.vDirection.y, Light.vDirection.z, 0.f );
+		cb.vLightDir = D3DXVECTOR4(Light.vDirection.x, Light.vDirection.y, Light.vDirection.z, 0.f);
 
 		// ライト方向の正規化(ノーマライズ）
 		//	※モデルからライトへ向かう方向. ディレクショナルライトで重要な要素
-		D3DXVec4Normalize( &cb.vLightDir, &cb.vLightDir );
+		D3DXVec4Normalize(&cb.vLightDir, &cb.vLightDir);
 
 		memcpy_s(
 			pData.pData,	// コピー先のバッファ
 			pData.RowPitch,	// コピー先のバッファサイズ
-			(void*)( &cb ),	// コピー元のバッファ
-			sizeof( cb ) );	// コピー元のバッファサイズ
+			(void*)(&cb),	// コピー元のバッファ
+			sizeof(cb));	// コピー元のバッファサイズ
 
 		// バッファ内のデータの書き換え終了時にUnmap
-		m_pContext11->Unmap( m_pCBufferPerFrame, 0 );
+		m_pContext11->Unmap(m_pCBufferPerFrame, 0);
 	}
 
 	// このコンスタントバッファをどのシェーダで使用するか？
-	m_pContext11->VSSetConstantBuffers(	2, 1, &m_pCBufferPerFrame );	//頂点シェーダ
-	m_pContext11->PSSetConstantBuffers(	2, 1, &m_pCBufferPerFrame );	//ピクセルシェーダ
+	m_pContext11->VSSetConstantBuffers(2, 1, &m_pCBufferPerFrame);	//頂点シェーダ
+	m_pContext11->PSSetConstantBuffers(2, 1, &m_pCBufferPerFrame);	//ピクセルシェーダ
 
 
 	// メッシュのレンダリング
-	RenderMesh( mWorld, mView, mProj );
+	RenderMesh(mWorld, mView, mProj);
 }
 
 
@@ -227,17 +227,17 @@ RayInfo StaticMesh::IsHitForRay(const RAY& pRay )
 	EndPoint = StartPoint + (vAxis * pRay.Length); // レイの終点を計算
 
 	// 移動処理
-	D3DXMatrixTranslation( &mTran, m_Position.x, m_Position.y, m_Position.z);
+	D3DXMatrixTranslation( &mTran, m_vPosition.x, m_vPosition.y, m_vPosition.z);
 
 	// 回転処理
-	D3DXMatrixRotationY(&mYaw,	 m_Rotation.y);	// Y軸回転行列作成
-	D3DXMatrixRotationX(&mPitch, m_Rotation.x);	// X軸回転行列作成
-	D3DXMatrixRotationZ(&mRoll,	 m_Rotation.z);	// Z軸回転行列作成
+	D3DXMatrixRotationY(&mYaw,	 m_vRotation.y);	// Y軸回転行列作成
+	D3DXMatrixRotationX(&mPitch, m_vRotation.x);	// X軸回転行列作成
+	D3DXMatrixRotationZ(&mRoll,	 m_vRotation.z);	// Z軸回転行列作成
 	// 回転行列作成
 	mRot = mYaw * mPitch * mRoll;
 
 	// 拡縮処理
-	D3DXMatrixScaling(&mScale, m_Scale.x, m_Scale.y, m_Scale.z);
+	D3DXMatrixScaling(&mScale, m_vScale.x, m_vScale.y, m_vScale.z);
 
 	// ワールド行列計算
 	mWorld = mScale * mTran;
@@ -566,8 +566,8 @@ HRESULT StaticMesh::CreateMaterials()
 //-----------------------------------------------------------------------------
 HRESULT StaticMesh::CreateIndexBuffer()
 {
-	D3D11_BUFFER_DESC	bd;			// Dx11バッファ構造体
-	D3D11_SUBRESOURCE_DATA	InitData;// 初期化データ
+	D3D11_BUFFER_DESC	bd = {}; // Dx11バッファ構造体
+	D3D11_SUBRESOURCE_DATA	InitData = {}; // 初期化データ
 
 	// マテリアル数分の領域を確保
 	m_ppIndexBuffer = new ID3D11Buffer*[m_Model.NumMaterials]();
@@ -631,8 +631,8 @@ HRESULT StaticMesh::CreateIndexBuffer()
 //-----------------------------------------------------------------------------
 HRESULT StaticMesh::CreateVertexBuffer()
 {
-	D3D11_BUFFER_DESC	bd;	// Dx11バッファ構造体
-	D3D11_SUBRESOURCE_DATA	InitData;// 初期化データ
+	D3D11_BUFFER_DESC	bd = {}; // Dx11バッファ構造体
+	D3D11_SUBRESOURCE_DATA	InitData = {}; // 初期化データ
 
 	// Dx9の場合、mapではなくLockで頂点バッファからデータを取り出す
 	LPDIRECT3DVERTEXBUFFER9 pVB = nullptr;
