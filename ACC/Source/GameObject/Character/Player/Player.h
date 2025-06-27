@@ -24,14 +24,17 @@ public:
 	// 更新処理
 	void Update(std::unique_ptr<Enemy>& chara);
 	// 描画処理
-	void Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light );
-	
-	const int& GetHitKind()			const { return m_HitKind;		}	// 命中の種類を渡す
-	const bool& GetHit()			const { return m_Hit;			}	// 命中フラグを渡す
-	const bool& GetHoming()			const { return m_Homing;		}	// ホーミングフラグを渡す
-	const bool& GetAutoAim()		const { return m_AutoAim;		}	// オートエイムフラグを渡す
-	const bool& GetWallHack()		const { return m_WallHack;	}	// ウォールハックフラグを渡す
-	const bool& GetTriggerHappy()	const { return m_TriggerHappy;}	// 連射モードフラグを渡す
+	void Draw(D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light);
+
+	void SetLanding(bool flag)		{ m_Landing = flag; }
+	const bool& GetLanding()		const { return m_Landing; }
+
+	const int& GetHitKind()			const { return m_HitKind; }
+	const bool& GetHit()			const { return m_Hit; }
+	const bool& GetHoming()			const { return m_Homing; }
+	const bool& GetAutoAim()		const { return m_AutoAim; }
+	const bool& GetWallHack()		const { return m_WallHack; }
+	const bool& GetTriggerHappy()	const { return m_TriggerHappy; }
 
 	// 移動量の追加
 	void AddVec(D3DXVECTOR3 vec) { m_vPosition += vec; }
@@ -41,7 +44,7 @@ private:
 	// キー入力処理
 	void KeyInput(std::unique_ptr<Enemy>& chara);
 	// 移動処理
-	void MoveProcess(std::unique_ptr<Enemy>& chara);
+	void MoveProcess(std::unique_ptr<Enemy>&chara);
 	// ダッシュ処理
 	void DashProcess();
 	// 発射処理

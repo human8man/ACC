@@ -271,7 +271,7 @@ void Player::KeyInput(std::unique_ptr<Enemy>& chara)
 	//----------------------------------------------------------------------
 	//		R‚ÅƒŠƒ[ƒh
 	//----------------------------------------------------------------------
-	if (Key->IsKeyAction(DIK_R)) {
+	if (Key->IsKeyAction(DIK_R) && m_ReloadTime <= 0) {
 		m_CharaInfo.Ammo = m_CharaInfo.MaxAmmo;
 		m_ReloadTime = m_ReloadTimeMax;
 		SoundManager::GetInstance()->Play(SoundManager::enList::SE_Reload);

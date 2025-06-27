@@ -253,6 +253,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Collision\CollisionManager.cpp" />
     <ClCompile Include="Source\Collision\Line\MeshLine.cpp" />
     <ClCompile Include="Source\Collision\GJK\GJK.cpp" />
     <ClCompile Include="Source\Collision\Ray\Ray.cpp" />
@@ -320,6 +321,7 @@
     <ClCompile Include="Source\Scenes\UIEditor\UIEditor.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Collision\CollisionManager.h" />
     <ClInclude Include="Source\Collision\GJK\GJK.h" />
     <ClInclude Include="Source\Collision\Ray\Ray.h" />
     <ClInclude Include="Source\Common\DirectInput\DirectInput.h" />

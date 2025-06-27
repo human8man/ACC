@@ -16,6 +16,8 @@
 #include "Random/Random.h"
 #include "Easing/Easing.h"
 
+#include "Collision/CollisionManager.h"
+#include "ImGui/CImGui.h"
 
 //============================================================================
 //		ゲームクラス
@@ -31,18 +33,17 @@ Game::Game(HWND hWnd)
 	, m_pCylinders			()
 	
 	, m_pPlayer				( nullptr )
-	, m_pEnemy				( nullptr )
+	, m_EnemyCount			( 3 )
+	, m_pEnemies			( )
 
-	, m_pGJK				( nullptr )
 	, m_pCamRay				( nullptr )
 	, m_pMeshLine			( nullptr )
 
 	, m_pWinUI				( nullptr )
-	, m_pDefeatUI				( nullptr )
+	, m_pDefeatUI			( nullptr )
 
 	, m_HitKind				( 0 )
 	, m_CylinderMax			( 9 )
-	, m_PlayerAnyLanding	( false )
 	, m_SlowMode			( false )
 	, m_SlowScalingTime		( 0.f )
 	, m_SlowScalingTimeMax	( Time::GetDeltaTime() * 60.f )
@@ -66,7 +67,7 @@ void Game::Create()
 	m_pEgg			= std::make_unique<StaticMesh>();
 	m_pFloor		= std::make_unique<StaticMesh>();
 	m_pPlayer		= std::make_unique<Player>();
-	m_pEnemy		= std::make_unique<Enemy>();
+	for (int i = 0; i < m_EnemyCount;++i) { m_pEnemies.push_back(std::move(std::make_unique<Enemy>())); }
 	m_pCamRay		= std::make_unique<Ray>();
 	m_pMeshLine		= std::make_unique<MeshLine>();
 	m_pGameUI		= std::make_unique<GameUI>();
@@ -105,15 +106,18 @@ HRESULT Game::LoadData()
 
 	// メッシュをアタッチする
 	m_pPlayer	->AttachMesh( *m_pEgg );
-	m_pEnemy	->AttachMesh( *m_pEgg );
+	for (int i = 0; i < m_pEnemies.size();++i) { m_pEnemies[i]->AttachMesh(*m_pEgg); }
+	;
 
 	// キャラクターの初期座標を設定
-	m_pPlayer	->SetScale( 2.f, 2.f, 2.f );
-	m_pEnemy	->SetScale( 2.f, 2.f, 2.f );
+	D3DXVECTOR3 scale = D3DXVECTOR3(2.f, 2.f, 2.f);
+	m_pPlayer	->SetScale(scale);
+	for (int i = 0; i < m_pEnemies.size();++i) { m_pEnemies[i]->SetScale(scale); }
+	;
 
 	// プレイヤーと敵のスポーン位置をランダムに決める
 	Random random;
-	InitEPPos(random, m_pPlayer, m_pEnemy);
+	InitEPPos(random, m_pPlayer, m_pEnemies);
 
 	// 柱の配置(後でどうにかする仮設置方法)
 	for (int i = 0; i < m_pCylinders.size(); ++i)
@@ -179,7 +183,7 @@ void Game::Release()
 {
 	m_pGameUI.reset();
 	m_pCamRay.reset();
-	m_pEnemy.reset();
+	m_pEnemies.clear();
 	m_pPlayer.reset();
 	for (auto& cylinder : m_pCylinders) {
 		cylinder.reset();
@@ -217,18 +221,48 @@ void Game::Update()
 	// 勝利や敗北画面が出現していない間
 	if (m_pDefeatUI == nullptr && m_pWinUI == nullptr)
 	{
-		// その他とカメラレイの判定(弾の到着地点に使用する)
-		RaytoObjeCol();
-		
-		m_pPlayer->Update(m_pEnemy);		// プレイヤーの更新
-		m_pEnemy->Update(m_pPlayer);		// エネミーの更新
-		Camera::GetInstance()->Update();	// カメラの更新
+		float minDistSq = FLT_MAX; // 一番小さい距離の初期値
+		for (size_t i = 0; i < m_pEnemies.size();++i) {
+			m_pEnemies[i]->Update(m_pPlayer); // エネミーの更新
+
+			const D3DXVECTOR3& enemyPos = m_pEnemies[i]->GetPos();
+			D3DXVECTOR3 diff = enemyPos - m_pPlayer->GetPos();
+			float distSq = D3DXVec3LengthSq(&diff); // 距離の2乗
+
+			if (distSq < minDistSq) {
+				minDistSq = distSq;
+				m_NearEnemyIndex = static_cast<int>(i);
+			}
+		}
+		m_pPlayer->Update(m_pEnemies[m_NearEnemyIndex]); // プレイヤーの更新
+
+		Camera::GetInstance()->Update(); // カメラの更新
 
 		// プレイヤーがオートエイムを使用していた場合
 		if (m_pPlayer->GetAutoAim()) { AutoAimProcess();}
 
 		// 当たり判定処理
-		CollisionJudge();
+		m_pCollisionManager->ColJudge(
+			*m_pPlayer,
+			m_pEnemies,
+			*m_pFloor,
+			m_pCylinders
+		);
+
+		// 敵の死亡削除処理
+		for (auto it = m_pEnemies.begin(); it != m_pEnemies.end(); )
+		{
+			if ((*it)->GetCharaInfo().HP <= 0 
+				//|| (*it)->GetPos().y < -1000.f
+				)
+			{
+				// eraseで要素ごと消す（unique_ptrが自動でdelete）
+				it = m_pEnemies.erase(it);
+			}
+			else {
+				++it;
+			}
+		}
 
 		// UIの更新処理
 		m_pGameUI->Update(m_pPlayer);
@@ -250,6 +284,16 @@ void Game::Update()
 	}
 
 	Time::GetInstance()->SetTimeScale(m_SlowScale);
+	if (m_pEnemies.empty()) { return; }
+	ImGui::Begin("enemies window");
+	for (size_t i = 0; i < m_pEnemies.size(); ++i) {
+		// ユニークラベル作成
+		char label[32];
+		sprintf_s(label, "Enemypos %zu", i);
+		D3DXVECTOR3 pos = m_pEnemies[i]->GetPos();
+		ImGui::DragFloat3(label, &pos.x, 0.1f);
+	}
+	ImGui::End();
 }
 
 
@@ -263,15 +307,18 @@ void Game::Draw()
 
 	D3DXVECTOR4 color = { 0.f,1.f,0.f,1.f };
 
-	// 柱の描画
 	for (auto& cylinder : m_pCylinders) { cylinder->Draw(m_mView, m_mProj, m_Light); }
-	m_pFloor->Draw(m_mView, m_mProj, m_Light);	// 地面の描画
-	m_pEnemy->Draw(m_mView, m_mProj, m_Light);	// 敵の描画
+	m_pFloor->Draw(m_mView, m_mProj, m_Light);
+	for (size_t i = 0; i < m_pEnemies.size();++i) {
+		m_pEnemies[i]->Draw(m_mView, m_mProj, m_Light);
+	}
 
 	// ウォールハック起動中は敵のフレームを描画
 	if (m_pPlayer->GetWallHack()) {
 		DirectX11::GetInstance()->SetDepth(false);
-		m_pMeshLine->DrawMeshWireframeFromVertices(*m_pEnemy->GetMesh(), *m_pEnemy, m_mView, m_mProj, color,1.f);
+		for (size_t i = 0; i < m_pEnemies.size();++i) {
+			m_pMeshLine->DrawMeshWireframeFromVertices(*m_pEnemies[i]->GetMesh(), *m_pEnemies[i], m_mView, m_mProj, color, 1.f);
+		}
 		m_pMeshLine->Render(m_mView, m_mProj);
 		DirectX11::GetInstance()->SetDepth(true);
 	}
@@ -290,321 +337,26 @@ void Game::Draw()
 
 
 //-----------------------------------------------------------------------------
-//		当たり判定関数
-//-----------------------------------------------------------------------------
-void Game::CollisionJudge()
-{
-	Collider PlayerEgg, EnemyEgg, Floor, Cylinder;
-	std::vector<Collider> Cylinders;
-
-	// 柱データ取得
-	for (int i = 0; i < m_CylinderMax; ++i) {
-		Cylinder.SetVertex( m_pCylinders[i]->GetObjectInfo(), m_pCylinders[i]->GetVertices());
-		Cylinders.push_back(Cylinder);
-	}
-
-	// 地面,プレイヤー,敵のデータ取得
-	Floor		.SetVertex( m_pFloor->GetObjectInfo(),	m_pFloor->GetVertices());
-	PlayerEgg	.SetVertex( m_pPlayer->GetObjectInfo(),	m_pEgg->GetVertices());
-	EnemyEgg	.SetVertex( m_pEnemy->GetObjectInfo(),	m_pEgg->GetVertices());
-
-	// プレイヤーと敵の柱判定を取得用の変数を用意
-	CollisionPoints pointsPC, pointsEC;
-
-	// プレイヤーと柱の判定を返す
-	std::vector<CollisionPoints> pointspecs;
-	for (int i = 0; i < m_CylinderMax; ++i) {
-		pointsPC = m_pGJK->GJKC(Cylinders[i], PlayerEgg);
-		pointspecs.push_back(pointsPC);
-	}
-
-	// 敵と柱の判定を返す
-	std::vector<CollisionPoints> pointseecs;
-	for (int i = 0; i < m_CylinderMax; ++i) {
-		pointsEC = m_pGJK->GJKC(Cylinders[i], EnemyEgg);
-		pointseecs.push_back(pointsEC);
-	}
-
-	// プレイヤーと敵の床の判定を取得
-	CollisionPoints pointsPF = m_pGJK->GJKC(PlayerEgg, Floor), pointsEF = m_pGJK->GJKC(EnemyEgg, Floor);
-
-	// 毎フレーム初期化
-	m_PlayerAnyLanding = false;
-	m_EnemyAnyLanding = false;
-
-	// プレイヤーと敵の床の衝突判定処理
-	PlayertoFloorCol(pointsPF);
-	EnemytoFloorCol(pointsEF);
-
-	// プレイヤーと敵の柱の衝突判定処理
-	for (int i = 0; i < m_CylinderMax; ++i) { PlayertoCylinderCol(pointspecs[i]); }
-	for (int i = 0; i < m_CylinderMax; ++i) { EnemytoCylinderCol(pointseecs[i]); }
-
-	// プレイヤーの着地状況ごとの処理
-	if (m_PlayerAnyLanding) {
-		m_pPlayer->CanJump();	// ジャンプ可能に
-		m_pPlayer->SetLanding(m_PlayerAnyLanding);
-	}
-	else {
-		m_pPlayer->JumpMath();	// ジャンプ計算
-	}
-
-	// 敵の着地状況ごとの処理
-	if (m_EnemyAnyLanding) {
-		m_pEnemy->CanJump();	// ジャンプ可能に
-		m_pEnemy->SetLanding( m_EnemyAnyLanding );
-	}
-	else {
-		m_pEnemy->JumpMath();	// ジャンプ計算
-	}
-
-	// プレイヤーと敵の当たり判定処理をする
-	for (int i = 0; i < m_CylinderMax; ++i) {
-		m_pPlayer->Collision(m_pEnemy, Floor, Cylinders[i]);
-		m_pEnemy->Collision(m_pPlayer, Floor, Cylinders[i]);
-	}
-}
-
-
-//-----------------------------------------------------------------------------
 //		敵とプレイヤーをランダムでスポーン
 //-----------------------------------------------------------------------------
-void Game::InitEPPos(Random& random, std::unique_ptr<Player>& player, std::unique_ptr<Enemy>& enemy)
+void Game::InitEPPos(Random& random,
+	std::unique_ptr<Player>& player,
+	std::vector<std::unique_ptr<Enemy>>& enemy)
 {
 	// スポーンポイントのインデックスをランダムに取得
 	int PIndex = random.GetRandomInt(0, static_cast<int>(m_SpawnPoints.size()) - 1);
+	// プレイヤー位置を設定
+	player->SetPos(m_SpawnPoints[PIndex]);
 
 	// 敵のスポーンポイントをプレイヤーと異なる場所にする
-	int EIndex;
-	do {
-		EIndex = random.GetRandomInt(0, static_cast<int> (m_SpawnPoints.size()) - 1);
-	} while (EIndex == PIndex);
+	int EIndex, countIndex;
+	for (int i = 0;i < m_pEnemies.size(); ++i) {
+		do {
+			EIndex = random.GetRandomInt(0, static_cast<int> (m_SpawnPoints.size()) - 1);
+		} while (EIndex == PIndex);
 
-	// プレイヤーと敵の位置を設定
-	player->SetPos(m_SpawnPoints[PIndex]);
-	enemy->SetPos(m_SpawnPoints[EIndex]);
-}
-
-
-//-----------------------------------------------------------------------------
-//		プレイヤーと床の当たり判定をまとめる関数
-//-----------------------------------------------------------------------------
-void Game::PlayertoFloorCol(CollisionPoints points)
-{
-	// 当たっていた場合
-	if (points.Col)
-	{
-		// 着地している
-		m_PlayerAnyLanding = true;
-
-		// 地面に衝突している場合
-		if (points.Normal.y < 0.f)
-		{
-			// プレイヤーを押し戻したときの座標を算出
-			D3DXVECTOR3 SetPos = m_pPlayer->GetPos() - points.Normal * points.Depth;
-
-			// プレイヤーの位置の更新
-			m_pPlayer->SetPos(SetPos);
-		}
-		// 壁や斜面に衝突している場合
-		else {
-			D3DXVec3Normalize(&points.Normal, &points.Normal); // 正規化
-			D3DXVECTOR3 PlayerMove = m_pPlayer->GetMoveVec();  // プレイヤーの移動ベクトルを取得
-			
-			// プレイヤーの移動ベクトルと法線ベクトルの内積を計算
-			float Dot = D3DXVec3Dot(&PlayerMove, &points.Normal);
-
-			// 法線方向の移動成分を除去して、壁に沿った移動成分のみにする
-			PlayerMove = PlayerMove - Dot * points.Normal;
-
-			// 修正した移動ベクトルをプレイヤーに加算
-			m_pPlayer->AddVec(PlayerMove);
-		}
-	} 
-}
-
-
-//-----------------------------------------------------------------------------
-//		プレイヤーと柱の当たり判定をまとめる関数
-//-----------------------------------------------------------------------------
-void Game::PlayertoCylinderCol(CollisionPoints points)
-{
-	if (points.Col) 
-	{
-		// 地面に衝突している場合
-		if (points.Normal.y > 0.f)
-		{
-			m_PlayerAnyLanding = true;
-
-			D3DXVECTOR3 SetPos = m_pPlayer->GetPos() - points.Normal * points.Depth;
-			m_pPlayer->SetPos(SetPos);
-		}
-
-		D3DXVec3Normalize(&points.Normal, &points.Normal);	// 法線を正規化
-		D3DXVECTOR3 PlayerMove = m_pPlayer->GetMoveVec();	// プレイヤーの移動ベクトルを取得
-
-		// プレイヤーの移動ベクトルと法線ベクトルの内積を計算
-		float Dot = D3DXVec3Dot(&PlayerMove, &points.Normal);
-
-		// 法線方向の移動成分を除去して、壁に沿った移動成分のみにする
-		PlayerMove = PlayerMove - Dot * points.Normal;
-
-		// 修正した移動ベクトルをプレイヤーに適用
-		m_pPlayer->AddVec(PlayerMove);
-		m_pPlayer->SetPos(m_pPlayer->GetPos() + points.Normal * points.Depth);
-
-		// 深度が設定値以下の場合
-		if (points.Depth < 0.05f) {
-			m_pPlayer->AddVec(-m_pPlayer->GetMoveVec());
-		}
+		enemy[i]->SetPos(m_SpawnPoints[EIndex]);
 	}
-}
-
-
-//-----------------------------------------------------------------------------
-//		敵と床の当たり判定をまとめる関数
-//-----------------------------------------------------------------------------
-void Game::EnemytoFloorCol(CollisionPoints points)
-{
-	// 当たっていた場合
-	if (points.Col)
-	{
-		m_EnemyAnyLanding = true;
-
-		// 地面に衝突している場合
-		if (points.Normal.y < 0.f)
-		{
-			// 敵を押し戻したときの座標を算出
-			D3DXVECTOR3 SetPos = m_pEnemy->GetPos() - points.Normal * points.Depth;
-
-			// 敵の位置の更新
-			m_pEnemy->SetPos(SetPos);
-		}
-		// 壁や斜面に衝突している場合
-		else {
-			D3DXVec3Normalize(&points.Normal, &points.Normal);	// 正規化
-			D3DXVECTOR3 EnemyMove = m_pEnemy->GetMoveVec();		// 敵の移動ベクトルを取得
-			
-			// 敵の移動ベクトルと法線ベクトルの内積を計算
-			float Dot = D3DXVec3Dot(&EnemyMove, &points.Normal);
-
-			// 法線方向の移動成分を除去して、壁に沿った移動成分のみにする
-			EnemyMove = EnemyMove - Dot * points.Normal;
-
-			// 修正した移動ベクトルを敵に加算
-			m_pEnemy->AddVec(EnemyMove);
-		}
-	}
-	else {
-		m_pEnemy->JumpMath();
-	}
-}
-
-
-//-----------------------------------------------------------------------------
-//		敵と柱の当たり判定をまとめる関数
-//-----------------------------------------------------------------------------
-void Game::EnemytoCylinderCol(CollisionPoints points)
-{
-	// 当たっている場合
-	if (points.Col) 
-	{
-		// 地面に衝突している場合
-		if (points.Normal.y > 0.f)
-		{
-			m_EnemyAnyLanding = true;
-
-			D3DXVECTOR3 SetPos = m_pEnemy->GetPos() - points.Normal * points.Depth;
-			m_pEnemy->SetPos(SetPos);
-		}
-		D3DXVec3Normalize(&points.Normal, &points.Normal);	// 法線を正規化
-		D3DXVECTOR3 EnemyMove = m_pEnemy->GetMoveVec();		// プレイヤーの移動ベクトルを取得
-
-		// プレイヤーの移動ベクトルと法線ベクトルの内積を計算
-		float Dot = D3DXVec3Dot(&EnemyMove, &points.Normal);
-
-		// 法線方向の移動成分を除去して、壁に沿った移動成分のみにする
-		EnemyMove = EnemyMove - Dot * points.Normal;
-
-		// 修正した移動ベクトルを敵に適用
-		m_pEnemy->AddVec(EnemyMove);
-		m_pEnemy->SetPos(m_pEnemy->GetPos() + points.Normal * points.Depth);
-
-		// 深度が設定値以下の場合
-		if (points.Depth < 0.05f) {
-			m_pEnemy->AddVec(-m_pEnemy->GetMoveVec());
-		}
-		// 地面に衝突している場合
-		if (points.Normal.y < 0.f)
-		{
-			m_pEnemy->CanJump();	// ジャンプを可能に
-
-			// プレイヤーを押し戻したときの座標を算出
-			D3DXVECTOR3 SetPos = m_pEnemy->GetPos() - points.Normal * points.Depth;
-
-			// プレイヤーの位置の更新
-			m_pEnemy->SetPos(SetPos);
-		}
-	}
-}
-
-
-//-----------------------------------------------------------------------------
-//		レイの当たり判定をまとめる関数
-//-----------------------------------------------------------------------------
-void Game::RaytoObjeCol()
-{
-	// カメラベクトル
-	D3DXVECTOR3 camlookpos = Camera::GetInstance()->GetPos() + Camera::GetInstance()->GetCamDir() * 100.f;
-	
-	// レイ情報用の変数
-	RayInfo SendCamera = { false, camlookpos, 5000.f }, GroundRay, EnemyRay, CylinderRay;
-	std::vector<RayInfo> CylinderRays;	// 柱用のレイ配列
-
-	//-------------------------------------------------------------------------
-	//	カメラレイと各オブジェごとの判定情報を取得
-	//-------------------------------------------------------------------------
-	
-	// 地面とカメラレイの判定を取得
-	GroundRay = m_pFloor->IsHitForRay(Camera::GetInstance()->GetRay());
-	
-	// 柱とカメラレイの判定を取得
-	for (int i = 0; i < m_CylinderMax; ++i) {
-		CylinderRay = m_pCylinders[i]->IsHitForRay(Camera::GetInstance()->GetRay());
-		CylinderRays.push_back(CylinderRay);
-	}
-	
-	// 敵とカメラレイの判定を取得
-	EnemyRay = m_pEnemy->IsHitForRay(Camera::GetInstance()->GetRay());
-
-
-	//-------------------------------------------------------------------------
-	//		どのオブジェクトが最もカメラから近いかを探す
-	//-------------------------------------------------------------------------
-	
-	// レイが地面にあたっている場合
-	if (GroundRay.Hit) {
-		// 地面からカメラまでのレイ長さを比較、trueの場合値を上書きする
-		if (SendCamera.Length > GroundRay.Length) { SendCamera = GroundRay; }
-	}
-	
-	// レイが敵にあたっている場合
-	if (EnemyRay.Hit) {
-		// 敵からカメラまでのレイ長さを比較し、trueの場合値を上書きする
-		if (SendCamera.Length > EnemyRay.Length) { SendCamera = EnemyRay; }
-	}
-
-	// 柱の数分forループを回す
-	for (int i = 0; i < m_CylinderMax; ++i) {
-		// レイが柱にあたっている場合
-		if (CylinderRays[i].Hit) {
-			// 柱からカメラまでのレイ長さを比較、trueの場合値を上書きする
-			if (SendCamera.Length > CylinderRays[i].Length) { SendCamera = CylinderRays[i]; }
-		}
-	}
-
-	// 最終的に最短距離にあるオブジェクトのHit座標を渡す
-	Camera::GetInstance()->SetRayHit(SendCamera.HitPos);
 }
 
 
@@ -627,7 +379,7 @@ void Game::UIUpdate()
 
 	// 敵がHP０の場合、もしくは地面抜けしていた場合、勝利UIを作成
 	if (m_pWinUI == nullptr 
-	&& (m_pEnemy->GetCharaInfo().HP <= 0|| m_pEnemy->GetPos().y < -100.f)) 
+	&& m_pEnemies.size() == 0) 
 	{
 		// 勝利UIの作成
 		m_pWinUI = std::make_unique<VictoryUI>();
@@ -638,8 +390,8 @@ void Game::UIUpdate()
 	}
 	
 	// 勝利や敗北画面の更新処理
-	if ( m_pDefeatUI != nullptr )	{ m_pDefeatUI->Update();	}
-	if ( m_pWinUI  != nullptr )	{ m_pWinUI->Update();	}
+	if ( m_pDefeatUI != nullptr ) { m_pDefeatUI->Update(); }
+	if ( m_pWinUI  != nullptr ) { m_pWinUI->Update(); }
 }
 
 
@@ -650,7 +402,7 @@ void Game::AutoAimProcess()
 {
 	Camera::GetInstance()->CursorInit();
 	D3DXVECTOR3 camPos = Camera::GetInstance()->GetPos();
-	D3DXVECTOR3 enemyPos = m_pEnemy->GetPos();
+	D3DXVECTOR3 enemyPos = m_pEnemies[m_NearEnemyIndex]->GetPos();
 	enemyPos.y += 1.f;
 	D3DXVECTOR3 toEnemy = enemyPos - camPos;
 	D3DXVECTOR3 camRot = ZEROVEC3;
