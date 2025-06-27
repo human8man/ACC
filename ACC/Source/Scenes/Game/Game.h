@@ -9,7 +9,6 @@
 
 
 class StaticMesh;
-class GJK;
 class Ray;
 class MeshLine;
 class Enemy;
@@ -20,6 +19,7 @@ class Random;
 class VictoryUI;
 class DefeatUI;
 class EnemyFrame;
+class CollisionManager;
 
 
 class Game
@@ -39,21 +39,9 @@ public:
 
 private:
 	// 敵とプレイヤーをンダムでスポーン
-	void InitEPPos(Random& random, std::unique_ptr<Player>& player, std::unique_ptr<Enemy>& enemy);
-
-	// 当たり判定関数
-	void CollisionJudge();
-	
-	// プレイヤーの床と柱の当たり判定をまとめる関数
-	void PlayertoFloorCol	(CollisionPoints points);
-	void PlayertoCylinderCol(CollisionPoints points);
-	
-	// 敵の床と柱の当たり判定をまとめる関数
-	void EnemytoFloorCol	(CollisionPoints points);
-	void EnemytoCylinderCol	(CollisionPoints points);
-
-	// レイの当たり判定をまとめる関数
-	void RaytoObjeCol();
+	void InitEPPos(Random& random,
+		std::unique_ptr<Player>& player,
+		std::vector<std::unique_ptr<Enemy>>& enemy);
 
 	// UI処理をまとめる関数
 	void UIUpdate();
@@ -73,10 +61,13 @@ private:
 	std::vector<std::unique_ptr<StaticMesh>> m_pCylinders;	// 柱配列
 		
 	std::unique_ptr<Player>	m_pPlayer;	// プレイヤークラス
-	std::unique_ptr<Enemy>		m_pEnemy;	// 敵クラス
+
+	int	m_EnemyCount;		// 敵の数
+	int	m_NearEnemyIndex;	// 近くの敵のインデックス
+	std::vector<std::unique_ptr<Enemy>> m_pEnemies;	// 敵配列
 
 	// 当たり判定
-	std::unique_ptr<GJK>		m_pGJK;			// GJKクラス
+	std::unique_ptr<CollisionManager> m_pCollisionManager; // 当たり判定管理クラス
 	std::unique_ptr<Ray>		m_pCamRay;		// レイクラス
 	std::unique_ptr<MeshLine>	m_pMeshLine;	// メッシュ線クラス
 
@@ -89,9 +80,6 @@ private:
 
 	int	m_HitKind;		// Hitの種類
 	int	m_CylinderMax;	// 柱の最大数
-
-	bool m_PlayerAnyLanding;	// プレイヤーが何かに着地している場合
-	bool m_EnemyAnyLanding;		// 敵が何かに着地している場合
 
 	bool m_SlowMode;			// スローモーション
 	float m_SlowScalingTime;	// スローモーション経過時間

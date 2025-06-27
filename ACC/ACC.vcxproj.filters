@@ -282,6 +282,7 @@
     <ClCompile Include="Source\Scenes\SceneManager\SceneManager.cpp" />
     <ClCompile Include="Source\Scenes\Title\Title.cpp" />
     <ClCompile Include="Source\Scenes\UIEditor\UIEditor.cpp" />
+    <ClCompile Include="Source\Collision\CollisionManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Common\stdafx.h">
@@ -413,6 +414,7 @@
     <ClInclude Include="Source\Scenes\SceneManager\SceneManager.h" />
     <ClInclude Include="Source\Scenes\Title\Title.h" />
     <ClInclude Include="Source\Scenes\UIEditor\UIEditor.h" />
+    <ClInclude Include="Source\Collision\CollisionManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Common\Easing\Easing.inl">

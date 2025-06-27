@@ -110,7 +110,7 @@ public:
 	// @param	Direction : 探索する方向ベクトル
 	// @return	サポート点 (最も遠い点の座標)
 	****************************************************************/
-	D3DXVECTOR3 Support(const Collider& ColliderA, const Collider& ColliderB, D3DXVECTOR3 Direction);
+	static D3DXVECTOR3 Support(const Collider& ColliderA, const Collider& ColliderB, D3DXVECTOR3 Direction);
 
 
 	/****************************************************************
@@ -119,7 +119,7 @@ public:
 	// @param	ColliderB : コライダーB
 	// @return	衝突情報 (衝突の有無や衝突点など)
 	****************************************************************/
-	CollisionPoints GJKC(const Collider& ColliderA, const Collider& ColliderB);
+	static CollisionPoints GJKC(const Collider& ColliderA, const Collider& ColliderB);
 
 
 	/****************************************************************
@@ -129,7 +129,7 @@ public:
 	// @param	colliderB	: コライダーB
 	// @return	衝突情報 (衝突深度や衝突法線)
 	****************************************************************/
-	CollisionPoints EPA(const Simplex& simplex, const Collider& colliderA, const Collider& colliderB);
+	static CollisionPoints EPA(const Simplex& simplex, const Collider& colliderA, const Collider& colliderB);
 
 
 	/****************************************************************
@@ -138,7 +138,7 @@ public:
 	// @param	Faces	: 面のインデックスリスト
 	// @return	面の法線ベクトルリストと最も近い面のインデックス
 	****************************************************************/
-	std::tuple<std::vector<D3DXVECTOR4>, size_t> GetFaceNormals(
+	static std::tuple<std::vector<D3DXVECTOR4>, size_t> GetFaceNormals(
 		const std::vector<D3DXVECTOR3>& Poly,
 		const std::vector<size_t>& Faces);
 
@@ -150,7 +150,7 @@ public:
 	// @param	a		: エッジの始点
 	// @param	b		: エッジの終点
 	****************************************************************/
-	void AddIfUniqueEdge(
+	static void AddIfUniqueEdge(
 		std::vector<std::pair<size_t, size_t>>& Edges,
 		const std::vector<size_t>& Faces, size_t a, size_t b);
 
@@ -161,7 +161,7 @@ public:
 	// @param	vertex	: 頂点リスト (ローカル座標)
 	// @return	最も低い頂点のY座標値
 	****************************************************************/
-	float SendMinVertexPosY( const ObjectInfo& obje, const std::vector<D3DXVECTOR3>& vertex);
+	static float SendMinVertexPosY( const ObjectInfo& obje, const std::vector<D3DXVECTOR3>& vertex);
 
 
 	/****************************************************************
@@ -170,7 +170,7 @@ public:
 	// @param	Direction	: 更新後の探索方向
 	// @return	GJKの終了条件を満たした場合 true
 	****************************************************************/
-	bool NextSimplex(Simplex& points, D3DXVECTOR3& Direction);
+	static bool NextSimplex(Simplex& points, D3DXVECTOR3& Direction);
 
 
 	/****************************************************************
@@ -179,7 +179,7 @@ public:
 	// @param	ao			: 判定するベクトル
 	// @return	同じ方向なら true
 	****************************************************************/
-	bool SameDirection(const D3DXVECTOR3& Direction, const D3DXVECTOR3& ao);
+	static bool SameDirection(const D3DXVECTOR3& Direction, const D3DXVECTOR3& ao);
 
 
 	/****************************************************************
@@ -188,7 +188,7 @@ public:
 	// @param	Direction	: 更新後の探索方向
 	// @return	GJKの終了条件を満たした場合 true
 	****************************************************************/
-	bool Line(Simplex& points, D3DXVECTOR3& Direction);
+	static bool Line(Simplex& points, D3DXVECTOR3& Direction);
 
 
 	/****************************************************************
@@ -197,7 +197,7 @@ public:
 	// @param	Direction	: 更新後の探索方向
 	// @return	GJKの終了条件を満たした場合 true
 	****************************************************************/
-	bool Triangle(Simplex& points, D3DXVECTOR3& Direction);
+	static bool Triangle(Simplex& points, D3DXVECTOR3& Direction);
 
 
 	/****************************************************************
@@ -206,5 +206,5 @@ public:
 	// @param	Direction	: 更新後の探索方向
 	// @return	GJKの終了条件を満たした場合 true
 	****************************************************************/
-	bool Tetrahedron(Simplex& points, D3DXVECTOR3& Direction);
+	static bool Tetrahedron(Simplex& points, D3DXVECTOR3& Direction);
 };

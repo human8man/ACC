@@ -140,7 +140,7 @@ CollisionPoints GJK::EPA(const Simplex& simplex, const Collider& colliderA, cons
 	// 初期の面（三角形）を定義
 	std::vector<size_t> Faces = { 0, 1, 2, 0, 3, 1, 0, 2, 3, 1, 3, 2 };
 	// 各面の法線情報を取得し、一番近い面のインデックスを取得
-	auto [normals, minFace] = GetFaceNormals(Polytope, Faces);
+	auto [normals, minFace] = GJK::GetFaceNormals(Polytope, Faces);
 
 	// 最も近い面の法線ベクトルと距離を取得
 	D3DXVECTOR3 minNormal = { normals[minFace].x, normals[minFace].y, normals[minFace].z };
