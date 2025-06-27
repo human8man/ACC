@@ -16,7 +16,7 @@ namespace {
 
 
 VictoryUI::VictoryUI()
-	: m_SpawnTimeMax	( Time::GetInstance()->GetDeltaTime() * 300.f )
+	: m_SpawnTimeMax	( Time::GetDeltaTime() * 180.f )
 	, m_SpawnTime		( m_SpawnTimeMax )
 {
 	// キャラクターCSVの情報保存用
@@ -27,7 +27,7 @@ VictoryUI::VictoryUI()
 	// 空でない場合は、外部で調整するべき変数の値を入れていく
 	if (!m_StateList.empty())
 	{
-		m_SpawnTimeMax = StrToFloat(m_StateList["Win_SpawnTimeMax"]) * Time::GetInstance()->GetDeltaTime();
+		m_SpawnTimeMax = StrToFloat(m_StateList["Win_SpawnTimeMax"]) * Time::GetDeltaTime();
 	}
 }
 VictoryUI::~VictoryUI()
@@ -67,7 +67,7 @@ void VictoryUI::Init()
 //=============================================================================
 void VictoryUI::Update()
 {
-	if (m_SpawnTime >= 0) { m_SpawnTime -= Time::GetInstance()->GetDeltaTime(); }
+	if (m_SpawnTime >= 0) { m_SpawnTime -= Time::GetDeltaTime(); }
 
 	//----------------------------------------------------------------------------
 	//		それぞれのUIの更新

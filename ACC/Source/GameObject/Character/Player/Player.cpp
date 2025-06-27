@@ -154,7 +154,7 @@ void Player::Collision(std::unique_ptr<Enemy>& egg, Collider floor, Collider cyl
 	static ::EsHandle hEffect = -1;
 
 	// 敵データを取得
-	enemyegg.SetVertex( egg->GetObjeInfo(), egg->GetMesh()->GetVertices());
+	enemyegg.SetVertex( egg->GetObjectInfo(), egg->GetMesh()->GetVertices());
 
 	// 弾の判定
 	for (size_t i = 0; i < m_pBullets.size(); ++i) {
@@ -173,7 +173,7 @@ void Player::Collision(std::unique_ptr<Enemy>& egg, Collider floor, Collider cyl
 		float distToEnemy		= D3DXVec3Length(&diffEnemy);
 
 		// 弾データを取得
-		Bullet.SetVertex( m_pBullets[i]->GetObjeInfo(), m_pMeshBullet->GetVertices());
+		Bullet.SetVertex( m_pBullets[i]->GetObjectInfo(), m_pMeshBullet->GetVertices());
 		
 		// 当たり判定情報用の変数を宣言
 		CollisionPoints pointsbc, pointsbf, pointsbe;

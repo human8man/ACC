@@ -1,4 +1,4 @@
-#include "LoseUI.h"
+#include "DefeatUI.h"
 
 #include "Scenes/SceneManager/SceneManager.h"
 #include "Sprite/2D/UI/UIObject.h"
@@ -15,8 +15,8 @@ namespace {
 }
 
 
-LoseUI::LoseUI()
-	: m_SpawnTimeMax	( Time::GetInstance()->GetDeltaTime() * 300.f )
+DefeatUI::DefeatUI()
+	: m_SpawnTimeMax	( Time::GetDeltaTime() * 180.f )
 	, m_SpawnTime		( m_SpawnTimeMax )
 {
 	// キャラクターCSVの情報保存用
@@ -27,10 +27,10 @@ LoseUI::LoseUI()
 	// 空でない場合は、外部で調整するべき変数の値を入れていく
 	if (!m_StateList.empty())
 	{
-		m_SpawnTimeMax = StrToFloat(m_StateList["Lose_SpawnTimeMax"]) * Time::GetInstance()->GetDeltaTime();
+		m_SpawnTimeMax = StrToFloat(m_StateList["Lose_SpawnTimeMax"]) * Time::GetDeltaTime();
 	}
 }
-LoseUI::~LoseUI()
+DefeatUI::~DefeatUI()
 {
 	Release();
 }
@@ -39,7 +39,7 @@ LoseUI::~LoseUI()
 //=================================================================================================
 //		作成処理
 //=================================================================================================
-void LoseUI::Create()
+void DefeatUI::Create()
 {
 	LoadFromJson(LoseJson, m_pUIs);
 }
@@ -48,7 +48,7 @@ void LoseUI::Create()
 //=================================================================================================
 //		読込処理
 //=================================================================================================
-HRESULT LoseUI::LoadData()
+HRESULT DefeatUI::LoadData()
 {
 	return S_OK;
 }
@@ -57,7 +57,7 @@ HRESULT LoseUI::LoadData()
 //=================================================================================================
 //		初期化処理
 //=================================================================================================
-void LoseUI::Init()
+void DefeatUI::Init()
 {
 }
 
@@ -65,9 +65,9 @@ void LoseUI::Init()
 //=================================================================================================
 //		更新処理
 //=================================================================================================
-void LoseUI::Update()
+void DefeatUI::Update()
 {
-	if (m_SpawnTime >= 0) { m_SpawnTime -= Time::GetInstance()->GetDeltaTime(); }
+	if (m_SpawnTime >= 0) { m_SpawnTime -= Time::GetDeltaTime(); }
 
 	//----------------------------------------------------------------------------
 	//		それぞれのUIの更新
@@ -90,7 +90,7 @@ void LoseUI::Update()
 //=================================================================================================
 //		描画処理
 //=================================================================================================
-void LoseUI::Draw()
+void DefeatUI::Draw()
 {	
 	// UIそれぞれの描画処理
 	for (size_t i = 0; i < m_pUIs.size(); ++i) { m_pUIs[i]->Draw(); }
@@ -100,7 +100,7 @@ void LoseUI::Draw()
 //=================================================================================================
 //		解放処理
 //=================================================================================================
-void LoseUI::Release()
+void DefeatUI::Release()
 {
 	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pUIs[i]); }
 	for (size_t i = 0; i < m_SpriteDataList.size(); ++i) { SAFE_DELETE(m_pSprite2Ds[i]); }

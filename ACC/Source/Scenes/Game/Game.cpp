@@ -11,7 +11,7 @@
 #include "Character/Player/Player.h"
 #include "Character/Enemy/Enemy.h"
 #include "Sprite/2D/UI/GameUI/GameUI.h"
-#include "Sprite/2D/UI/LoseUI/LoseUI.h"
+#include "Sprite/2D/UI/DefeatUI/DefeatUI.h"
 #include "Sprite/2D/UI/VictoryUI/VictoryUI.h"
 #include "Random/Random.h"
 #include "Easing/Easing.h"
@@ -38,7 +38,7 @@ Game::Game(HWND hWnd)
 	, m_pMeshLine			( nullptr )
 
 	, m_pWinUI				( nullptr )
-	, m_pLoseUI				( nullptr )
+	, m_pDefeatUI				( nullptr )
 
 	, m_HitKind				( 0 )
 	, m_CylinderMax			( 9 )
@@ -215,7 +215,7 @@ void Game::Update()
 	UIUpdate();
 
 	// 勝利や敗北画面が出現していない間
-	if (m_pLoseUI == nullptr && m_pWinUI == nullptr)
+	if (m_pDefeatUI == nullptr && m_pWinUI == nullptr)
 	{
 		// その他とカメラレイの判定(弾の到着地点に使用する)
 		RaytoObjeCol();
@@ -264,8 +264,8 @@ void Game::Draw()
 	D3DXVECTOR4 color = { 0.f,1.f,0.f,1.f };
 
 	// 柱の描画
-	for (auto& cylinder : m_pCylinders) { cylinder->Render(m_mView, m_mProj, m_Light); }
-	m_pFloor->Render(m_mView, m_mProj, m_Light);	// 地面の描画
+	for (auto& cylinder : m_pCylinders) { cylinder->Draw(m_mView, m_mProj, m_Light); }
+	m_pFloor->Draw(m_mView, m_mProj, m_Light);	// 地面の描画
 	m_pEnemy->Draw(m_mView, m_mProj, m_Light);	// 敵の描画
 
 	// ウォールハック起動中は敵のフレームを描画
@@ -284,7 +284,7 @@ void Game::Draw()
 	m_pGameUI->Draw();
 
 	// 勝利と敗北画面の描画
-	if (m_pLoseUI != nullptr) { m_pLoseUI->Draw(); }
+	if (m_pDefeatUI != nullptr) { m_pDefeatUI->Draw(); }
 	if (m_pWinUI != nullptr) { m_pWinUI->Draw(); }
 }
 
@@ -299,14 +299,14 @@ void Game::CollisionJudge()
 
 	// 柱データ取得
 	for (int i = 0; i < m_CylinderMax; ++i) {
-		Cylinder.SetVertex( m_pCylinders[i]->GetObjeInfo(), m_pCylinders[i]->GetVertices());
+		Cylinder.SetVertex( m_pCylinders[i]->GetObjectInfo(), m_pCylinders[i]->GetVertices());
 		Cylinders.push_back(Cylinder);
 	}
 
 	// 地面,プレイヤー,敵のデータ取得
-	Floor		.SetVertex( m_pFloor->GetObjeInfo(),	m_pFloor->GetVertices());
-	PlayerEgg	.SetVertex( m_pPlayer->GetObjeInfo(),	m_pEgg->GetVertices());
-	EnemyEgg	.SetVertex( m_pEnemy->GetObjeInfo(),	m_pEgg->GetVertices());
+	Floor		.SetVertex( m_pFloor->GetObjectInfo(),	m_pFloor->GetVertices());
+	PlayerEgg	.SetVertex( m_pPlayer->GetObjectInfo(),	m_pEgg->GetVertices());
+	EnemyEgg	.SetVertex( m_pEnemy->GetObjectInfo(),	m_pEgg->GetVertices());
 
 	// プレイヤーと敵の柱判定を取得用の変数を用意
 	CollisionPoints pointsPC, pointsEC;
@@ -614,12 +614,12 @@ void Game::RaytoObjeCol()
 void Game::UIUpdate()
 {
 	// プレイヤーがHP０の場合、もしくは地面抜けしていた場合、勝利UIを作成
-	if (m_pLoseUI == nullptr
+	if (m_pDefeatUI == nullptr
 	&& (m_pPlayer->GetCharaInfo().HP <= 0|| m_pPlayer->GetPos().y < -100.f)) 
 	{
 		// 敗北UIの作成
-		m_pLoseUI = std::make_unique<LoseUI>();
-		m_pLoseUI->Create();
+		m_pDefeatUI = std::make_unique<DefeatUI>();
+		m_pDefeatUI->Create();
 
 		// 敗北時の効果音を鳴らす
 		SoundManager::GetInstance()->Play(SoundManager::enList::SE_Lose);
@@ -638,7 +638,7 @@ void Game::UIUpdate()
 	}
 	
 	// 勝利や敗北画面の更新処理
-	if ( m_pLoseUI != nullptr )	{ m_pLoseUI->Update();	}
+	if ( m_pDefeatUI != nullptr )	{ m_pDefeatUI->Update();	}
 	if ( m_pWinUI  != nullptr )	{ m_pWinUI->Update();	}
 }
 

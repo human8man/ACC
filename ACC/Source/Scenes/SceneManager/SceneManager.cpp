@@ -215,7 +215,7 @@ void SceneManager::EndProcess()
 //-----------------------------------------------------------------------------
 //		’è”ˆ—
 //-----------------------------------------------------------------------------
-void SceneManager::ConstantProcess()
+void SceneManager::ConstantProcess() const
 {
 	BOOL isFullscreen = FALSE;
 	IDXGISwapChain* swappchain = DirectX11::GetInstance()->GetSwapChain();

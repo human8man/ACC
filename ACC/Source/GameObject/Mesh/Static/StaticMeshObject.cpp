@@ -34,7 +34,7 @@ void StaticMeshObject::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 	m_pMesh->SetScale( m_vScale );
 
 	//ƒŒƒ“ƒ_ƒŠƒ“ƒO
-	m_pMesh->Render( View, Proj, Light );
+	m_pMesh->Draw( View, Proj, Light );
 }
 
 

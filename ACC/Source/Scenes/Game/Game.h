@@ -18,7 +18,7 @@ class Character;
 class GameUI;
 class Random;
 class VictoryUI;
-class LoseUI;
+class DefeatUI;
 class EnemyFrame;
 
 
@@ -83,7 +83,7 @@ private:
 	// UI
 	std::unique_ptr<GameUI>	m_pGameUI;	// UIクラス
 	std::unique_ptr<VictoryUI>		m_pWinUI;	// 勝利クラス
-	std::unique_ptr<LoseUI>	m_pLoseUI;	// 敗北クラス
+	std::unique_ptr<DefeatUI>	m_pDefeatUI;	// 敗北クラス
 
 	std::vector<D3DXVECTOR3> m_SpawnPoints;	// スポーン地点配列
 

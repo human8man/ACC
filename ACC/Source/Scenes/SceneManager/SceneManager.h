@@ -43,7 +43,7 @@ private:
 	// 終了処理
 	void EndProcess();
 	// 定数処理
-	void ConstantProcess();
+	void ConstantProcess() const;
 	// ImGui処理
 	void ImGuiUpdate();
 	// シーン更新処理
