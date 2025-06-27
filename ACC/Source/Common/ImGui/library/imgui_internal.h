@@ -168,7 +168,7 @@ struct ImGuiWindowSettings;         // Storage for a window .ini settings (we ke
 
 // Enumerations
 // Use your programming IDE "Go to definition" facility on the names of the center columns to find the actual flags/enum lists
-enum ImGuiLocKey : int;                 // -> enum ImGuiLocKey              // Enum: a localization entry for translation
+enum ImGuiLoKey : int;                 // -> enum ImGuiLoKey              // Enum: a localization entry for translation
 typedef int ImGuiDataAuthority;         // -> enum ImGuiDataAuthority_      // Enum: for storing the source authority (dock node vs window) of a field
 typedef int ImGuiLayoutType;            // -> enum ImGuiLayoutType_         // Enum: Horizontal or vertical
 
@@ -1995,25 +1995,25 @@ struct ImGuiSettingsHandler
 //-----------------------------------------------------------------------------
 
 // This is experimental and not officially supported, it'll probably fall short of features, if/when it does we may backtrack
-enum ImGuiLocKey : int
+enum ImGuiLoKey : int
 {
-    ImGuiLocKey_VersionStr,
-    ImGuiLocKey_TableSizeOne,
-    ImGuiLocKey_TableSizeAllFit,
-    ImGuiLocKey_TableSizeAllDefault,
-    ImGuiLocKey_TableResetOrder,
-    ImGuiLocKey_WindowingMainMenuBar,
-    ImGuiLocKey_WindowingPopup,
-    ImGuiLocKey_WindowingUntitled,
-    ImGuiLocKey_DockingHideTabBar,
-    ImGuiLocKey_DockingHoldShiftToDock,
-    ImGuiLocKey_DockingDragToUndockOrMoveNode,
-    ImGuiLocKey_COUNT
+    ImGuiLoKey_VersionStr,
+    ImGuiLoKey_TableSizeOne,
+    ImGuiLoKey_TableSizeAllFit,
+    ImGuiLoKey_TableSizeAllDefault,
+    ImGuiLoKey_TableResetOrder,
+    ImGuiLoKey_WindowingMainMenuBar,
+    ImGuiLoKey_WindowingPopup,
+    ImGuiLoKey_WindowingUntitled,
+    ImGuiLoKey_DockingHideTabBar,
+    ImGuiLoKey_DockingHoldShiftToDock,
+    ImGuiLoKey_DockingDragToUndockOrMoveNode,
+    ImGuiLoKey_COUNT
 };
 
 struct ImGuiLocEntry
 {
-    ImGuiLocKey     Key;
+    ImGuiLoKey     Key;
     const char*     Text;
 };
 
@@ -2424,7 +2424,7 @@ struct ImGuiContext
     ImGuiID                             HookIdNext;             // Next available HookId
 
     // Localization
-    const char*             LocalizationTable[ImGuiLocKey_COUNT];
+    const char*             LocalizationTable[ImGuiLoKey_COUNT];
 
     // Capture/Logging
     bool                    LogEnabled;                         // Currently capturing
@@ -3345,7 +3345,7 @@ namespace ImGui
 
     // Localization
     IMGUI_API void          LocalizeRegisterEntries(const ImGuiLocEntry* entries, int count);
-    inline const char*      LocalizeGetMsg(ImGuiLocKey key) { ImGuiContext& g = *GImGui; const char* msg = g.LocalizationTable[key]; return msg ? msg : "*Missing Text*"; }
+    inline const char*      LocalizeGetMsg(ImGuiLoKey key) { ImGuiContext& g = *GImGui; const char* msg = g.LocalizationTable[key]; return msg ? msg : "*Missing Text*"; }
 
     // Scrolling
     IMGUI_API void          SetScrollX(ImGuiWindow* window, float scroll_x);

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Scenes/CSceneBase.h"
+#include "Scenes/SceneBase.h"
 #include "Sprite/2D/UI/UIObject.h"
-#include "DirectInput/CDirectInput.h"
+#include "DirectInput/DirectInput.h"
 
 
 class TitleUI

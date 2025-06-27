@@ -2,11 +2,11 @@
 
 #include "Sprite/2D/Sprite2D.h"
 #include "Sprite/3D/Sprite3D.h"
-#include "Singleton/CSingleton.h"
+#include "Singleton/Singleton.h"
 
 
 class CSpriteManager
-	: public CSingleton<CSpriteManager>
+	: public Singleton<CSpriteManager>
 {
 public:
 	using Sprite2D_map = std::unordered_map<std::string, std::shared_ptr<Sprite2D>>;
@@ -14,7 +14,7 @@ public:
 	using Sprite_List = std::vector<std::string>;
 
 public:
-	friend class CSingleton<CSpriteManager>;// シングルトンクラスをフレンド宣言
+	friend class Singleton<CSpriteManager>;// シングルトンクラスをフレンド宣言
 
 	CSpriteManager();
 	~CSpriteManager();

@@ -1,5 +1,5 @@
 #pragma once
-#include "Common/Singleton/CSingleton.h"
+#include "Common/Singleton/Singleton.h"
 #include "Common/ImGui/library/imgui.h"
 #include "Common/ImGui/library/imgui_impl_win32.h"
 #include "Common/ImGui/library/imgui_impl_dx11.h"
@@ -12,10 +12,10 @@ static UINT g_ResizeWidth, g_ResizeHeight;
 //		ImGuiクラス
 //=============================================================================
 class CImGui
-	: public CSingleton<CImGui>
+	: public Singleton<CImGui>
 {
 private:
-	friend class CSingleton<CImGui>; //シングルトンクラスをフレンド宣言
+	friend class Singleton<CImGui>; //シングルトンクラスをフレンド宣言
 	CImGui();
 	~CImGui();
 

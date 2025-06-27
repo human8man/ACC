@@ -4,7 +4,7 @@
 #pragma warning(disable:4005)
 
 // 前方宣言
-class CDirectX11;
+class DirectX11;
 
 
 class Sprite3D
@@ -110,7 +110,7 @@ public:
 	// スプライト情報をまとめたjsonファイルの作成
 	HRESULT CreateSpriteState(const std::string& FilePath);
 private:
-	CDirectX11*				m_pDx11;
+	DirectX11*				m_pDx11;
 	ID3D11Device*			m_pDevice11;
 	ID3D11DeviceContext*	m_pContext11;
 

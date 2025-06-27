@@ -1,11 +1,11 @@
 #include "Bullet.h"
-#include "Time/CTime.h"
+#include "Time/Time.h"
 
 
 Bullet::Bullet()
 	: m_MoveDirection	()
 	, m_MoveSpeed		()
-	, m_DeleteTime		( CTime::GetDeltaTime() * 70.f )
+	, m_DeleteTime		( Time::GetDeltaTime() * 70.f )
 {
 }
 Bullet::~Bullet()
@@ -18,8 +18,8 @@ Bullet::~Bullet()
 //============================================================================
 void Bullet::Update()
 {
-	m_DeleteTime -= CTime::GetDeltaTime() * CTime::GetTimeScale();
-	m_vPosition += m_MoveDirection * m_MoveSpeed * CTime::GetDeltaTime();
+	m_DeleteTime -= Time::GetDeltaTime() * Time::GetTimeScale();
+	m_vPosition += m_MoveDirection * m_MoveSpeed * Time::GetDeltaTime();
 }
 
 
@@ -28,5 +28,5 @@ void Bullet::Update()
 //============================================================================
 void Bullet::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 {
-	CStaticMeshObject::Draw( View, Proj, Light );
+	StaticMeshObject::Draw( View, Proj, Light );
 }

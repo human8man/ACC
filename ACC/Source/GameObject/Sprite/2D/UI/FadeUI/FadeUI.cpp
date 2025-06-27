@@ -1,6 +1,6 @@
 #include "FadeUI.h"
-#include "DirectX/CDirectX11.h"
-#include "DirectSound/CSoundManager.h"
+#include "DirectX/DirectX11.h"
+#include "DirectSound/SoundManager.h"
 #include "Sprite/2D/SpriteManager/SpriteManager.h"
 
 
@@ -77,7 +77,7 @@ void FadeUI::Update()
 	if (m_Peaking) {
 		if (m_PeakCnt > 0.f) {
 			m_FadeAlpha = 1.f; // ピーク中はアルファ固定
-			m_PeakCnt -= CTime::GetDeltaTime();
+			m_PeakCnt -= Time::GetDeltaTime();
 		}
 		else {
 			m_FadeAlpha -= m_OutAddAlpha;
@@ -151,7 +151,7 @@ void FadeUI::DoFade(int in, int peak, int out)
 		return;
 	}
 
-	m_PeakCnt = peak * CTime::GetNormalDeltaTime();
+	m_PeakCnt = peak * Time::GetNormalDeltaTime();
 	m_InAddAlpha = (in > 0) ? (1.f / in) : 0.f;
 	m_OutAddAlpha = (out > 0) ? (1.f / out) : 0.f;
 }

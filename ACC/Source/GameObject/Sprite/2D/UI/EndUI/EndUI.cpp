@@ -1,7 +1,7 @@
 ﻿#include "EndUI.h"
 
-#include "Scenes/SceneManager/CSceneManager.h"
-#include "DirectSound/CSoundManager.h"
+#include "Scenes/SceneManager/SceneManager.h"
+#include "DirectSound/SoundManager.h"
 #include "Sprite/2D/SpriteManager/SpriteManager.h"
 
 
@@ -55,8 +55,8 @@ void EndUI::Init()
 void EndUI::Update()
 {
 	// DInputの呼び出し
-	CMouse* Mouse = CInput::GetInstance()->CDMouse();
-	CKey* Key = CInput::GetInstance()->CDKeyboard();
+	Mouse* Mouse = DirectInput::GetInstance()->CDMouse();
+	Key* Key = DirectInput::GetInstance()->CDKeyboard();
 	
 	// マウス位置を取得
 	POINT MousePos;
@@ -83,7 +83,7 @@ void EndUI::Update()
 		{
 			//	前回選択されていなかった場合SEを鳴らす
 			if (m_pUIs[i]->GetPatternNo().x == 0) {
-				CSoundManager::GetInstance()->Play(CSoundManager::SE_SelectMove);
+				SoundManager::GetInstance()->Play(SoundManager::SE_SelectMove);
 			}
 			m_pUIs[i]->SetPatternNo(1, 0);
 		}

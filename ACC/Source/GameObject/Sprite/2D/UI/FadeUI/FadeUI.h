@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Sprite/2D/UI/UIObject.h"
-#include "Time/CTime.h"
+#include "Time/Time.h"
 
 
 class FadeUI

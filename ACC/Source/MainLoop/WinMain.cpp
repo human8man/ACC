@@ -1,5 +1,5 @@
-#include "CMain.h"
-#include "DirectX/CDirectX11.h"
+#include "Main.h"
+#include "DirectX/DirectX11.h"
 #include <crtdbg.h>	//_ASSERT_EXPR()で必要
 #include "MyMacro.h"
 
@@ -19,7 +19,7 @@ INT WINAPI WinMain(
 	_In_ PSTR lpCmdLine,
 	_In_ INT nCmdShow)
 {
-	CMain* pCMain = new CMain();	// 初期化＆クラス宣言
+	Main* pMain = new Main();	// 初期化＆クラス宣言
 
 	// UIEditorの場合はDEBUGモードに切り替え
 	Json m_SceneData = nullptr;
@@ -30,26 +30,26 @@ INT WINAPI WinMain(
 	ISDEBUG = true;
 #endif
 
-	if (pCMain != nullptr)
+	if (pMain != nullptr)
 	{
 		// ウィンドウ作成成功したら
 		if( SUCCEEDED(
-			pCMain->InitWindow(
+			pMain->InitWindow(
 				hInstance,
 				0, 0,
 				WND_W, WND_H)))
 		{
 			// Dx11用の初期化
-			if( SUCCEEDED( pCMain->Create() ))
+			if( SUCCEEDED( pMain->Create() ))
 			{
 				// メッセージループ
-				pCMain->Loop();
+				pMain->Loop();
 			}
 		}
 		// 終了
-		pCMain->Release();	// Direct3Dの解放
+		pMain->Release();	// Direct3Dの解放
 
-		SAFE_DELETE( pCMain );	// クラスの破棄
+		SAFE_DELETE( pMain );	// クラスの破棄
 	}
 
 	return 0;

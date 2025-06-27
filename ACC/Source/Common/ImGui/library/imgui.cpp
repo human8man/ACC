@@ -3664,17 +3664,17 @@ void ImGui::DestroyContext(ImGuiContext* ctx)
 // IMPORTANT: ###xxx suffixes must be same in ALL languages
 static const ImGuiLocEntry GLocalizationEntriesEnUS[] =
 {
-    { ImGuiLocKey_VersionStr,           "Dear ImGui " IMGUI_VERSION " (" IM_STRINGIFY(IMGUI_VERSION_NUM) ")" },
-    { ImGuiLocKey_TableSizeOne,         "Size column to fit###SizeOne"          },
-    { ImGuiLocKey_TableSizeAllFit,      "Size all columns to fit###SizeAll"     },
-    { ImGuiLocKey_TableSizeAllDefault,  "Size all columns to default###SizeAll" },
-    { ImGuiLocKey_TableResetOrder,      "Reset order###ResetOrder"              },
-    { ImGuiLocKey_WindowingMainMenuBar, "(Main menu bar)"                       },
-    { ImGuiLocKey_WindowingPopup,       "(Popup)"                               },
-    { ImGuiLocKey_WindowingUntitled,    "(Untitled)"                            },
-    { ImGuiLocKey_DockingHideTabBar,    "Hide tab bar###HideTabBar"             },
-    { ImGuiLocKey_DockingHoldShiftToDock,       "Hold SHIFT to enable Docking window."  },
-    { ImGuiLocKey_DockingDragToUndockOrMoveNode,"Click and drag to move or undock whole node."    },
+    { ImGuiLoKey_VersionStr,           "Dear ImGui " IMGUI_VERSION " (" IM_STRINGIFY(IMGUI_VERSION_NUM) ")" },
+    { ImGuiLoKey_TableSizeOne,         "Size column to fit###SizeOne"          },
+    { ImGuiLoKey_TableSizeAllFit,      "Size all columns to fit###SizeAll"     },
+    { ImGuiLoKey_TableSizeAllDefault,  "Size all columns to default###SizeAll" },
+    { ImGuiLoKey_TableResetOrder,      "Reset order###ResetOrder"              },
+    { ImGuiLoKey_WindowingMainMenuBar, "(Main menu bar)"                       },
+    { ImGuiLoKey_WindowingPopup,       "(Popup)"                               },
+    { ImGuiLoKey_WindowingUntitled,    "(Untitled)"                            },
+    { ImGuiLoKey_DockingHideTabBar,    "Hide tab bar###HideTabBar"             },
+    { ImGuiLoKey_DockingHoldShiftToDock,       "Hold SHIFT to enable Docking window."  },
+    { ImGuiLoKey_DockingDragToUndockOrMoveNode,"Click and drag to move or undock whole node."    },
 };
 
 void ImGui::Initialize()
@@ -13597,12 +13597,12 @@ static void ImGui::NavUpdateWindowing()
 static const char* GetFallbackWindowNameForWindowingList(ImGuiWindow* window)
 {
     if (window->Flags & ImGuiWindowFlags_Popup)
-        return ImGui::LocalizeGetMsg(ImGuiLocKey_WindowingPopup);
+        return ImGui::LocalizeGetMsg(ImGuiLoKey_WindowingPopup);
     if ((window->Flags & ImGuiWindowFlags_MenuBar) && strcmp(window->Name, "##MainMenuBar") == 0)
-        return ImGui::LocalizeGetMsg(ImGuiLocKey_WindowingMainMenuBar);
+        return ImGui::LocalizeGetMsg(ImGuiLoKey_WindowingMainMenuBar);
     if (window->DockNodeAsHost)
         return "(Dock node)"; // Not normally shown to user
-    return ImGui::LocalizeGetMsg(ImGuiLocKey_WindowingUntitled);
+    return ImGui::LocalizeGetMsg(ImGuiLoKey_WindowingUntitled);
 }
 
 // Overlay displayed when using CTRL+TAB. Called by EndFrame()
@@ -17297,7 +17297,7 @@ void ImGui::DockNodeWindowMenuHandler_Default(ImGuiContext* ctx, ImGuiDockNode* 
     if (tab_bar->Tabs.Size == 1)
     {
         // "Hide tab bar" option. Being one of our rare user-facing string we pull it from a table
-        if (MenuItem(LocalizeGetMsg(ImGuiLocKey_DockingHideTabBar), NULL, node->IsHiddenTabBar()))
+        if (MenuItem(LocalizeGetMsg(ImGuiLoKey_DockingHideTabBar), NULL, node->IsHiddenTabBar()))
             node->WantHiddenTabBarToggle = true;
     }
     else
@@ -17481,7 +17481,7 @@ static void ImGui::DockNodeUpdateTabBar(ImGuiDockNode* node, ImGuiWindow* host_w
         if (IsItemActive())
             focus_tab_id = tab_bar->SelectedTabId;
         if (IsItemHovered(ImGuiHoveredFlags_ForTooltip | ImGuiHoveredFlags_DelayNormal) && g.HoveredIdTimer > 0.5f)
-            SetTooltip("%s", LocalizeGetMsg(ImGuiLocKey_DockingDragToUndockOrMoveNode));
+            SetTooltip("%s", LocalizeGetMsg(ImGuiLoKey_DockingDragToUndockOrMoveNode));
     }
 
     // If multiple tabs are appearing on the same frame, sort them based on their persistent DockOrder value
@@ -19248,7 +19248,7 @@ void ImGui::BeginDockableDragDropSource(ImGuiWindow* window)
         // (because of the 'is_mouse_dragging_with_an_expected_destination' logic in UpdateViewportsNewFrame() function)
         IM_ASSERT(g.NextWindowData.Flags == 0);
         if (g.IO.ConfigDockingWithShift && g.MouseStationaryTimer >= 1.0f && g.ActiveId >= 1.0f)
-            SetTooltip("%s", LocalizeGetMsg(ImGuiLocKey_DockingHoldShiftToDock));
+            SetTooltip("%s", LocalizeGetMsg(ImGuiLoKey_DockingHoldShiftToDock));
         return;
     }
 
