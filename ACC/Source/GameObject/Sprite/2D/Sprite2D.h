@@ -8,7 +8,7 @@
 #define ALIGN16	_declspec( align(16) )
 
 // ‘O•ûéŒ¾
-class CDirectX11;
+class DirectX11;
 
 
 class Sprite2D
@@ -157,7 +157,7 @@ public:
 	// ‰æ‘œî•ñ‚ğæ“¾
 	SPRITE_STATE GetSpriteData()const { return m_SpriteState; }
 private:
-	CDirectX11*				m_pDx11;
+	DirectX11*				m_pDx11;
 	ID3D11Device*			m_pDevice11;
 	ID3D11DeviceContext*	m_pContext11;
 

@@ -1,5 +1,5 @@
 #include "Sprite2D.h"
-#include "DirectX/CDirectX11.h"
+#include "DirectX/DirectX11.h"
 #include "FileManager/LoadImage/LoadImage.h"
 #include "FileManager/FileManager.h"
 #include <string>
@@ -50,7 +50,7 @@ Sprite2D::~Sprite2D()
 //=============================================================================
 HRESULT Sprite2D::Init(const std::string& lpFileName)
 {
-	m_pDx11 = CDirectX11::GetInstance();
+	m_pDx11 = DirectX11::GetInstance();
 	m_pDevice11 = m_pDx11->GetDevice();
 	m_pContext11 = m_pDx11->GetContext();
 
@@ -375,7 +375,7 @@ void Sprite2D::Render()
 	// 重要: 拡縮行列 * 回転行列 * 平行行列
 	mWorld = mPivot * mScale * mRot * mUnpivot * mTrans;
 
-	m_pContext11 = CDirectX11::GetInstance()->GetContext();
+	m_pContext11 = DirectX11::GetInstance()->GetContext();
 
 	// 使用するシェーダの登録
 	m_pContext11->VSSetShader( m_pVertexShader, nullptr, 0 );

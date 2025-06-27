@@ -1,9 +1,9 @@
 #include "TitleUI.h"
 
-#include "Scenes/SceneManager/CSceneManager.h"
+#include "Scenes/SceneManager/SceneManager.h"
 #include "Sprite/2D/UI/UIObject.h"
-#include "DirectSound/CSoundManager.h"
-#include "Time/CTime.h"
+#include "DirectSound/SoundManager.h"
+#include "Time/Time.h"
 #include "FileManager/FileManager.h"
 #include "Sprite/2D/SpriteManager/SpriteManager.h"
 
@@ -60,8 +60,8 @@ void TitleUI::Init()
 //=================================================================================================
 void TitleUI::Update()
 {
-	CMouse*	Mouse	= CInput::GetInstance()->CDMouse();
-	CKey*	Key		= CInput::GetInstance()->CDKeyboard();
+	Mouse*	Mouse	= DirectInput::GetInstance()->CDMouse();
+	Key*	Key		= DirectInput::GetInstance()->CDKeyboard();
 	
 	// マウス位置を取得
 	POINT MousePos;
@@ -82,7 +82,7 @@ void TitleUI::Update()
 		{
 			//	前回選択されていなかった場合SEを鳴らす
 			if ( m_pUIs[i]->GetPatternNo().x == 0 ) {
-				CSoundManager::GetInstance()->Play(CSoundManager::SE_SelectMove);
+				SoundManager::GetInstance()->Play(SoundManager::SE_SelectMove);
 			}
 			m_pUIs[i]->SetPatternNo(1, 0);
 		}

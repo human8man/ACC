@@ -1,8 +1,8 @@
 #include "GameUI.h"
 
-#include "DirectX/CDirectX11.h"
-#include "DirectSound/CSoundManager.h"
-#include "Time/CTime.h"
+#include "DirectX/DirectX11.h"
+#include "DirectSound/SoundManager.h"
+#include "Time/Time.h"
 #include "FileManager/FileManager.h"
 #include "Sprite/2D/SpriteManager/SpriteManager.h"
 #include "Easing/Easing.h"
@@ -23,7 +23,7 @@ GameUI::GameUI()
 	, m_ReloadTime		( 0.f )
 	, m_ReloadTimeMax	( 0.f )
 	, m_ViewHitTime		( 0.f )
-	, m_ViewHitTimeMax	( CTime::GetDeltaTime() * 60.f )
+	, m_ViewHitTimeMax	( Time::GetDeltaTime() * 60.f )
 	, m_AutoAim			( false )
 	, m_Homing			( false )
 	, m_WallHack		( false )
@@ -31,23 +31,23 @@ GameUI::GameUI()
 	, m_Slow			( false )
 	
 	, m_CrosshairEase		( 0.f )
-	, m_CrosshairEaseMax	( CTime::GetDeltaTime() * 150.f )
+	, m_CrosshairEaseMax	( Time::GetDeltaTime() * 150.f )
 	, m_CrosshairRot		( 0.f )
 
 	, m_HPRate				( 1.f )
 	, m_DamageEase			( 0.f )
-	, m_DamageEaseMax		( CTime::GetDeltaTime() * 500.f )
+	, m_DamageEaseMax		( Time::GetDeltaTime() * 500.f )
 
 	, m_PlayerDamage			( false )
 	, m_ChangedRed				( false )
 	, m_HitEffectColor			( 1.f )
 	, m_HitEffectAlpha			( 0.f )
 	, m_HitEffectTime			( 0.f )
-	, m_HitEffectTimeMax		( CTime::GetDeltaTime() * 30.f)
+	, m_HitEffectTimeMax		( Time::GetDeltaTime() * 30.f)
 	, m_HitEffectChangeTime		( 0.f )
-	, m_HitEffectChangeTimeMax	( CTime::GetDeltaTime() * 10.f )
+	, m_HitEffectChangeTimeMax	( Time::GetDeltaTime() * 10.f )
 	, m_HitEffectDeleteTime		( 0.f )
-	, m_HitEffectDeleteTimeMax	( CTime::GetDeltaTime() * 50.f )
+	, m_HitEffectDeleteTimeMax	( Time::GetDeltaTime() * 50.f )
 {
 	// キャラクターCSVの情報保存用
 	std::unordered_map<std::string, std::string> m_StateList;
@@ -57,7 +57,7 @@ GameUI::GameUI()
 	// 空でない場合は、外部で調整するべき変数の値を入れていく
 	if (!m_StateList.empty())
 	{
-		m_ViewHitTimeMax = StrToFloat(m_StateList["Game_HitViewTime"]) * CTime::GetInstance()->GetDeltaTime();
+		m_ViewHitTimeMax = StrToFloat(m_StateList["Game_HitViewTime"]) * Time::GetInstance()->GetDeltaTime();
 	}
 }
 GameUI::~GameUI()
@@ -78,12 +78,12 @@ void GameUI::Create()
 //=================================================================================================
 //		更新
 //=================================================================================================
-void GameUI::Update(std::unique_ptr<CPlayer>& chara)
+void GameUI::Update(std::unique_ptr<Player>& chara)
 {
 	// カウントを回す
-	if ( m_ViewHitTime >= 0.f ) { m_ViewHitTime -= CTime::GetDeltaTime(); }
-	if ( m_DamageEase <= m_DamageEaseMax ) { m_DamageEase += CTime::GetDeltaTime(); }
-	if ( m_CrosshairEase <= m_CrosshairEaseMax ) { m_CrosshairEase += CTime::GetDeltaTime(); }
+	if ( m_ViewHitTime >= 0.f ) { m_ViewHitTime -= Time::GetDeltaTime(); }
+	if ( m_DamageEase <= m_DamageEaseMax ) { m_DamageEase += Time::GetDeltaTime(); }
+	if ( m_CrosshairEase <= m_CrosshairEaseMax ) { m_CrosshairEase += Time::GetDeltaTime(); }
 	
 		
 	// プレイヤーの攻撃が命中していた場合
@@ -212,11 +212,11 @@ void GameUI::InitHiteffect()
 	m_HitEffectColor	= 1.f;
 	m_HitEffectAlpha	= 0.f;
 	m_HitEffectTime			= 0.f;
-	m_HitEffectTimeMax		= CTime::GetDeltaTime() * 10.f;
+	m_HitEffectTimeMax		= Time::GetDeltaTime() * 10.f;
 	m_HitEffectChangeTime		= 0.f;
-	m_HitEffectChangeTimeMax	= CTime::GetDeltaTime() * 10.f;
+	m_HitEffectChangeTimeMax	= Time::GetDeltaTime() * 10.f;
 	m_HitEffectDeleteTime		= 0.f;
-	m_HitEffectDeleteTimeMax	= CTime::GetDeltaTime() * 15.f ;
+	m_HitEffectDeleteTimeMax	= Time::GetDeltaTime() * 15.f ;
 }
 
 
@@ -231,13 +231,13 @@ void GameUI::Hiteffect(UIObject* object)
 	// 変色前
 	if (!m_ChangedRed)
 	{
-		m_HitEffectTime += CTime::GetDeltaTime();
+		m_HitEffectTime += Time::GetDeltaTime();
 		// 透過無しにする
 		m_HitEffectAlpha = MyEasing::OutExpo(m_HitEffectTime, m_HitEffectTimeMax,m_HitEffectAlpha, goalalpha);
 		// 透過でない場合
 		if (goalalpha <= m_HitEffectAlpha) {
 			// 赤以外の色要素を消す
-			m_HitEffectChangeTime += CTime::GetDeltaTime();
+			m_HitEffectChangeTime += Time::GetDeltaTime();
 			m_HitEffectColor = MyEasing::OutExpo(m_HitEffectChangeTime, m_HitEffectChangeTimeMax, m_HitEffectColor, 0.f);
 			// 完了時にフラグを立てる
 			if (m_HitEffectColor <= 0.f) { m_ChangedRed = true; }
@@ -245,7 +245,7 @@ void GameUI::Hiteffect(UIObject* object)
 	}
 	else {
 		// エフェクト事態を透過
-		m_HitEffectDeleteTime += CTime::GetDeltaTime();
+		m_HitEffectDeleteTime += Time::GetDeltaTime();
 		m_HitEffectAlpha = MyEasing::OutExpo(m_HitEffectDeleteTime, m_HitEffectDeleteTimeMax, m_HitEffectAlpha, 0.f);
 		if (m_HitEffectAlpha <= 0.f) { m_PlayerDamage = 0.f; }
 	}

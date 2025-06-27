@@ -1,9 +1,9 @@
 #include "VictoryUI.h"
 
-#include "Scenes/SceneManager/CSceneManager.h"
+#include "Scenes/SceneManager/SceneManager.h"
 #include "Sprite/2D/UI/UIObject.h"
-#include "DirectSound/CSoundManager.h"
-#include "Time/CTime.h"
+#include "DirectSound/SoundManager.h"
+#include "Time/Time.h"
 #include "FileManager/FileManager.h"
 #include "Sprite/2D/SpriteManager/SpriteManager.h"
 
@@ -16,7 +16,7 @@ namespace {
 
 
 VictoryUI::VictoryUI()
-	: m_SpawnTimeMax	( CTime::GetInstance()->GetDeltaTime() * 300.f )
+	: m_SpawnTimeMax	( Time::GetInstance()->GetDeltaTime() * 300.f )
 	, m_SpawnTime		( m_SpawnTimeMax )
 {
 	// キャラクターCSVの情報保存用
@@ -27,7 +27,7 @@ VictoryUI::VictoryUI()
 	// 空でない場合は、外部で調整するべき変数の値を入れていく
 	if (!m_StateList.empty())
 	{
-		m_SpawnTimeMax = StrToFloat(m_StateList["Win_SpawnTimeMax"]) * CTime::GetInstance()->GetDeltaTime();
+		m_SpawnTimeMax = StrToFloat(m_StateList["Win_SpawnTimeMax"]) * Time::GetInstance()->GetDeltaTime();
 	}
 }
 VictoryUI::~VictoryUI()
@@ -67,7 +67,7 @@ void VictoryUI::Init()
 //=============================================================================
 void VictoryUI::Update()
 {
-	if (m_SpawnTime >= 0) { m_SpawnTime -= CTime::GetInstance()->GetDeltaTime(); }
+	if (m_SpawnTime >= 0) { m_SpawnTime -= Time::GetInstance()->GetDeltaTime(); }
 
 	//----------------------------------------------------------------------------
 	//		それぞれのUIの更新
@@ -80,8 +80,8 @@ void VictoryUI::Update()
 		// 出現時間が終了した場合
 		if( m_SpawnTime < 0.f ) {
 			// タイトル画面に遷移
-			CSceneManager::GetInstance()->LoadScene(SceneList::Title);
-			CSoundManager::GetInstance()->AllStop();
+			SceneManager::GetInstance()->LoadScene(SceneList::eTitle);
+			SoundManager::GetInstance()->AllStop();
 		}
 	}
 }

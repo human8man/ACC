@@ -1,5 +1,5 @@
 #include "Sprite3D.h"
-#include "DirectX/CDirectX11.h"
+#include "DirectX/DirectX11.h"
 #include "FileManager/LoadImage/LoadImage.h"
 #include "FileManager/FileManager.h"
 
@@ -47,7 +47,7 @@ Sprite3D::~Sprite3D()
 //=============================================================================
 HRESULT Sprite3D::Init(const std::string& lpFileName)
 {
-	m_pDx11 = CDirectX11::GetInstance();
+	m_pDx11 = DirectX11::GetInstance();
 	m_pDevice11 = m_pDx11->GetDevice();
 	m_pContext11 = m_pDx11->GetContext();
 

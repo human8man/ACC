@@ -1,7 +1,7 @@
 #include "CImGui.h"
 #include "Psapi.h"
 #include "library/imgui_internal.h"
-#include "DirectX/CDirectX11.h"
+#include "DirectX/DirectX11.h"
 
 // ImGui‚ðÈ—ª
 using namespace ImGui;
@@ -69,7 +69,7 @@ void CImGui::Create(HWND hwnd)
 
 	// Setup Platform/Renderer backends
 	ImGui_ImplWin32_Init(hwnd);
-	ImGui_ImplDX11_Init(CDirectX11::GetInstance()->GetDevice(), CDirectX11::GetInstance()->GetContext());
+	ImGui_ImplDX11_Init(DirectX11::GetInstance()->GetDevice(), DirectX11::GetInstance()->GetContext());
 
 }
 

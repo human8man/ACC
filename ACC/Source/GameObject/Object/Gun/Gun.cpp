@@ -24,7 +24,7 @@ void Gun::Update()
 void Gun::Draw(D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light)
 {
 	// オブジェクトの描画
-	CStaticMeshObject::Draw( View, Proj, Light );
+	StaticMeshObject::Draw( View, Proj, Light );
 }
 
 

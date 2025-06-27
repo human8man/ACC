@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Sprite/2D/UI/UIObject.h"
-#include "Character/Player/CPlayer.h"
+#include "Character/Player/Player.h"
 
 
 class GameUI
@@ -14,7 +14,7 @@ public:
 	// ì¬ˆ—
 	void Create();
 	// XVˆ—
-	void Update(std::unique_ptr<CPlayer>& chara);
+	void Update(std::unique_ptr<Player>& chara);
 	// •`‰æˆ—
 	void Draw(); 
 	// ‰ğ•úˆ—

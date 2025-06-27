@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Mesh/Static/CStaticMeshObject.h"
+#include "Mesh/Static/StaticMeshObject.h"
 
 
 class Gun
-	: public CStaticMeshObject
+	: public StaticMeshObject
 {
 public:
 	Gun();

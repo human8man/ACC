@@ -1,5 +1,5 @@
 #include "UIObject.h"
-#include "DirectX/CDirectX11.h"
+#include "DirectX/DirectX11.h"
 #include "Sprite/2D/SpriteManager/SpriteManager.h"
 #include "FileManager/FileManager.h"
 
@@ -43,10 +43,10 @@ void UIObject::Draw()
 	m_pSprite->SetPatternNo( m_PatternNo.x, m_PatternNo.y );
 
 
-	CDirectX11::GetInstance()->SetDepth(false);
+	DirectX11::GetInstance()->SetDepth(false);
 	// ƒŒƒ“ƒ_ƒŠƒ“ƒO
 	m_pSprite->Render();
-	CDirectX11::GetInstance()->SetDepth(true);
+	DirectX11::GetInstance()->SetDepth(true);
 }
 
 
