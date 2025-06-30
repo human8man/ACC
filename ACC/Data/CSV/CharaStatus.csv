@@ -28,10 +28,12 @@ GunRotRevision,-1.5
 GunPosRevision,-30.0
 // リロードにかかる時間{120.0}
 ReloadTimeMax,120.0
-// コッキング時間{20.0}
+// コッキング最大時間{20.0}
 BulletCoolTimeMax,20.0
-// 弾速{180.0}
-BulletSpeed,180.0
+// コッキング最小時間{4.0}
+BulletCoolTimeMax,4.0
+// 弾速{4.0}
+BulletSpeed,4.0
 
 // キャラのジャンプ力{25.0}
 JumpPowerMax,25.0

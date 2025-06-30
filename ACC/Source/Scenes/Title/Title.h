@@ -5,7 +5,7 @@
 #include "Sprite/2D/UI/UIObject.h"
 #include "DirectInput/DirectInput.h"
 
-// 前方宣言
+
 class UIObject;
 class StaticMesh;
 class TitleUI;
@@ -29,7 +29,7 @@ private:
 	D3DXMATRIX	m_mView;
 	D3DXMATRIX	m_mProj;
 
-	std::unique_ptr<TitleUI>	m_pTitleUI;	// UIクラス
+	std::unique_ptr<TitleUI>	m_pTitleUI;
 	StaticMesh* m_pEgg;	// 卵
 
 	bool m_Start;	// ゲーム開始フラグ

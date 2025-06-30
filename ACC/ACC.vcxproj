@@ -306,6 +306,7 @@
     <ClCompile Include="Source\GameObject\Sprite\2D\UI\EndUI\EndUI.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\2D\UI\GameUI\GameUI.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\2D\UI\DefeatUI\DefeatUI.cpp" />
+    <ClCompile Include="Source\GameObject\Sprite\2D\UI\NumberUI\NumberUI.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\2D\UI\TitleUI\TitleUI.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\2D\UI\FadeUI\FadeUI.cpp" />
     <ClCompile Include="Source\GameObject\Sprite\2D\UI\UIObject.cpp" />
@@ -371,6 +372,7 @@
     <ClInclude Include="Source\GameObject\Sprite\2D\UI\EndUI\EndUI.h" />
     <ClInclude Include="Source\GameObject\Sprite\2D\UI\GameUI\GameUI.h" />
     <ClInclude Include="Source\GameObject\Sprite\2D\UI\DefeatUI\DefeatUI.h" />
+    <ClInclude Include="Source\GameObject\Sprite\2D\UI\NumberUI\NumberUI.h" />
     <ClInclude Include="Source\GameObject\Sprite\2D\UI\TitleUI\TitleUI.h" />
     <ClInclude Include="Source\GameObject\Sprite\2D\UI\FadeUI\FadeUI.h" />
     <ClInclude Include="Source\GameObject\Sprite\2D\UI\UIObject.h" />

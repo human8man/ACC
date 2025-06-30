@@ -33,7 +33,7 @@ Game::Game(HWND hWnd)
 	, m_pCylinders			()
 	
 	, m_pPlayer				( nullptr )
-	, m_EnemyCount			( 30 )
+	, m_EnemyCount			( ENEMY_COUNT )
 	, m_pEnemies			( )
 
 	, m_pCamRay				( nullptr )
