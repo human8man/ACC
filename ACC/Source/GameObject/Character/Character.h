@@ -38,18 +38,20 @@ public:
 	// HPをクリティカルダメージ分減らす
 	void CritDamage();
 
+	// 最終移動時のベクトルを渡す
+	D3DXVECTOR3 GetMoveVec();
+	RAY GetRayY()			const { return *m_pRayY; }
+	float GetReloadTime()	const { return m_ReloadTime; }
+	float GetReloadTimeMax()const { return m_ReloadTimeMax; }
+	float GetEggAirRoomY()	const { return m_EggAirRoomY; }
+	CROSSRAY GetCrossRay()	const { return *m_pCrossRay; }
+	CharaInfo GetCharaInfo()const { return m_CharaInfo; }
+	bool GetDamage()		const{ return m_Damage; }
+	bool GetCanJump()		const{ return m_CanJump; }
+	bool GetLanding()		const{ return m_Landing; }
+	void SetLanding(bool flag)	{ m_Landing = flag; }
 
-	D3DXVECTOR3 GetMoveVec();	// 最終移動ベクトルを渡す
-	RAY GetRayY()			const { return *m_pRayY; }		// Y軸方向へ伸ばしたレイを取得
-	float GetReloadTime()	const { return m_ReloadTime; }	// リロード時間を返す
-	float GetReloadTimeMax()const { return m_ReloadTimeMax; }// リロード最大時間を返す
-	CROSSRAY GetCrossRay()	const { return *m_pCrossRay; }	// 十字レイを取得
-	CharaInfo GetCharaInfo()const { return m_CharaInfo; }	// キャラの情報を取得
-	bool GetDamage()		const{ return m_Damage; }		// ダメージを受けたかを取得
-	bool GetCanJump()		const{ return m_CanJump; }		// ジャンプ可能かを取得
-	bool GetLanding()		const{ return m_Landing; }		// 着地中かを取得
-	void SetLanding(bool flag)	{ m_Landing = flag; }		// 着地中かを設定
-
+	std::vector<std::unique_ptr<Bullet>>& GetBullets()	{ return m_pBullets; }
 protected:
 	std::unique_ptr<RAY>		m_pRayY;		// Y方向へ伸ばしたレイ
 	std::unique_ptr<CROSSRAY>	m_pCrossRay;	// 十字（前後左右に伸ばした）レイ

@@ -33,7 +33,7 @@ Game::Game(HWND hWnd)
 	, m_pCylinders			()
 	
 	, m_pPlayer				( nullptr )
-	, m_EnemyCount			( 3 )
+	, m_EnemyCount			( 15 )
 	, m_pEnemies			( )
 
 	, m_pCamRay				( nullptr )
@@ -67,11 +67,12 @@ void Game::Create()
 	m_pEgg			= std::make_unique<StaticMesh>();
 	m_pFloor		= std::make_unique<StaticMesh>();
 	m_pPlayer		= std::make_unique<Player>();
-	for (int i = 0; i < m_EnemyCount;++i) { m_pEnemies.push_back(std::move(std::make_unique<Enemy>())); }
+	for (int i = 0; i < m_EnemyCount;++i) { m_pEnemies.push_back(std::make_unique<Enemy>()); }
 	m_pCamRay		= std::make_unique<Ray>();
 	m_pMeshLine		= std::make_unique<MeshLine>();
 	m_pGameUI		= std::make_unique<GameUI>();
 	m_pGameUI		->Create();
+	m_pCollisionManager = std::make_unique<CollisionManager>();
 
 	// スポーン地点の設定
 	m_SpawnPoints = {
@@ -221,19 +222,12 @@ void Game::Update()
 	// 勝利や敗北画面が出現していない間
 	if (m_pDefeatUI == nullptr && m_pWinUI == nullptr)
 	{
-		float minDistSq = FLT_MAX; // 一番小さい距離の初期値
 		for (size_t i = 0; i < m_pEnemies.size();++i) {
 			m_pEnemies[i]->Update(m_pPlayer); // エネミーの更新
-
-			const D3DXVECTOR3& enemyPos = m_pEnemies[i]->GetPos();
-			D3DXVECTOR3 diff = enemyPos - m_pPlayer->GetPos();
-			float distSq = D3DXVec3LengthSq(&diff); // 距離の2乗
-
-			if (distSq < minDistSq) {
-				minDistSq = distSq;
-				m_NearEnemyIndex = static_cast<int>(i);
-			}
 		}
+		m_NearEnemyIndex = m_pCollisionManager->FindNearestVisibleEnemy(
+			m_pEnemies,
+			m_pCylinders);
 		m_pPlayer->Update(m_pEnemies[m_NearEnemyIndex]); // プレイヤーの更新
 
 		Camera::GetInstance()->Update(); // カメラの更新
@@ -286,6 +280,9 @@ void Game::Update()
 	Time::GetInstance()->SetTimeScale(m_SlowScale);
 	if (m_pEnemies.empty()) { return; }
 	ImGui::Begin("enemies window");
+	char indexlabel[32];
+	sprintf_s(indexlabel, "NearEnemyIndex %d", m_NearEnemyIndex);
+	ImGui::Text(indexlabel);
 	for (size_t i = 0; i < m_pEnemies.size(); ++i) {
 		// ユニークラベル作成
 		char label[32];
@@ -349,7 +346,7 @@ void Game::InitEPPos(Random& random,
 	player->SetPos(m_SpawnPoints[PIndex]);
 
 	// 敵のスポーンポイントをプレイヤーと異なる場所にする
-	int EIndex, countIndex;
+	int EIndex;
 	for (int i = 0;i < m_pEnemies.size(); ++i) {
 		do {
 			EIndex = random.GetRandomInt(0, static_cast<int> (m_SpawnPoints.size()) - 1);

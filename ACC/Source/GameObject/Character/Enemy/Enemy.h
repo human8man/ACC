@@ -27,9 +27,6 @@ public:
 	void Update(std::unique_ptr<Player>& chara);
 	// 描画処理
 	void Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light );
-	
-	// 当たり判定処理(プレイヤー、床、柱)
-	void Collision(std::unique_ptr<Player>& egg, Collider floor, Collider cylinder);
 
 	// 外的なベクトルの追加
 	void AddVec(D3DXVECTOR3 vec) { m_vPosition += vec; }
