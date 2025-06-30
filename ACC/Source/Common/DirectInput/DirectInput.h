@@ -19,8 +19,8 @@ private:
 
 	static constexpr int Button_MAX = 256;
 public:
-	bool IsKeyDown(int key)	  const { return m_KeyState[key];  } // 入力中の判定を返す
-	bool IsKeyAction(int key) const { return m_KeyAction[key]; } // 入力時の判定を返す
+	bool IsKeyDown(int key)	  const { return m_KeyState[key];  }
+	bool IsKeyAction(int key) const { return m_KeyAction[key]; }
 	
 	bool Init(Key& Key, IDirectInput8* pDInput, HWND hWnd);
 private:

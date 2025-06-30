@@ -2,7 +2,7 @@
   "Alpha": 1.0,
   "Base": {
     "h": 64.0,
-    "w": 480.0
+    "w": 320.0
   },
   "Color": {
     "x": 1.0,
@@ -11,9 +11,9 @@
   },
   "Disp": {
     "h": 64.0,
-    "w": 48.0
+    "w": 320.0
   },
-  "FilePath": "Data\\Texture\\Other\\Number.json",
+  "FilePath": "Data\\Texture\\Title\\EnemyCount.json",
   "Pivot": {
     "x": 0.0,
     "y": 0.0,
@@ -36,6 +36,6 @@
   },
   "Stride": {
     "h": 64.0,
-    "w": 48.0
+    "w": 320.0
   }
 }

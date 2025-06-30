@@ -19,7 +19,7 @@ Bullet::~Bullet()
 void Bullet::Update()
 {
 	m_DeleteTime -= Time::GetDeltaTime() * Time::GetTimeScale();
-	m_vPosition += m_MoveDirection * m_MoveSpeed * Time::GetDeltaTime();
+	m_vPosition += m_MoveDirection * m_MoveSpeed;
 }
 
 

@@ -34,7 +34,7 @@ Character::Character()
 	, m_BulletCoolTime		( 0.f )
 	, m_BulletCoolTimeMax	( Time::GetDeltaTime() * 20.f )
 	, m_BulletCoolTimeMin	( Time::GetDeltaTime() * 2.f )
-	, m_BulletSpeed			( 180.f )
+	, m_BulletSpeed			( Time::GetDeltaTime() * 4.f )
 	, m_CanShot				( true )
 
 	, m_JumpPower			( 0.f )
