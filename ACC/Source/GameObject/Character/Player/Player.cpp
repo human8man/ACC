@@ -24,6 +24,7 @@ Player::Player()
 	, m_WallHack	( false )
 	, m_TriggerHappy( false )
 	, m_Invincible	( false )
+	, m_ThroughWall	( false )
 {
 	// 初期化
 	m_CharaInfo.HP = m_CharaInfo.MaxHP;
@@ -186,6 +187,7 @@ void Player::KeyInput(std::unique_ptr<Enemy>& chara)
 	if (Key->IsKeyAction(DIK_3)) { m_WallHack = !m_WallHack; }
 	if (Key->IsKeyAction(DIK_4)) { m_TriggerHappy = !m_TriggerHappy; RAINBOW_WINDOW = m_TriggerHappy; }
 	if (Key->IsKeyAction(DIK_6)) { m_Invincible = !m_Invincible; }
+	if (Key->IsKeyAction(DIK_7)) { m_ThroughWall = !m_ThroughWall; }
 
 
 	// 合計のベクトル量分位置を更新

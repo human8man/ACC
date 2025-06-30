@@ -246,9 +246,9 @@ RayInfo StaticMesh::IsHitForRay(const RAY& pRay )
 
 	// 逆行列を求める
 	D3DXMatrixInverse( &mInverseWorld, nullptr, &mWorld );
-	// レイの始点、終点に反映
-	D3DXVec3TransformCoord( &StartPoint, &StartPoint, &mInverseWorld );
-	D3DXVec3TransformCoord( &EndPoint, &EndPoint, &mInverseWorld );
+	D3DXVec3TransformCoord(&StartPoint, &StartPoint, &mInverseWorld);
+	D3DXVec3TransformCoord(&EndPoint, &EndPoint, &mInverseWorld);
+	D3DXVec3TransformNormal(&vDirection, &vDirection, &mInverseWorld);
 	D3DXVec3Normalize(&vDirection, &vDirection);
 
 	BOOL bHit = FALSE;		// 命中フラグ

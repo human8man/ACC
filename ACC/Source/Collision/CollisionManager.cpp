@@ -160,7 +160,7 @@ void CollisionManager::PlayerBulletsCol(
 
 		// 床判定
 		float diffY = fabsf(bulletCenter.y - floorCenter.y);
-		if (diffY < DistanceToFloorY)
+		if (diffY < DistanceToFloorY && !player.GetThroughWall())
 		{
 			point = GJK::GJKC(bulletCol, floorCol);
 			if (point.Col)
@@ -173,7 +173,7 @@ void CollisionManager::PlayerBulletsCol(
 		}
 
 		// 柱判定
-		if (!hit)
+		if (!hit && !player.GetThroughWall())
 		{
 			for (const auto& cylinder : cylinders)
 			{
@@ -444,30 +444,37 @@ void CollisionManager::RaytoObjeCol(
 	StaticMesh& floor, 
 	const std::vector<std::unique_ptr<StaticMesh>>& cylinders)
 {
-	D3DXVECTOR3 camlookpos = Camera::GetInstance()->GetPos() + Camera::GetInstance()->GetCamDir() * 100.f;
+	D3DXVECTOR3 camPos = Camera::GetInstance()->GetPos();
+	D3DXVECTOR3 camDir = Camera::GetInstance()->GetCamDir();
 
-	RayInfo sendCamera = { false, camlookpos, 5000.f };
+	D3DXVECTOR3 defaultTarget = camPos + camDir * 100000.0f;
 
-	RayInfo groundRay = floor.IsHitForRay(Camera::GetInstance()->GetRay());
+	RayInfo nearestHit;
+	nearestHit.Hit = false;
+	nearestHit.HitPos = defaultTarget;
+	nearestHit.Length = FLT_MAX;
 
-	if (groundRay.Hit && sendCamera.Length > groundRay.Length)
-		sendCamera = groundRay;
+	const RAY& ray = Camera::GetInstance()->GetRay();
+
+	RayInfo groundRay = floor.IsHitForRay(ray);
+	if (groundRay.Hit && groundRay.Length < nearestHit.Length)
+		nearestHit = groundRay;
 
 	for (const auto& cyl : cylinders)
 	{
-		RayInfo cylRay = cyl->IsHitForRay(Camera::GetInstance()->GetRay());
-		if (cylRay.Hit && sendCamera.Length > cylRay.Length)
-			sendCamera = cylRay;
+		RayInfo cylRay = cyl->IsHitForRay(ray);
+		if (cylRay.Hit && cylRay.Length < nearestHit.Length)
+			nearestHit = cylRay;
 	}
 
 	for (const auto& enemy : enemies)
 	{
-		RayInfo enemyRay = enemy->IsHitForRay(Camera::GetInstance()->GetRay());
-		if (enemyRay.Hit && sendCamera.Length > enemyRay.Length)
-			sendCamera = enemyRay;
+		RayInfo enemyRay = enemy->IsHitForRay(ray);
+		if (enemyRay.Hit && enemyRay.Length < nearestHit.Length)
+			nearestHit = enemyRay;
 	}
 
-	Camera::GetInstance()->SetRayHit(sendCamera.HitPos);
+	Camera::GetInstance()->SetRayHit(nearestHit.HitPos);
 }
 
 
@@ -480,54 +487,44 @@ int CollisionManager::FindNearestVisibleEnemy(
 {
 	D3DXVECTOR3 campos = Camera::GetInstance()->GetPos();
 
-	std::vector<float> cyllengths;
-
-	// デバッグ用: ヒットしたかどうか
-	std::vector<bool> cylHits;
+	int nearestIndex = 0;
+	float nearestDist = FLT_MAX;
 
 	for (size_t i = 0; i < enemies.size(); ++i)
 	{
 		D3DXVECTOR3 enemyPos = enemies[i]->GetPos();
-		// ベクトル
 		D3DXVECTOR3 vecToEnemy = enemyPos - campos;
-		// 距離
-		const float MaxRayLength = 10000.0f;
 		float lengthToEnemy = D3DXVec3Length(&vecToEnemy);
-		// 正規化方向
+
+		const float MaxRayLength = 10000.0f;
+
 		D3DXVECTOR3 axis;
 		D3DXVec3Normalize(&axis, &vecToEnemy);
-		// Y軸回転角度
-		float rotationY = atan2f(axis.x, axis.z);
-		// RAY生成
+
 		RAY camtoenemy;
 		camtoenemy.Position = campos;
 		camtoenemy.Axis = axis;
 		camtoenemy.Length = MaxRayLength;
-		camtoenemy.RotationY = rotationY;
-
+		camtoenemy.RotationY = atan2f(axis.x, axis.z);
 
 		bool visible = true;
 
 		for (const auto& cyl : cylinders)
 		{
 			RayInfo cylHit = cyl->IsHitForRay(camtoenemy);
-			cyllengths.push_back(cylHit.Length);
-			cylHits.push_back(cylHit.Hit);
 
-			// ヒットしている場合は射線が遮られている
-			if (cylHit.Hit && cylHit.Length <= lengthToEnemy)
+			if (cylHit.Hit && cylHit.Length < lengthToEnemy - 0.01f)
 			{
 				visible = false;
 				break;
 			}
 		}
 
-		if (visible)
+		if (visible && lengthToEnemy < nearestDist)
 		{
-			// 射線が通っていればこの敵を返す
-			return static_cast<int>(i);
+			nearestDist = lengthToEnemy;
+			nearestIndex = static_cast<int>(i);
 		}
 	}
-
-	return 0;
+	return nearestIndex;
 }
