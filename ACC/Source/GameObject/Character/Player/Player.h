@@ -39,6 +39,7 @@ public:
 	const bool& GetWallHack()		const { return m_WallHack; }
 	const bool& GetTriggerHappy()	const { return m_TriggerHappy; }
 	const bool& GetInvincible()		const { return m_Invincible; }
+	const bool& GetThroughWall()	const { return m_ThroughWall; }
 
 	// 移動量の追加
 	void AddVec(D3DXVECTOR3 vec) { m_vPosition += vec; }
@@ -70,4 +71,5 @@ private:
 	bool m_WallHack;	// ウォールハック
 	bool m_TriggerHappy;// 連射モード
 	bool m_Invincible;	// 無敵
+	bool m_ThroughWall;	// 壁貫通
 };

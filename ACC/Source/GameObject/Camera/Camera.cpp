@@ -1,7 +1,6 @@
 ﻿#include "Camera.h"
 #include "DirectInput/DirectInput.h"
 
-
 Camera::Camera()
 	: m_Camera			()
 	, m_WindowMid		(static_cast<LONG>(NOWFWND_W / 2.f), static_cast<LONG>(NOWFWND_H / 2.f))
@@ -81,8 +80,10 @@ void Camera::Update()
 	m_pRay.Position	= m_Camera.Pos;						// レイ座標をカメラ座標にする
 	m_CamDirection	= m_Camera.Look - m_Camera.Pos;		// カメラの正面ベクトルの計算
 	D3DXVec3Normalize(&m_CamDirection, &m_CamDirection);// 正面ベクトルの正規化
-	m_pRay.Axis = m_CamDirection;						// レイにベクトルを適応
-	m_pRay.Length = 1.f;								// レイ長さの設定
+	D3DXVECTOR3 dir = m_Camera.Look - m_Camera.Pos;
+	D3DXVec3Normalize(&dir, &dir);
+	m_pRay.Axis = dir;									// レイにベクトルを適応
+	m_pRay.Length = 100000.f;							// レイ長さの設定
 }
 
 
