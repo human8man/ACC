@@ -122,12 +122,18 @@ void Player::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 
 	D3DXVECTOR4 color = { 0.f, 0.f, 1.f, 1.f };
 
-	// 弾とそのエフェクトの描画
+	// 弾の描画
 	for (size_t i = 0; i < m_pBullets.size(); ++i) { 
 		hEffect = Effect::Play(Effect::BulletSmoke, m_pBullets[i]->GetPos());
+		D3DXVECTOR3 dir = m_pBullets[i]->GetMoveVec();
+		float ry = atan2f(dir.x, dir.z);
+		float horizontalLength = sqrtf(dir.x * dir.x + dir.z * dir.z);
+		float rx = atan2f(-dir.y, horizontalLength);
+		Effect::SetRot(hEffect, D3DXVECTOR3(rx, ry, 0.0f));
+
 		m_pBullets[i]->Draw(View, Proj, Light);
 
-		// ウォールハック中はメッシュ線が出現
+		// ウォールハック中はメッシュ線を出現
 		if (m_WallHack) {
 			DirectX11::GetInstance()->SetDepth(false);
 			m_pMeshLine->DrawMeshWireframeFromVertices(*m_pBullets[i]->GetMesh(), *m_pBullets[i], View, Proj, color, 5.f);
@@ -286,7 +292,7 @@ void Player::ShotProcess()
 	Mouse* Mouse = DirectInput::GetInstance()->CDMouse();
 	
 	// クールタイムが終了していたら射撃可能
-	if (m_BulletCoolTime <= 0.f) { m_CanShot = true; }
+	if (m_BulletCoolTime < 0.f) { m_CanShot = true; }
 
 	// 左クリックが押されいない場合
 	if (!(Mouse->IsLAction() || m_TriggerHappy && Mouse->IsLDown())) { return; }
@@ -299,7 +305,8 @@ void Player::ShotProcess()
 	D3DXVec3Normalize(&shootdir, &shootdir);	// 正規化
 	
 	// 射撃条件が整っている場合
-	if (m_CanShot && m_CharaInfo.Ammo != 0 && m_ReloadTime <= 0 || m_CanShot && m_TriggerHappy)
+	if (m_CanShot && m_CharaInfo.Ammo != 0 && m_ReloadTime <= 0 
+	||	m_CanShot && m_TriggerHappy)
 	{
 		// 連射モードの場合クールタイムや残弾数の設定.
 		if (m_TriggerHappy) {
