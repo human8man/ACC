@@ -33,7 +33,7 @@ Character::Character()
 	, m_ReloadTimeMax		( Time::GetDeltaTime() * 120.f )
 	, m_BulletCoolTime		( 0.f )
 	, m_BulletCoolTimeMax	( Time::GetDeltaTime() * 20.f )
-	, m_BulletCoolTimeMin	( Time::GetDeltaTime() * 1.f )
+	, m_BulletCoolTimeMin	( Time::GetDeltaTime() * 2.f )
 	, m_BulletSpeed			( 180.f )
 	, m_CanShot				( true )
 

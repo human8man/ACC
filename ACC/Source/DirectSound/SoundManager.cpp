@@ -6,21 +6,21 @@ static SoundManager::SoundList s_SoundList[] =
 {
 	// 10000Ç™MAXÇÃâπó 
 	// Ç±Ç±Ç≈ê›íËÇ∑ÇÈâπó ÇÃêîílÇÕMAXéûÇÃâπó ÇÃêîíl
-	{ SoundManager::enList::SE_CritHit		,"Data\\Sound\\SE\\CritHit.wav"		, {"SE_CritHit"}	,10000 },
+	{ SoundManager::enList::SE_CritHit		,"Data\\Sound\\SE\\CritHit.wav"		, {"SE_CritHit"}	, 9000 },
 	{ SoundManager::enList::SE_Hit			,"Data\\Sound\\SE\\Hit.wav"			, {"SE_Hit"}		,10000 },
-	{ SoundManager::enList::SE_NoAmmo		,"Data\\Sound\\SE\\NoAmmo.wav"		, {"SE_NoAmmo"}		, 9000 },
-	{ SoundManager::enList::SE_Reload		,"Data\\Sound\\SE\\Reload.wav"		, {"SE_Reload"}		, 9000 },
-	{ SoundManager::enList::SE_ReloadEnd	,"Data\\Sound\\SE\\ReloadEnd.wav"	, {"SE_ReloadEnd"}	, 9000 },
+	{ SoundManager::enList::SE_NoAmmo		,"Data\\Sound\\SE\\NoAmmo.wav"		, {"SE_NoAmmo"}		, 9500 },
+	{ SoundManager::enList::SE_Reload		,"Data\\Sound\\SE\\Reload.wav"		, {"SE_Reload"}		, 9500 },
+	{ SoundManager::enList::SE_ReloadEnd	,"Data\\Sound\\SE\\ReloadEnd.wav"	, {"SE_ReloadEnd"}	, 9500 },
 	{ SoundManager::enList::SE_SelectMove	,"Data\\Sound\\SE\\SelectMove.wav"	, {"SE_SelectMove"}	, 9000 },
-	{ SoundManager::enList::SE_Shot			,"Data\\Sound\\SE\\Shot.wav"		, {"SE_Shot"}		,10000 },
+	{ SoundManager::enList::SE_Shot			,"Data\\Sound\\SE\\Shot.wav"		, {"SE_Shot"}		, 8250 },
 	{ SoundManager::enList::SE_Dash			,"Data\\Sound\\SE\\Dash.wav"		, {"SE_Dash"}		, 9000 },
 	{ SoundManager::enList::SE_Jump			,"Data\\Sound\\SE\\Jump.wav"		, {"SE_Jump"}		, 9000 },
-	{ SoundManager::enList::SE_Damage		,"Data\\Sound\\SE\\Damage.wav"		, {"SE_Damage"}		,10000 },
-	{ SoundManager::enList::SE_DamageCrit	,"Data\\Sound\\SE\\DamageCrit.wav"	, {"SE_DamageCrit"}	,10000 },
-	{ SoundManager::enList::SE_Lose			,"Data\\Sound\\SE\\Lose.wav"		, {"SE_Lose"}		,10000 },
-	{ SoundManager::enList::SE_Win			,"Data\\Sound\\SE\\Win.wav"			, {"SE_Win"}		,10000 },
+	{ SoundManager::enList::SE_Damage		,"Data\\Sound\\SE\\Damage.wav"		, {"SE_Damage"}		, 9000 },
+	{ SoundManager::enList::SE_DamageCrit	,"Data\\Sound\\SE\\DamageCrit.wav"	, {"SE_DamageCrit"}	, 9000 },
+	{ SoundManager::enList::SE_Lose			,"Data\\Sound\\SE\\Lose.wav"		, {"SE_Lose"}		, 9000 },
+	{ SoundManager::enList::SE_Win			,"Data\\Sound\\SE\\Win.wav"			, {"SE_Win"}		, 9000 },
 																									  
-	{ SoundManager::enList::BGM_Game		,"Data\\Sound\\BGM\\Game.wav"		, {"BGM_Game"}		, 9000 },
+	{ SoundManager::enList::BGM_Game		,"Data\\Sound\\BGM\\Game.wav"		, {"BGM_Game"}		, 8500 },
 	{ SoundManager::enList::BGM_Title		,"Data\\Sound\\BGM\\Title.wav"		, {"BGM_Title"}		, 9000 },
 };
 

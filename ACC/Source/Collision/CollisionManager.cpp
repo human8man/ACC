@@ -23,6 +23,7 @@ void CollisionManager::ColJudge(
 	StaticMesh& floor,
 	const std::vector<std::unique_ptr<StaticMesh>>& cylinders)
 {
+	// プレイヤー判定
 	m_PlayerLanding = false;
 	PlayertoFloorCol(player, floor);
 	PlayertoCylinderCol(player, cylinders);
@@ -35,6 +36,7 @@ void CollisionManager::ColJudge(
 	}
 	PlayerBulletsCol(player, enemies, floor, cylinders);
 
+	// 敵判定
 	m_EnemyLandingFlags.assign(enemies.size(), false);
 	EnemytoFloorCol(enemies, floor);
 	EnemytoCylinderCol(enemies, cylinders);
@@ -95,15 +97,18 @@ void CollisionManager::PlayertoCylinderCol(
 	Player& player,
 	const std::vector<std::unique_ptr<StaticMesh>>& cylinders)
 {
+	float DistanceToCylinder = 100.f;
+
 	for (const auto& cyl : cylinders)
 	{
 		Collider cylCol, playerCol;
 		cylCol.SetVertex(cyl->GetObjectInfo(), cyl->GetVertices());
 		playerCol.SetVertex(player.GetObjectInfo(), player.GetMesh()->GetVertices());
-
 		CollisionPoints points = GJK::GJKC(cylCol, playerCol);
+		D3DXVECTOR3 diff = playerCol.GetCenter() - cylCol.GetCenter();
 
-		if (points.Col)
+
+		if (points.Col && D3DXVec3Length(&diff) <= DistanceToCylinder)
 		{
 			if (points.Normal.y > 0.f)
 			{
@@ -139,7 +144,7 @@ void CollisionManager::PlayerBulletsCol(
 	// 当たり判定用
 	float DistanceToFloorY = 5.f;
 	float DistanceToCylinder = 100.f;
-	float DistanceToEnemy = 30.f;
+	float DistanceToEnemy = 10.f;
 
 	Collider bulletCol, floorCol, cylinderCol, enemyCol;
 	CollisionPoints point;
@@ -289,6 +294,8 @@ void CollisionManager::EnemytoCylinderCol(
 	const std::vector<std::unique_ptr<Enemy>>& enemies,
 	const std::vector<std::unique_ptr<StaticMesh>>& cylinders)
 {
+	float DistanceToCylinder = 100.f;
+
 	for (const auto& cyl : cylinders)
 	{
 		Collider cylCol, enemyCol;
@@ -297,8 +304,9 @@ void CollisionManager::EnemytoCylinderCol(
 		for (size_t i = 0; i < enemies.size(); ++i) {
 			enemyCol.SetVertex(enemies[i]->GetObjectInfo(), enemies[i]->GetMesh()->GetVertices());
 			CollisionPoints points = GJK::GJKC(cylCol, enemyCol);
+			D3DXVECTOR3 diff = enemyCol.GetCenter() - cylCol.GetCenter();
 
-			if (points.Col)
+			if (points.Col && D3DXVec3Length(&diff) <= DistanceToCylinder)
 			{
 				if (points.Normal.y > 0.f)
 				{
@@ -335,7 +343,7 @@ void CollisionManager::EnemyBulletsCol(
 	// 当たり判定用
 	const float DistanceToFloorY = 5.f;
 	const float DistanceToCylinder = 100.f;
-	const float DistanceToPlayer = 30.f;
+	const float DistanceToPlayer = 10.f;
 
 	Collider bulletCol, floorCol, cylinderCol, playerCol;
 	CollisionPoints point;

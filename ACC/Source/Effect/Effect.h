@@ -95,6 +95,18 @@ public:
 	static void StopAll() {
 		Effect::GetInstance()->m_pManager->StopAllEffects();
 	}
+	// 回転
+	static void SetRot(::EsHandle handle, const D3DXVECTOR3& rot) {
+		Effect::GetInstance()->m_pManager->SetRotation(handle, rot.x, rot.y, rot.z);
+	}
+	// スケール
+	static void SetScale(::EsHandle handle, const D3DXVECTOR3& size) {
+		Effect::GetInstance()->m_pManager->SetScale(handle, size.x, size.y, size.z);
+	}
+	// 速度
+	static void SetTimeScale(::EsHandle handle, float scale) {
+		Effect::GetInstance()->m_pManager->SetTimeScaleByHandle(handle, scale);
+	}
 
 private:
 	// データ解放

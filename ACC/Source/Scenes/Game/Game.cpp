@@ -33,7 +33,7 @@ Game::Game(HWND hWnd)
 	, m_pCylinders			()
 	
 	, m_pPlayer				( nullptr )
-	, m_EnemyCount			( 15 )
+	, m_EnemyCount			( 30 )
 	, m_pEnemies			( )
 
 	, m_pCamRay				( nullptr )
@@ -278,19 +278,6 @@ void Game::Update()
 	}
 
 	Time::GetInstance()->SetTimeScale(m_SlowScale);
-	if (m_pEnemies.empty()) { return; }
-	ImGui::Begin("enemies window");
-	char indexlabel[32];
-	sprintf_s(indexlabel, "NearEnemyIndex %d", m_NearEnemyIndex);
-	ImGui::Text(indexlabel);
-	for (size_t i = 0; i < m_pEnemies.size(); ++i) {
-		// ユニークラベル作成
-		char label[32];
-		sprintf_s(label, "Enemypos %zu", i);
-		D3DXVECTOR3 pos = m_pEnemies[i]->GetPos();
-		ImGui::DragFloat3(label, &pos.x, 0.1f);
-	}
-	ImGui::End();
 }
 
 
