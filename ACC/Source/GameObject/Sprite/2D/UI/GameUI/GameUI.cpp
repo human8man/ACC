@@ -29,6 +29,7 @@ GameUI::GameUI()
 	, m_WallHack		( false )
 	, m_TriggerHappy	( false )
 	, m_Slow			( false )
+	, m_Invincible		( false )
 	
 	, m_CrosshairEase		( 0.f )
 	, m_CrosshairEaseMax	( Time::GetDeltaTime() * 150.f )
@@ -101,6 +102,7 @@ void GameUI::Update(std::unique_ptr<Player>& chara)
 	m_WallHack		= chara->GetWallHack();
 	m_ReloadTime	= chara->GetReloadTime();
 	m_TriggerHappy	= chara->GetTriggerHappy();
+	m_Invincible	= chara->GetInvincible();
 	m_ReloadTimeMax = chara->GetReloadTimeMax();
 	m_HP			= chara->GetCharaInfo().HP;
 	m_Ammo			= chara->GetCharaInfo().Ammo;
@@ -171,6 +173,7 @@ void GameUI::Draw()
 		if (spritename == "WallHack")		{ m_pUIs[i]->SetPatternNo( m_WallHack,		0 ); }
 		if (spritename == "TriggerHappy")	{ m_pUIs[i]->SetPatternNo( m_TriggerHappy,	0 ); }
 		if (spritename == "Slow")			{ m_pUIs[i]->SetPatternNo( m_Slow,			0 ); }
+		if (spritename == "Invincible")		{ m_pUIs[i]->SetPatternNo( m_Invincible,	0 ); }
 
 		m_pUIs[i]->Draw();
 	}

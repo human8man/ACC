@@ -10,8 +10,11 @@
 class CollisionManager
 {
 public:
+	CollisionManager();
+	~CollisionManager();
+
 	/**************************************************************************
-	* @brief  当たり判定.
+	* @brief  当たり判定
 	* @param  player	: プレイヤー
 	* @param  enemies	: 敵配列
 	* @param  floor		: 床
@@ -26,7 +29,7 @@ public:
 
 
 	/**************************************************************************
-	* @brief  プレイヤーと床の当たり判定.
+	* @brief  プレイヤーと床の当たり判定
 	* @param  player	: プレイヤー
 	* @param  floor		: 床
 	**************************************************************************/
@@ -37,9 +40,9 @@ public:
 
 
 	/**************************************************************************
-	* @brief  プレイヤーと柱の当たり判定.
+	* @brief  プレイヤーと柱の当たり判定
 	* @param  player	: プレイヤー
-	* @param  floor		: 柱配列
+	* @param  cylinder	: 柱配列
 	**************************************************************************/
 	void PlayertoCylinderCol(
 		Player& player,
@@ -48,7 +51,20 @@ public:
 
 
 	/**************************************************************************
-	* @brief  敵と床の当たり判定.
+	* @brief  プレイヤーの弾の当たり判定
+	* @param  player	: プレイヤー
+	* @param  floor		: 柱配列
+	**************************************************************************/
+	void PlayerBulletsCol(
+		Player& player,
+		const std::vector<std::unique_ptr<Enemy>>& enemies,
+		StaticMesh& floor,
+		const std::vector<std::unique_ptr<StaticMesh>>& cylinders
+	);
+
+
+	/**************************************************************************
+	* @brief  敵と床の当たり判定
 	* @param  player	: 敵配列
 	* @param  floor		: 床
 	**************************************************************************/
@@ -59,9 +75,9 @@ public:
 
 
 	/**************************************************************************
-	* @brief  敵と柱の当たり判定.
+	* @brief  敵と柱の当たり判定
 	* @param  enemies	: 敵配列
-	* @param  floor		: 床
+	* @param  cylinder	: 柱配列
 	**************************************************************************/
 	void EnemytoCylinderCol(
 		const std::vector<std::unique_ptr<Enemy>>& enemies,
@@ -70,7 +86,21 @@ public:
 
 
 	/**************************************************************************
-	* @brief  レイの当たり判定.
+	* @brief  敵の弾の当たり判定
+	* @param  enemies	: 敵配列
+	* @param  floor		: 床
+	* @param  cylinder	: 柱配列
+	**************************************************************************/
+	void EnemyBulletsCol(
+		Player& player,
+		const std::vector<std::unique_ptr<Enemy>>& enemies,
+		StaticMesh& floor,
+		const std::vector<std::unique_ptr<StaticMesh>>& cylinders
+	);
+
+
+	/**************************************************************************
+	* @brief  レイの当たり判定
 	* @param  enemies	: 敵配列
 	* @param  floor		: 床
 	* @param  cylinders	: 柱配列
@@ -80,6 +110,21 @@ public:
 		StaticMesh& floor,
 		const std::vector<std::unique_ptr<StaticMesh>>& cylinders
 	);
-private:
-	std::unique_ptr<GJK> m_pGJK;
+
+
+	/**************************************************************************
+	* @brief  射線が通っている最短距離の敵のインデックスの取得
+	* @param  playerPos	: プレイヤー座標
+	* @param  enemies	: 敵配列
+	* @param  cylinders	: 柱配列
+	* @return int		: インデックス
+	**************************************************************************/
+	int FindNearestVisibleEnemy(
+		const std::vector<std::unique_ptr<Enemy>>& enemies,
+		const std::vector<std::unique_ptr<StaticMesh>>& cylinders);
+
+private:	
+	// 一度だけ処理を通すもののためのフラグ.
+	std::vector<bool> m_EnemyLandingFlags;
+	bool m_PlayerLanding ;
 };

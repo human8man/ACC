@@ -23,6 +23,7 @@ Player::Player()
 	, m_Homing		( false )
 	, m_WallHack	( false )
 	, m_TriggerHappy( false )
+	, m_Invincible	( false )
 {
 	// 初期化
 	m_CharaInfo.HP = m_CharaInfo.MaxHP;
@@ -139,106 +140,6 @@ void Player::Draw( D3DXMATRIX& View, D3DXMATRIX& Proj, LIGHT& Light )
 }
 
 
-//============================================================================
-//		当たり判定処理
-//============================================================================
-void Player::Collision(std::unique_ptr<Enemy>& egg, Collider floor, Collider cylinder)
-{
-	// 距離チェック用変数
-	float DistanceToFloorY		= 5.f;		// 床とのY座標距離
-	float DistanceToCylinder	= 100.f;	// 柱
-	float DistanceToEnemy		= 30.f;		// 敵
-	Collider Bullet,enemyegg;
-
-	// エフェクト事に必要なハンドルを用意
-	static ::EsHandle hEffect = -1;
-
-	// 敵データを取得
-	enemyegg.SetVertex( egg->GetObjectInfo(), egg->GetMesh()->GetVertices());
-
-	// 弾の判定
-	for (size_t i = 0; i < m_pBullets.size(); ++i) {
-		// 各中心点の取得
-		D3DXVECTOR3 bulletCenter   = m_pBullets[i]->GetPos();
-		D3DXVECTOR3 floorCenter    = floor.GetCenter();
-		D3DXVECTOR3 cylinderCenter = cylinder.GetCenter();
-		D3DXVECTOR3 enemyCenter    = enemyegg.GetCenter();
-		
-		// 距離計算
-		D3DXVECTOR3 diffCylinder = bulletCenter - cylinderCenter;
-		D3DXVECTOR3 diffEnemy    = bulletCenter - enemyCenter;
-		
-		float diffY				= fabsf(bulletCenter.y - floorCenter.y);
-		float distToCylinder	= D3DXVec3Length(&diffCylinder);
-		float distToEnemy		= D3DXVec3Length(&diffEnemy);
-
-		// 弾データを取得
-		Bullet.SetVertex( m_pBullets[i]->GetObjectInfo(), m_pMeshBullet->GetVertices());
-		
-		// 当たり判定情報用の変数を宣言
-		CollisionPoints pointsbc, pointsbf, pointsbe;
-
-		// 距離が近いときだけ判定
-		if (diffY < DistanceToFloorY)
-			pointsbf = m_pGJK->GJKC(Bullet, floor);
-
-		if (distToCylinder < DistanceToCylinder)
-			pointsbc = m_pGJK->GJKC(Bullet, cylinder);
-
-		if (distToEnemy < DistanceToEnemy)
-			pointsbe = m_pGJK->GJKC(Bullet, enemyegg);
-
-		// 柱や床にあたった場合削除
-		if (pointsbc.Col || pointsbf.Col)
-		{
-			// エフェクトの再生
-			hEffect = Effect::Play(Effect::Dust, m_pBullets[i]->GetPos() - m_pBullets[i]->GetMoveVec() * 2);
-
-			m_pBullets[i].reset();
-			m_pBullets.erase(m_pBullets.begin() + i);
-			--i;
-			continue;
-		}
-
-		// エネミーと弾が当たった場合
-		if ( pointsbe.Col ) {
-			// ヘッドショット判定(気室判定)
-			if (m_pBullets[i]->GetPos().y < egg->GetPos().y + m_EggAirRoomY) {
-				// HPをクリティカルダメージ分減らす
-				egg->CritDamage();
-				// エフェクトの再生
-				hEffect = Effect::Play(Effect::CritHit, egg->GetPos());
-				// 命中種類の設定
-				m_HitKind = HitKind::Crit;
-				// クリティカル命中音を鳴らす
-				SoundManager::GetInstance()->Play(SoundManager::enList::SE_CritHit);
-			}
-			else {
-				// HPを胴体ダメージ分減らす
-				egg->BodyDamage();
-				// エフェクトがズレていたのでずらしてからエフェクトの再生
-				D3DXVECTOR3 enemypos = egg->GetPos();
-				enemypos.y += 2.f;
-				hEffect = Effect::Play(Effect::Hit, enemypos);
-				// 命中種類の設定
-				m_HitKind = HitKind::Hit;
-				// 命中音を鳴らす
-				SoundManager::GetInstance()->Play(SoundManager::enList::SE_Hit);
-			}
-
-			// 命中した
-			m_Hit = true;
-
-			// 当たったあとは削除
-			m_pBullets[i].reset();
-			m_pBullets.erase(m_pBullets.begin() + i);
-			--i;
-			continue;
-		}
-	}
-}
-
-
 //-----------------------------------------------------------------------------
 //		キー入力処理
 //-----------------------------------------------------------------------------
@@ -284,6 +185,7 @@ void Player::KeyInput(std::unique_ptr<Enemy>& chara)
 	if (Key->IsKeyAction(DIK_2)) { m_Homing = !m_Homing; }
 	if (Key->IsKeyAction(DIK_3)) { m_WallHack = !m_WallHack; }
 	if (Key->IsKeyAction(DIK_4)) { m_TriggerHappy = !m_TriggerHappy; RAINBOW_WINDOW = m_TriggerHappy; }
+	if (Key->IsKeyAction(DIK_6)) { m_Invincible = !m_Invincible; }
 
 
 	// 合計のベクトル量分位置を更新
@@ -443,5 +345,11 @@ void Player::PlayerImGui()
 	ImGui::Text("Reload%f", m_ReloadTime);
 	ImGui::Text("DashCool%f", m_DashCoolTime);
 	ImGui::Text("BulletCool%f", m_BulletCoolTime);
+	if (m_CanJump) {
+		ImGui::Text("CanJump", m_BulletCoolTime);
+	}
+	if (m_Landing) {
+		ImGui::Text("Landing", m_BulletCoolTime);
+	}
 	ImGui::End();
 }

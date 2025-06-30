@@ -29,17 +29,19 @@ public:
 	void SetLanding(bool flag)		{ m_Landing = flag; }
 	const bool& GetLanding()		const { return m_Landing; }
 
+
+	void SetHit(bool flag)			{ m_Hit = flag; }
+	void SetHitKind(HitKind kind)	{ m_HitKind = kind; }
 	const int& GetHitKind()			const { return m_HitKind; }
 	const bool& GetHit()			const { return m_Hit; }
 	const bool& GetHoming()			const { return m_Homing; }
 	const bool& GetAutoAim()		const { return m_AutoAim; }
 	const bool& GetWallHack()		const { return m_WallHack; }
 	const bool& GetTriggerHappy()	const { return m_TriggerHappy; }
+	const bool& GetInvincible()		const { return m_Invincible; }
 
 	// 移動量の追加
 	void AddVec(D3DXVECTOR3 vec) { m_vPosition += vec; }
-	// 当たり判定処理(エネミー、床、柱)
-	void Collision(std::unique_ptr<Enemy>& egg, Collider floor, Collider cylinder);
 private:
 	// キー入力処理
 	void KeyInput(std::unique_ptr<Enemy>& chara);
@@ -67,4 +69,5 @@ private:
 	bool m_Homing;		// ホーミング
 	bool m_WallHack;	// ウォールハック
 	bool m_TriggerHappy;// 連射モード
+	bool m_Invincible;	// 無敵
 };

@@ -217,13 +217,15 @@ std::vector<DWORD> StaticMesh::GetIndex() const
 RayInfo StaticMesh::IsHitForRay(const RAY& pRay )
 {
 	FLOAT vDistance;
-	D3DXVECTOR3 vAxis, StartPoint, EndPoint, vIntersect;
+	D3DXVECTOR3 vAxis, StartPoint, EndPoint, vIntersect, vDirection;
 	D3DXMATRIX mTran, mRot, mScale, mWorld, mInverseWorld, mYaw, mPitch, mRoll;
 	RayInfo info;
 
 	// レイの方向ベクトルと位置を設定
 	vAxis		= pRay.Axis;	 // レイの方向（軸ベクトル）
 	StartPoint	= pRay.Position; // レイの開始位置
+	vDirection	= pRay.Axis;
+
 	EndPoint = StartPoint + (vAxis * pRay.Length); // レイの終点を計算
 
 	// 移動処理
@@ -240,16 +242,14 @@ RayInfo StaticMesh::IsHitForRay(const RAY& pRay )
 	D3DXMatrixScaling(&mScale, m_vScale.x, m_vScale.y, m_vScale.z);
 
 	// ワールド行列計算
-	mWorld = mScale * mTran;
+	mWorld = mScale * mRot * mTran;
 
 	// 逆行列を求める
 	D3DXMatrixInverse( &mInverseWorld, nullptr, &mWorld );
 	// レイの始点、終点に反映
 	D3DXVec3TransformCoord( &StartPoint, &StartPoint, &mInverseWorld );
 	D3DXVec3TransformCoord( &EndPoint, &EndPoint, &mInverseWorld );
-
-	// 向きと長さ（大きさ）を求める
-	D3DXVECTOR3 vDirection = EndPoint - StartPoint;
+	D3DXVec3Normalize(&vDirection, &vDirection);
 
 	BOOL bHit = FALSE;		// 命中フラグ
 	DWORD dwIndex = 0;		// インデックス番号

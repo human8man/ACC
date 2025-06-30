@@ -48,6 +48,7 @@ private:
 	bool	m_WallHack;		// ウォールハック
 	bool	m_TriggerHappy;	// 連射モード
 	bool	m_Slow;			// スローモード
+	bool	m_Invincible;	// 無敵モード
 
 	// クロスヘアのイージングに使用
 	float	m_CrosshairEase;
