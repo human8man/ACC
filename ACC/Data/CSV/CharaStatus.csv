@@ -32,8 +32,8 @@ ReloadTimeMax,120.0
 BulletCoolTimeMax,20.0
 // コッキング最小時間{4.0}
 BulletCoolTimeMax,4.0
-// 弾速{4.0}
-BulletSpeed,4.0
+// 弾速{120.0}
+BulletSpeed,120.0
 
 // キャラのジャンプ力{25.0}
 JumpPowerMax,25.0
