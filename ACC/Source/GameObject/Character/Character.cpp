@@ -54,6 +54,9 @@ Character::Character()
 
 	, m_CharaInfo			()
 	, m_SumVec				(ZEROVEC3)
+
+	, m_RotGun				( false ) 
+	, m_RotSpeed			( 0.5f )
 {
 	// レイの設定
 	m_pRayY			= std::make_unique<RAY>();
@@ -132,8 +135,13 @@ void Character::Update()
 		m_GunRadius,
 		D3DXToRadian(m_vRotation.y + m_GunPosRevision));
 
-	// 銃の角度をプレイヤーの向き + 補正値に設定
-	m_pGun->SetRot( 0.f, -D3DXToRadian(m_vRotation.y) + m_GunRotRevision, 0.f);
+	if (!m_RotGun) {
+		// 銃の角度をプレイヤーの向き + 補正値に設定
+		m_pGun->SetRot( 0.f, -D3DXToRadian(m_vRotation.y) + m_GunRotRevision, 0.f);
+	}
+	else {
+		m_pGun->SetRot(0.f, m_pGun->GetRot().y + m_RotSpeed, 0.f);
+	}
 
 	// 弾の更新処理
 	for (size_t i = 0; i < m_pBullets.size(); ++i) {

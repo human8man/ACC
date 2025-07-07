@@ -50,6 +50,7 @@ private:
 	bool	m_Slow;			// スローモード
 	bool	m_Invincible;	// 無敵モード
 	bool	m_ThroughWall;	// 壁貫通モード
+	bool	m_RotGun;		// 銃回転モード
 
 	// クロスヘアのイージングに使用
 	float	m_CrosshairEase;
