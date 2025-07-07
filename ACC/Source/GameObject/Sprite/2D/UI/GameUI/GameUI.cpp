@@ -31,6 +31,7 @@ GameUI::GameUI()
 	, m_Slow			( false )
 	, m_Invincible		( false )
 	, m_ThroughWall		( false )
+	, m_RotGun			( false )
 	
 	, m_CrosshairEase		( 0.f )
 	, m_CrosshairEaseMax	( Time::GetDeltaTime() * 150.f )
@@ -105,6 +106,7 @@ void GameUI::Update(std::unique_ptr<Player>& chara)
 	m_TriggerHappy	= chara->GetTriggerHappy();
 	m_Invincible	= chara->GetInvincible();
 	m_ThroughWall	= chara->GetThroughWall();
+	m_RotGun		= chara->GetRotGun();
 	m_ReloadTimeMax = chara->GetReloadTimeMax();
 	m_HP			= chara->GetCharaInfo().HP;
 	m_Ammo			= chara->GetCharaInfo().Ammo;
@@ -177,6 +179,7 @@ void GameUI::Draw()
 		if (spritename == "Slow")			{ m_pUIs[i]->SetPatternNo( m_Slow,			0 ); }
 		if (spritename == "Invincible")		{ m_pUIs[i]->SetPatternNo( m_Invincible,	0 ); }
 		if (spritename == "ThroughWall")	{ m_pUIs[i]->SetPatternNo( m_ThroughWall,	0 ); }
+		if (spritename == "RotationGun")	{ m_pUIs[i]->SetPatternNo( m_RotGun,		0 ); }
 
 		m_pUIs[i]->Draw();
 	}

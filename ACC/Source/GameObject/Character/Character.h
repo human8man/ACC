@@ -49,6 +49,7 @@ public:
 	bool GetDamage()		const{ return m_Damage; }
 	bool GetCanJump()		const{ return m_CanJump; }
 	bool GetLanding()		const{ return m_Landing; }
+	bool GetRotGun()		const { return m_RotGun; }
 	void SetLanding(bool flag)	{ m_Landing = flag; }
 
 	std::vector<std::unique_ptr<Bullet>>& GetBullets()	{ return m_pBullets; }
@@ -104,4 +105,7 @@ protected:
 	CharaInfo m_CharaInfo;
 	// 合計の移動ベクトル量
 	D3DXVECTOR3 m_SumVec;
+
+	bool m_RotGun;
+	float m_RotSpeed;
 };
